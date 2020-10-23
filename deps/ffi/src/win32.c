@@ -68,9 +68,6 @@ WCHAR* bw_win32_copyAsNewWstr( bw_CStrSlice slice ) {
 	MultiByteToWideChar( CP_UTF8, 0, slice.data, (int)slice.len, str, size );
 	str[size] = L'\0';
 
-	fprintf(stderr, "------%s\n", slice.data);
-	fwprintf(stderr, L"%s: %i\n", str, size);
-
 	return str;
 }
 
