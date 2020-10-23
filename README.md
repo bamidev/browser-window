@@ -41,4 +41,4 @@ This software is made available open source under a MIT license, for maximum fre
 
 ## Note
 
-This project is currently in alpha phase. It is not really complete at this moment, and no versioning is done.
+This project is currently in alpha phase. It is not really complete at this moment, and no real versioning is used yet.
