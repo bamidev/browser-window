@@ -29,15 +29,15 @@ use crate::common::*;
 ///       making BrowserWindow not Send.
 #[derive(Clone)]
 pub struct BrowserWindow {
-	pub inner: Arc<BrowserWindowInner>,
+	pub inner: Arc<BrowserWindowInner>,	// TODO: Change this to Rc<BrowserWindowInner>, instead of using the additinal _not_send field.
 	/// Something that obviously not send or sync so that we can make sure BrowserWindow is not Send or Sync.
 	pub _not_send: PhantomData<Rc<u8>>
 }
 
 /// A thread-safe handle to a browser window.
-/// It provided the same functionality as Browserwindow.
-/// However, each function is async: it runs on the thread the application is run on, and returns when it is done.
-/// Also, it allows you to dispatch anything on that thread.
+/// It provides the same functionality as Browserwindow.
+/// However, each function is async: it runs on the GUI thread, and returns when it is done.
+/// Also, it allows you to dispatch a closure on that thread.
 #[derive(Clone)]
 pub struct BrowserWindowAsync {
 	pub inner: Arc<BrowserWindowInner>
@@ -51,8 +51,9 @@ pub struct BrowserWindowHandle {
 unsafe impl Send for BrowserWindowHandle {}
 unsafe impl Sync for BrowserWindowHandle {}
 
-/// This structure holds an handle for the c api,
-///     if this struct is dropped, the handle is dropped in c as well
+/// This structure holds an application handle and a browser window handle.
+/// The purpose of this structure is to invoke the FFI function to drop the browser window handle, when this struct is dropped naturally by Rust.
+/// So by putting this struct in an Arc<...>, you effectively have some sort garbage collection.
 pub struct BrowserWindowInner {
 	pub app: ApplicationHandle,
 	pub handle: BrowserWindowHandle
