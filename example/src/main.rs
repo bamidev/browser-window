@@ -20,9 +20,15 @@ fn main() {
 
 async fn program_logic( app: ApplicationAsync ) {
 
-	BrowserWindowBuilder::new( Source::Url( "https://www.google.com".to_owned() ) )
+	let bw = BrowserWindowBuilder::new( Source::Html( include_str!("example.html").to_owned() ) )
 		.title("Example".to_owned())
 		.width( 80 )
 		.height( 600 )
 		.spawn_async( &app ).await;
+
+	tokio::time::delay_for( tokio::time::Duration::from_millis(3000) ).await;
+
+	let cookies = bw.eval_js("document.cookie").await.expect("Something went wrong while evaluating JavaScript");
+
+	eprintln!("End of example: {}", cookies);
 }
