@@ -64,7 +64,7 @@ impl<'a,H,R> Future for DispatchFuture<'a,H,R> where
 			let mut data = Box::new( DispatchData {
 				handle: self.handle.clone(),
 				func: None,
-				result_ptr: unsafe { mem::transmute( &self.result ) },
+				result_ptr: &mut self.result as _,
 				waker: cx.waker().clone()
 			} );
 			// Move ownership of the boxed FnOnce to the data struct
