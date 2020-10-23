@@ -24,41 +24,6 @@ char* bw_cef_error_message( bw_ErrCode code, const void* data );
 
 
 
-// The task used to run javascript code in the renderer process
-class bw_BrowserWindowEvalJsTask: public CefTask {
-	bw_BrowserWindow* bw;
-	CefString js;
-	bw_BrowserWindowJsCallbackFn callback;
-	void* user_data;
-
-public:
-	bw_BrowserWindowEvalJsTask( bw_BrowserWindow* bw, CefString js, bw_BrowserWindowJsCallbackFn callback, void* user_data ) :
-		bw(bw), js(js), callback( callback ), user_data(user_data)	{}
-
-	void Execute() override {
-
-		CefString script_url( "eval" );
-		CefRefPtr<CefBrowser>* cef_ptr = (CefRefPtr<CefBrowser>*)bw->inner.cef_ptr;
-		CefRefPtr<CefV8Value> ret_val;
-		CefRefPtr<CefV8Exception> exception;
-
-		bool result = (*cef_ptr)->GetMainFrame()->GetV8Context()->Eval( js, script_url, 0, ret_val, exception );
-		if ( !result ) {
-			bw_Err error = bw_cef_v8exc_to_bwerr( exception );
-			callback( bw, user_data, NULL, &error );
-		}
-		else {
-			std::string return_string = ret_val->GetStringValue().ToString();
-			callback( bw, user_data, return_string.c_str(), NULL );
-		}
-	}
-
-private:
-	IMPLEMENT_REFCOUNTING( bw_BrowserWindowEvalJsTask );
-};
-
-
-
 void bw_BrowserWindow_close( bw_BrowserWindow* bw ) {
 	// Actually close the brower
 	CefRefPtr<CefBrowser>* cef_ptr = (CefRefPtr<CefBrowser>*)bw->inner.cef_ptr;
@@ -76,14 +41,24 @@ void bw_BrowserWindow_drop( bw_BrowserWindow* bw ) {
 void bw_BrowserWindow_eval_js( bw_BrowserWindow* bw, bw_CStrSlice js, bw_BrowserWindowJsCallbackFn cb, void* user_data ) {
 
 	// Wrap the JS code within a temporary function and execute it, converting the return value to a string
-	std::string _code = "(function () { ";
+	std::string _code = "(function () { return ";
 	_code.append( js.data, js.len );
-	_code += " })().toString()";
+	_code += "; })().toString()";
 	CefString code = _code;
 
+	// TODO: Save the cb and user_data vars in a global index of running scripts, so we can retrieve them and call them when this process is being
+
 	// Execute the javascript on the renderer process, and invoke the callback from there:
-	CefRefPtr<bw_BrowserWindowEvalJsTask> task( new bw_BrowserWindowEvalJsTask( bw, code, cb, user_data ) );
-	CefPostTask( TID_RENDERER, task.get() );
+	CefRefPtr<CefBrowser> cef_browser = *(CefRefPtr<CefBrowser>*)(bw->inner.cef_ptr);
+
+	CefRefPtr<CefProcessMessage> msg = CefProcessMessage::Create("eval-js");
+	CefRefPtr<CefListValue> args = msg->GetArgumentList();
+
+	// eval-js message arguments
+	args->SetInt( 0, 0 );	// TODO: Put new unique script ID here
+	args->SetString( 1, code );
+
+	cef_browser->GetMainFrame()->SendProcessMessage( PID_RENDERER, msg );
 }
 
 void bw_BrowserWindow_init_cef( CefRefPtr<CefBrowser> browser ) {
@@ -157,7 +132,12 @@ bw_BrowserWindow* bw_BrowserWindow_new(
 	CefRefPtr<CefBrowser> _cef_ptr = CefBrowserHost::CreateBrowserSync( info, *cef_client, source_string, settings, NULL, NULL );
 	CefRefPtr<CefBrowser>* cef_ptr = new CefRefPtr<CefBrowser>( _cef_ptr );
 	auto bw = new bw_BrowserWindow;
+	// Even though the CEF implementation doesn't use the window 'class', we still need to allocate it because some struct fields are still used.
+	bw->window = bw_Window_new( app, parent, _title, width, height, window_options, user_data );
 	bw->inner.cef_ptr = (void*)cef_ptr;
+	bw->handler = handler;
+	bw->user_data = user_data;
+	//bw->callbacks <--- TODO
 
 	bw_BrowserWindow_init_cef( *cef_ptr );
 

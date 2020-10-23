@@ -10,7 +10,7 @@
 
 
 
-class ClientHandler : public CefClient, public CefLifeSpanHandler, public CefV8Handler {
+class ClientHandler : public CefClient, public CefLifeSpanHandler {//}, public CefV8Handler {
 
 	bw_Application* app;
 	unsigned int browser_count;
@@ -36,7 +36,7 @@ public:
 
 	virtual void OnBeforeClose(CefRefPtr<CefBrowser> browser) override {
 		this->browser_count -= 1;
-		
+
 		// If the last browser window is now closed, we exit the application
 		if ( this->browser_count == 0 ) {
 			bw_Application_exit( this->app, 0 );
@@ -44,10 +44,10 @@ public:
 	}
 
 	// Virutal on CefV8Handler
-	bool Execute( const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr< CefV8Value >& retval, CefString& exception ) override {
+	/*bool Execute( const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr< CefV8Value >& retval, CefString& exception ) override {
 		//TODO: Call handler..
 		return false;
-	}
+	}*/
 
 protected:
 	IMPLEMENT_REFCOUNTING(ClientHandler);

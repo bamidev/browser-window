@@ -45,9 +45,7 @@ void _bw_Application_dispatch_exit( bw_Application* app, void* data ) {
 }
 
 void bw_Application_dispatch( bw_Application* app, bw_ApplicationDispatchFn func, void* data ) {
-
 	CefRefPtr<bw_ApplicationDispatchTask> task( new bw_ApplicationDispatchTask( app, func, data ) );
-
 	CefPostTask( TID_UI, task.get() );
 }
 
