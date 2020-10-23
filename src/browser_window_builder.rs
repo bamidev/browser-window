@@ -14,11 +14,13 @@ use std::{
 
 
 
+/// The type of content to display in a browser window
 pub enum Source {
 	Url( String ),
 	Html( String )
 }
 
+/// Allows building a BrowserWindow instance
 pub struct BrowserWindowBuilder {
 
 	parent: Option<BrowserWindowHandle>,
@@ -32,6 +34,10 @@ pub struct BrowserWindowBuilder {
 
 
 impl BrowserWindowBuilder {
+
+	/// Configure a closure that can be invoked from within JavaScript
+	/// The closure's first parameter specifies a command name.
+	/// The closure's second parameter specifies an array of string arguments.
 	pub fn handler<H>( mut self, handler: H ) -> Self where
 		H: FnMut(BrowserWindowHandle, &str, &[&str]) + Send + 'static
 	{
@@ -39,6 +45,8 @@ impl BrowserWindowBuilder {
 		self
 	}
 
+	/// Configure a parent window.
+	/// When a parent window closes, this browser window will close as well.
 	pub fn parent<B>( mut self, bw: &B ) -> Self where
 		B: Deref<Target=BrowserWindowHandle>
 	{
@@ -46,6 +54,10 @@ impl BrowserWindowBuilder {
 		self
 	}
 
+	/// Creates an instance of a browser window builder.
+	///
+	/// # Arguments
+	/// * `source` - The content that will be displayed in the browser window.
 	pub fn new( source: Source ) -> Self {
 		Self {
 			parent: None,
@@ -57,21 +69,38 @@ impl BrowserWindowBuilder {
 		}
 	}
 
+	/// Sets the title of the window
+	///
+	/// # Arguments
+	/// * `title` - The text that will be displayed in the title bar
 	pub fn title( mut self, title: String ) -> Self {
 		self.title = Some( title );
 		self
 	}
 
+	/// Sets the width that the browser window will be created with initially
+	///
+	/// # Arguments
+	/// * `width` - Width in pixels
 	pub fn width( mut self, width: u32 ) -> Self {
 		self.width = Some( width );
 		self
 	}
 
+	/// Sets the height that the browser window will be created with initially
+	///
+	/// # Arguments
+	/// * `height` - Width in pixels
 	pub fn height( mut self, height: u32 ) -> Self {
 		self.height = Some( height );
 		self
 	}
 
+	/// Creates the browser window, and immediately displays it to the user.
+	/// A browser window handle is returned.
+	///
+	/// # Arguments
+	/// * `app` - A reference to an application handle that this browser window can spawn into
 	pub fn spawn( self, app: &Application ) -> BrowserWindow {
 		BrowserWindow {
 			inner: self._spawn( (*app.inner).clone() ),
@@ -126,6 +155,7 @@ impl BrowserWindowBuilder {
 					}
 				) );
 
+				// TODO: Expose these options in the BrowserWindowBuilder
 				let window_options = bw_WindowOptions {
 					maximizable: true,
 					minimizable: true,
@@ -159,10 +189,17 @@ impl BrowserWindowBuilder {
 		}
 	}
 
+	/// Same as spawn, but asynchronous.
+	/// Returns an asynchronous handle that is available immediately.
+	/// However, this function may return before the window is actually shown.
+	/// Nevertheless, the handle is valid.
+	///
+	/// # Arguments
+	/// * `width` - Width in pixels
 	pub async fn spawn_async( self, app: &ApplicationAsync ) -> BrowserWindowAsync {
 
 		let app_inner: ApplicationHandle = (*app.inner).clone();
-		
+
 		let bw_inner = *app.dispatch(move |_| {
 			self._spawn( app_inner )
 		}).await;
@@ -173,12 +210,14 @@ impl BrowserWindowBuilder {
 	}
 }
 
+/// The data that is passed to the C FFI handler function
 struct BrowserWindowHandlerData {
 	func: Box<dyn FnMut( BrowserWindowHandle, &str, &[&str])>
 }
 
 
 
+/// Takes the arguments received from the C FFI handler callback, and converts it to a vector of strings
 fn args_to_vec<'a>( args: *const bw_CStrSlice, args_count: usize ) -> Vec<&'a str> {
 
 	let mut vec = Vec::<&str>::with_capacity( args_count );
@@ -192,6 +231,7 @@ fn args_to_vec<'a>( args: *const bw_CStrSlice, args_count: usize ) -> Vec<&'a st
 	vec
 }
 
+/// This external C funtion will be invoked by the underlying implementation browser-window when it is invoked in JavaScript
 extern "C" fn ffi_window_invoke_handler( inner_handle: *mut bw_BrowserWindow, _command: bw_CStrSlice, _args: *const bw_CStrSlice, args_count: usize ) {
 
 	unsafe {
