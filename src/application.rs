@@ -45,6 +45,7 @@ pub struct ApplicationHandle {
 unsafe impl Send for ApplicationHandle {}
 unsafe impl Sync for ApplicationHandle {}
 
+/// The future that dispatches a closure onto the GUI thread
 pub type ApplicationDispatchFuture<'a,R> = DispatchFuture<'a, ApplicationHandle, R>;
 
 pub struct ApplicationInner {
@@ -55,12 +56,15 @@ pub struct ApplicationInner {
 
 impl Application {
 
+	/// Get an async clone of this handle
 	pub fn async_clone( &self ) -> ApplicationAsync {
 		ApplicationAsync {
 			inner: self.inner.clone()
 		}
 	}
 
+	/// Constructs a new application handle
+	/// Only call this once
 	pub fn new() -> Self {
 		let ffi_handle = unsafe { bw_Application_new() };
 
@@ -74,6 +78,7 @@ impl Application {
 	}
 
 	/// Run the main loop
+	/// This method finishes when all windows are closed.
 	pub fn run( &self ) -> i32 {
 		unsafe { bw_Application_run( self.inner._ffi_handle ) }
 	}
@@ -97,6 +102,9 @@ impl AppHandle for ApplicationHandle {
 
 impl ApplicationAsync {
 
+	/// Clones the async version of this application handle into a non-async version.
+	/// This is unsafe because the non-async version of the handle may only be used on the thread it was created on,
+	///  while this method might not have been called on that thread
 	unsafe fn clone_threadunsafe_handle( &self ) -> ApplicationHandle {
 		ApplicationHandle {
 			_ffi_handle: (**self.inner)._ffi_handle.clone()
