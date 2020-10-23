@@ -25,6 +25,8 @@ use crate::common::*;
 /// Also, if you lose this handle, window destruction and cleanup is only done when the user actually closes it.
 /// So you don't have to worry about lifetimes and/or propper destruction of the window either.
 /// Note: Due to the way the internal structure is reused in BrowserWindowAsync,
+///       We mark this non-async version of the browser window handle with a phantom member that is not Send,
+///       making BrowserWindow not Send.
 #[derive(Clone)]
 pub struct BrowserWindow {
 	pub inner: Arc<BrowserWindowInner>,
