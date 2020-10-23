@@ -32,7 +32,7 @@ Otherwise, you get errors like this:
 
 So you need to copy everything from CEF's Resource dir into the executable's dir as wel.
 
-So if you want to run the example, put everything from CEF's Release and Resource dir, into example/target/debug, and then it should work.
+So if you want to run the example, put everything from CEF's Release and Resource dir, into example/target/debug, and then it should work fine.
 
 
 ## License
