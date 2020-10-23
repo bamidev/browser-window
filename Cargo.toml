@@ -1,0 +1,19 @@
+[package]
+name = "browser-window"
+version = "0.0.0"
+description = "An async/await aware browser GUI toolkit."
+edition = "2018"
+publish = true
+
+[features]
+nightly = []
+webview2 = ["browser-window-ffi/webview2"]
+
+[lib]
+name = "browser_window"
+path = "src/lib.rs"
+
+[dependencies]
+boxfnonce = "0.1"
+browser-window-ffi = { path = "./deps/ffi" }
+tokio = { version = "0.2", features = ["sync"] }

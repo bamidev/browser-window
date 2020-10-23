@@ -1,0 +1,18 @@
+[package]
+name = "browser-window-ffi"
+version = "0.0.0"
+description = "Rust native ffi bindings for the browser-window crate."
+build = "build.rs"
+edition = "2018"
+publish = false
+
+[features]
+webview2 = []
+
+[lib]
+name = "browser_window_ffi"
+path = "src/lib.rs"
+crate-type = ["rlib"]
+
+[build-dependencies]
+cc = "1.0"
