@@ -90,7 +90,7 @@ impl BrowserWindowBuilder {
 	/// Sets the height that the browser window will be created with initially
 	///
 	/// # Arguments
-	/// * `height` - Width in pixels
+	/// * `height` - Height in pixels
 	pub fn height( mut self, height: u32 ) -> Self {
 		self.height = Some( height );
 		self
@@ -195,7 +195,7 @@ impl BrowserWindowBuilder {
 	/// Nevertheless, the handle is valid.
 	///
 	/// # Arguments
-	/// * `width` - Width in pixels
+	/// * `app` - An async application handle.
 	pub async fn spawn_async( self, app: &ApplicationAsync ) -> BrowserWindowAsync {
 
 		let app_inner: ApplicationHandle = (*app.inner).clone();

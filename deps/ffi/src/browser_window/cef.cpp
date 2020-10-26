@@ -20,6 +20,8 @@ void bw_BrowserWindow_init_cef( CefRefPtr<CefBrowser> browser );
 #ifdef BW_CEF_WINDOWS
 RECT bw_BrowserWindow_window_rect( int width, int height );
 #endif
+// Sends the given Javascript code to the renderer process, expecting the code to be executed over there.
+void bw_BrowserWindow_send_js_to_renderer_process( CefRefPtr<CefBrowser>& cef_browser, CefString& code );
 char* bw_cef_error_message( bw_ErrCode code, const void* data );
 
 
@@ -51,14 +53,7 @@ void bw_BrowserWindow_eval_js( bw_BrowserWindow* bw, bw_CStrSlice js, bw_Browser
 	// Execute the javascript on the renderer process, and invoke the callback from there:
 	CefRefPtr<CefBrowser> cef_browser = *(CefRefPtr<CefBrowser>*)(bw->inner.cef_ptr);
 
-	CefRefPtr<CefProcessMessage> msg = CefProcessMessage::Create("eval-js");
-	CefRefPtr<CefListValue> args = msg->GetArgumentList();
-
-	// eval-js message arguments
-	args->SetInt( 0, 0 );	// TODO: Put new unique script ID here
-	args->SetString( 1, code );
-
-	cef_browser->GetMainFrame()->SendProcessMessage( PID_RENDERER, msg );
+	bw_BrowserWindow_send_js_to_renderer_process( cef_browser, code );
 }
 
 void bw_BrowserWindow_init_cef( CefRefPtr<CefBrowser> browser ) {
@@ -142,6 +137,17 @@ bw_BrowserWindow* bw_BrowserWindow_new(
 	bw_BrowserWindow_init_cef( *cef_ptr );
 
 	return bw;
+}
+
+void bw_BrowserWindow_send_js_to_renderer_process( CefRefPtr<CefBrowser>& cef_browser, CefString& code ) {
+	CefRefPtr<CefProcessMessage> msg = CefProcessMessage::Create("eval-js");
+	CefRefPtr<CefListValue> args = msg->GetArgumentList();
+
+	// eval-js message arguments
+	args->SetInt( 0, 0 );	// TODO: Put new unique script ID here
+	args->SetString( 1, code );
+
+	cef_browser->GetMainFrame()->SendProcessMessage( PID_RENDERER, msg );
 }
 
 #ifdef BW_CEF_WINDOWS
