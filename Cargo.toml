@@ -15,5 +15,5 @@ path = "src/lib.rs"
 
 [dependencies]
 boxfnonce = "0.1"
-browser-window-ffi = { path = "./deps/ffi" }
+browser-window-ffi = { path = "./ffi" }
 tokio = { version = "0.2", features = ["sync"] }
