@@ -90,12 +90,18 @@ impl Deref for BrowserWindow {
 
 impl BrowserWindowAsync {
 
+	/// Closes the browser.
+	/// The browser will be freed from memory when the last handle to it gets dropped.
 	pub async fn close( self ) {
 		self.dispatch(|bw| {
 			bw.close()
 		}).await;
 	}
 
+	/// Executes the given closure within the GUI thread
+	///
+	/// # Arguments
+	/// * `func` - The closure to run on the GUI thread
 	pub fn dispatch<'a,F,R>( &self, func: F ) -> BrowserWindowDispatchFuture<'a,R> where
 		F: FnOnce( BrowserWindowHandle ) -> R + Send + 'a,
 		R: Send
@@ -103,6 +109,10 @@ impl BrowserWindowAsync {
 		BrowserWindowDispatchFuture::new( self.inner.handle.clone(), func )
 	}
 
+	/// Executes the given javascript code, and returns the resulting output as a string when done.
+	///
+	/// # Arguments:
+	/// * `js` - Javascript code
 	pub async fn eval_js( &self, js: &str ) -> Result<String, Box<dyn Error + Send>> {
 
 		let (tx, rx) = oneshot::channel::<Result<String, Box<dyn Error + Send>>>();
@@ -121,6 +131,10 @@ impl BrowserWindowAsync {
 		rx.await.unwrap()
 	}
 
+	/// Causes the browser to navigate to the given url.
+	///
+	/// # Arguments
+	/// * `url` - The url to navigate to
 	pub async fn navigate( &self, url: &str ) -> Result<(), Box<dyn Error + Send>> {
 		*self.dispatch(|bw| {
 			bw.navigate( url )
@@ -138,10 +152,20 @@ pub type BrowserWindowDispatchFuture<'a,R> = DispatchFuture<'a, BrowserWindowHan
 
 impl BrowserWindowHandle {
 
+	/// Closes the browser.
+	/// The browser will be freed from memory when the last handle to it gets dropped.
 	pub fn close( self ) {
 		unsafe { bw_BrowserWindow_close( self._ffi_handle ); }
 	}
 
+	/// Executes the given javascript code, and returns the output via a callback.
+	/// If you don't need the result, see "exec_js".
+	///
+	/// # Arguments:
+	/// * `js` - The javascript code to execute.
+	/// * `on_complete` - The 'callback'. This closure will be invoked, with the result provided as the first argument.
+	///                   The result contains the output of the javascript code when it succeeded.
+	///                   Otherwise the error explains the javascript exception.
 	pub fn eval_js<'a,H>( &self, js: &str, on_complete: H ) where
 		H: FnOnce( BrowserWindowHandle, Result<String, Box<dyn Error + Send>> ) + Send + 'a
 	{
@@ -157,6 +181,10 @@ impl BrowserWindowHandle {
 		) };
 	}
 
+	/// Executes the given javascript code without waiting on it to finish.
+	///
+	/// # Arguments:
+	/// * `js` - The javascript code
 	pub fn exec_js( &self, js: &str ) {
 		self.eval_js( js, |_,_|{} );
 	}
@@ -167,6 +195,10 @@ impl BrowserWindowHandle {
 		}
 	}
 
+	/// Causes the browser to navigate to the given url.
+	///
+	/// # Arguments
+	/// * `url` - The url to navigate to
 	pub fn navigate( &self, url: &str ) -> Result<(), Box<dyn Error + Send>> {
 		let err = unsafe { bw_BrowserWindow_navigate( self._ffi_handle, url.into() ) };
 
