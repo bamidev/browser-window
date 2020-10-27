@@ -2,6 +2,7 @@
 #include "../assert.h"
 #include "../application/cef.h"
 #include "../browser_window.h"
+#include "../cef/eval_callback_store.hpp"
 #include "../cef/exception.hpp"
 
 #include <string>
@@ -10,7 +11,8 @@
 #include <include/cef_client.h>
 #include <include/cef_v8.h>
 
-// QUICKFIX: The win32 definition of GetMessage is getting through from some include
+// QUICKFIX: The win32 definition of GetMessage is getting through from somewhere...
+// TODO: Find out where
 #undef GetMessage
 
 
@@ -21,7 +23,8 @@ void bw_BrowserWindow_init_cef( CefRefPtr<CefBrowser> browser );
 RECT bw_BrowserWindow_window_rect( int width, int height );
 #endif
 // Sends the given Javascript code to the renderer process, expecting the code to be executed over there.
-void bw_BrowserWindow_send_js_to_renderer_process( CefRefPtr<CefBrowser>& cef_browser, CefString& code );
+// script_id should be a script id obtained from storing a callback in the eval callback store.
+void bw_BrowserWindow_send_js_to_renderer_process( CefRefPtr<CefBrowser>& cef_browser, unsigned int script_id, CefString& code );
 char* bw_cef_error_message( bw_ErrCode code, const void* data );
 
 
@@ -35,29 +38,38 @@ void bw_BrowserWindow_close( bw_BrowserWindow* bw ) {
 void _bw_BrowserWindow_doCleanup( bw_BrowserWindow* ) {}
 
 void bw_BrowserWindow_drop( bw_BrowserWindow* bw ) {
+
+	// Delete (a c++ feature) the CefBrowser pointer that we have allocated
 	CefRefPtr<CefBrowser>* cef_ptr = (CefRefPtr<CefBrowser>*)bw->inner.cef_ptr;
 	delete cef_ptr;
+
+	// Then free (a c feature) the browser window
 	free( bw );
 }
 
 void bw_BrowserWindow_eval_js( bw_BrowserWindow* bw, bw_CStrSlice js, bw_BrowserWindowJsCallbackFn cb, void* user_data ) {
 
-	// Wrap the JS code within a temporary function and execute it, converting the return value to a string
+	// Wrap the JS code within a temporary function and execute it, and convert the return value to a string
+	// This allows executing JS code that isn't terminated with a semicolon, and does the javascript value string conversion inside JS.
 	std::string _code = "(function () { return ";
 	_code.append( js.data, js.len );
 	_code += "; })().toString()";
 	CefString code = _code;
+	// Note: For the sake of simplicity, I've used std::string to append some strings together.
+	//       CefString unfortunately doesn't provide this functionality.
+	//       There is some overhead because of this, but for now it is ok.
 
-	// TODO: Save the cb and user_data vars in a global index of running scripts, so we can retrieve them and call them when this process is being
+	// Save all callback data into a store, so that when the evaluation of javascript has finished in the renderer process, the callback can be called (within the browser process).
+	auto script_id = bw::eval_callback_store.store( bw, cb, user_data );
 
 	// Execute the javascript on the renderer process, and invoke the callback from there:
 	CefRefPtr<CefBrowser> cef_browser = *(CefRefPtr<CefBrowser>*)(bw->inner.cef_ptr);
 
-	bw_BrowserWindow_send_js_to_renderer_process( cef_browser, code );
+	bw_BrowserWindow_send_js_to_renderer_process( cef_browser, script_id, code );
 }
 
 void bw_BrowserWindow_init_cef( CefRefPtr<CefBrowser> browser ) {
-
+	// We could do some initialization here...
 }
 
 
@@ -139,12 +151,12 @@ bw_BrowserWindow* bw_BrowserWindow_new(
 	return bw;
 }
 
-void bw_BrowserWindow_send_js_to_renderer_process( CefRefPtr<CefBrowser>& cef_browser, CefString& code ) {
+void bw_BrowserWindow_send_js_to_renderer_process( CefRefPtr<CefBrowser>& cef_browser, unsigned int script_id, CefString& code ) {
 	CefRefPtr<CefProcessMessage> msg = CefProcessMessage::Create("eval-js");
 	CefRefPtr<CefListValue> args = msg->GetArgumentList();
 
 	// eval-js message arguments
-	args->SetInt( 0, 0 );	// TODO: Put new unique script ID here
+	args->SetInt( 0, script_id );
 	args->SetString( 1, code );
 
 	cef_browser->GetMainFrame()->SendProcessMessage( PID_RENDERER, msg );

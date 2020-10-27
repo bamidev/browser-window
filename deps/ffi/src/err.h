@@ -34,10 +34,17 @@ typedef struct bw_Err {
 	}
 
 
+
 char* bw_Err_msg_success( bw_ErrCode, const void* );
 char* bw_Err_msg_string( bw_ErrCode, const void* );
 
+// Should always be called on a bw_Err.
+// Frees internal data from the heap.
 void bw_Err_free( bw_Err* err );
+// Creates a new initialized bw_Err, with the given code and message.
+// The alloc_message pointer will return the same message as given here.
+bw_Err bw_Err_new_with_msg( bw_ErrCode code, const char* msg );
+
 
 
 

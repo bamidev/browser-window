@@ -34,6 +34,7 @@ fn main() {
 		build
 			.file("src/application/cef.cpp")
 			.file("src/browser_window/cef.cpp")
+			.file("src/cef/eval_callback_store.cpp")
 			.file("src/cef/exception.cpp")
 			.file("src/window/void.c")
 			.flag("/D")

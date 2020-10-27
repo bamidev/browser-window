@@ -28,7 +28,20 @@ async fn program_logic( app: ApplicationAsync ) {
 
 	tokio::time::delay_for( tokio::time::Duration::from_millis(3000) ).await;
 
-	let cookies = bw.eval_js("document.cookie").await.expect("Something went wrong while evaluating JavaScript");
+	// Let's fetch the title through Javascript
+	match bw.eval_js("document.title").await {
+		Err(e) => { eprintln!("Something went wrong with evaluating javascript: {}", e) },
+		Ok( cookies ) => {
+			eprintln!("This is the window title: {}", cookies);
+		}
+	}
 
-	eprintln!("End of example: {}", cookies);
+	// Let's execute some bad code
+	// This doesn't work because cookies are not available when using Source::Html.
+	match bw.eval_js("document.cookie").await {
+		Err(e) => { eprintln!("This javascript error is expected: {}", e) },
+		Ok( cookies ) => {
+			eprintln!("Unexpected cookies?!: {}", cookies);
+		}
+	}
 }
