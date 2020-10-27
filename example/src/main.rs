@@ -8,7 +8,7 @@ fn main() {
 
 	let app = Application::new();
 
-	// Start the tokio runtime and run our actual main function on it
+	// Start the tokio runtime and run our program logic on it
 	let runtime = tokio::runtime::Runtime::new().unwrap();
 	runtime.spawn( program_logic( app.clone().into() ) );
 
