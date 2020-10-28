@@ -43,10 +43,18 @@ public:
 
 		// The message to execute some javascript, and return its output
 		if ( message->GetName() == "eval-js" ) {
-			int script_id = message->GetArgumentList()->GetInt( 0 );
-			CefString js = message->GetArgumentList()->GetString( 1 );
+			auto msg_args = message->GetArgumentList();
 
-			this->eval_js( browser, frame, js, script_id );
+			// Javascript to execute
+			CefString js = msg_args->GetString( 0 );
+
+			// Browser window handle
+			CefRefPtr<CefBinaryValue> bw_bin = msg_args->GetBinary( 1 );
+			CefRefPtr<CefBinaryValue> cb_bin = msg_args->GetBinary( 2 );
+			CefRefPtr<CefBinaryValue> user_data_bin = msg_args->GetBinary( 3 );
+
+
+			this->eval_js( browser, frame, js, bw_bin, cb_bin, user_data_bin );
 
 			return true;
 		}
@@ -61,7 +69,9 @@ public:
 		CefRefPtr<CefBrowser> browser,
 		CefRefPtr<CefFrame> frame,
 		const CefString& js,
-		int script_id
+		CefRefPtr<CefBinaryValue> bw_handle_binary,
+		CefRefPtr<CefBinaryValue> callback_binary,
+		CefRefPtr<CefBinaryValue> user_data_binary
 	) {
 		CefString script_url( "eval" );
 		CefRefPtr<CefV8Value> ret_val;
@@ -75,24 +85,25 @@ public:
 
 		if ( !result ) {
 
-			// The first parameter specifies the ID of the script that has executed
-			msg_args->SetDouble( 0, script_id );
-			// The second parameter specifies whether or not an error has resulted
-			msg_args->SetBool( 1, false );
-			// The third parameter specifies the error message
-			msg_args->SetString( 2, exception->GetMessage() );
+			// The first parameter specifies whether or not an error has resulted
+			msg_args->SetBool( 0, false );
+			// The second parameter specifies the error message
+			msg_args->SetString( 1, exception->GetMessage() );
 		}
 		else {
 
 			CefString result_string = ret_val->GetStringValue();
 
-			// The first parameter specifies the ID of the script that has executed
-			msg_args->SetDouble( 0, script_id );
-			// The second parameter specifies whether or not an error has resulted
-			msg_args->SetBool( 1, true );
-			// The third parameter specifies the result formatted as a string
-			msg_args->SetString( 2, result_string );
+			// The first parameter specifies whether or not an error has resulted
+			msg_args->SetBool( 0, true );
+			// The second parameter specifies the result formatted as a string
+			msg_args->SetString( 1, result_string );
 		}
+
+		// Send along the binaries of the callback data
+		msg_args->SetBinary( 2, bw_handle_binary );
+		msg_args->SetBinary( 3, callback_binary );
+		msg_args->SetBinary( 4, user_data_binary );
 
 		// Send the message back to the browser process
 		frame->SendProcessMessage( PID_BROWSER, msg );

@@ -6,7 +6,6 @@
 #include <include/cef_v8.h>
 
 #include "bw_handle_map.hpp"
-#include "eval_callback_store.hpp"
 #include "../application.h"
 
 
@@ -71,30 +70,38 @@ protected:
 		CefProcessId source_process,
 		CefRefPtr<CefProcessMessage> message
 	) {
-		// Parameters
-		unsigned int script_id = (unsigned int)message->GetArgumentList()->GetDouble( 0 );
-		bool success = message->GetArgumentList()->GetBool( 1 );
-		CefString result_str = message->GetArgumentList()->GetString( 2 );
+		auto msg_args = message->GetArgumentList();
 
-		// Construct the callback result union
-		bw::EvalCallbackResult cb_result;
+		// Parameters
+		bool success = msg_args->GetBool( 0 );
+		CefString cef_result = msg_args->GetString( 1 );
+		std::string result = cef_result.ToString();
+
+		// Browser window handle
+		bw_BrowserWindow* bw_handle;
+		CefRefPtr<CefBinaryValue> bw_handle_bin = msg_args->GetBinary( 2 );
+		bw_handle_bin->GetData( (void*)&bw_handle, sizeof( bw_handle ), 0 );
+
+		// Callback function
+		bw_BrowserWindowJsCallbackFn callback;
+		CefRefPtr<CefBinaryValue> cb_bin = msg_args->GetBinary( 3 );
+		cb_bin->GetData( (void*)&callback, sizeof( callback ), 0 );
+
+		// User data for the callback function
+		void* user_data;
+		CefRefPtr<CefBinaryValue> user_data_bin = msg_args->GetBinary( 4 );
+		user_data_bin->GetData( (void*)&user_data, sizeof( user_data ), 0 );
+
+		// // Invoke the callback with either a result string or an error
 		if (success) {
-			cb_result.result = result_str;
+			callback( bw_handle, user_data, result.c_str(), 0 );
 		}
 		else {
-			bw_Err error = bw_Err_new_with_msg( 1, result_str.ToString().c_str() );
+			bw_Err error = bw_Err_new_with_msg( 1, result.c_str() );
 
-			cb_result.error = error;
-		}
+			callback( bw_handle, user_data, 0, &error );
 
-		// Invoke the callback!
-		if ( !bw::eval_callback_store.invoke( script_id, success, cb_result ) ) {
-			BW_ASSERT( false, "Eval callback doesn't exist!\n" );
-		}
-
-		// Drop the error
-		if (!success) {
-			bw_Err_free( &cb_result.error );
+			bw_Err_free( &error );
 		}
 	}
 
@@ -112,7 +119,7 @@ protected:
 		auto params = msg->GetArgumentList();
 
 		// This argument is the command string
-		CefString cmd = msg->GetArgumentList()->GetString( 0 );
+		CefString cmd = params->GetString( 0 );
 
 		// TODO: Obtain all extra parameters
 

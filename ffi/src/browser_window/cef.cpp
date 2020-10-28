@@ -3,7 +3,6 @@
 #include "../application/cef.h"
 #include "../browser_window.h"
 #include "../cef/bw_handle_map.hpp"
-#include "../cef/eval_callback_store.hpp"
 #include "../cef/exception.hpp"
 
 #include <string>
@@ -25,7 +24,7 @@ RECT bw_BrowserWindow_window_rect( int width, int height );
 #endif
 // Sends the given Javascript code to the renderer process, expecting the code to be executed over there.
 // script_id should be a script id obtained from storing a callback in the eval callback store.
-void bw_BrowserWindow_send_js_to_renderer_process( CefRefPtr<CefBrowser>& cef_browser, unsigned int script_id, CefString& code );
+void bw_BrowserWindow_send_js_to_renderer_process( bw_BrowserWindow* bw, CefRefPtr<CefBrowser>& cef_browser, CefString& code, bw_BrowserWindowJsCallbackFn cb, void* user_data );
 char* bw_cef_error_message( bw_ErrCode code, const void* data );
 
 
@@ -61,13 +60,10 @@ void bw_BrowserWindow_eval_js( bw_BrowserWindow* bw, bw_CStrSlice js, bw_Browser
 	//       CefString unfortunately doesn't provide this functionality.
 	//       There is some overhead because of this, but for now it is ok.
 
-	// Save all callback data into a store, so that when the evaluation of javascript has finished in the renderer process, the callback can be called (within the browser process).
-	auto script_id = bw::eval_callback_store.store( bw, cb, user_data );
-
 	// Execute the javascript on the renderer process, and invoke the callback from there:
 	CefRefPtr<CefBrowser> cef_browser = *(CefRefPtr<CefBrowser>*)(bw->inner.cef_ptr);
 
-	bw_BrowserWindow_send_js_to_renderer_process( cef_browser, script_id, code );
+	bw_BrowserWindow_send_js_to_renderer_process( bw, cef_browser, code, cb, user_data );
 }
 
 void bw_BrowserWindow_init_cef( CefRefPtr<CefBrowser> browser ) {
@@ -159,13 +155,18 @@ bw_BrowserWindow* bw_BrowserWindow_new(
 	return bw;
 }
 
-void bw_BrowserWindow_send_js_to_renderer_process( CefRefPtr<CefBrowser>& cef_browser, unsigned int script_id, CefString& code ) {
+void bw_BrowserWindow_send_js_to_renderer_process( bw_BrowserWindow* bw, CefRefPtr<CefBrowser>& cef_browser, CefString& code, bw_BrowserWindowJsCallbackFn cb, void* user_data ) {
 	CefRefPtr<CefProcessMessage> msg = CefProcessMessage::Create("eval-js");
 	CefRefPtr<CefListValue> args = msg->GetArgumentList();
 
 	// eval-js message arguments
-	args->SetInt( 0, script_id );
-	args->SetString( 1, code );
+	args->SetString( 0, code );
+	CefRefPtr<CefBinaryValue> bw_bin = CefBinaryValue::Create( (const void*)&bw, sizeof( bw ) );
+	args->SetBinary( 1, bw_bin );
+	CefRefPtr<CefBinaryValue> cb_bin = CefBinaryValue::Create( (const void*)&cb, sizeof( cb ) );
+	args->SetBinary( 2, cb_bin );
+	CefRefPtr<CefBinaryValue> user_data_bin = CefBinaryValue::Create( (const void*)&user_data, sizeof( user_data ) );
+	args->SetBinary( 3, user_data_bin );
 
 	cef_browser->GetMainFrame()->SendProcessMessage( PID_RENDERER, msg );
 }
