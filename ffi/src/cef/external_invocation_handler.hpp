@@ -24,7 +24,6 @@ namespace bw {
 			CefRefPtr<CefV8Value>& retval,
 			CefString& exception
 		) override  {
-			fprintf(stderr, "Execute %s\n", name.ToString().c_str());
 
 			if ( name == "invoke_extern" ) {
 
@@ -36,7 +35,7 @@ namespace bw {
 				for ( auto it = arguments.begin(); it != arguments.end(); it++, index++ ) {
 
 					CefString string = this->v8ValueToString(*it);
-					fprintf(stderr, "arg %s\n", string.ToString().c_str());
+
 					msg_args->SetString( index, string );
 				}
 
