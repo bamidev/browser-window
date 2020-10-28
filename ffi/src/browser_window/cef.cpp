@@ -39,13 +39,13 @@ void _bw_BrowserWindow_doCleanup( bw_BrowserWindow* ) {}
 
 void bw_BrowserWindow_drop( bw_BrowserWindow* bw ) {
 
-	// Delete (a c++ feature) the CefBrowser pointer that we have allocated
-	CefRefPtr<CefBrowser>* cef_ptr = (CefRefPtr<CefBrowser>*)bw->inner.cef_ptr;
-	bw::bw_handle_map.drop( *cef_ptr );
-	delete cef_ptr;
-
-	// Then free (a c feature) the browser window
-	free( bw );
+	// If browser window has actually already closed, we can free the handle if it gets dropped.
+	if ( bw->window->closed ) {
+		bw_BrowserWindow_free( bw );
+	}
+	else {
+		bw->inner.handle_is_used = false;
+	}
 }
 
 void bw_BrowserWindow_eval_js( bw_BrowserWindow* bw, bw_CStrSlice js, bw_BrowserWindowJsCallbackFn cb, void* user_data ) {
@@ -64,6 +64,19 @@ void bw_BrowserWindow_eval_js( bw_BrowserWindow* bw, bw_CStrSlice js, bw_Browser
 	CefRefPtr<CefBrowser> cef_browser = *(CefRefPtr<CefBrowser>*)(bw->inner.cef_ptr);
 
 	bw_BrowserWindow_send_js_to_renderer_process( bw, cef_browser, code, cb, user_data );
+}
+
+void bw_BrowserWindow_free( bw_BrowserWindow* bw ) {
+
+	// Delete the CefBrowser pointer that we have allocated
+	CefRefPtr<CefBrowser>* cef_ptr = (CefRefPtr<CefBrowser>*)bw->inner.cef_ptr;
+	bw::bw_handle_map.drop( *cef_ptr );
+	delete cef_ptr;
+
+	bw_Window_free( bw->window );
+
+	// Then free (a c feature) the browser window
+	free( bw );
 }
 
 void bw_BrowserWindow_init_cef( CefRefPtr<CefBrowser> browser ) {
@@ -140,6 +153,7 @@ bw_BrowserWindow* bw_BrowserWindow_new(
 	// Even though the CEF implementation doesn't use the window 'class', we still need to allocate it because some struct fields are still used.
 	bw->window = bw_Window_new( app, parent, _title, width, height, window_options, user_data );
 	bw->inner.cef_ptr = (void*)cef_ptr;
+	bw->inner.handle_is_used = true;
 	bw->external_handler = external_handler;
 	bw->user_data = user_data;
 	//bw->callbacks <--- TODO

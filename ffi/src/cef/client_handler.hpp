@@ -33,6 +33,18 @@ public:
 	virtual void OnBeforeClose(CefRefPtr<CefBrowser> browser) override {
 		this->browser_count -= 1;
 
+		// Fetch our handle
+		std::optional<bw_BrowserWindow*> result = bw::bw_handle_map.fetch( browser );
+		BW_ASSERT( result.has_value(), "Link between CEF's browser handle and our handle does not exist!\n" );
+		bw_BrowserWindow* handle = *result;
+
+		handle->window->closed = true;
+
+		// If the handle has been dropped, free the browser window
+		if ( !handle->inner.handle_is_used ) {
+			bw_BrowserWindow_free( handle );
+		}
+
 		// If the last browser window is now closed, we exit the application
 		if ( this->browser_count == 0 ) {
 			bw_Application_exit( this->app, 0 );

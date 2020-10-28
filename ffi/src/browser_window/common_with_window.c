@@ -7,6 +7,6 @@ void bw_BrowserWindow_close( bw_BrowserWindow* bw ) {
 }
 
 void bw_BrowserWindow_drop( bw_BrowserWindow* bw ) {
-	bw_Window_drop( bw->window );
+	bw_Window_free( bw->window );
 	free( bw );
 }

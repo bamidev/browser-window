@@ -79,7 +79,7 @@ void bw_Window_close( bw_Window* window );
 
 /// Should be called when the window is not needed anymore within the code, otherwise memory leaks happen.
 /// This makes sure the window is destroyed when window closes, or already ís closed.
-void bw_Window_drop( bw_Window* window );
+void bw_Window_free( bw_Window* window );
 
 /// Dispatches the given function on the GUI thread, and passes the given data along.
 /// This function is thread-safe.

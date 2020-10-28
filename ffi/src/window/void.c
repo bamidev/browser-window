@@ -20,12 +20,12 @@ bw_Window* bw_Window_new(
 	void* user_data
 ) {
 	bw_Window* w = malloc( sizeof( bw_Window ) );
-	printf(stderr,"hai\n");
+	
 	w->app = app;
 	w->parent = parent;
 	w->closed = false;
 	w->user_data = user_data;
-	printf(stderr,"hoi\n");
+
 	memset( &w->callbacks, 0, sizeof( bw_WindowCallbacks ) );
 
 	return w;
@@ -33,7 +33,7 @@ bw_Window* bw_Window_new(
 
 void bw_Window_close( bw_Window* window ) {}
 
-void bw_Window_drop( bw_Window* window ) {
+void bw_Window_free( bw_Window* window ) {
 	free( window );
 }
 

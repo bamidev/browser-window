@@ -66,10 +66,15 @@ void bw_BrowserWindow_close( bw_BrowserWindow* bw );
 
 void _bw_BrowserWindow_doCleanup( bw_BrowserWindow* bw );
 
-/// Same as bw_Window_drop, but for bw_BrowserWindow.
+/// Marks the browser window handle as not being used anymore.
+/// This makes it so that if and when the window gets closed, everything is freed and cleaned from memory.
 void bw_BrowserWindow_drop( bw_BrowserWindow* bw );
 
 void bw_BrowserWindow_eval_js( bw_BrowserWindow* bw, bw_CStrSlice js, bw_BrowserWindowJsCallbackFn callback, void* cb_data );
+
+// This frees the browser window handle and everything that it has allocated.
+// Warning: only call this when the browser has actually closed AND the handle is not being used anymore in Rust!
+void bw_BrowserWindow_free( bw_BrowserWindow* bw );
 
 const bw_Application* bw_BrowserWindow_get_app( bw_BrowserWindow* bw );
 void* bw_BrowserWindow_get_user_data( bw_BrowserWindow* bw );
