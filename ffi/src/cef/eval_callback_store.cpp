@@ -1,5 +1,4 @@
 #include "eval_callback_store.hpp"
-#include <Windows.h>
 
 
 namespace bw {

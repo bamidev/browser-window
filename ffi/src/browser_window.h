@@ -38,7 +38,7 @@ typedef struct bw_BrowserWindowCallbacks {
 	void (*on_loaded)( bw_BrowserWindow* bw );
 } bw_BrowserWindowCallbacks;
 
-typedef void (*bw_BrowserWindowHandlerFn)( bw_BrowserWindow* window, const char* cmd, const char** args, size_t arg_count );
+typedef void (*bw_BrowserWindowHandlerFn)( bw_BrowserWindow* window, bw_CStrSlice cmd, bw_CStrSlice* args, size_t arg_count );
 typedef void (*bw_BrowserWindowJsCallbackFn)( bw_BrowserWindow* window, void* user_data, const char* result, const bw_Err* err );
 
 typedef struct bw_BrowserWindowOptions {
@@ -55,7 +55,7 @@ typedef struct bw_BrowserWindowSource {
 struct bw_BrowserWindow {
 	bw_Window* window;
 	bw_BrowserWindowInner inner;
-	bw_BrowserWindowHandlerFn handler;
+	bw_BrowserWindowHandlerFn external_handler;
 	void* user_data;
 	bw_BrowserWindowCallbacks callbacks;
 };

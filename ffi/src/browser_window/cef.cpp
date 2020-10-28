@@ -2,6 +2,7 @@
 #include "../assert.h"
 #include "../application/cef.h"
 #include "../browser_window.h"
+#include "../cef/bw_handle_map.hpp"
 #include "../cef/eval_callback_store.hpp"
 #include "../cef/exception.hpp"
 
@@ -41,6 +42,7 @@ void bw_BrowserWindow_drop( bw_BrowserWindow* bw ) {
 
 	// Delete (a c++ feature) the CefBrowser pointer that we have allocated
 	CefRefPtr<CefBrowser>* cef_ptr = (CefRefPtr<CefBrowser>*)bw->inner.cef_ptr;
+	bw::bw_handle_map.drop( *cef_ptr );
 	delete cef_ptr;
 
 	// Then free (a c feature) the browser window
@@ -93,7 +95,7 @@ bw_BrowserWindow* bw_BrowserWindow_new(
 	int width, int height,
 	const bw_WindowOptions* window_options,
 	const bw_BrowserWindowOptions* browser_window_options,
-	bw_BrowserWindowHandlerFn handler,	/// A function that gets invoked when javascript the appropriate call is made in javascript.
+	bw_BrowserWindowHandlerFn external_handler,	/// A function that gets invoked when javascript the appropriate call is made in javascript.
 	void* user_data	/// The data that will be passed to the above handler function when it is invoked.
 ) {
 	CefString title( std::string( _title.data, _title.len ) );
@@ -142,9 +144,15 @@ bw_BrowserWindow* bw_BrowserWindow_new(
 	// Even though the CEF implementation doesn't use the window 'class', we still need to allocate it because some struct fields are still used.
 	bw->window = bw_Window_new( app, parent, _title, width, height, window_options, user_data );
 	bw->inner.cef_ptr = (void*)cef_ptr;
-	bw->handler = handler;
+	bw->external_handler = external_handler;
 	bw->user_data = user_data;
 	//bw->callbacks <--- TODO
+
+	// TODO: Apply width and height
+	_cef_ptr->GetHost()->GetWindowHandle();
+
+	// Store the cef browser handle with our handle in a global map
+	bw::bw_handle_map.store( _cef_ptr, bw );
 
 	bw_BrowserWindow_init_cef( *cef_ptr );
 
