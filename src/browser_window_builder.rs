@@ -20,7 +20,7 @@ pub enum Source {
 	Html( String )
 }
 
-/// Allows building a BrowserWindow instance
+/// Used to create a BrowserWindow instance
 pub struct BrowserWindowBuilder {
 
 	parent: Option<BrowserWindowHandle>,
@@ -35,7 +35,7 @@ pub struct BrowserWindowBuilder {
 
 impl BrowserWindowBuilder {
 
-	/// Configure a closure that can be invoked from within JavaScript
+	/// Configure a closure that can be invoked from within JavaScript.
 	/// The closure's first parameter specifies a command name.
 	/// The closure's second parameter specifies an array of string arguments.
 	pub fn handler<H>( mut self, handler: H ) -> Self where
