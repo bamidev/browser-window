@@ -1,8 +1,16 @@
 #ifndef BW_ASSERT_H
 #define BW_ASSERT_H
 
-#include <cassert>
-#include <cstdio>
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include <assert.h>
+#include <stdio.h>
+
+#ifdef __cplusplus
+} //extern "C"
+#endif
 
 
 
