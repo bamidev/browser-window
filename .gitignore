@@ -1,2 +1,6 @@
 Cargo.lock
 target
+
+# Eclipse project files
+.project
+.settings
