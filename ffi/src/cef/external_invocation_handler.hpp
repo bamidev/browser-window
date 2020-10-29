@@ -47,6 +47,7 @@ namespace bw {
 
 	protected:
 		// Convert a javascript value into a string, for very basic compatibility purposes with the Rust application
+		// Note: This function is not yet complete. Not all types are converted appropriately.
 		CefString v8ValueToString( CefRefPtr<CefV8Value> val ) {
 
 			// If string

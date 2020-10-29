@@ -4,6 +4,8 @@
 #include <include/cef_client.h>
 #include <include/cef_life_span_handler.h>
 #include <include/cef_v8.h>
+#include <string>
+#include <vector>
 
 #include "bw_handle_map.hpp"
 #include "../application.h"
@@ -128,12 +130,26 @@ protected:
 		BW_ASSERT( _bw_handle.has_value(), "Link between CEF's browser handle and our handle does not exist!\n" );
 		bw_BrowserWindow* our_handle = *_bw_handle;
 
-		auto params = msg->GetArgumentList();
+		auto msg_args = msg->GetArgumentList();
 
 		// This argument is the command string
-		CefString cmd = params->GetString( 0 );
+		CefString cmd = msg_args->GetString( 0 );
 
 		// TODO: Obtain all extra parameters
+		std::vector<std::string> params; params.reserve( msg_args->GetSize() - 1 );
+		std::vector<bw_CStrSlice> params_slices; params_slices.reserve( params.capacity() );
+		for ( size_t i = 1; i < msg_args->GetSize(); i++ ) {
+			std::string param = msg_args->GetString( i ).ToString();
+
+			params.push_back( param );
+
+			// Convert the stored param into a bw_CStrSlice
+			bw_CStrSlice param_str_slice = {
+				param.length(),
+				params[i - 1].c_str()
+			};
+			params_slices.push_back( param_str_slice );
+		}
 
 		// Convert cmd from CefString to bw_CStrSlice
 		std::string cmd_str = cmd.ToString();
@@ -143,7 +159,7 @@ protected:
 		};
 		// TODO: Move this conversion into its own function
 
-		our_handle->external_handler( our_handle, cmd_str_slice, 0, 0 );
+		our_handle->external_handler( our_handle, cmd_str_slice, params_slices.data(), params.size() );
 	}
 
 	IMPLEMENT_REFCOUNTING(ClientHandler);
