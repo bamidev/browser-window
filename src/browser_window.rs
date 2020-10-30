@@ -3,7 +3,6 @@ use browser_window_ffi::*;
 use std::{
 	error::Error,
 	ffi::CStr,
-	marker::PhantomData,
 	ops::Deref,
 	os::raw::*,
 	rc::Rc,
@@ -29,9 +28,7 @@ use crate::common::*;
 ///       making BrowserWindow not Send.
 #[derive(Clone)]
 pub struct BrowserWindow {
-	pub inner: Arc<BrowserWindowInner>,	// TODO: Change this to Rc<BrowserWindowInner>, instead of using the additinal _not_send field.
-	/// Something that obviously not send or sync so that we can make sure BrowserWindow is not Send or Sync.
-	pub _not_send: PhantomData<Rc<u8>>
+	pub inner: Rc<BrowserWindowInner>,	// TODO: Change this to Rc<BrowserWindowInner>, instead of using the additinal _not_send field.
 }
 // TODO: Remove the _not_send parameter and change inner to Rc<BrowserWindowInner>
 
@@ -73,8 +70,11 @@ impl AppHandle for BrowserWindow {
 impl BrowserWindow {
 
 	pub fn into_async( self ) -> BrowserWindowAsync {
+		// Convert a Rc to an Arc
+		let inner = unsafe { Arc::from_raw( Rc::into_raw( self.inner ) ) };
+
 		BrowserWindowAsync {
-			inner: self.inner
+			inner: inner
 		}
 	}
 }

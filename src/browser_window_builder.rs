@@ -2,7 +2,6 @@ use browser_window_ffi::*;
 
 use boxfnonce::SendBoxFnOnce;
 use std::ffi::*;
-use std::marker::PhantomData;
 use tokio::sync::oneshot;
 
 use crate::application::{Application, ApplicationAsync, ApplicationHandle};
@@ -12,6 +11,7 @@ use std::{
 	mem,
 	ops::Deref,
 	ptr,
+	rc::Rc,
 	sync::Arc
 };
 
@@ -111,11 +111,10 @@ impl BrowserWindowBuilder {
 
 		self._spawn( app_handle.clone(), move |inner_handle| {
 			let bw = BrowserWindow {
-				inner: Arc::new( BrowserWindowInner {
+				inner: Rc::new( BrowserWindowInner {
 					app: app_handle,
 					handle: inner_handle
-				} ),
-				_not_send: PhantomData
+				} )
 			};
 
 			on_created( bw );
