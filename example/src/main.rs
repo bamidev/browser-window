@@ -25,7 +25,7 @@ async fn program_logic( app: ApplicationAsync ) {
 		.width( 800 )
 		.height( 600 )
 		.handler(|_, cmd, _| {
-			
+
 			println!("Command \"{}\" invoked!", cmd);
 		})
 		.spawn_async( &app ).await;

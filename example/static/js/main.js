@@ -1,3 +1,3 @@
-function onHelloWorld {
+function onHelloWorld() {
 	alert("Hello World")
 }
