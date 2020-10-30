@@ -5,15 +5,13 @@
 extern "C" {
 #endif
 
-// Windows.h defines somewhere that HWND eventually evualates to void*
+#include <stdbool.h>
+#define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
 
 
-struct bw_WindowInner {
-	HWND handle;
-	bool destroy_on_close;	// When true, the window can be destroyed (cleaned up) when it is closed by the user
-};
+typedef HWND bw_WindowHandle;
 
 
 

@@ -10,20 +10,25 @@ fn main() {
     let target = env::var("TARGET").unwrap();
 
 	let mut std_flag = "-std=c11";
+	
+	if target.contains("windows") {
+		build
+			.file("src/win32.c")
+			.file("src/application/win32.c")
+			.file("src/browser_window/common_with_window.c")
+			.file("src/window/common.c")
+			.file("src/window/win32.c")
+			.flag("/D")
+			.flag("BW_WIN32");
+	}
 
+	// Note: not actually supported atm
 	if cfg!(feature = "webview2") {
 		if target.contains("windows") {
 			std_flag = "/std:c++17";
 
 			build
-				.file("src/win32.c")
-				.file("src/application/win32.c")
-				.file("src/browser_window/common_with_window.c")
 				.file("src/browser_window/webview2.cpp")
-				.file("src/window/common.c")
-				.file("src/window/win32.c")
-				.flag("/D")
-				.flag("BW_WIN32")
 				.flag("/D")
 				.flag("BW_WEBVIEW2");
 		}
@@ -36,7 +41,6 @@ fn main() {
 			.file("src/browser_window/cef.cpp")
 			.file("src/cef/bw_handle_map.cpp")
 			.file("src/cef/exception.cpp")
-			.file("src/window/void.c")
 			.flag("/D")
 			.flag("BW_CEF");
 

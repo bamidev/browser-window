@@ -2,7 +2,7 @@
 #pragma comment(lib, "gdi32.lib")
 #pragma comment(lib, "ole32.lib")
 
-#include "win32.h"
+//#include "win32.h"
 #include "../application.h"
 
 #include <stdlib.h>
@@ -12,6 +12,8 @@
 
 #include "../win32.h"
 #include "../window/win32.h"
+
+#include <stdio.h>
 
 
 
@@ -25,20 +27,29 @@ void bw_Application_dispatch( bw_Application* app, bw_ApplicationDispatchFn func
 }
 
 bw_Application* bw_Application_new() {
+
 	bw_Application* app = malloc( sizeof( bw_Application ) );
 
 	app->thread_id = GetCurrentThreadId();
  	app->handle = GetModuleHandle( NULL );
 	app->engine_data = 0;
 
-	_bw_Window_init( app );
+	bw_Application_init( app );
+
+	// Register window class
+	memset( &app->wc, 0, sizeof(WNDCLASSEX) );
+	app->wc.cbSize = sizeof( WNDCLASSEX );
+	app->wc.hInstance = app->handle;
+	app->wc.lpfnWndProc = bw_Window_proc;
+	app->wc.lpszClassName = L"browser_window";
+	RegisterClassExW( &app->wc );
 
 	return app;
 }
 
 void bw_Application_free( bw_Application* app ) {
 
-	_bw_Application_uninit( app );
+	bw_Application_uninit( app );
 
 	UnregisterClassW( L"browser_window", app->handle );
 
@@ -54,7 +65,7 @@ void bw_Application_exit( bw_Application* app, int exit_code ) {
 	PostThreadMessageW( app->thread_id, WM_QUIT, (WPARAM)exit_code, (LPARAM)NULL );
 }
 
-void bw_Application_exit_sync( bw_Application* app, int code ) {
+void bw_Application_exit_async( bw_Application* app, int code ) {
 	// PostThreadMessage is threadsafe, so we do exactly the same thing
 	bw_Application_exit( app, code );
 }
@@ -64,7 +75,6 @@ int bw_Application_run( bw_Application* app ) {
 
 	while( true ) {
 		BOOL res = GetMessageW( &msg, 0, 0, 0);
-
 		if ( res == 0 ) {
 			int exit_code = (int)msg.wParam;
 			return exit_code;
@@ -72,8 +82,7 @@ int bw_Application_run( bw_Application* app ) {
 		else if (res == -1) {
 			BW_WIN32_ASSERT_ERROR;
 		}
-		else
-		{
+		else {
 			TranslateMessage( &msg );
 			DispatchMessageW( &msg );
 

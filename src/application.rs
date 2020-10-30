@@ -142,6 +142,13 @@ impl ApplicationHandle {
 	pub fn exit( &self, exit_code: u32 ) {
 		unsafe { bw_Application_exit( self._ffi_handle, exit_code as _ ); }
 	}
+
+	/// Constructs an ApplicationHandle from an internal C handle
+	pub fn from_ptr( ptr: &mut bw_Application ) -> ApplicationHandle {
+		ApplicationHandle {
+			_ffi_handle: ptr
+		}
+	}
 }
 
 

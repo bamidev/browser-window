@@ -38,6 +38,7 @@ typedef struct bw_BrowserWindowCallbacks {
 	void (*on_loaded)( bw_BrowserWindow* bw );
 } bw_BrowserWindowCallbacks;
 
+typedef void (*bw_BrowserWindowCreationCallbackFn)( bw_BrowserWindow* window, void* data );
 typedef void (*bw_BrowserWindowHandlerFn)( bw_BrowserWindow* window, bw_CStrSlice cmd, bw_CStrSlice* args, size_t arg_count );
 typedef void (*bw_BrowserWindowJsCallbackFn)( bw_BrowserWindow* window, void* user_data, const char* result, const bw_Err* err );
 
@@ -85,7 +86,7 @@ void _bw_BrowserWindow_init_window_callbacks( bw_BrowserWindow* bw );
 bw_Err bw_BrowserWindow_navigate( bw_BrowserWindow* bw, bw_CStrSlice url );
 
 /// Creates a new browser window
-bw_BrowserWindow* bw_BrowserWindow_new(
+void bw_BrowserWindow_new(
 	const bw_Application* app,
 	const bw_Window* parent,
 	bw_BrowserWindowSource source,
@@ -94,7 +95,9 @@ bw_BrowserWindow* bw_BrowserWindow_new(
 	const bw_WindowOptions* window_options,
 	const bw_BrowserWindowOptions* browser_window_options,
 	bw_BrowserWindowHandlerFn handler,	/// A function that gets invoked when javascript the appropriate call is made in javascript.
-	void* user_data	/// The data that will be passed to the above handler function when it is invoked.
+	void* user_data,	// The data that will be passed to the above handler function and the creation-callback when they are invoked.
+	bw_BrowserWindowCreationCallbackFn callback,	// A function that gets invoked when the browser window has been created.
+	void* callback_data	// Data that will be passed to the creation callback
 );
 
 

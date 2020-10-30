@@ -1,7 +1,5 @@
-#ifndef BW_APPLICATION_WIN32_H
-#define BW_APPLICATION_WIN32_H
-
-#include "../application.h"
+#ifndef BW_APPLICATION_CEF_H
+#define BW_APPLICATION_CEF_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -9,15 +7,15 @@ extern "C" {
 
 
 
-struct bw_Application {
+struct bw_ApplicationEngineData {
 	void* cef_client;
 	int exit_code;
 };
 
-struct bw_ApplicationDispatchData {
+/*struct bw_ApplicationDispatchData {
 	bw_ApplicationDispatchFn func;
 	void* data;
-};
+};*/
 
 
 
@@ -25,4 +23,4 @@ struct bw_ApplicationDispatchData {
 }
 #endif
 
-#endif//BW_APPLICATION_WIN32_H
+#endif//BW_APPLICATION_CEF_H

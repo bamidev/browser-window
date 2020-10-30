@@ -17,6 +17,8 @@
 
 
 
+/// Constructs the platform-specific window info needed by CEF.
+CefWindowInfo _bw_BrowserWindow_windowInfo( bw_Window* window, int width, int height );
 /// Initialize the Cef's browser object
 void bw_BrowserWindow_init_cef( CefRefPtr<CefBrowser> browser );
 #ifdef BW_CEF_WINDOWS
@@ -96,7 +98,7 @@ bw_Err bw_BrowserWindow_navigate( bw_BrowserWindow* bw, bw_CStrSlice url ) {
 	BW_ERR_RETURN_SUCCESS;
 }
 
-bw_BrowserWindow* bw_BrowserWindow_new(
+void bw_BrowserWindow_new(
 	const bw_Application* app,
 	const bw_Window* parent,
 	bw_BrowserWindowSource source,
@@ -105,12 +107,16 @@ bw_BrowserWindow* bw_BrowserWindow_new(
 	const bw_WindowOptions* window_options,
 	const bw_BrowserWindowOptions* browser_window_options,
 	bw_BrowserWindowHandlerFn external_handler,	/// A function that gets invoked when javascript the appropriate call is made in javascript.
-	void* user_data	/// The data that will be passed to the above handler function when it is invoked.
+	void* user_data,	/// The data that will be passed to the above handler function when it is invoked.
+	bw_BrowserWindowCreationCallbackFn callback,
+	void* callback_data
 ) {
 	CefString title( std::string( _title.data, _title.len ) );
 
 	CefWindowInfo info;
 	CefBrowserSettings settings;
+
+	// Platform-specific default parent handle:
 #ifdef BW_CEF_WINDOWS
 	HWND parent_handle = HWND_DESKTOP;
 #endif
@@ -122,7 +128,7 @@ bw_BrowserWindow* bw_BrowserWindow_new(
 		parent_handle = (*parent_cef_ptr)->GetHost()->GetWindowHandle();
 	}
 
-#ifdef BW_CEF_WINDOWS
+/*#ifdef BW_CEF_WINDOWS
 	// On Windows, the following is required.
 	// Possibly because CreateWindowEx doesn't work without a parent handle if it is not a popup.
 	info.SetAsPopup( 0, title );
@@ -130,7 +136,7 @@ bw_BrowserWindow* bw_BrowserWindow_new(
 	RECT rect = bw_BrowserWindow_window_rect( width, height );
 
 	//info.SetAsChild( parent_handle, bw_BrowserWindow_window_rect( width, height ) );
-#endif
+#endif*/
 
 	// Set up a CefString with the source
 	CefString source_string;
@@ -143,30 +149,34 @@ bw_BrowserWindow* bw_BrowserWindow_new(
 		source_string = CefString( data );
 	}
 
-	// TODO: Set title of window. If needed, through the win32 or other platform's methods...
-	CefRefPtr<CefClient>* cef_client = (CefRefPtr<CefClient>*)app->cef_client;
+	bw_Window* window = bw_Window_new( app, parent, _title, width, height, window_options, user_data );
 
-	// Create the browser
-	CefRefPtr<CefBrowser> _cef_ptr = CefBrowserHost::CreateBrowserSync( info, *cef_client, source_string, settings, NULL, NULL );
-	CefRefPtr<CefBrowser>* cef_ptr = new CefRefPtr<CefBrowser>( _cef_ptr );
-	auto bw = new bw_BrowserWindow;
-	// Even though the CEF implementation doesn't use the window 'class', we still need to allocate it because some struct fields are still used.
-	bw->window = bw_Window_new( app, parent, _title, width, height, window_options, user_data );
-	bw->inner.cef_ptr = (void*)cef_ptr;
+	// Update window size in CefWindowInfo
+#ifdef BW_WIN32
+	RECT rect;
+	GetClientRect( window->handle, &rect );
+	info.SetAsChild( window->handle, rect );
+#endif
+
+	// Create the browser window handle
+	bw_BrowserWindow* bw = new bw_BrowserWindow;
+	bw->window = window;
+	bw->inner.cef_ptr = 0;
 	bw->inner.handle_is_used = true;
 	bw->external_handler = external_handler;
 	bw->user_data = user_data;
 	//bw->callbacks <--- TODO
 
-	// TODO: Apply width and height
-	_cef_ptr->GetHost()->GetWindowHandle();
+	// Create a CefDictionary containing the bw_BrowserWindow pointer to pass along CreateBrowser
+	CefRefPtr<CefDictionaryValue> dict = CefDictionaryValue::Create();
+	dict->SetBinary( "handle", CefBinaryValue::Create( (const void*)&bw, sizeof(bw) ) );
+	dict->SetBinary( "callback", CefBinaryValue::Create( (const void*)&callback, sizeof(callback) ) );
+	dict->SetBinary( "callback-data", CefBinaryValue::Create( (const void*)&callback_data, sizeof(callback_data) ) );
 
-	// Store the cef browser handle with our handle in a global map
-	bw::bw_handle_map.store( _cef_ptr, bw );
-
-	bw_BrowserWindow_init_cef( *cef_ptr );
-
-	return bw;
+	// Create the browser
+	CefRefPtr<CefClient>* cef_client = (CefRefPtr<CefClient>*)app->engine_data->cef_client;
+	bool success = CefBrowserHost::CreateBrowser( info, *cef_client, source_string, settings, dict, NULL );
+	BW_ASSERT( success, "CefBrowserHost::CreateBrowser failed!\n" );
 }
 
 void bw_BrowserWindow_send_js_to_renderer_process( bw_BrowserWindow* bw, CefRefPtr<CefBrowser>& cef_browser, CefString& code, bw_BrowserWindowJsCallbackFn cb, void* user_data ) {
@@ -175,6 +185,7 @@ void bw_BrowserWindow_send_js_to_renderer_process( bw_BrowserWindow* bw, CefRefP
 
 	// eval-js message arguments
 	args->SetString( 0, code );
+	// Conver the callback data into binary blobs so we can send them to the renderer process
 	CefRefPtr<CefBinaryValue> bw_bin = CefBinaryValue::Create( (const void*)&bw, sizeof( bw ) );
 	args->SetBinary( 1, bw_bin );
 	CefRefPtr<CefBinaryValue> cb_bin = CefBinaryValue::Create( (const void*)&cb, sizeof( cb ) );
@@ -194,10 +205,12 @@ RECT bw_BrowserWindow_window_rect( int width, int height) {
 	LONG desktop_height = desktop_rect.bottom - desktop_rect.top;
 
 	RECT rect;
-	rect.left = -1;
-	rect.top = -1;
-	rect.right = -1;
-	rect.bottom = -1;
+	rect.left = 0;
+	rect.top = 0;
+	rect.right = width;
+	rect.bottom = height;
+
+	return rect;
 
 	if ( width != -1 ) {
 		rect.left = ( desktop_width - width ) / 2;

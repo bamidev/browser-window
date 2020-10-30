@@ -33,6 +33,7 @@ pub struct BrowserWindow {
 	/// Something that obviously not send or sync so that we can make sure BrowserWindow is not Send or Sync.
 	pub _not_send: PhantomData<Rc<u8>>
 }
+// TODO: Remove the _not_send parameter and change inner to Rc<BrowserWindowInner>
 
 /// A thread-safe handle to a browser window.
 /// It provides the same functionality as Browserwindow.
@@ -56,7 +57,7 @@ unsafe impl Sync for BrowserWindowHandle {}
 /// So by putting this struct in an Arc<...>, you effectively have some sort garbage collection.
 pub struct BrowserWindowInner {
 	pub app: ApplicationHandle,
-	pub handle: BrowserWindowHandle
+	pub handle: BrowserWindowHandle	// TODO: Change name to "browser", handle is too ambigious
 }
 
 
@@ -123,7 +124,7 @@ impl BrowserWindowAsync {
 			bw.eval_js( js, move |_, result| {
 
 				// Result is ready
-				tx.send( result ).unwrap()
+				tx.send( result ).unwrap();
 			} );
 		}).await;
 

@@ -10,6 +10,7 @@ use super::string::bw_CStrSlice;
 
 
 pub enum bw_BrowserWindow {}
+pub type bw_BrowserWindowCreationCallbackFn = extern "C" fn ( bw: *mut bw_BrowserWindow, data: *mut c_void );
 pub type bw_BrowserWindowDispatchFn = extern "C" fn( bw: *mut bw_BrowserWindow, data: *mut c_void );
 pub type bw_BrowserWindowHandlerFn = extern "C" fn( bw: *mut bw_BrowserWindow, cmd: bw_CStrSlice, args: *const bw_CStrSlice, args_count: usize );
 pub type bw_BrowserWindowEvalJsCallbackFn = extern "C" fn( bw: *mut bw_BrowserWindow, data: *mut c_void, js: *const c_char, error: *const bw_Err );
@@ -57,6 +58,8 @@ extern "C" {
 		window_options: *const bw_WindowOptions,
 		options: *const bw_BrowserWindowOptions,
 		handler: bw_BrowserWindowHandlerFn,
-		user_data: *mut c_void
-	) -> *mut bw_BrowserWindow;
+		user_data: *mut c_void,
+		callback: bw_BrowserWindowCreationCallbackFn,
+		callback_data: *mut c_void
+	);
 }

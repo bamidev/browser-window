@@ -24,10 +24,6 @@ public:
 		return this;
 	}
 
-	// Virutal on CefLifeSpanHandler
-	virtual bool DoClose(CefRefPtr<CefBrowser> browser) override { return false; }
-	virtual bool OnBeforePopup( CefRefPtr< CefBrowser > browser, CefRefPtr< CefFrame > frame, const CefString& target_url, const CefString& target_frame_name, CefLifeSpanHandler::WindowOpenDisposition target_disposition, bool user_gesture, const CefPopupFeatures& popupFeatures, CefWindowInfo& windowInfo, CefRefPtr< CefClient >& client, CefBrowserSettings& settings, CefRefPtr< CefDictionaryValue >& extra_info, bool* no_javascript_access ) override { return true; }
-
 	virtual void OnAfterCreated( CefRefPtr<CefBrowser> browser ) override {
 		this->browser_count += 1;
 	}
@@ -70,6 +66,11 @@ public:
 			this->onInvokeHandlerReceived( browser, frame, source_process, message );
 			return true;
 		}
+		// The message to send data from within javascript to application code
+		else if ( message->GetName() == "on-browser-created" ) {
+			this->onBrowserCreated( browser, frame, source_process, message );
+			return true;
+		}
 		else
 			fprintf(stderr, "Unknown process message received: %s\n", message->GetName().ToString().c_str() );
 
@@ -77,6 +78,33 @@ public:
 	}
 
 protected:
+
+	void onBrowserCreated(
+		CefRefPtr<CefBrowser> browser,
+		CefRefPtr<CefFrame>,
+		CefProcessId,
+		CefRefPtr<CefProcessMessage> msg
+	) {
+		auto args = msg->GetArgumentList();
+
+		// Process message arguments
+		bw_BrowserWindow* bw_handle;
+		args->GetBinary( 0 )->GetData( (void*)&bw_handle, sizeof( bw_handle ), 0 );
+		bw_BrowserWindowCreationCallbackFn callback;
+		args->GetBinary( 1 )->GetData( (void*)&callback, sizeof( callback ), 0 );
+		void* callback_data;
+		args->GetBinary( 2 )->GetData( (void*)&callback_data, sizeof( callback_data ), 0 );
+
+
+		// Make a copy on the heap to store in our handle
+		CefRefPtr<CefBrowser>* cef_ptr = new CefRefPtr<CefBrowser>( browser );
+		bw_handle->inner.cef_ptr = (void*)cef_ptr;
+
+		// Store a link with the cef browser handle and our handle in a global map
+		bw::bw_handle_map.store( *cef_ptr, bw_handle );
+
+		callback( bw_handle, callback_data );
+	}
 
 	void onEvalJsResultReceived(
 		CefRefPtr<CefBrowser> browser,

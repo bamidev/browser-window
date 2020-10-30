@@ -9,6 +9,8 @@
 #include "external_invocation_handler.hpp"
 #include "../assert.h"
 #include "../application.h"
+#include "../browser_window.h"
+#include "../cef/bw_handle_map.hpp"
 
 
 
@@ -18,6 +20,20 @@ class AppHandler : public CefApp, public CefRenderProcessHandler {
 
 public:
 	AppHandler( bw_Application* app ) : app(app) {}
+
+	virtual void OnBrowserCreated( CefRefPtr<CefBrowser> browser, CefRefPtr<CefDictionaryValue> extra_info ) override {
+
+		// Lets send the handle and callback data back to the browser process, where we can actually use them
+		auto msg = CefProcessMessage::Create( "on-browser-created" );
+		auto args = msg->GetArgumentList();
+
+		// Load in our other data
+		args->SetBinary( 0, extra_info->GetBinary( "handle" ) );
+		args->SetBinary( 1, extra_info->GetBinary( "callback" ) );
+		args->SetBinary( 2, extra_info->GetBinary( "callback-data" ) );
+
+		browser->GetMainFrame()->SendProcessMessage( PID_BROWSER, msg );
+	}
 
 	virtual void OnContextCreated( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefV8Context> context ) override {
 

@@ -1,6 +1,9 @@
 use browser_window_ffi::*;
 
+use boxfnonce::SendBoxFnOnce;
+use std::ffi::*;
 use std::marker::PhantomData;
+use tokio::sync::oneshot;
 
 use crate::application::{Application, ApplicationAsync, ApplicationHandle};
 use crate::browser_window::{BrowserWindow, BrowserWindowHandle, BrowserWindowInner, BrowserWindowAsync};
@@ -96,20 +99,59 @@ impl BrowserWindowBuilder {
 		self
 	}
 
-	/// Creates the browser window, and immediately displays it to the user.
-	/// A browser window handle is returned.
+	/// Creates the browser window.
 	///
 	/// # Arguments
-	/// * `app` - A reference to an application handle that this browser window can spawn into
-	pub fn spawn( self, app: &Application ) -> BrowserWindow {
-		BrowserWindow {
-			inner: self._spawn( (*app.inner).clone() ),
-			_not_send: PhantomData
+	/// * `app` - An application handle that this browser window can spawn into
+	/// * `on_created` - A callback closure that will be invoked when the browser window is created and ready.
+	pub fn spawn<H>( self, app: &Application, on_created: H ) where
+		H: FnOnce( BrowserWindow ) + Send + 'static
+	{
+		let app_handle = (*app.inner).clone();
+
+		self._spawn( app_handle.clone(), move |inner_handle| {
+			let bw = BrowserWindow {
+				inner: Arc::new( BrowserWindowInner {
+					app: app_handle,
+					handle: inner_handle
+				} ),
+				_not_send: PhantomData
+			};
+
+			on_created( bw );
+		} );
+	}
+
+	/// Same as spawn, but asynchronous.
+	/// Instead of providing a callback, the handle is simply returned.
+	///
+	/// # Arguments
+	/// * `app` - An async application handle.
+	pub async fn spawn_async( self, app: &ApplicationAsync ) -> BrowserWindowAsync {
+		let (tx, rx) = oneshot::channel::<BrowserWindowHandle>();
+
+		let app_handle = (*app.inner).clone();
+
+		// We need to dispatch the spawning to the GUI thread because only there we can call GUI functionality
+		app.dispatch(|app| {
+			self._spawn(app, move |inner_handle| {
+				let _ = tx.send( inner_handle );
+			} );
+		}).await;
+
+		let inner_handle = rx.await.unwrap();
+
+		BrowserWindowAsync {
+			inner: Arc::new( BrowserWindowInner {
+				app: app_handle,
+				handle: inner_handle
+			} )
 		}
 	}
 
-	fn _spawn( self, app: ApplicationHandle ) -> Arc<BrowserWindowInner> {
-
+	fn _spawn<H: 'static>( self, app: ApplicationHandle, on_created: H ) where
+		H: FnOnce( BrowserWindowHandle ) + Send + 'static
+	{
 		match self {
 			BrowserWindowBuilder { parent, source, title, width, height, handler } => {
 
@@ -147,12 +189,15 @@ impl BrowserWindowBuilder {
 				};
 
 				let user_data = Box::into_raw( Box::new(
-					BrowserWindowHandlerData {
-						func: match handler {
-							None => Box::new(|_,_,_|{}),
+					BrowserWindowUserData {
+						handler: match handler {
+							None => Box::new(|_,_,_| {}),
 							Some(f) => Box::new(f)
 						}
 					}
+				) );
+				let callback_data = Box::into_raw( Box::new(
+					BrowserWindowCreationCallbackData::from( on_created )
 				) );
 
 				// TODO: Expose these options in the BrowserWindowBuilder
@@ -168,7 +213,7 @@ impl BrowserWindowBuilder {
 					dev_tools: true
 				};
 
-				let ffi_handle = unsafe { bw_BrowserWindow_new(
+				unsafe { bw_BrowserWindow_new(
 					app._ffi_handle.clone(),
 					parent_handle,
 					csource,
@@ -178,42 +223,22 @@ impl BrowserWindowBuilder {
 					&window_options,
 					&other_options,
 					ffi_window_invoke_handler,
-					user_data as _
+					user_data as _,
+					ffi_browser_window_created_callback,
+					callback_data as _
 				) };
-
-				Arc::new( BrowserWindowInner {
-					app: app,
-					handle: BrowserWindowHandle { _ffi_handle: ffi_handle }
-				} )
 			}
-		}
-	}
-
-	/// Same as spawn, but asynchronous.
-	/// Returns an asynchronous handle that is available immediately.
-	/// However, this function may return before the window is actually shown.
-	/// Nevertheless, the handle is valid.
-	///
-	/// # Arguments
-	/// * `app` - An async application handle.
-	pub async fn spawn_async( self, app: &ApplicationAsync ) -> BrowserWindowAsync {
-
-		let app_inner: ApplicationHandle = (*app.inner).clone();
-
-		let bw_inner = *app.dispatch(move |_| {
-			self._spawn( app_inner )
-		}).await;
-
-		BrowserWindowAsync {
-			inner: bw_inner
 		}
 	}
 }
 
 /// The data that is passed to the C FFI handler function
-struct BrowserWindowHandlerData {
-	func: Box<dyn FnMut( BrowserWindowHandle, &str, &[&str])>
+struct BrowserWindowUserData {
+	handler: Box<dyn FnMut( BrowserWindowHandle, &str, &[&str])>
 }
+
+/// The data that is passed to the creation callback function
+type BrowserWindowCreationCallbackData = SendBoxFnOnce<'static, ( BrowserWindowHandle, )>;
 
 
 
@@ -231,21 +256,34 @@ fn args_to_vec<'a>( args: *const bw_CStrSlice, args_count: usize ) -> Vec<&'a st
 	vec
 }
 
-/// This external C funtion will be invoked by the underlying implementation browser-window when it is invoked in JavaScript
+/// This external C function will be invoked by the underlying implementation browser-window when it is invoked in JavaScript
 extern "C" fn ffi_window_invoke_handler( inner_handle: *mut bw_BrowserWindow, _command: bw_CStrSlice, _args: *const bw_CStrSlice, args_count: usize ) {
 
 	unsafe {
-		let data_ptr: *mut BrowserWindowHandlerData = mem::transmute( bw_BrowserWindow_get_user_data( inner_handle ) );
-		let data: &mut BrowserWindowHandlerData = &mut *data_ptr;
+		let data_ptr: *mut BrowserWindowUserData = mem::transmute( bw_BrowserWindow_get_user_data( inner_handle ) );
+		let data: &mut BrowserWindowUserData = &mut *data_ptr;
 
 		match data {
-			BrowserWindowHandlerData{ func } => {
+			BrowserWindowUserData{ handler } => {
 				let outer_handle = BrowserWindowHandle::from_ptr( inner_handle );
 
 				let args = args_to_vec( _args, args_count );
 
-				func( outer_handle, _command.into(), &*args );
+				handler( outer_handle, _command.into(), &*args );
 			}
 		}
+	}
+}
+
+// This external C function will be given as the callback to the bw_BrowserWindow_new function, to be invoked when the browser window has been created
+extern "C" fn ffi_browser_window_created_callback( inner_handle: *mut bw_BrowserWindow, data: *mut c_void ) {
+
+	unsafe {
+		let data_ptr: *mut BrowserWindowCreationCallbackData = mem::transmute( data );
+		let data = Box::from_raw( data_ptr );
+
+		let outer_handle = BrowserWindowHandle::from_ptr( inner_handle );
+
+		data.call( outer_handle );
 	}
 }
