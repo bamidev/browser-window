@@ -8,7 +8,7 @@
 #include <include/cef_app.h>
 #include <include/cef_base.h>
 
-#ifdef BW_CEF_WINDOWS
+#ifdef BW_WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #pragma comment(lib, "shell32.lib")
@@ -72,7 +72,7 @@ void _bw_Application_exitProcess( int exit_code ) {
 void bw_Application_init( bw_Application* app ) {
 	app->engine_data = new bw_ApplicationEngineData;
 
-#ifdef BW_CEF_WINDOWS
+#ifdef BW_WIN32
 	CefMainArgs main_args( GetModuleHandle( NULL ) );
 #else
 #error Platform not yet supported

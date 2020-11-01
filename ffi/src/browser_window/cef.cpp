@@ -18,7 +18,7 @@
 
 
 
-#ifdef BW_CEF_WINDOWS
+#ifdef BW_WIN32
 RECT bw_BrowserWindow_window_rect( int width, int height );
 #endif
 // Sends the given Javascript code to the renderer process, expecting the code to be executed over there.
@@ -102,7 +102,7 @@ void bw_BrowserWindow_new(
 	CefBrowserSettings settings;
 
 	// Platform-specific default parent handle:
-#ifdef BW_CEF_WINDOWS
+#ifdef BW_WIN32
 	HWND parent_handle = HWND_DESKTOP;
 #endif
 
@@ -113,7 +113,7 @@ void bw_BrowserWindow_new(
 		parent_handle = (*parent_cef_ptr)->GetHost()->GetWindowHandle();
 	}
 
-/*#ifdef BW_CEF_WINDOWS
+/*#ifdef BW_WIN32
 	// On Windows, the following is required.
 	// Possibly because CreateWindowEx doesn't work without a parent handle if it is not a popup.
 	info.SetAsPopup( 0, title );
@@ -137,7 +137,7 @@ void bw_BrowserWindow_new(
 	bw_Window* window = bw_Window_new( app, parent, _title, width, height, window_options, 0 );
 	window->callbacks.do_cleanup = _bw_BrowserWindow_doCleanup;
 	window->callbacks.on_resize = _bw_BrowserWindow_onResize;
-	
+
 	// Update window size in CefWindowInfo
 #ifdef BW_WIN32
 	RECT rect;
@@ -184,7 +184,7 @@ void bw_BrowserWindow_sendJsToRendererProcess( bw_BrowserWindow* bw, CefRefPtr<C
 	cef_browser->GetMainFrame()->SendProcessMessage( PID_RENDERER, msg );
 }
 
-#ifdef BW_CEF_WINDOWS
+#ifdef BW_WIN32
 RECT bw_BrowserWindow_window_rect( int width, int height) {
 
 	RECT desktop_rect;
