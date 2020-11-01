@@ -1,13 +1,19 @@
 [package]
 name = "browser-window"
 version = "0.0.0"
-description = "An async/await aware browser GUI toolkit."
+description = "An async/await aware browser (GUI) toolkit like electron."
 edition = "2018"
+authors = ["Danny de Jong"]
+license = "MIT"
 publish = true
+keywords = ["browser", "chromium", "electron", "gui", "webview"]
+categories = ["asynchronous", "gui", "web-programming"]
+readme = "README.md"
+repository = "https://github.com/bamilab/browser-window"
 
 [features]
 nightly = []
-webview2 = ["browser-window-ffi/webview2"]
+webview2 = []
 
 [lib]
 name = "browser_window"
@@ -15,5 +21,5 @@ path = "src/lib.rs"
 
 [dependencies]
 boxfnonce = "0.1"
-browser-window-ffi = { path = "./ffi" }
+browser-window-ffi = { path = "./ffi", version = "0.0.0" }
 tokio = { version = "0.2", features = ["sync"] }

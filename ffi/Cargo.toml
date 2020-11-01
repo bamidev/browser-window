@@ -1,13 +1,13 @@
 [package]
 name = "browser-window-ffi"
 version = "0.0.0"
-description = "Rust native ffi bindings for the browser-window crate."
-build = "build.rs"
+description = "FFI bindings for the browser-window create."
 edition = "2018"
-publish = false
-
-[features]
-webview2 = []
+authors = ["Danny de Jong"]
+license = "MIT"
+publish = true
+categories = ["external-ffi-bindings"]
+repository = "https://github.com/bamilab/browser-window"
 
 [lib]
 name = "browser_window_ffi"
