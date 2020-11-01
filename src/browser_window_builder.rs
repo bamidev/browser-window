@@ -31,12 +31,23 @@ pub struct BrowserWindowBuilder {
 	title: Option<String>,
 	width: Option<u32>,
 	height: Option<u32>,
-	handler: Option<Box<dyn FnMut(BrowserWindowHandle, &str, &[&str]) + Send>>
+	handler: Option<Box<dyn FnMut(BrowserWindowHandle, &str, &[&str]) + Send>>,
+
+	borders: bool,
+	maximizable: bool,
+	minimizable: bool,
+	resizable: bool
 }
 
 
 
 impl BrowserWindowBuilder {
+
+	/// Sets whether or not the window has borders
+	/// Default is true.
+	pub fn borders( mut self, value: bool ) -> Self {
+		self.borders = value;	self
+	}
 
 	/// Configure a closure that can be invoked from within JavaScript.
 	/// The closure's first parameter specifies a command name.
@@ -46,6 +57,18 @@ impl BrowserWindowBuilder {
 	{
 		self.handler = Some( Box::new( handler ) );
 		self
+	}
+
+	/// Sets whether or not the window has a maximize button on the title bar
+	/// Default is true.
+	pub fn maximizable( mut self, value: bool ) -> Self {
+		self.maximizable = value;	self
+	}
+
+	/// Sets whether or not the window has a minimize button on the title bar
+	/// Default is true
+	pub fn minimizable( mut self, value: bool ) -> Self {
+		self.minimizable = value;	self
 	}
 
 	/// Configure a parent window.
@@ -68,7 +91,12 @@ impl BrowserWindowBuilder {
 			handler: None,
 			title: None,
 			width: None,
-			height: None
+			height: None,
+
+			borders: true,
+			minimizable: true,
+			maximizable: true,
+			resizable: true
 		}
 	}
 
@@ -97,6 +125,12 @@ impl BrowserWindowBuilder {
 	pub fn height( mut self, height: u32 ) -> Self {
 		self.height = Some( height );
 		self
+	}
+
+	/// Sets whether or not the window will be resizable
+	/// Default is true
+	pub fn resizable( mut self, resizable: bool ) -> Self {
+		self.resizable = resizable;	self
 	}
 
 	/// Creates the browser window.
@@ -152,7 +186,7 @@ impl BrowserWindowBuilder {
 		H: FnOnce( BrowserWindowHandle ) + Send + 'static
 	{
 		match self {
-			BrowserWindowBuilder { parent, source, title, width, height, handler } => {
+			BrowserWindowBuilder { parent, source, title, width, height, handler, borders, minimizable, maximizable, resizable } => {
 
 				// Parent
 				let parent_handle = match parent {
@@ -199,14 +233,12 @@ impl BrowserWindowBuilder {
 					BrowserWindowCreationCallbackData::from( on_created )
 				) );
 
-				// TODO: Expose these options in the BrowserWindowBuilder
 				let window_options = bw_WindowOptions {
-					maximizable: true,
-					minimizable: true,
-					resizable: true,
+					maximizable: maximizable,
+					minimizable: minimizable,
+					resizable: resizable,
 					closable: true,
-					borders: true,
-					is_popup: true
+					borders: borders
 				};
 				let other_options = bw_BrowserWindowOptions {
 					dev_tools: true

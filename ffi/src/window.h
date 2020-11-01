@@ -39,7 +39,6 @@ typedef struct bw_WindowOptions {
 	bool resizable;
 	bool closable;
 	bool borders;
-	bool is_popup;
 } bw_WindowOptions;
 
 typedef void (*bw_WindowDispatchFn)( bw_Window* window, void* data );

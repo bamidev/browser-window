@@ -24,6 +24,10 @@ async fn program_logic( app: ApplicationAsync ) {
 		.title("Example".to_owned())
 		.width( 800 )
 		.height( 600 )
+		.minimizable( false )
+		.maximizable( false )
+		.borders( false )
+		.resizable( false )
 		.handler(|_, cmd, _| {
 
 			println!("Command \"{}\" invoked!", cmd);
