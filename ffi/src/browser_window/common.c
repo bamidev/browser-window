@@ -19,15 +19,15 @@ void bw_BrowserWindow_drop( bw_BrowserWindow* bw ) {
 	bw_Window_drop( bw->window );
 }
 
-const bw_Application* bw_BrowserWindow_get_app( bw_BrowserWindow* bw ) {
+const bw_Application* bw_BrowserWindow_getApp( bw_BrowserWindow* bw ) {
 	return bw->window->app;
 }
 
-void* bw_BrowserWindow_get_user_data( bw_BrowserWindow* bw ) {
+void* bw_BrowserWindow_getUserData( bw_BrowserWindow* bw ) {
 	return bw->user_data;
 }
 
-void _bw_BrowserWindow_init_window_callbacks( bw_BrowserWindow* bw ) {
+void _bw_BrowserWindow_initWindowCallbacks( bw_BrowserWindow* bw ) {
 
 	bw->callbacks.on_close = bw_BrowserWindow_onClose;
 	bw->callbacks.on_loaded = bw_BrowserWindow_onLoaded;

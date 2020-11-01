@@ -16,7 +16,7 @@
 #endif
 
 // Causes the current process to exit with the given exit code.
-void _bw_Application_exit_process( int exit_code );
+void _bw_Application_exitProcess( int exit_code );
 
 
 
@@ -56,7 +56,7 @@ void bw_Application_exit( bw_Application* app, int exit_code ) {
 	CefQuitMessageLoop();
 }*/
 
-void _bw_Application_exit_process( int exit_code ) {
+void _bw_Application_exitProcess( int exit_code ) {
 #ifdef BW_WIN32
 	ExitProcess( exit_code );
 #endif
@@ -87,7 +87,7 @@ void bw_Application_init( bw_Application* app ) {
 	int exit_code = CefExecuteProcess( main_args, cef_app_handle.get(), 0 );
 	// If the current process returns a non-negative number, it is not the main process on which we run user code.
 	if ( exit_code >= 0 ) {
-		_bw_Application_exit_process( exit_code );
+		_bw_Application_exitProcess( exit_code );
 		return;
 	}
 

@@ -68,17 +68,17 @@ void bw_BrowserWindow_close( bw_BrowserWindow* bw );
 /// This function can be called from any thread so it needs to be thread safe.
 void bw_BrowserWindow_drop( bw_BrowserWindow* bw );
 
-void bw_BrowserWindow_eval_js( bw_BrowserWindow* bw, bw_CStrSlice js, bw_BrowserWindowJsCallbackFn callback, void* cb_data );
+void bw_BrowserWindow_evalJs( bw_BrowserWindow* bw, bw_CStrSlice js, bw_BrowserWindowJsCallbackFn callback, void* cb_data );
 
 // This frees the browser window handle and everything that it has allocated.
 // Warning: only call this when the browser has actually closed AND the handle is not being used anymore in Rust!
 void bw_BrowserWindow_free( bw_BrowserWindow* bw );
 
-const bw_Application* bw_BrowserWindow_get_app( bw_BrowserWindow* bw );
-void* bw_BrowserWindow_get_user_data( bw_BrowserWindow* bw );
+const bw_Application* bw_BrowserWindow_getApp( bw_BrowserWindow* bw );
+void* bw_BrowserWindow_getUserData( bw_BrowserWindow* bw );
 
 /// Sets up the callbacks of the internal window handle to redirect the callbacks of the browser window callbacks.
-void _bw_BrowserWindow_init_window_callbacks( bw_BrowserWindow* bw );
+void _bw_BrowserWindow_initWindowCallbacks( bw_BrowserWindow* bw );
 
 bw_Err bw_BrowserWindow_navigate( bw_BrowserWindow* bw, bw_CStrSlice url );
 

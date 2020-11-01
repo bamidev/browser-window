@@ -18,17 +18,15 @@
 
 
 
-/// Initialize the Cef's browser object
-void bw_BrowserWindow_init_cef( CefRefPtr<CefBrowser> browser );
 #ifdef BW_CEF_WINDOWS
 RECT bw_BrowserWindow_window_rect( int width, int height );
 #endif
 // Sends the given Javascript code to the renderer process, expecting the code to be executed over there.
 // script_id should be a script id obtained from storing a callback in the eval callback store.
-void bw_BrowserWindow_send_js_to_renderer_process( bw_BrowserWindow* bw, CefRefPtr<CefBrowser>& cef_browser, CefString& code, bw_BrowserWindowJsCallbackFn cb, void* user_data );
-char* bw_cef_error_message( bw_ErrCode code, const void* data );
+void bw_BrowserWindow_sendJsToRendererProcess( bw_BrowserWindow* bw, CefRefPtr<CefBrowser>& cef_browser, CefString& code, bw_BrowserWindowJsCallbackFn cb, void* user_data );
+char* bw_cef_errorMessage( bw_ErrCode code, const void* data );
 void _bw_BrowserWindow_doCleanup( bw_BrowserWindow* bw );
-void _bw_BrowserWindow_on_resize( const bw_Window* window, unsigned int width, unsigned int height );
+void _bw_BrowserWindow_onResize( const bw_Window* window, unsigned int width, unsigned int height );
 /// Constructs the platform-specific window info needed by CEF.
 CefWindowInfo _bw_BrowserWindow_windowInfo( bw_Window* window, int width, int height );
 
@@ -40,7 +38,7 @@ CefWindowInfo _bw_BrowserWindow_windowInfo( bw_Window* window, int width, int he
 	(*cef_ptr)->GetHost()->CloseBrowser( true );
 }*/
 
-void bw_BrowserWindow_eval_js( bw_BrowserWindow* bw, bw_CStrSlice js, bw_BrowserWindowJsCallbackFn cb, void* user_data ) {
+void bw_BrowserWindow_evalJs( bw_BrowserWindow* bw, bw_CStrSlice js, bw_BrowserWindowJsCallbackFn cb, void* user_data ) {
 
 	// Wrap the JS code within a temporary function and execute it, and convert the return value to a string
 	// This allows executing JS code that isn't terminated with a semicolon, and does the javascript value string conversion inside JS.
@@ -55,7 +53,7 @@ void bw_BrowserWindow_eval_js( bw_BrowserWindow* bw, bw_CStrSlice js, bw_Browser
 	// Execute the javascript on the renderer process, and invoke the callback from there:
 	CefRefPtr<CefBrowser> cef_browser = *(CefRefPtr<CefBrowser>*)(bw->inner.cef_ptr);
 
-	bw_BrowserWindow_send_js_to_renderer_process( bw, cef_browser, code, cb, user_data );
+	bw_BrowserWindow_sendJsToRendererProcess( bw, cef_browser, code, cb, user_data );
 }
 
 void _bw_BrowserWindow_doCleanup( const bw_Window* window ) {BW_DEBUG("bw_BrowserWindow_cleanup")
@@ -72,11 +70,6 @@ void _bw_BrowserWindow_doCleanup( const bw_Window* window ) {BW_DEBUG("bw_Browse
 	// Then free (a c feature) the browser window itself
 	free( bw_ptr );
 }
-
-void bw_BrowserWindow_init_cef( CefRefPtr<CefBrowser> browser ) {
-	// We could do some initialization here...
-}
-
 
 bw_Err bw_BrowserWindow_navigate( bw_BrowserWindow* bw, bw_CStrSlice url ) {
 
@@ -143,7 +136,7 @@ void bw_BrowserWindow_new(
 
 	bw_Window* window = bw_Window_new( app, parent, _title, width, height, window_options, 0 );
 	window->callbacks.do_cleanup = _bw_BrowserWindow_doCleanup;
-	window->callbacks.on_resize = _bw_BrowserWindow_on_resize;
+	window->callbacks.on_resize = _bw_BrowserWindow_onResize;
 	
 	// Update window size in CefWindowInfo
 #ifdef BW_WIN32
@@ -173,7 +166,7 @@ void bw_BrowserWindow_new(
 	BW_ASSERT( success, "CefBrowserHost::CreateBrowser failed!\n" );
 }
 
-void bw_BrowserWindow_send_js_to_renderer_process( bw_BrowserWindow* bw, CefRefPtr<CefBrowser>& cef_browser, CefString& code, bw_BrowserWindowJsCallbackFn cb, void* user_data ) {
+void bw_BrowserWindow_sendJsToRendererProcess( bw_BrowserWindow* bw, CefRefPtr<CefBrowser>& cef_browser, CefString& code, bw_BrowserWindowJsCallbackFn cb, void* user_data ) {
 	CefRefPtr<CefProcessMessage> msg = CefProcessMessage::Create("eval-js");
 	CefRefPtr<CefListValue> args = msg->GetArgumentList();
 
@@ -219,7 +212,7 @@ RECT bw_BrowserWindow_window_rect( int width, int height) {
 }
 #endif
 
-void _bw_BrowserWindow_on_resize( const bw_Window* window, unsigned int width, unsigned int height ) {fprintf(stderr, "sdfasdfsdf s23232\n");
+void _bw_BrowserWindow_onResize( const bw_Window* window, unsigned int width, unsigned int height ) {fprintf(stderr, "sdfasdfsdf s23232\n");
 	bw_BrowserWindow* bw = (bw_BrowserWindow*)window->user_data;
 
 	fprintf(stderr, "sdfasdfsdf s\n");

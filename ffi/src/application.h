@@ -32,7 +32,7 @@ void bw_Application_exit(  bw_Application* app, int exit_code );
 
 /// Same as bw_Application_exit, but guaranteed to be thread-safe
 /// The exit_code will be returned by bw_Application_run.
-void bw_Application_exit_async(  bw_Application* app, int exit_code );
+void bw_Application_exitAsync(  bw_Application* app, int exit_code );
 
 /// Dispatches the given function to be executed on the thread this application instance has been created on,
 ///     and passes the given data to it.

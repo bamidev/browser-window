@@ -44,9 +44,9 @@ extern "C" {
 	pub fn bw_BrowserWindow_close( bw: *mut bw_BrowserWindow );
 	pub fn bw_BrowserWindow_dispatch( bw: *mut bw_BrowserWindow, func: bw_BrowserWindowDispatchFn, data: *mut c_void );
 	pub fn bw_BrowserWindow_drop( bw: *mut bw_BrowserWindow );
-	pub fn bw_BrowserWindow_eval_js( bw: *mut bw_BrowserWindow, js: bw_CStrSlice, callback: bw_BrowserWindowEvalJsCallbackFn, cb_data: *mut c_void );
-	pub fn bw_BrowserWindow_get_app( bw: *mut bw_BrowserWindow ) -> *const bw_Application;
-	pub fn bw_BrowserWindow_get_user_data( bw: *mut bw_BrowserWindow ) -> *mut c_void;
+	pub fn bw_BrowserWindow_evalJs( bw: *mut bw_BrowserWindow, js: bw_CStrSlice, callback: bw_BrowserWindowEvalJsCallbackFn, cb_data: *mut c_void );
+	pub fn bw_BrowserWindow_getApp( bw: *mut bw_BrowserWindow ) -> *const bw_Application;
+	pub fn bw_BrowserWindow_getUserData( bw: *mut bw_BrowserWindow ) -> *mut c_void;
 	pub fn bw_BrowserWindow_navigate( bw: *mut bw_BrowserWindow, url: bw_CStrSlice ) -> bw_Err;
 	pub fn bw_BrowserWindow_new(
 		app: *mut bw_Application,

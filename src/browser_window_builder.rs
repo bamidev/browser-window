@@ -259,7 +259,7 @@ fn args_to_vec<'a>( args: *const bw_CStrSlice, args_count: usize ) -> Vec<&'a st
 extern "C" fn ffi_window_invoke_handler( inner_handle: *mut bw_BrowserWindow, _command: bw_CStrSlice, _args: *const bw_CStrSlice, args_count: usize ) {
 
 	unsafe {
-		let data_ptr: *mut BrowserWindowUserData = mem::transmute( bw_BrowserWindow_get_user_data( inner_handle ) );
+		let data_ptr: *mut BrowserWindowUserData = mem::transmute( bw_BrowserWindow_getUserData( inner_handle ) );
 		let data: &mut BrowserWindowUserData = &mut *data_ptr;
 
 		match data {

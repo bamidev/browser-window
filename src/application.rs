@@ -123,7 +123,7 @@ impl ApplicationAsync {
 	/// The run command will return the exit code provided.
 	pub fn exit( &self, exit_code: u32 ) {
 		// The thread-safe version of bw_Application_exit:
-		unsafe { bw_Application_exit_async( self.inner._ffi_handle, exit_code as _ ); }
+		unsafe { bw_Application_exitAsync( self.inner._ffi_handle, exit_code as _ ); }
 	}
 }
 

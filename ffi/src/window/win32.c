@@ -12,7 +12,7 @@
 
 void bw_Window_cleanup( bw_Window* window );
 void _bw_Window_destroy( bw_Window* window, void* data );
-BOOL CALLBACK bw_Window_hide_child( HWND handle, LPARAM lparam );
+BOOL CALLBACK bw_Window_hideChild( HWND handle, LPARAM lparam );
 void _bw_Window_resize( bw_Window* window );
 
 
@@ -42,7 +42,7 @@ void bw_Window_close( bw_Window* window ) {
 	// Hide window and hide all its children, to emulate DestroyWindow without actually destroying it:
 	ShowWindow( window->handle, SW_HIDE );
 
-	EnumChildWindows( window->handle, bw_Window_hide_child, 0 );
+	EnumChildWindows( window->handle, bw_Window_hideChild, 0 );
 
 	window->closed = true;
 }
@@ -82,7 +82,7 @@ void bw_Window_dispatch( bw_Window* window, bw_WindowDispatchFn f, void* data ) 
 	}
 }
 
-BOOL CALLBACK bw_Window_hide_child( HWND handle, LPARAM _ ) {
+BOOL CALLBACK bw_Window_hideChild( HWND handle, LPARAM _ ) {
 
 	ShowWindow( handle, SW_HIDE );
 

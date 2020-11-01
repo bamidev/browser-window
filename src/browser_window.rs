@@ -170,7 +170,7 @@ impl BrowserWindowHandle {
 			BrowserWindowCallbackData::<'a>::new( on_complete )
 		) );
 
-		unsafe { bw_BrowserWindow_eval_js(
+		unsafe { bw_BrowserWindow_evalJs(
 			self._ffi_handle,
 			js.into(),
 			ffi_eval_js_callback,
@@ -210,7 +210,7 @@ impl BrowserWindowHandle {
 impl AppHandle for BrowserWindowHandle {
 	fn app_handle( &self ) -> ApplicationHandle {
 		ApplicationHandle {
-			_ffi_handle: unsafe { bw_BrowserWindow_get_app( self._ffi_handle ) as _ }
+			_ffi_handle: unsafe { bw_BrowserWindow_getApp( self._ffi_handle ) as _ }
 		}
 	}
 }

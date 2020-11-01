@@ -66,7 +66,7 @@ void bw_Application_exit( bw_Application* app, int exit_code ) {
 	PostThreadMessageW( app->thread_id, WM_QUIT, (WPARAM)exit_code, (LPARAM)NULL );
 }
 
-void bw_Application_exit_async( bw_Application* app, int code ) {
+void bw_Application_exitAsync( bw_Application* app, int code ) {
 	// PostThreadMessage is threadsafe, so we do exactly the same thing
 	bw_Application_exit( app, code );
 }

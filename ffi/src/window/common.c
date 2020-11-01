@@ -2,7 +2,7 @@
 
 
 
-const bw_Application* bw_Window_get_app( bw_Window* window ) {
+const bw_Application* bw_Window_getApp( bw_Window* window ) {
 	return window->app;
 }
 
