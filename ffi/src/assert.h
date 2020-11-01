@@ -21,7 +21,7 @@ extern "C" {
 #define BW_ASSERT( CONDITION, MESSAGE, ... ) \
 	if ( !(CONDITION) ) { \
 		fprintf( stderr, MESSAGE, __VA_ARGS__ ); \
-		assert(0); \
+		assert( CONDITION ); \
 	}
 
 
