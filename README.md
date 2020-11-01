@@ -10,7 +10,7 @@ This allows you to create authentication dialogs for websites that don't provide
 
 This API is designed with asynchronous programming in mind from the ground up.
 This gives the developer(s) the ability to use this API within an async/await context, but not forcing them to.
-This makes it so much easier, than having to deal with callbacks.
+It makes it so much easier, than having to deal with callbacks in your code.
 You can view the [example](https://github.com/bamilab/browser-window/tree/master/example) to see how a graphical user interface within a asynchronous context could be made.
 
 ## Requirements
