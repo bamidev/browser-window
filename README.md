@@ -1,22 +1,29 @@
 # Browser Window
 
 Browser Window is a simple Rust crate for using browser windows.
+This can be used to build a graphical user interface with HTML/CSS/JS technology, or just to have browser functionality within your application.
 Browser Window was born from the lack of a good [Electron](https://www.electronjs.org/) alternative for Rust.
-There a few very basic ones out there.
-However, a few key features are missing, such as using them in asynchronous environments.
-This is an attempt at creating an API that can be used to build a graphical user interface with HTML/CSS/JS technology, or just to have browser functionality within your application.
-Another feature that will be made available in the future is the ability to obtain HTTP cookies.
-This allows you to create authentication dialogs for websites that don't provide public API's.
+There are actually a few ones out there already.
+However, they seem to be lacking a few important things.
 
-This API is designed with asynchronous programming in mind from the ground up.
+## The problem Browser Window is solving
+
+The main problem is that they depend on crate web-view, which uses browser engine API's already available on the OS itself, like Edge on Windows.
+This makes it really easy to build and ship applications because you don't really need to install and ship any libraries on Windows and iOS.
+However, the Edge API that's preinstalled on Windows is not being maintained anymore.
+Also, with Linux you still need to provide WebKit anyway, so basically only iOS could provide the promise of compiling to single executables while at the same time keeping up to date with the newest web technology.
+Moreover, the Windows web-view implementation, at this time of writting, causes segfaults because there are some problems with memory management.
+What also would be nice is a nice asynchronous interface.
+
+This API is designed with asynchronous programming in mind, from the ground up.
 This gives the developer(s) the ability to use this API within an async/await context, but not forcing them to.
-It makes it so much easier, than having to deal with callbacks in your code.
-You can view the [example](https://github.com/bamilab/browser-window/tree/master/example) to see how a graphical user interface within a asynchronous context could be made.
+It makes it so much easier than having to deal with callbacks in your code.
+You can view the [example](https://github.com/bamilab/browser-window/tree/master/example) to see how easy a graphical user interface within a asynchronous context can be made.
 
 ## Requirements
 
 Browser Window currently relies on [CEF3](https://bitbucket.org/chromiumembedded/cef/wiki/Home) as its browser engine.
-Also, only windows is the supported platform at the moment.
+Also, only windows is the only supported platform at the moment.
 
 ### CEF3
 
@@ -40,11 +47,11 @@ This software is made available open source under a MIT license, for maximum fre
 
 ## Development
 
-If you want to help out, you're more than welcome! I also need someone to implement support for iOS with WebKit.
+If you want to help out, you're more than welcome! I will need someone at some point to implement iOS support.
 
 ## Comming Soon
 
-This project is very new. At the moment only very basic functionality is made available. More will come soon.
+This project is very new. At the moment only very basic functionality is made available. There will be more soon:
 
 * Linux support
-* Cookies (including HttpOnly cookies)
+* Cookie support (including HttpOnly cookies)
