@@ -1,6 +1,6 @@
 [package]
 name = "browser-window-ffi"
-version = "0.0.0"
+version = "0.0.1"
 description = "FFI bindings for the browser-window create."
 edition = "2018"
 authors = ["Danny de Jong"]
@@ -16,3 +16,8 @@ crate-type = ["rlib"]
 
 [build-dependencies]
 cc = "1.0"
+
+[package.metadata.docs.rs]
+all-features = true
+default-target = "x86_64-pc-windows-msvc"
+targets = ["x86_64-pc-windows-msvc", "i686-pc-windows-msvc"]

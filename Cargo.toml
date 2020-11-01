@@ -1,6 +1,6 @@
 [package]
 name = "browser-window"
-version = "0.0.2"
+version = "0.0.3"
 description = "An async/await aware browser (GUI) toolkit like electron."
 edition = "2018"
 authors = ["Danny de Jong"]
@@ -21,10 +21,10 @@ path = "src/lib.rs"
 
 [dependencies]
 boxfnonce = "0.1"
-browser-window-ffi = { path = "./ffi", version = "0.0.0" }
+browser-window-ffi = { path = "./ffi", version = "0.0.1" }
 tokio = { version = "0.2", features = ["sync"] }
 
 [package.metadata.docs.rs]
 all-features = true
 default-target = "x86_64-pc-windows-msvc"
-targets = ["x86_64-pc-windows-msvc"]
+targets = ["x86_64-pc-windows-msvc", "i686-pc-windows-msvc"]
