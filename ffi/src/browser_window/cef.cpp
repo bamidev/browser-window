@@ -213,7 +213,7 @@ RECT bw_BrowserWindow_window_rect( int width, int height) {
 }
 #endif
 
-void _bw_BrowserWindow_onResize( const bw_Window* window, unsigned int width, unsigned int height ) {fprintf(stderr, "sdfasdfsdf s23232\n");
+void _bw_BrowserWindow_onResize( const bw_Window* window, unsigned int width, unsigned int height ) {
 	bw_BrowserWindow* bw = (bw_BrowserWindow*)window->user_data;
 
 	if ( bw != 0 ) {

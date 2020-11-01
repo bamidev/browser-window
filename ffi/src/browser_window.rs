@@ -34,8 +34,7 @@ pub struct bw_WindowOptions {
 	pub minimizable: bool,
 	pub resizable: bool,
 	pub closable: bool,
-	pub borders: bool,
-	pub is_popup: bool
+	pub borders: bool
 }
 
 

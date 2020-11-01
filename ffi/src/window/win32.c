@@ -151,17 +151,14 @@ bw_Window* bw_Window_new(
 
 	DWORD window_style = WS_OVERLAPPEDWINDOW;
 
-	if ( !options->borders ) {
-		window_style = WS_POPUP | WS_MINIMIZEBOX;
-	}
-	else {
-		if ( options->resizable )
-			window_style |= WS_SIZEBOX;
-		if ( options->minimizable )
-			window_style |= WS_MINIMIZEBOX;
-		if ( options->maximizable )
-			window_style |= WS_MAXIMIZEBOX;
-	}
+	if ( !options->borders )
+		window_style ^= WS_BORDER;
+	if ( !options->resizable )
+		window_style ^= WS_SIZEBOX;
+	if ( !options->minimizable )
+		window_style ^= WS_MINIMIZEBOX;
+	if ( !options->maximizable )
+		window_style ^= WS_MAXIMIZEBOX;
 
 	wchar_t* title = bw_win32_copyAsNewWstr( _title );
 
@@ -183,6 +180,7 @@ bw_Window* bw_Window_new(
 		BW_WIN32_ASSERT_ERROR;
 	}
 
+	// Store a pointer to our window handle in win32's window handle
 	SetWindowLongPtr( window->handle, GWLP_USERDATA, (LONG_PTR)window );
 
 	// Show window

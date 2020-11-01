@@ -152,7 +152,7 @@ pub type BrowserWindowDispatchFuture<'a,R> = DispatchFuture<'a, BrowserWindowHan
 impl BrowserWindowHandle {
 
 	/// Closes the browser.
-	/// The browser will be freed from memory when the last handle to it gets dropped.
+	// The browser will be freed from memory when the last handle to it gets dropped.
 	pub fn close( self ) {
 		unsafe { bw_BrowserWindow_close( self._ffi_handle ); }
 	}
