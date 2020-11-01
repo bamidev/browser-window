@@ -89,7 +89,6 @@ impl Deref for BrowserWindow {
 impl BrowserWindowAsync {
 
 	/// Closes the browser.
-	/// The browser will be freed from memory when the last handle to it gets dropped.
 	pub async fn close( self ) {
 		self.dispatch(|bw| {
 			bw.close()

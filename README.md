@@ -11,7 +11,7 @@ However, they seem to be lacking a few important things.
 The main problem is that they depend on crate web-view, which uses browser engine API's already available on the OS itself, like Edge on Windows.
 This makes it really easy to build and ship applications because you don't really need to install and ship any libraries on Windows and iOS.
 However, the Edge API that's preinstalled on Windows is not being maintained anymore.
-Also, with Linux you still need to provide WebKit anyway, so basically only iOS could provide the promise of compiling to single executables while at the same time keeping up to date with the newest web technology.
+Also, with Linux you still need to provide WebKit anyway, so basically only iOS could provide the promise of being able to be shipped as a single executables while at the same time keeping up to date with the newest web technology.
 Moreover, the Windows web-view implementation, at this time of writting, causes segfaults because there are some problems with memory management.
 What would also be nice is a good asynchronous interface.
 
