@@ -2,7 +2,6 @@
 
 mod application;
 mod browser_window;
-mod browser_window_builder;
 mod common;
 
 
@@ -19,7 +18,7 @@ pub use browser_window::{
 	BrowserWindowDispatchFuture,
 	BrowserWindowHandle
 };
-pub use browser_window_builder::{
+pub use browser_window::builder::{
 	BrowserWindowBuilder,
 	Source
 };

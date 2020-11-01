@@ -15,6 +15,10 @@ use crate::application::{
 };
 use crate::common::*;
 
+pub mod builder;
+
+pub use builder::BrowserWindowBuilder;
+
 
 
 /// A thread-unsafe handle to a browser window.
@@ -40,7 +44,7 @@ pub struct BrowserWindowAsync {
 /// A browser window handle that can not be instantiated, but is provided by handlers.
 #[derive(Clone)]
 pub struct BrowserWindowHandle {
-	pub _ffi_handle: *mut bw_BrowserWindow
+	_ffi_handle: *mut bw_BrowserWindow
 }
 // We implement Send and Sync of BrowserWindowHandle because it is used internally by BrowserWindowAsync as well.
 unsafe impl Send for BrowserWindowHandle {}
