@@ -6,7 +6,7 @@ edition = "2018"
 authors = ["Danny de Jong"]
 license = "MIT"
 publish = true
-categories = ["external-ffi-bindings"]
+categories = ["api-bindings"]
 repository = "https://github.com/bamilab/browser-window/tree/master/ffi"
 
 [lib]
