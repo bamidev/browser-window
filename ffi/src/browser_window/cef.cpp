@@ -56,7 +56,7 @@ void bw_BrowserWindow_evalJs( bw_BrowserWindow* bw, bw_CStrSlice js, bw_BrowserW
 	bw_BrowserWindow_sendJsToRendererProcess( bw, cef_browser, code, cb, user_data );
 }
 
-void _bw_BrowserWindow_doCleanup( const bw_Window* window ) {BW_DEBUG("bw_BrowserWindow_cleanup")
+void _bw_BrowserWindow_doCleanup( const bw_Window* window ) {
 
 	auto bw_ptr = (bw_BrowserWindow*)window->user_data;
 
@@ -216,12 +216,8 @@ RECT bw_BrowserWindow_window_rect( int width, int height) {
 void _bw_BrowserWindow_onResize( const bw_Window* window, unsigned int width, unsigned int height ) {fprintf(stderr, "sdfasdfsdf s23232\n");
 	bw_BrowserWindow* bw = (bw_BrowserWindow*)window->user_data;
 
-	fprintf(stderr, "sdfasdfsdf s\n");
-
 	if ( bw != 0 ) {
 		CefRefPtr<CefBrowser> cef = *(CefRefPtr<CefBrowser>*)bw->inner.cef_ptr;
-
-		fprintf(stderr, "sdfasdfsdf\n");
 
 #ifdef BW_WIN32
 		SetWindowPos( cef->GetHost()->GetWindowHandle(), 0, 0, 0, width, height, SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOACTIVATE );
