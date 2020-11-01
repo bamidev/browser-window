@@ -5,6 +5,13 @@ use std::env;
 
 
 fn main() {
+
+	// If this is being build by docs.rs, don't do anything.
+	// docs.rs is not able to compile the C/C++ source files because it doesn't have the win32 and cef3 header files available.
+	if let Ok(_) = env::var("DOCS_RS") {
+		return
+	}
+
     let mut build = cc::Build::new();
 
     let target = env::var("TARGET").unwrap();
