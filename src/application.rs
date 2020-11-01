@@ -16,8 +16,7 @@ pub struct Application {
 
 
 /// A thread-safe application handle.
-/// This handle allows you to dispatch code to be executed on the GUI thread.
-/// It can also be used to exit the application from some other thread.
+/// This handle also allows you to dispatch code to be executed on the GUI thread.
 #[derive(Clone)]
 pub struct ApplicationAsync {
 	pub inner: Arc<ApplicationInner>
