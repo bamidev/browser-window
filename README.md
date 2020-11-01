@@ -13,7 +13,7 @@ This makes it really easy to build and ship applications because you don't reall
 However, the Edge API that's preinstalled on Windows is not being maintained anymore.
 Also, with Linux you still need to provide WebKit anyway, so basically only iOS could provide the promise of compiling to single executables while at the same time keeping up to date with the newest web technology.
 Moreover, the Windows web-view implementation, at this time of writting, causes segfaults because there are some problems with memory management.
-What also would be nice is a nice asynchronous interface.
+What would also be nice is a good asynchronous interface.
 
 This API is designed with asynchronous programming in mind, from the ground up.
 This gives the developer(s) the ability to use this API within an async/await context, but not forcing them to.
@@ -23,7 +23,7 @@ You can view the [example](https://github.com/bamilab/browser-window/tree/master
 ## Requirements
 
 Browser Window currently relies on [CEF3](https://bitbucket.org/chromiumembedded/cef/wiki/Home) as its browser engine.
-Also, only windows is the only supported platform at the moment.
+Also, Windows is the only supported platform at the moment.
 
 ### CEF3
 
@@ -47,7 +47,7 @@ This software is made available open source under a MIT license, for maximum fre
 
 ## Development
 
-If you want to help out, you're more than welcome! I will need someone at some point to implement iOS support.
+If you want to help out, you're more than welcome! I could use some help with implementing iOS support.
 
 ## Comming Soon
 
