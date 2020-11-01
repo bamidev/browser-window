@@ -20,7 +20,7 @@ fn main() {
 			.file("src/application/win32.c")
 			.file("src/window/common.c")
 			.file("src/window/win32.c")
-			.flag("/DBW_WIN32");
+			.define("BW_WIN32", None);
 
 		// CEF source files
 		build
@@ -28,7 +28,7 @@ fn main() {
 			.file("src/browser_window/cef.cpp")
 			.file("src/cef/bw_handle_map.cpp")
 			.file("src/cef/exception.cpp")
-			.flag("/DBW_CEF");
+			.define("BW_CEF", None);
 	}
 
 	// Common source files
