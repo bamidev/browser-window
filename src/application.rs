@@ -1,5 +1,6 @@
 use browser_window_ffi::*;
 use std::ops::Deref;
+use std::rc::Rc;
 use std::sync::Arc;
 
 use super::common::*;
@@ -7,22 +8,10 @@ use super::common::*;
 
 
 /// A thread-unsafe handle to an application instance.
-/// To do anything useful with the browser_window lib, you need to construct an Apllication,
-///     preferably on the main thread. (Some future implementations might not work on any other threads.)
-/// Then, you can spawn any browser window you like.
-/// Then you need to call method run. This will execute the event loop and causes your browser windows to appear.
-///
-/// Note:
-///     Due to the way the internal structure is reused for ApplicationAsync, we have had to declare its internal structure as Send and Sync.
-///     However, Application is not supposed to be Send or Sync.
-///     We can't disable Send and Sync for Application without a new feature that is only available in Rust nightly atm.
-///     Therefore, if you want upmost safety, enable feature "nightly" for this crate
 #[derive(Clone)]
 pub struct Application {
-	pub inner: Arc<ApplicationInner>
+	pub inner: Rc<ApplicationInner>
 }
-#[cfg(feature = "nightly")]
-impl !Send for Application {}
 
 
 
@@ -57,9 +46,13 @@ pub struct ApplicationInner {
 impl Application {
 
 	/// Get an async clone of this handle
-	pub fn async_clone( &self ) -> ApplicationAsync {
+	pub fn into_async( self ) -> ApplicationAsync {
+		
+		// Convert an Rc to an Arc
+		let inner = unsafe { Arc::from_raw( Rc::into_raw( self.inner ) ) };
+		
 		ApplicationAsync {
-			inner: self.inner.clone()
+			inner: inner
 		}
 	}
 
@@ -69,7 +62,7 @@ impl Application {
 		let ffi_handle = unsafe { bw_Application_new() };
 
 		Self {
-			inner: Arc::new( ApplicationInner{
+			inner: Rc::new( ApplicationInner{
 				inner: ApplicationHandle {
 					_ffi_handle: ffi_handle
 				}
@@ -129,9 +122,7 @@ impl ApplicationAsync {
 
 impl From<Application> for ApplicationAsync {
 	fn from( app: Application ) -> Self {
-		ApplicationAsync {
-			inner: app.inner
-		}
+		app.into_async()
 	}
 }
 
