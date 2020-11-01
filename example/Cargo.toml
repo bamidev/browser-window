@@ -5,10 +5,6 @@ description = "A simple example that demonstrates how you can use browser window
 edition = "2018"
 publish = false
 
-[features]
-nightly = ["browser-window/nightly"]
-webview2 = ["browser-window/webview2"]
-
 [dependencies]
 browser-window = { path = ".." }
 tokio = { version = "0.2", features = ["rt-threaded", "time"] }
