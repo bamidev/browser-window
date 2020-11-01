@@ -153,6 +153,7 @@ void bw_BrowserWindow_new(
 	bw->user_data = user_data;
 	// Store a pointer of our browser window into the window
 	bw->window->user_data = (void*)bw;
+	_bw_BrowserWindow_initWindowCallbacks( bw );
 
 	// Create a CefDictionary containing the bw_BrowserWindow pointer to pass along CreateBrowser
 	CefRefPtr<CefDictionaryValue> dict = CefDictionaryValue::Create();
