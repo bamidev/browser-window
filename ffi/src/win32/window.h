@@ -1,0 +1,15 @@
+#ifndef BW_WIN32_WINDOW_H
+#define BW_WIN32_WINDOW_H
+
+
+
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+
+
+
+typedef HWND bw_WindowHandle;
+
+
+
+#endif//BW_WIN32_WINDOW_H

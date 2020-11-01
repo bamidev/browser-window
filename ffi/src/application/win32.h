@@ -21,6 +21,7 @@ struct bw_Application {
 	HINSTANCE handle;
 	WNDCLASSEX wc;
 	struct bw_ApplicationEngineData* engine_data;	/// Can be set by the implementation of a browser engine
+	unsigned int windows_alive;
 };
 
 struct bw_ApplicationDispatchData {

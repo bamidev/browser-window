@@ -31,10 +31,8 @@ typedef struct bw_BrowserWindow bw_BrowserWindow;
 typedef struct bw_BrowserWindowInner bw_BrowserWindowInner;
 
 typedef struct bw_BrowserWindowCallbacks {
-	void (*do_cleanup)( bw_BrowserWindow* bw );
 	/// Fired when a browser window has finished loading its window and its browser
 	void (*on_close)( bw_BrowserWindow* bw );
-	void (*on_destroy)( bw_BrowserWindow* bw );
 	void (*on_loaded)( bw_BrowserWindow* bw );
 } bw_BrowserWindowCallbacks;
 
@@ -65,10 +63,9 @@ struct bw_BrowserWindow {
 
 void bw_BrowserWindow_close( bw_BrowserWindow* bw );
 
-void _bw_BrowserWindow_doCleanup( bw_BrowserWindow* bw );
-
 /// Marks the browser window handle as not being used anymore.
 /// This makes it so that if and when the window gets closed, everything is freed and cleaned from memory.
+/// This function can be called from any thread so it needs to be thread safe.
 void bw_BrowserWindow_drop( bw_BrowserWindow* bw );
 
 void bw_BrowserWindow_eval_js( bw_BrowserWindow* bw, bw_CStrSlice js, bw_BrowserWindowJsCallbackFn callback, void* cb_data );
@@ -87,7 +84,7 @@ bw_Err bw_BrowserWindow_navigate( bw_BrowserWindow* bw, bw_CStrSlice url );
 
 /// Creates a new browser window
 void bw_BrowserWindow_new(
-	const bw_Application* app,
+	bw_Application* app,
 	const bw_Window* parent,
 	bw_BrowserWindowSource source,
 	bw_CStrSlice _title,

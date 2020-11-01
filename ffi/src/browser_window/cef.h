@@ -5,13 +5,10 @@
 extern "C" {
 #endif
 
-#include <stdbool.h>
-
 
 
 struct bw_BrowserWindowInner {
 	void* cef_ptr;
-	bool handle_is_used;
 };
 
 

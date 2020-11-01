@@ -15,7 +15,6 @@ fn main() {
 		build
 			.file("src/win32.c")
 			.file("src/application/win32.c")
-			.file("src/browser_window/common_with_window.c")
 			.file("src/window/common.c")
 			.file("src/window/win32.c")
 			.flag("/D")

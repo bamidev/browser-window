@@ -33,6 +33,7 @@ bw_Application* bw_Application_new() {
 	app->thread_id = GetCurrentThreadId();
  	app->handle = GetModuleHandle( NULL );
 	app->engine_data = 0;
+	app->windows_alive = 0;
 
 	bw_Application_init( app );
 
@@ -73,7 +74,7 @@ void bw_Application_exit_async( bw_Application* app, int code ) {
 int bw_Application_run( bw_Application* app ) {
 	MSG msg;
 
-	while( true ) {
+	while ( 1 ) {
 		BOOL res = GetMessageW( &msg, 0, 0, 0);
 		if ( res == 0 ) {
 			int exit_code = (int)msg.wParam;
@@ -94,13 +95,13 @@ int bw_Application_run( bw_Application* app ) {
 
 				free( params );
 			}
-			/*else if ( msg.message == WM_APP + 1 ) {
+			else if ( msg.message == WM_APP + 1 ) {
 				bw_WindowDispatchData* params = (bw_WindowDispatchData*)msg.lParam;
 
 				(params->func)( params->window, params->data );
 
 				free( params );
-			}*/
+			}
 		}
 	}
 }

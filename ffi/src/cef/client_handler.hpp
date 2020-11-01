@@ -15,38 +15,12 @@
 class ClientHandler : public CefClient, public CefLifeSpanHandler {
 
 	bw_Application* app;
-	unsigned int browser_count;
 
 public:
-	ClientHandler( bw_Application* app ) : app(app), browser_count(0) {}
+	ClientHandler( bw_Application* app ) : app(app) {}
 
 	virtual CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() override {
 		return this;
-	}
-
-	virtual void OnAfterCreated( CefRefPtr<CefBrowser> browser ) override {
-		this->browser_count += 1;
-	}
-
-	virtual void OnBeforeClose(CefRefPtr<CefBrowser> browser) override {
-		this->browser_count -= 1;
-
-		// Fetch our handle
-		std::optional<bw_BrowserWindow*> result = bw::bw_handle_map.fetch( browser );
-		BW_ASSERT( result.has_value(), "Link between CEF's browser handle and our handle does not exist!\n" );
-		bw_BrowserWindow* handle = *result;
-
-		handle->window->closed = true;
-
-		// If the handle has been dropped, free the browser window
-		if ( !handle->inner.handle_is_used ) {
-			bw_BrowserWindow_free( handle );
-		}
-
-		// If the last browser window is now closed, we exit the application
-		if ( this->browser_count == 0 ) {
-			bw_Application_exit( this->app, 0 );
-		}
 	}
 
 	virtual bool OnProcessMessageReceived(
@@ -95,7 +69,6 @@ protected:
 		void* callback_data;
 		args->GetBinary( 2 )->GetData( (void*)&callback_data, sizeof( callback_data ), 0 );
 
-
 		// Make a copy on the heap to store in our handle
 		CefRefPtr<CefBrowser>* cef_ptr = new CefRefPtr<CefBrowser>( browser );
 		bw_handle->inner.cef_ptr = (void*)cef_ptr;
@@ -103,6 +76,7 @@ protected:
 		// Store a link with the cef browser handle and our handle in a global map
 		bw::bw_handle_map.store( *cef_ptr, bw_handle );
 
+		// Invoke the callback
 		callback( bw_handle, callback_data );
 	}
 
