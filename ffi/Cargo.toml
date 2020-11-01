@@ -1,7 +1,7 @@
 [package]
 name = "browser-window-ffi"
 version = "0.0.1"
-description = "FFI bindings for the browser-window create."
+description = "FFI bindings for the browser-window crate."
 edition = "2018"
 authors = ["Danny de Jong"]
 license = "MIT"
