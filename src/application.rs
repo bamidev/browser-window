@@ -8,6 +8,7 @@ use super::common::*;
 
 
 /// A thread-unsafe handle to an application instance.
+/// Use this to start the application with.
 #[derive(Clone)]
 pub struct Application {
 	pub inner: Rc<ApplicationInner>
@@ -25,7 +26,7 @@ pub struct ApplicationAsync {
 
 
 /// An application handle that can not be instantiated,
-///     but is provided by certain handlers
+///     but is provided by certain handlers.
 #[derive(Clone)]
 pub struct ApplicationHandle {
 	pub _ffi_handle: *mut bw_Application
@@ -69,7 +70,7 @@ impl Application {
 		}
 	}
 
-	/// Run the main loop
+	/// Run the main loop.
 	/// This method finishes when all windows are closed.
 	pub fn run( &self ) -> i32 {
 		unsafe { bw_Application_run( self.inner._ffi_handle ) }
@@ -129,11 +130,15 @@ impl From<Application> for ApplicationAsync {
 
 impl ApplicationHandle {
 
+	/// Causes the run function to exit.
+	/// 
+	/// # Arguments
+	/// * `exit_code` - The code that will be returned by the run function when it stops.
 	pub fn exit( &self, exit_code: u32 ) {
 		unsafe { bw_Application_exit( self._ffi_handle, exit_code as _ ); }
 	}
 
-	/// Constructs an ApplicationHandle from an internal C handle
+	// Constructs an ApplicationHandle from an internal C handle
 	pub fn from_ptr( ptr: &mut bw_Application ) -> ApplicationHandle {
 		ApplicationHandle {
 			_ffi_handle: ptr

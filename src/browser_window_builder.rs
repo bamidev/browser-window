@@ -23,7 +23,7 @@ pub enum Source {
 	Html( String )
 }
 
-/// Used to create a BrowserWindow instance
+/// Used to create a BrowserWindow instance.
 pub struct BrowserWindowBuilder {
 
 	parent: Option<BrowserWindowHandle>,

@@ -18,25 +18,26 @@ use crate::common::*;
 
 
 /// A thread-unsafe handle to a browser window.
-/// A reference counter is held internally,
-///     meaning that you can simply clone this handle without having to worry about memory leakage.
-/// If the user closes the window, this handle stays valid.
-/// Also, if you lose this handle, window destruction and cleanup is only done when the user actually closes it.
-/// So you don't have to worry about lifetimes and/or propper destruction of the window either.
+// A reference counter is held internally,
+//     meaning that you can simply clone this handle without having to worry about memory leakage.
+// If the user closes the window, this handle stays valid.
+// Also, if you lose this handle, window destruction and cleanup is only done when the user actually closes it.
+// So you don't have to worry about lifetimes and/or propper destruction of the window either.
 #[derive(Clone)]
 pub struct BrowserWindow {
 	pub inner: Rc<BrowserWindowInner>
 }
 
 /// A thread-safe handle to a browser window.
-/// It provides the same functionality as Browserwindow.
-/// However, each function is async: it runs on the GUI thread, and returns when it is done.
-/// Also, it allows you to dispatch a closure on that thread.
+/// It allows you to dispatch code to the GUI thread.
+// It provides the same functionality as Browserwindow.
+// However, each function is async: it runs on the GUI thread, and returns when it is done.
 #[derive(Clone)]
 pub struct BrowserWindowAsync {
 	pub inner: Arc<BrowserWindowInner>
 }
 
+/// A browser window handle that can not be instantiated, but is provided by handlers.
 #[derive(Clone)]
 pub struct BrowserWindowHandle {
 	pub _ffi_handle: *mut bw_BrowserWindow
@@ -143,6 +144,7 @@ impl BrowserWindowAsync {
 
 type BrowserWindowCallbackData<'a> = SendBoxFnOnce<'a,(BrowserWindowHandle, Result<String, Box<dyn Error + Send>>),()>;
 
+/// The future that dispatches a closure on the GUI thread used by BrowserWindowAsync.
 pub type BrowserWindowDispatchFuture<'a,R> = DispatchFuture<'a, BrowserWindowHandle, R>;
 
 
