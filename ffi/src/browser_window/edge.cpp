@@ -38,6 +38,7 @@ void bw_BrowserWindow_evalJs( bw_BrowserWindow* bw, bw_CStrSlice js_slice, bw_Br
 
 	op.Completed([=](auto op, auto status) {
 
+		// on error
 		if ( status == AsyncStatus::Error ) {
 			bw_Err error;
 
@@ -50,14 +51,17 @@ void bw_BrowserWindow_evalJs( bw_BrowserWindow* bw, bw_CStrSlice js_slice, bw_Br
 
 			bw_Err_free( &error );
 		}
+		// on success
 		else if ( status == AsyncStatus::Completed ) {
 			std::string result = winrt::to_string( op.GetResults() );
 
+			// If result indicates success
 			if ( result.find( "ok:" ) == 0 ) {
 				auto result_str = result.substr(3);
 
 				callback( bw, cb_data, result_str.c_str(), 0 );
 			}
+			// If result indicates error
 			else if ( result.find("err:") == 0 ) {
 				std::string err_msg = "JavaScript error: ";
 				err_msg += result.substr(4);
