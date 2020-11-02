@@ -29,13 +29,21 @@ fn main() {
 			.file("src/window/win32.c")
 			.define("BW_WIN32", None);
 
-		// CEF source files
-		build
-			.file("src/application/cef.cpp")
-			.file("src/browser_window/cef.cpp")
-			.file("src/cef/bw_handle_map.cpp")
-			.file("src/cef/exception.cpp")
-			.define("BW_CEF", None);
+		if cfg!(feature = "edge") {
+			build
+				.file("src/application/edge.cpp")
+				.file("src/browser_window/edge.cpp")
+				.define("BW_EDGE", None);
+		}
+		else {
+			// CEF source files
+			build
+				.file("src/application/cef.cpp")
+				.file("src/browser_window/cef.cpp")
+				.file("src/cef/bw_handle_map.cpp")
+				.file("src/cef/exception.cpp")
+				.define("BW_CEF", None);
+		}
 	}
 
 	// Common source files

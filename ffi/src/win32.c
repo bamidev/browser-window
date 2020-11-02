@@ -1,5 +1,7 @@
 #include "win32.h"
 
+#include "debug.h"
+
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -115,10 +117,9 @@ bw_Err bw_win32_unhandledHresult( HRESULT hResult ) {
 			return error;
 		}
 		else {
-
 			bw_Err error;
 			error.code = (bw_ErrCode)hResult;
-			// No data is used here
+			error.data = 0;	// No data is used here
 			error.alloc_message = bw_win32_unknownHresultMessage;
 			return error;
 		}
@@ -129,17 +130,18 @@ char* bw_win32_unhandledHresultMessage( bw_ErrCode code, void* data ) {
 
 	char* hresult_msg = bw_win32_copyWstrAsNewCstr( (WCHAR*)data );
 
-	char* message = calloc( strlen("Unhandled win32 hresult error [0x00000000]: ") + strlen( hresult_msg ) + 1, sizeof( char ) );
-	sprintf_s( message, "Unhandled win32 hresult error [%x]: %s", code, hresult_msg );
+	char* message = calloc( strlen("Unhandled win32 hresult error [0x00000000]: ") + strlen( hresult_msg ) + 9, sizeof( char ) );
+	sprintf( message, "Unhandled win32 hresult error [0x%x]: %s", code, hresult_msg );
 
 	free( hresult_msg );
 	return message;
 }
 
-char* bw_win32_unknownHresultMessage( bw_ErrCode code, void* _data ) {
+char* bw_win32_unknownHresultMessage( bw_ErrCode code, void* _ ) {
 
-	char* message = calloc( strlen("Unknown win32 hresult error: 0x00000000") + 1, sizeof( char ) );
-	sprintf_s( message, "Unknown win32 hresult error: %x", code );
+	char* message = calloc( strlen("Unknown win32 hresult error: 0x00000000") + 9, sizeof( char ) );
+
+	sprintf( message, "Unknown win32 hresult error: 0x%x", code );
 
 	return message;
 }

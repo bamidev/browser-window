@@ -38,6 +38,7 @@ pub struct BrowserWindow {
 // However, each function is async: it runs on the GUI thread, and returns when it is done.
 #[derive(Clone)]
 pub struct BrowserWindowAsync {
+	#[doc(hidden)]
 	pub inner: Arc<BrowserWindowInner>
 }
 
@@ -54,7 +55,9 @@ unsafe impl Sync for BrowserWindowHandle {}
 /// The purpose of this structure is to invoke the FFI function to drop the browser window handle, when this struct is dropped naturally by Rust.
 /// So by putting this struct in an Arc<...>, you effectively have some sort garbage collection.
 pub struct BrowserWindowInner {
+	#[doc(hidden)]
 	pub app: ApplicationHandle,
+	#[doc(hidden)]
 	pub handle: BrowserWindowHandle	// TODO: Change name to "browser", handle is too ambigious
 }
 

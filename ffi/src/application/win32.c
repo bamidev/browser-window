@@ -38,8 +38,8 @@ bw_Application* bw_Application_new() {
 	bw_Application_init( app );
 
 	// Register window class
-	memset( &app->wc, 0, sizeof(WNDCLASSEX) );
-	app->wc.cbSize = sizeof( WNDCLASSEX );
+	memset( &app->wc, 0, sizeof(WNDCLASSEXW) );
+	app->wc.cbSize = sizeof( WNDCLASSEXW );
 	app->wc.hInstance = app->handle;
 	app->wc.lpfnWndProc = bw_Window_proc;
 	app->wc.lpszClassName = L"browser_window";

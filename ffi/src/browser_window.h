@@ -1,8 +1,8 @@
 #ifndef BW_BROWSER_WINDOW_H
 #define BW_BROWSER_WINDOW_H
 
-#ifdef BW_WEBVIEW2
-#include "browser_window/webview2.h"
+#ifdef BW_EDGE
+#include "browser_window/edge.h"
 #endif
 #ifdef BW_CEF
 #include "browser_window/cef.h"
@@ -70,15 +70,8 @@ void bw_BrowserWindow_drop( bw_BrowserWindow* bw );
 
 void bw_BrowserWindow_evalJs( bw_BrowserWindow* bw, bw_CStrSlice js, bw_BrowserWindowJsCallbackFn callback, void* cb_data );
 
-// This frees the browser window handle and everything that it has allocated.
-// Warning: only call this when the browser has actually closed AND the handle is not being used anymore in Rust!
-void bw_BrowserWindow_free( bw_BrowserWindow* bw );
-
 const bw_Application* bw_BrowserWindow_getApp( bw_BrowserWindow* bw );
 void* bw_BrowserWindow_getUserData( bw_BrowserWindow* bw );
-
-/// Sets up the callbacks of the internal window handle to redirect the callbacks of the browser window callbacks.
-void _bw_BrowserWindow_initWindowCallbacks( bw_BrowserWindow* bw );
 
 bw_Err bw_BrowserWindow_navigate( bw_BrowserWindow* bw, bw_CStrSlice url );
 
@@ -96,6 +89,9 @@ void bw_BrowserWindow_new(
 	bw_BrowserWindowCreationCallbackFn callback,	// A function that gets invoked when the browser window has been created.
 	void* callback_data	// Data that will be passed to the creation callback
 );
+
+/// Sets up the callbacks of the internal window handle to redirect the callbacks of the browser window callbacks.
+void _bw_BrowserWindow_initWindowCallbacks( bw_BrowserWindow* bw );
 
 
 

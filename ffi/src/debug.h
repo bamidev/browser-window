@@ -24,7 +24,7 @@ extern "C" {
 	fprintf( stderr, "\n" ); \
 }
 #else
-#define BW_DEBUG
+#define BW_DEBUG( ... )
 #endif
 
 

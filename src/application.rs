@@ -11,6 +11,7 @@ use super::common::*;
 /// Use this to start the application with.
 #[derive(Clone)]
 pub struct Application {
+	#[doc(hidden)]
 	pub inner: Rc<ApplicationInner>
 }
 
@@ -20,15 +21,17 @@ pub struct Application {
 /// This handle also allows you to dispatch code to be executed on the GUI thread.
 #[derive(Clone)]
 pub struct ApplicationAsync {
+	#[doc(hidden)]
 	pub inner: Arc<ApplicationInner>
 }
 
 
 
 /// An application handle that can not be instantiated,
-///     but is provided by certain handlers.
+///     but is provided.
 #[derive(Clone)]
 pub struct ApplicationHandle {
+	#[doc(hidden)]
 	pub _ffi_handle: *mut bw_Application
 }
 unsafe impl Send for ApplicationHandle {}
@@ -47,17 +50,17 @@ impl Application {
 
 	/// Get an async clone of this handle
 	pub fn into_async( self ) -> ApplicationAsync {
-		
+
 		// Convert an Rc to an Arc
 		let inner = unsafe { Arc::from_raw( Rc::into_raw( self.inner ) ) };
-		
+
 		ApplicationAsync {
 			inner: inner
 		}
 	}
 
 	/// Constructs a new application handle
-	/// Only call this once
+	/// Only call this once in your application
 	pub fn new() -> Self {
 		let ffi_handle = unsafe { bw_Application_new() };
 
@@ -131,7 +134,7 @@ impl From<Application> for ApplicationAsync {
 impl ApplicationHandle {
 
 	/// Causes the run function to exit.
-	/// 
+	///
 	/// # Arguments
 	/// * `exit_code` - The code that will be returned by the run function when it stops.
 	pub fn exit( &self, exit_code: u32 ) {

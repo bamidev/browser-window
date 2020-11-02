@@ -28,9 +28,12 @@ async fn program_logic( app: ApplicationAsync ) {
 		.maximizable( false )
 		.borders( false )
 		.resizable( false )
-		.handler(|_, cmd, _| {
+		.handler(|_, cmd, args| {
 
 			println!("Command \"{}\" invoked!", cmd);
+			for i in 0..args.len() {
+				println!("\tArg {}: {}", i+1, args[i]);
+			}
 		})
 		.spawn_async( &app ).await;
 
@@ -47,9 +50,9 @@ async fn program_logic( app: ApplicationAsync ) {
 	// Let's execute some bad code
 	// This doesn't work because cookies are not available when using Source::Html.
 	match bw.eval_js("document.cookie").await {
-		Err(e) => { eprintln!("This javascript error is expected: {}", e) },
+		Err(e) => { eprintln!("This javascript error is expected when using CEF: {}", e) },
 		Ok( cookies ) => {
-			eprintln!("Unexpected cookies?!: {}", cookies);
+			eprintln!("Available cookies: {}", cookies);
 		}
 	}
 }
