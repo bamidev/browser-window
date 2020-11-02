@@ -133,16 +133,21 @@ void bw_BrowserWindow_new(
 			// Is needed in order to be visible to the user
 			handle_data->control.IsVisible( true );
 
-			handle_data->control.ScriptNotify([=](auto, auto const& args) {BW_DEBUG("on SCRIPTNOTIFY")
+			handle_data->control.ScriptNotify([=](auto, auto const& args) {
 				std::string args_str = winrt::to_string( args.Value() );
+				bw_CStrSlice args_slice = { args_str.length(), args_str.c_str() };
 
-				BW_DEBUG("ScriptNotify %s", args_str.c_str())
+				external_handler( bw, args_slice, 0, 0 );
 			});
 
 			// Inject javascript that creates the invoke_extern function
 			handle_data->control.NavigationStarting([=](auto const& sender, auto const& args) {
 				handle_data->control.AddInitializeScript(winrt::to_hstring(
-					"function() invoke_extern( cmd ) { window.external.notify( cmd ) }"
+					"(function() {"
+						"window.invoke_extern = (...cmd) => {"
+							"window.external.notify(cmd.join(','))"
+						"}"
+					"})();"
 				));
 			});
 

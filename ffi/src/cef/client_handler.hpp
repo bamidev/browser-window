@@ -137,7 +137,6 @@ protected:
 		// This argument is the command string
 		CefString cmd = msg_args->GetString( 0 );
 
-		// TODO: Obtain all extra parameters
 		std::vector<std::string> params; params.reserve( msg_args->GetSize() - 1 );
 		std::vector<bw_CStrSlice> params_slices; params_slices.reserve( params.capacity() );
 		for ( size_t i = 1; i < msg_args->GetSize(); i++ ) {
