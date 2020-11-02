@@ -20,7 +20,7 @@ path = "src/lib.rs"
 
 [dependencies]
 boxfnonce = "0.1"
-browser-window-ffi = { path = "./ffi", version = "0.0.5" }
+browser-window-ffi = { path = "./ffi", version = "0.1.0" }
 tokio = { version = "0.2", features = ["sync"] }
 
 [package.metadata.docs.rs]
