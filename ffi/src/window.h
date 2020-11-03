@@ -84,7 +84,7 @@ void bw_Window_free( bw_Window* window );
 
 /// Dispatches the given function on the GUI thread, and passes the given data along.
 /// This function is thread-safe.
-void bw_Window_dispatch( bw_Window* window, bw_WindowDispatchFn fn, void* data );
+//void bw_Window_dispatch( bw_Window* window, bw_WindowDispatchFn fn, void* data );
 
 void _bw_Window_init( bw_Application* app );
 

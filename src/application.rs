@@ -1,4 +1,5 @@
 use browser_window_ffi::*;
+use std::marker::PhantomData;
 use std::ops::Deref;
 use std::rc::Rc;
 use std::sync::Arc;
@@ -11,7 +12,9 @@ use super::common::*;
 /// Use this to start the application with.
 #[derive(Clone)]
 pub struct Application {
-	pub(in super) inner: Rc<ApplicationInner>
+	pub(in super) inner: Arc<ApplicationInner>,
+	/// This field is purely here to force Application in not being Send or Sync
+	_not_send: PhantomData<Rc<u8>>
 }
 
 
@@ -25,8 +28,8 @@ pub struct ApplicationAsync {
 
 
 
-/// An application handle that can not be instantiated,
-///     but is provided.
+/// An handle for this application.
+/// Can be seen as an interface for the Application and ApplicationAsync 'handles'.
 #[derive(Clone)]
 pub struct ApplicationHandle {
 	pub(in super) _ffi_handle: *mut bw_Application
@@ -34,46 +37,44 @@ pub struct ApplicationHandle {
 unsafe impl Send for ApplicationHandle {}
 unsafe impl Sync for ApplicationHandle {}
 
+
+
 /// The future that dispatches a closure onto the GUI thread
 pub type ApplicationDispatchFuture<'a,R> = DispatchFuture<'a, ApplicationHandle, R>;
 
 pub struct ApplicationInner {
-	pub(in super) inner: ApplicationHandle
+	pub(in super) handle: ApplicationHandle
 }
 
 
 
 impl Application {
 
-	/// Get an async clone of this handle
 	pub fn into_async( self ) -> ApplicationAsync {
-
-		// Convert an Rc to an Arc
-		let inner = unsafe { Arc::from_raw( Rc::into_raw( self.inner ) ) };
-
 		ApplicationAsync {
-			inner: inner
-		}
-	}
-
-	/// Constructs a new application handle
-	/// Only call this once in your application
-	pub fn new() -> Self {
-		let ffi_handle = unsafe { bw_Application_new() };
-
-		Self {
-			inner: Rc::new( ApplicationInner{
-				inner: ApplicationHandle {
-					_ffi_handle: ffi_handle
-				}
-			} )
+			inner: self.inner
 		}
 	}
 
 	/// Run the main loop.
 	/// This method finishes when all windows are closed.
 	pub fn run( &self ) -> i32 {
-		unsafe { bw_Application_run( self.inner._ffi_handle ) }
+		unsafe { bw_Application_run( self._ffi_handle ) }
+	}
+
+	/// Starts the GUI application.
+	/// Only call this once, and at the start of your program, before anything else.
+	/// Everything that runs before this function, runs as well on the other (browser engine related) processes.
+	/// This is generally unnecessary.
+	pub fn start() -> Self {
+		let ffi_handle = unsafe { bw_Application_start() };
+
+		Self {
+			inner: Arc::new( ApplicationInner{
+				handle: ApplicationHandle::from_ptr( ffi_handle )
+			} ),
+			_not_send: PhantomData
+		}
 	}
 }
 
@@ -85,43 +86,34 @@ impl Deref for Application {
 	}
 }
 
-impl AppHandle for ApplicationHandle {
-	fn app_handle( &self ) -> ApplicationHandle {
-		ApplicationHandle {
-			_ffi_handle: self._ffi_handle
-		}
-	}
-}
-
 impl ApplicationAsync {
-
-	/// Clones the async version of this application handle into a non-async version.
-	/// This is unsafe because the non-async version of the handle may only be used on the thread it was created on,
-	///  while this method might not have been called on that thread
-	unsafe fn clone_threadunsafe_handle( &self ) -> ApplicationHandle {
-		ApplicationHandle {
-			_ffi_handle: (**self.inner)._ffi_handle.clone()
-		}
-	}
 
 	/// Executes the given closure on the GUI thread.
 	pub fn dispatch<'a,F,R>( &self, func: F ) -> ApplicationDispatchFuture<'a,R> where
 		F: FnOnce( ApplicationHandle ) -> R + Send + 'a,
 		R: Send
 	{
-		ApplicationDispatchFuture::<'a,R>::new( unsafe { self.clone_threadunsafe_handle() }, func )
+		ApplicationDispatchFuture::<'a,R>::new( (**self).clone(), func )
 	}
 
 	/// Signals the application to exit.
 	/// The run command will return the exit code provided.
 	pub fn exit( &self, exit_code: u32 ) {
 		// The thread-safe version of bw_Application_exit:
-		unsafe { bw_Application_exitAsync( self.inner._ffi_handle, exit_code as _ ); }
+		unsafe { bw_Application_exitAsync( self.inner.handle._ffi_handle, exit_code as _ ); }
+	}
+}
+
+impl Deref for ApplicationAsync {
+	type Target = ApplicationHandle;
+
+	fn deref( &self ) -> &Self::Target {
+		&self.inner.handle
 	}
 }
 
 impl From<Application> for ApplicationAsync {
-	fn from( app: Application ) -> Self {
+	fn from( app: Application ) -> ApplicationAsync {
 		app.into_async()
 	}
 }
@@ -139,10 +131,16 @@ impl ApplicationHandle {
 	}
 
 	// Constructs an ApplicationHandle from an internal C handle
-	pub fn from_ptr( ptr: &mut bw_Application ) -> ApplicationHandle {
+	fn from_ptr( ptr: *mut bw_Application ) -> ApplicationHandle {
 		ApplicationHandle {
 			_ffi_handle: ptr
 		}
+	}
+}
+
+impl HasAppHandle for ApplicationHandle {
+	fn app_handle( &self ) -> ApplicationHandle {
+		self.clone()
 	}
 }
 
@@ -152,12 +150,12 @@ impl Deref for ApplicationInner {
 	type Target = ApplicationHandle;
 
 	fn deref( &self ) -> &Self::Target {
-		&self.inner
+		&self.handle
 	}
 }
 
 impl Drop for ApplicationInner {
 	fn drop( &mut self ) {
-		unsafe { bw_Application_free( self._ffi_handle ) }
+		unsafe { bw_Application_free( self.handle._ffi_handle ); }
 	}
 }

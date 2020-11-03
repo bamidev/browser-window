@@ -15,6 +15,6 @@ extern "C" {
 	pub fn bw_Application_exit( app: *mut bw_Application, result: c_int );
 	pub fn bw_Application_exitAsync( app: *mut bw_Application, result: c_int );
 	pub fn bw_Application_free( app: *mut bw_Application );
-	pub fn bw_Application_new() -> *mut bw_Application;
+	pub fn bw_Application_start() -> *mut bw_Application;
 	pub fn bw_Application_run( app: *mut bw_Application ) -> c_int;
 }

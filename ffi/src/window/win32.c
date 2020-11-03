@@ -1,5 +1,6 @@
 #include "win32.h"
 #include "../application/win32.h"
+#include "../assert.h"
 #include "../debug.h"
 #include "../win32.h"
 #include "../window.h"
@@ -49,12 +50,6 @@ void bw_Window_close( bw_Window* window ) {
 
 void bw_Window_drop( bw_Window* window ) {
 
-	// We need to dispatch the destruction of this window because bw_Window_drop needs to be thread-safe.
-	bw_Window_dispatch( window, _bw_Window_destroy, 0 );
-}
-
-void _bw_Window_destroy( bw_Window* window, void* data ) {
-
 	// If we want to have the window destroyed and it has already been closed by the user,
 	//     the window is only hidden and we can go ahead and actually destroy it.
 	if ( window->closed ) {
@@ -64,21 +59,6 @@ void _bw_Window_destroy( bw_Window* window, void* data ) {
 	// If the window is still active, but it isn't needed anymore in the code, we just activate automatic destruction:
 	else {
 		window->destroy_on_close = true;
-	}
-}
-
-void bw_Window_dispatch( bw_Window* window, bw_WindowDispatchFn f, void* data ) {
-
-	bw_WindowDispatchData* param = malloc( sizeof( bw_WindowDispatchData ) );
-	param->func = f;
-	param->window = window;
-	param->data = data;
-
-	// WM_APP + 1 is the message code for dispatching a window function
-	if ( !PostThreadMessageW( window->app->thread_id, WM_APP + 1, 0, (LPARAM)param ) ) {
-		free( param );
-
-		BW_WIN32_ASSERT_ERROR;
 	}
 }
 
@@ -95,6 +75,8 @@ LRESULT CALLBACK bw_Window_proc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 
 	switch (msg) {
 	case WM_SIZE:
+		BW_ASSERT( window != 0, "Invalid window pointer during WM_SIZE" );
+
 		RECT rect;
 		GetClientRect( window->handle, &rect );
 

@@ -21,7 +21,7 @@ path = "src/lib.rs"
 [dependencies]
 boxfnonce = "0.1"
 browser-window-ffi = { path = "./ffi", version = "0.1.1" }
-tokio = { version = "0.2", features = ["sync"] }
+futures-channel = { version = "0.3" }
 
 [package.metadata.docs.rs]
 all-features = true

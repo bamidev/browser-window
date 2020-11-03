@@ -116,7 +116,7 @@ bw_Err bw_BrowserWindow_navigate( bw_BrowserWindow* bw, bw_CStrSlice url ) {
 
 void bw_BrowserWindow_new(
 	bw_Application* app,
-	const bw_Window* parent,
+	const bw_BrowserWindow* parent,
 	bw_BrowserWindowSource _source,
 	bw_CStrSlice title,
 	int width, int height,
@@ -132,7 +132,8 @@ void bw_BrowserWindow_new(
 
 	auto process = WebViewControlProcess();
 
-	bw_Window* window = bw_Window_new( app, parent, title, width, height, window_options, 0 );
+	bw_Window* parent_window = parent == 0 ? 0 : parent->window;
+	bw_Window* window = bw_Window_new( app, parent_window, title, width, height, window_options, 0 );
 
 	auto op = process.CreateWebViewControlAsync( reinterpret_cast<long>(window->handle), Rect( 0.0, 0.0, (float)width, (float)height ) );
 

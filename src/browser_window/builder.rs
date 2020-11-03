@@ -1,11 +1,10 @@
 use browser_window_ffi::*;
 
-use boxfnonce::SendBoxFnOnce;
+use boxfnonce::{BoxFnOnce};
 use std::ffi::*;
-use tokio::sync::oneshot;
 
 use crate::application::{Application, ApplicationAsync, ApplicationHandle};
-use crate::browser_window::{BrowserWindow, BrowserWindowHandle, BrowserWindowInner, BrowserWindowAsync};
+use crate::browser_window::*;
 
 use std::{
 	mem,
@@ -140,14 +139,15 @@ impl BrowserWindowBuilder {
 	/// * `app` - An application handle that this browser window can spawn into
 	/// * `on_created` - A callback closure that will be invoked when the browser window is created and ready.
 	pub fn spawn<H>( self, app: &Application, on_created: H ) where
-		H: FnOnce( BrowserWindow ) + Send + 'static
+		H: FnOnce( BrowserWindow )
 	{
-		let app_handle = (*app.inner).clone();
+		let app_inner = app.inner.clone();
+		let app_handle = (**app).clone();
 
-		self._spawn( app_handle.clone(), move |inner_handle| {
+		self._spawn( app_handle, move |inner_handle| {
 			let bw = BrowserWindow {
 				inner: Rc::new( BrowserWindowInner {
-					app: app_handle,
+					app: app_inner,
 					handle: inner_handle
 				} )
 			};
@@ -162,29 +162,30 @@ impl BrowserWindowBuilder {
 	/// # Arguments
 	/// * `app` - An async application handle.
 	pub async fn spawn_async( self, app: &ApplicationAsync ) -> BrowserWindowAsync {
+
 		let (tx, rx) = oneshot::channel::<BrowserWindowHandle>();
 
-		let app_handle = (*app.inner).clone();
+		// We need to dispatch the spawning to the GUI thread
+		app.dispatch(|app_handle| {
 
-		// We need to dispatch the spawning to the GUI thread because only there we can call GUI functionality
-		app.dispatch(|app| {
-			self._spawn(app, move |inner_handle| {
-				let _ = tx.send( inner_handle );
+			self._spawn(app_handle, |inner_handle| {
+
+				if let Err(_) = tx.send( inner_handle ) {
+					panic!("Unable to send browser handle back")
+				}
 			} );
 		}).await;
 
-		let inner_handle = rx.await.unwrap();
-
 		BrowserWindowAsync {
-			inner: Arc::new( BrowserWindowInner {
-				app: app_handle,
-				handle: inner_handle
+			inner: Arc::new( BrowserWindowInnerAsync {
+				app: app.inner.clone(),
+				handle: rx.await.unwrap()
 			} )
 		}
 	}
 
-	fn _spawn<H: 'static>( self, app: ApplicationHandle, on_created: H ) where
-		H: FnOnce( BrowserWindowHandle ) + Send + 'static
+	fn _spawn<H>( self, app: ApplicationHandle, on_created: H ) where
+		H: FnOnce( BrowserWindowHandle )
 	{
 		match self {
 			BrowserWindowBuilder { parent, source, title, width, height, handler, borders, minimizable, maximizable, resizable } => {
@@ -270,7 +271,7 @@ struct BrowserWindowUserData {
 }
 
 /// The data that is passed to the creation callback function
-type BrowserWindowCreationCallbackData = SendBoxFnOnce<'static, ( BrowserWindowHandle, )>;
+type BrowserWindowCreationCallbackData<'a> = BoxFnOnce<'a, ( BrowserWindowHandle, )>;
 
 
 

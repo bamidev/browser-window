@@ -1,5 +1,6 @@
 use boxfnonce::SendBoxFnOnce;
 use browser_window_ffi::*;
+use futures_channel::oneshot;
 use std::{
 	error::Error,
 	ffi::CStr,
@@ -8,11 +9,8 @@ use std::{
 	rc::Rc,
 	sync::Arc
 };
-use tokio::sync::oneshot;
 
-use crate::application::{
-	ApplicationHandle
-};
+use crate::application::*;
 use crate::common::*;
 
 pub mod builder;
@@ -38,47 +36,41 @@ pub struct BrowserWindow {
 // However, each function is async: it runs on the GUI thread, and returns when it is done.
 #[derive(Clone)]
 pub struct BrowserWindowAsync {
-	pub(in super) inner: Arc<BrowserWindowInner>
+	pub(in super) inner: Arc<BrowserWindowInnerAsync>
 }
 
-/// A browser window handle that can not be instantiated, but is provided by handlers.
+/// A handle to a browser window.
+/// This can not be instantiated, but can be seen as an interface that is provided for by the BrowserWindow and BrowserWindowAsync 'handles'.
 #[derive(Clone)]
 pub struct BrowserWindowHandle {
 	_ffi_handle: *mut bw_BrowserWindow
 }
-// We implement Send and Sync of BrowserWindowHandle because it is used internally by BrowserWindowAsync as well.
+// BrowserWindowHandle is made to be Send and Sync, because it is used internally by BrowserWindowAsync as well.
 unsafe impl Send for BrowserWindowHandle {}
 unsafe impl Sync for BrowserWindowHandle {}
 
-/// This structure holds an application handle and a browser window handle.
+/// This structure holds a browser window handle.
 /// The purpose of this structure is to invoke the FFI function to drop the browser window handle, when this struct is dropped naturally by Rust.
-/// So by putting this struct in an Arc<...>, you effectively have some sort garbage collection.
+/// So by putting this struct in an Arc<...> or Rc<...>, you effectively have some sort garbage collection.
 pub struct BrowserWindowInner {
-	pub(in super) app: ApplicationHandle,
-	pub(in super) handle: BrowserWindowHandle	// TODO: Change name to "browser", handle is too ambigious
+	app: Arc<ApplicationInner>,	// Keep a reference to ApplicationInner so that the application handle doesn't get freed prematurely
+	pub(in super) handle: BrowserWindowHandle
+}
+
+pub struct BrowserWindowInnerAsync {
+	app: Arc<ApplicationInner>,	// Keep a reference to ApplicationInner so that the application handle doesn't get freed prematurely
+	pub(in super) handle: BrowserWindowHandle
 }
 
 
 
-impl AppHandle for BrowserWindow {
+impl HasAppHandle for BrowserWindow {
 	fn app_handle( &self ) -> ApplicationHandle {
-		self.inner.app.clone()
+		self.inner.app.handle.clone()
 	}
 }
 
 
-
-impl BrowserWindow {
-
-	pub fn into_async( self ) -> BrowserWindowAsync {
-		// Convert a Rc to an Arc
-		let inner = unsafe { Arc::from_raw( Rc::into_raw( self.inner ) ) };
-
-		BrowserWindowAsync {
-			inner: inner
-		}
-	}
-}
 
 impl Deref for BrowserWindow {
 	type Target = BrowserWindowHandle;
@@ -118,13 +110,13 @@ impl BrowserWindowAsync {
 
 		let (tx, rx) = oneshot::channel::<Result<String, Box<dyn Error + Send>>>();
 
-		self.dispatch(move |bw| {
+		self.dispatch(|bw| {
 
 			// Executing the JavaScript on the GUI thread
-			bw.eval_js( js, move |_, result| {
+			bw.eval_js( js, |_, result| {
 
 				// Result is ready
-				tx.send( result ).unwrap();
+				let _ = tx.send( result ).unwrap();
 			} );
 		}).await;
 
@@ -220,7 +212,7 @@ impl BrowserWindowHandle {
 	}
 }
 
-impl AppHandle for BrowserWindowHandle {
+impl HasAppHandle for BrowserWindowHandle {
 	fn app_handle( &self ) -> ApplicationHandle {
 		ApplicationHandle {
 			_ffi_handle: unsafe { bw_BrowserWindow_getApp( self._ffi_handle ) as _ }
@@ -242,7 +234,17 @@ impl Drop for BrowserWindowInner {
 	}
 }
 
+impl Drop for BrowserWindowInnerAsync {
+	fn drop( &mut self ) {
+		unsafe { bw_Application_dispatch( self.app.handle._ffi_handle, ffi_free_browser_window, self.handle._ffi_handle as _ ); }
+	}
+}
 
+
+
+extern "C" fn ffi_free_browser_window( _app: *mut bw_Application, data: *mut c_void ) {
+	unsafe { bw_BrowserWindow_drop( data as *mut bw_BrowserWindow ); }
+}
 
 extern "C" fn ffi_eval_js_callback( bw: *mut bw_BrowserWindow, cb_data: *mut c_void, result: *const c_char, error: *const bw_Err ) {
 

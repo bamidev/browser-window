@@ -6,7 +6,7 @@ use tokio;
 
 fn main() {
 
-	let app = Application::new();
+	let app = Application::start();
 
 	// Start the tokio runtime and run our program logic on it
 	let runtime = tokio::runtime::Runtime::new().unwrap();

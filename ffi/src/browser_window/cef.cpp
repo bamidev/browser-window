@@ -85,7 +85,7 @@ bw_Err bw_BrowserWindow_navigate( bw_BrowserWindow* bw, bw_CStrSlice url ) {
 
 void bw_BrowserWindow_new(
 	bw_Application* app,
-	const bw_Window* parent,
+	const bw_BrowserWindow* parent,
 	bw_BrowserWindowSource source,
 	bw_CStrSlice _title,
 	int width, int height,
@@ -101,28 +101,6 @@ void bw_BrowserWindow_new(
 	CefWindowInfo info;
 	CefBrowserSettings settings;
 
-	// Platform-specific default parent handle:
-#ifdef BW_WIN32
-	HWND parent_handle = HWND_DESKTOP;
-#endif
-
-	if ( parent != 0 ) {
-		bw_BrowserWindow* parent_bw = (bw_BrowserWindow*)parent->user_data;
-		CefRefPtr<CefBrowser>* parent_cef_ptr = (CefRefPtr<CefBrowser>*)(parent_bw->inner.cef_ptr);
-
-		parent_handle = (*parent_cef_ptr)->GetHost()->GetWindowHandle();
-	}
-
-/*#ifdef BW_WIN32
-	// On Windows, the following is required.
-	// Possibly because CreateWindowEx doesn't work without a parent handle if it is not a popup.
-	info.SetAsPopup( 0, title );
-
-	RECT rect = bw_BrowserWindow_window_rect( width, height );
-
-	//info.SetAsChild( parent_handle, bw_BrowserWindow_window_rect( width, height ) );
-#endif*/
-
 	// Set up a CefString with the source
 	CefString source_string;
 	if ( !source.is_html ) {
@@ -134,7 +112,8 @@ void bw_BrowserWindow_new(
 		source_string = CefString( data );
 	}
 
-	bw_Window* window = bw_Window_new( app, parent, _title, width, height, window_options, 0 );
+	bw_Window* parent_window = parent == 0 ? 0 : parent->window;
+	bw_Window* window = bw_Window_new( app, parent_window, _title, width, height, window_options, 0 );
 	window->callbacks.do_cleanup = _bw_BrowserWindow_doCleanup;
 	window->callbacks.on_resize = _bw_BrowserWindow_onResize;
 

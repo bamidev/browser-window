@@ -4,6 +4,7 @@
 
 //#include "win32.h"
 #include "../application.h"
+#include "../debug.h"
 
 #include <stdlib.h>
 #define WIN32_LEAN_AND_MEAN
@@ -26,7 +27,7 @@ void bw_Application_dispatch( bw_Application* app, bw_ApplicationDispatchFn func
 	PostThreadMessageW( app->thread_id, WM_APP, (WPARAM)NULL, (LPARAM)dispatch_data );
 }
 
-bw_Application* bw_Application_new() {
+bw_Application* bw_Application_start() {
 
 	bw_Application* app = malloc( sizeof( bw_Application ) );
 
@@ -49,11 +50,6 @@ bw_Application* bw_Application_new() {
 }
 
 void bw_Application_free( bw_Application* app ) {
-
-	bw_Application_uninit( app );
-
-	UnregisterClassW( L"browser_window", app->handle );
-
 	free( app );
 }
 
@@ -73,12 +69,13 @@ void bw_Application_exitAsync( bw_Application* app, int code ) {
 
 int bw_Application_run( bw_Application* app ) {
 	MSG msg;
+	int exit_code = 0;
 
 	while ( 1 ) {
 		BOOL res = GetMessageW( &msg, 0, 0, 0);
 		if ( res == 0 ) {
-			int exit_code = (int)msg.wParam;
-			return exit_code;
+			exit_code = (int)msg.wParam;
+			break;
 		}
 		else if (res == -1) {
 			BW_WIN32_ASSERT_ERROR;
@@ -95,13 +92,17 @@ int bw_Application_run( bw_Application* app ) {
 
 				free( params );
 			}
-			else if ( msg.message == WM_APP + 1 ) {
+			/*else if ( msg.message == WM_APP + 1 ) {
 				bw_WindowDispatchData* params = (bw_WindowDispatchData*)msg.lParam;
 
 				(params->func)( params->window, params->data );
 
 				free( params );
-			}
+			}*/
 		}
 	}
+
+	bw_Application_uninit( app );
+
+	UnregisterClassW( L"browser_window", app->handle );
 }

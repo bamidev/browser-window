@@ -78,7 +78,7 @@ bw_Err bw_BrowserWindow_navigate( bw_BrowserWindow* bw, bw_CStrSlice url );
 /// Creates a new browser window
 void bw_BrowserWindow_new(
 	bw_Application* app,
-	const bw_Window* parent,
+	const bw_BrowserWindow* parent,
 	bw_BrowserWindowSource source,
 	bw_CStrSlice _title,
 	int width, int height,

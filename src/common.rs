@@ -48,7 +48,7 @@ impl<'a,H,R> DispatchFuture<'a,H,R> {
 }
 
 impl<'a,H,R> Future for DispatchFuture<'a,H,R> where
-	H: AppHandle + Clone
+	H: HasAppHandle + Clone
 	//R: Send
 {
 	type Output = Box<R>;
@@ -70,7 +70,6 @@ impl<'a,H,R> Future for DispatchFuture<'a,H,R> where
 			// Move ownership of the boxed FnOnce to the data struct
 			// Our future doesn't need it itself
 			mem::swap( &mut self.func, &mut data.func );
-
 			unsafe {
 				let data_ptr = Box::into_raw( data );
 
@@ -100,8 +99,9 @@ impl<'a,H,R> Future for DispatchFuture<'a,H,R> where
 
 
 
-// The trait to be implemented by thread-unsafe handles
-pub trait AppHandle {
+// The trait to be implemented by all (user-level) handles that are able to return an ApplicationHandle.
+// Like: Application, ApplicationAsync, BrowserWindow, BrowserWindowAsync
+pub trait HasAppHandle {
 	fn app_handle( &self ) -> ApplicationHandle;
 }
 
