@@ -73,6 +73,7 @@ impl BrowserWindowBuilder {
 
 	/// Configure a parent window.
 	/// When a parent window closes, this browser window will close as well.
+	/// This could be a reference to a BrowserWindow or BrowserWindowAsync handle.
 	pub fn parent<B>( mut self, bw: &B ) -> Self where
 		B: Deref<Target=BrowserWindowHandle>
 	{

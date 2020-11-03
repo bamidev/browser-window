@@ -143,6 +143,14 @@ impl BrowserWindowAsync {
 	}
 }
 
+impl Deref for BrowserWindowAsync {
+	type Target = BrowserWindowHandle;
+
+	fn deref( &self ) -> &Self::Target {
+		&self.inner.handle
+	}
+}
+
 
 
 type BrowserWindowCallbackData<'a> = SendBoxFnOnce<'a,(BrowserWindowHandle, Result<String, Box<dyn Error + Send>>),()>;
@@ -219,8 +227,6 @@ impl AppHandle for BrowserWindowHandle {
 		}
 	}
 }
-
-
 
 impl Deref for BrowserWindowInner {
 	type Target = BrowserWindowHandle;
