@@ -29,7 +29,7 @@ pub use builder::BrowserWindowBuilder;
 // So you don't have to worry about lifetimes and/or propper destruction of the window either.
 #[derive(Clone)]
 pub struct BrowserWindow {
-	pub inner: Rc<BrowserWindowInner>
+	pub(in super) inner: Rc<BrowserWindowInner>
 }
 
 /// A thread-safe handle to a browser window.
@@ -38,8 +38,7 @@ pub struct BrowserWindow {
 // However, each function is async: it runs on the GUI thread, and returns when it is done.
 #[derive(Clone)]
 pub struct BrowserWindowAsync {
-	#[doc(hidden)]
-	pub inner: Arc<BrowserWindowInner>
+	pub(in super) inner: Arc<BrowserWindowInner>
 }
 
 /// A browser window handle that can not be instantiated, but is provided by handlers.
@@ -55,10 +54,8 @@ unsafe impl Sync for BrowserWindowHandle {}
 /// The purpose of this structure is to invoke the FFI function to drop the browser window handle, when this struct is dropped naturally by Rust.
 /// So by putting this struct in an Arc<...>, you effectively have some sort garbage collection.
 pub struct BrowserWindowInner {
-	#[doc(hidden)]
-	pub app: ApplicationHandle,
-	#[doc(hidden)]
-	pub handle: BrowserWindowHandle	// TODO: Change name to "browser", handle is too ambigious
+	pub(in super) app: ApplicationHandle,
+	pub(in super) handle: BrowserWindowHandle	// TODO: Change name to "browser", handle is too ambigious
 }
 
 

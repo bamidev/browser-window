@@ -11,8 +11,7 @@ use super::common::*;
 /// Use this to start the application with.
 #[derive(Clone)]
 pub struct Application {
-	#[doc(hidden)]
-	pub inner: Rc<ApplicationInner>
+	pub(in super) inner: Rc<ApplicationInner>
 }
 
 
@@ -21,8 +20,7 @@ pub struct Application {
 /// This handle also allows you to dispatch code to be executed on the GUI thread.
 #[derive(Clone)]
 pub struct ApplicationAsync {
-	#[doc(hidden)]
-	pub inner: Arc<ApplicationInner>
+	pub(in super) inner: Arc<ApplicationInner>
 }
 
 
@@ -31,8 +29,7 @@ pub struct ApplicationAsync {
 ///     but is provided.
 #[derive(Clone)]
 pub struct ApplicationHandle {
-	#[doc(hidden)]
-	pub _ffi_handle: *mut bw_Application
+	pub(in super) _ffi_handle: *mut bw_Application
 }
 unsafe impl Send for ApplicationHandle {}
 unsafe impl Sync for ApplicationHandle {}
@@ -41,7 +38,7 @@ unsafe impl Sync for ApplicationHandle {}
 pub type ApplicationDispatchFuture<'a,R> = DispatchFuture<'a, ApplicationHandle, R>;
 
 pub struct ApplicationInner {
-	pub inner: ApplicationHandle
+	pub(in super) inner: ApplicationHandle
 }
 
 
