@@ -4,6 +4,7 @@
 #include "../err.h"
 #include "../win32.h"
 
+#include <sstream>
 #include <string>
 #include <vector>
 #include <winrt/Windows.Web.UI.Interop.h>
@@ -20,6 +21,30 @@ struct HandleData {
 };
 
 
+
+std::vector<std::string> parse_args( const char* args_string ) {
+	std::string tmp;
+	std::vector<std::string> stk;
+	std::stringstream ss(args_string);
+	while( std::getline( ss, tmp, '\x03' ) ) {
+		stk.push_back( tmp );
+	}
+	return stk;
+}
+
+std::vector<bw_CStrSlice> args_slices( const std::vector<std::string>& args ) {
+
+	std::vector<bw_CStrSlice> vec; vec.reserve( args.size() );
+
+	for ( auto it = args.begin(); it != args.end(); it++ ) {
+		const std::string& arg = *it;
+
+		bw_CStrSlice slice = { arg.length(), arg.c_str() };
+		vec.push_back( slice );
+	}
+
+	return vec;
+}
 
 void bw_BrowserWindow_evalJs( bw_BrowserWindow* bw, bw_CStrSlice js_slice, bw_BrowserWindowJsCallbackFn callback, void* cb_data ) {
 	auto hd = (HandleData*)bw->inner.webview;
@@ -135,9 +160,10 @@ void bw_BrowserWindow_new(
 
 			handle_data->control.ScriptNotify([=](auto, auto const& args) {
 				std::string args_str = winrt::to_string( args.Value() );
-				bw_CStrSlice args_slice = { args_str.length(), args_str.c_str() };
+				std::vector<std::string> parsed_args = parse_args( args_str.c_str() );
+				std::vector<bw_CStrSlice> slices = args_slices( parsed_args );
 
-				external_handler( bw, args_slice, 0, 0 );
+				external_handler( bw, slices[0], &slices[1], slices.size() - 1 );
 			});
 
 			// Inject javascript that creates the invoke_extern function
@@ -145,14 +171,13 @@ void bw_BrowserWindow_new(
 				handle_data->control.AddInitializeScript(winrt::to_hstring(
 					"(function() {"
 						"window.invoke_extern = (...cmd) => {"
-							"window.external.notify(cmd.join(','))"
+							"window.external.notify(cmd.join(String.fromCharCode(3)))"
 						"}"
 					"})();"
 				));
 			});
 
 			// Navigate to the given source
-
 			auto source_str = winrt::to_hstring( source );
 			if ( _source.is_html ) {
 
