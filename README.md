@@ -1,7 +1,7 @@
 # Browser Window
 
-Browser Window is a simple Rust crate for browser windows.
-You can build graphical user interfaces with HTML/CSS/JS technology, or just to have some browser functionality in your app.
+Browser Window is a simple Rust crate for managing browser windows.
+You can build graphical user interfaces with HTML/CSS/JS technology, or just use browser functionality in your application.
 Browser Window was born from the lack of a good [Electron](https://www.electronjs.org/) alternative for Rust.
 There are actually a few ones out there already.
 However, they are lacking a few important things.
