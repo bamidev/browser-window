@@ -191,7 +191,7 @@ impl BrowserWindowHandle {
 		self.eval_js( js, |_,_|{} );
 	}
 
-	pub unsafe fn from_ptr( ptr: *mut bw_BrowserWindow ) -> Self {
+	unsafe fn from_ptr( ptr: *mut bw_BrowserWindow ) -> Self {
 		Self {
 			_ffi_handle: ptr
 		}
