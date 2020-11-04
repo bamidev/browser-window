@@ -32,6 +32,7 @@ typedef struct bw_BrowserWindowInner bw_BrowserWindowInner;
 
 typedef struct bw_BrowserWindowCallbacks {
 	/// Fired when a browser window has finished loading its window and its browser
+	void (*do_cleanup)( bw_BrowserWindow* bw );
 	void (*on_close)( bw_BrowserWindow* bw );
 	void (*on_loaded)( bw_BrowserWindow* bw );
 } bw_BrowserWindowCallbacks;

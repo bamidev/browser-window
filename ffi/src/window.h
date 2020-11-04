@@ -47,11 +47,11 @@ typedef struct bw_WindowDispatchData bw_WindowDispatchData;
 
 
 struct bw_Window {
-	const bw_Application* app;	// The application handle that this window belongs to.
+	bw_Application* app;	// The application handle that this window belongs to.
 	const bw_Window* parent;	// An optional window that acts as the parent to this window. If the parent gets destroyed, children will get destroyed too.
-	bw_WindowHandle handle;	/// The underlying handle to the window
-	bool closed;	// Whether or not the window has been closed by the user
-	bool destroy_on_close;	// Whether or not the window may be destroyed when the user actually closes it
+	bw_WindowHandle handle;	// The underlying handle to the window
+	bool closed;	// Whether or not the window has been closed already
+	bool dropped;	// Whether or not the window may be destroyed when it is actually closed
 	bw_WindowCallbacks callbacks;
 	void* user_data;
 };
@@ -77,10 +77,6 @@ bw_Window* bw_Window_new(
 void bw_Window_close( bw_Window* window );
 
 void bw_Window_drop( bw_Window* window );
-
-/// Should be called when the window is not needed anymore within the code, otherwise memory leaks happen.
-/// This makes sure the window is destroyed when window closes, or already ís closed.
-void bw_Window_free( bw_Window* window );
 
 /// Dispatches the given function on the GUI thread, and passes the given data along.
 /// This function is thread-safe.

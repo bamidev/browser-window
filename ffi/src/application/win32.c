@@ -43,7 +43,7 @@ bw_Application* bw_Application_start() {
 	app->wc.cbSize = sizeof( WNDCLASSEXW );
 	app->wc.hInstance = app->handle;
 	app->wc.lpfnWndProc = bw_Window_proc;
-	app->wc.lpszClassName = L"browser_window";
+	app->wc.lpszClassName = L"bw-window";
 	RegisterClassExW( &app->wc );
 
 	return app;
@@ -104,5 +104,7 @@ int bw_Application_run( bw_Application* app ) {
 
 	bw_Application_uninit( app );
 
-	UnregisterClassW( L"browser_window", app->handle );
+	UnregisterClassW( L"bw-window", app->handle );
+
+	return exit_code;
 }

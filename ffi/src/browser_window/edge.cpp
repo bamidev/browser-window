@@ -102,6 +102,12 @@ void bw_BrowserWindow_evalJs( bw_BrowserWindow* bw, bw_CStrSlice js_slice, bw_Br
 	});
 }
 
+void _bw_BrowserWindow_doCleanup( bw_BrowserWindow* bw ) {
+
+	auto hd = (HandleData*)bw->inner.webview;
+	delete hd;
+}
+
 bw_Err bw_BrowserWindow_navigate( bw_BrowserWindow* bw, bw_CStrSlice url ) {
 	auto hd = (HandleData*)bw->inner.webview;
 
@@ -153,6 +159,7 @@ void bw_BrowserWindow_new(
 			bw->user_data = user_data;
 			window->user_data = (void*)bw;	// Store a pointer of our browser window into the window
 			_bw_BrowserWindow_initWindowCallbacks( bw );
+			bw->callbacks.do_cleanup = _bw_BrowserWindow_doCleanup;
 
 			// Allow calling back to us from js
 			handle_data->control.Settings().IsScriptNotifyAllowed( true );
