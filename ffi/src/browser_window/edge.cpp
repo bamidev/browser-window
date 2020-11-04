@@ -22,6 +22,11 @@ struct HandleData {
 
 
 
+// Handles the resizing of the browser
+void _bw_BrowserWindow_onResize( const bw_Window* window, unsigned int width, unsigned int height );
+
+
+
 std::vector<std::string> parse_args( const char* args_string ) {
 	std::string tmp;
 	std::vector<std::string> stk;
@@ -102,8 +107,9 @@ void bw_BrowserWindow_evalJs( bw_BrowserWindow* bw, bw_CStrSlice js_slice, bw_Br
 	});
 }
 
-void _bw_BrowserWindow_doCleanup( bw_BrowserWindow* bw ) {
+void _bw_BrowserWindow_doCleanup( const bw_Window* window ) {
 
+	auto bw = (bw_BrowserWindow*)window->user_data;
 	auto hd = (HandleData*)bw->inner.webview;
 	delete hd;
 }
@@ -158,8 +164,10 @@ void bw_BrowserWindow_new(
 			bw->external_handler = external_handler;
 			bw->user_data = user_data;
 			window->user_data = (void*)bw;	// Store a pointer of our browser window into the window
+
 			_bw_BrowserWindow_initWindowCallbacks( bw );
-			bw->callbacks.do_cleanup = _bw_BrowserWindow_doCleanup;
+			window->callbacks.do_cleanup = _bw_BrowserWindow_doCleanup;
+			window->callbacks.on_resize = _bw_BrowserWindow_onResize;
 
 			// Allow calling back to us from js
 			handle_data->control.Settings().IsScriptNotifyAllowed( true );
@@ -202,4 +210,13 @@ void bw_BrowserWindow_new(
 			callback( bw, callback_data );
 		}
 	});
+}
+
+void _bw_BrowserWindow_onResize( const bw_Window* window, unsigned int width, unsigned int height ) {
+
+	auto bw = (bw_BrowserWindow*)window->user_data;
+	auto hd = (HandleData*)bw->inner.webview;
+
+	Rect rect( 0.0, 0.0, (float)width, (float)height );
+	hd->control.Bounds( rect );
 }
