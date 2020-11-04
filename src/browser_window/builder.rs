@@ -104,8 +104,8 @@ impl BrowserWindowBuilder {
 	///
 	/// # Arguments
 	/// * `title` - The text that will be displayed in the title bar
-	pub fn title( mut self, title: String ) -> Self {
-		self.title = Some( title );
+	pub fn title<S: Into<String>>( mut self, title: S ) -> Self {
+		self.title = Some( title.into() );
 		self
 	}
 
