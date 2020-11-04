@@ -20,7 +20,7 @@ path = "src/lib.rs"
 
 [dependencies]
 boxfnonce = "0.1"
-browser-window-ffi = { path = "./ffi", version = "0.1.1" }
+browser-window-ffi = { path = "./ffi", version = "0.1.2" }
 futures-channel = { version = "0.3" }
 
 [package.metadata.docs.rs]
