@@ -1,6 +1,6 @@
 [package]
 name = "browser-window-ffi"
-version = "0.1.1"
+version = "0.1.2"
 description = "FFI bindings for the browser-window crate."
 edition = "2018"
 authors = ["Danny de Jong"]
