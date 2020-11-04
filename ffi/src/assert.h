@@ -20,7 +20,9 @@ extern "C" {
 //     BW_ASSERT( false, "Unable to find number %i", my_number )
 #define BW_ASSERT( CONDITION, MESSAGE, ... ) \
 	if ( !(CONDITION) ) { \
+		fprintf( stderr, "[ASSERTION %s:%s] ", __FILE__, __LINE__ ); \
 		fprintf( stderr, MESSAGE, __VA_ARGS__ ); \
+		fprintf( stderr, "\n" ); \
 		assert( CONDITION ); \
 	}
 
