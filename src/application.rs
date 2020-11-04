@@ -50,6 +50,7 @@ pub struct ApplicationInner {
 
 impl Application {
 
+	/// Transform this handle into a thread-safe handle.
 	pub fn into_async( self ) -> ApplicationAsync {
 		ApplicationAsync {
 			inner: self.inner
@@ -98,7 +99,7 @@ impl ApplicationAsync {
 
 	/// Signals the application to exit.
 	/// The run command will return the exit code provided.
-	pub fn exit( &self, exit_code: u32 ) {
+	pub fn exit( &self, exit_code: i32 ) {
 		// The thread-safe version of bw_Application_exit:
 		unsafe { bw_Application_exitAsync( self.inner.handle._ffi_handle, exit_code as _ ); }
 	}
@@ -126,7 +127,7 @@ impl ApplicationHandle {
 	///
 	/// # Arguments
 	/// * `exit_code` - The code that will be returned by the run function when it stops.
-	pub fn exit( &self, exit_code: u32 ) {
+	pub fn exit( &self, exit_code: i32 ) {
 		unsafe { bw_Application_exit( self._ffi_handle, exit_code as _ ); }
 	}
 
