@@ -50,6 +50,14 @@ pub struct ApplicationInner {
 
 impl Application {
 
+	/// Causes the run function to exit.
+	///
+	/// # Arguments
+	/// * `exit_code` - The code that will be returned by the run function when it stops.
+	pub fn exit( &self, exit_code: i32 ) {
+		unsafe { bw_Application_exit( self._ffi_handle, exit_code as _ ); }
+	}
+
 	/// Transform this handle into a thread-safe handle.
 	pub fn into_async( self ) -> ApplicationAsync {
 		ApplicationAsync {
@@ -122,14 +130,6 @@ impl From<Application> for ApplicationAsync {
 
 
 impl ApplicationHandle {
-
-	/// Causes the run function to exit.
-	///
-	/// # Arguments
-	/// * `exit_code` - The code that will be returned by the run function when it stops.
-	pub fn exit( &self, exit_code: i32 ) {
-		unsafe { bw_Application_exit( self._ffi_handle, exit_code as _ ); }
-	}
 
 	// Constructs an ApplicationHandle from an internal C handle
 	fn from_ptr( ptr: *mut bw_Application ) -> ApplicationHandle {
