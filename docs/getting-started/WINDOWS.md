@@ -30,10 +30,10 @@ Once you have extracted everything, we need to set up some environment variables
 You can find your system environment variables by going to: Control Panel > System and Security > System > Advanced system settings.
 Then click on the "Environment variables..." button.
 
-* Add the extracted folder to your %INCLUDE% variable.
+* Add the extracted folder to your `%INCLUDE%` variable.
 * Add the Release folder inside that extracted folder to your %LIB% variable.
 * Do one of the following:
-    1. Add the same Release folder to your %PATH% variable.
+    1. Add the same Release folder to your `%PATH%` variable.
     2. Copy all .dll files in the Release folder to the executables working directory.
        This is target/debug or target/release within your crate's folder.
 * Copy all .bin files from the Release folder, into the working directory.

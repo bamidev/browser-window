@@ -12,7 +12,7 @@ However, they lack a few important things.
 The main problem is that they (except on Linux) use browser engine's already available on the operating system.
 This is useful if you want to ship your application as a single executable file.
 However, using different engines on each platform makes it harder to make your application work consistently on each platform, especially when using newer features that are not yet supported by some browsers engines.
-Using the same engine for each platform is a good idea. 
+Using the same engine for each platform is a good idea.
 
 Another problem you run into when using preinstalled browser engines, is that in the case of Windows, that engine is not being maintained anymore.
 Windows uses the EdgeHTML engine that Edge used before it switched to using CEF as well.
@@ -46,12 +46,12 @@ CEF is used as the default engine for Browser Window.
 It is being actively maintained and supports multiple platforms.
 So when Browser Window has multiple platform support in the future, CEF is available on all of them.
 
-Edge WebView is not being maintained anymore, in light of the new Edge WebView2 engine having just been released.
+Edge WebView is not being maintained anymore, in light of the new Edge WebView2 engine having just been released. (Which is just a wrapper for CEF actually.)
 However, it is already available on your Windows 10 system, so no additional setup is needed.
-Moreover, it is possible to ship your executable as a single .exe file because of this.
+This makes it possible to ship your executable as a single .exe file because of this.
 
 Support for cookies will be implemented in the future.
-However, Edge's WebView has this problem where no HTTP Only cookies are available, which kind of defeats the purpose.
+However, Edge's WebView has this problem where no HTTP Only cookies are available, which kind of defeats the purpose of this feature.
 
 ## Getting Started
 
@@ -63,7 +63,7 @@ This software is available as open source software under a MIT license, for maxi
 
 ## Development
 
-If you want to help out, you're more than welcome! I could use some help with implementing iOS support actually.
+If you want to help out, you're more than welcome! I could use some help with implementing MacOS support actually.
 
 ## Comming Soon
 
@@ -71,5 +71,5 @@ At the moment, basic functionality is available, but there is more to come.
 These are the features that are awaiting implementation:
 
 * Linux support (through GTK+)
-* iOS support (through Cocoa)
+* MacOS support (through Cocoa)
 * Cookie support (including HttpOnly cookies)
