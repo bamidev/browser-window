@@ -25,7 +25,7 @@ RECT bw_BrowserWindow_window_rect( int width, int height );
 // script_id should be a script id obtained from storing a callback in the eval callback store.
 void bw_BrowserWindow_sendJsToRendererProcess( bw_BrowserWindow* bw, CefRefPtr<CefBrowser>& cef_browser, CefString& code, bw_BrowserWindowJsCallbackFn cb, void* user_data );
 char* bw_cef_errorMessage( bw_ErrCode code, const void* data );
-void _bw_BrowserWindow_doCleanup( bw_Window* bw );
+void _bw_BrowserWindow_doCleanup( const bw_Window* bw );
 void _bw_BrowserWindow_onResize( const bw_Window* window, unsigned int width, unsigned int height );
 /// Constructs the platform-specific window info needed by CEF.
 CefWindowInfo _bw_BrowserWindow_windowInfo( bw_Window* window, int width, int height );
@@ -56,7 +56,7 @@ void bw_BrowserWindow_evalJs( bw_BrowserWindow* bw, bw_CStrSlice js, bw_BrowserW
 	bw_BrowserWindow_sendJsToRendererProcess( bw, cef_browser, code, cb, user_data );
 }
 
-void _bw_BrowserWindow_doCleanup( bw_Window* window ) {
+void _bw_BrowserWindow_doCleanup( const bw_Window* window ) {
 
 	auto bw_ptr = (bw_BrowserWindow*)window->user_data;
 
@@ -132,8 +132,8 @@ void bw_BrowserWindow_new(
 	bw->window->user_data = (void*)bw;
 	_bw_BrowserWindow_initWindowCallbacks( bw );
 
-	bw->callbacks.do_cleanup = _bw_BrowserWindow_doCleanup;
-	bw->callbacks.on_resize = _bw_BrowserWindow_onResize;
+	window->callbacks.do_cleanup = _bw_BrowserWindow_doCleanup;
+	window->callbacks.on_resize = _bw_BrowserWindow_onResize;
 
 	// Create a CefDictionary containing the bw_BrowserWindow pointer to pass along CreateBrowser
 	CefRefPtr<CefDictionaryValue> dict = CefDictionaryValue::Create();
