@@ -1,6 +1,6 @@
 [package]
 name = "browser-window"
-version = "0.2.2"
+version = "0.2.3"
 description = "An async/await aware browser (GUI) toolkit like Electron."
 edition = "2018"
 authors = ["Danny de Jong"]

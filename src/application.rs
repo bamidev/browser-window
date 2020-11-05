@@ -108,7 +108,7 @@ impl ApplicationAsync {
 
 	/// Signals the application to exit.
 	/// The run command will return the exit code provided.
-	/// 
+	///
 	/// # Arguments
 	/// `exit_code` - The code that will be returned by the run function when it stops.
 	pub fn exit( &self, exit_code: i32 ) {
