@@ -10,15 +10,15 @@ browser-window = { features = ["edge"] }
 ```
 
 This compiles Browser Window with the EdgeHTML engine on Windows.
-However, it is recommended to compile it with CEF3 (Chromium Embedding Framework), for better support of newer HTML5 features. No crate features need to be enabled when using CEF.
+However, it is recommended to compile it with CEF3 (Chromium Embedding Framework), for better support of the newest HTML5 features. No crate features need to be enabled when using CEF.
 
 ##### Download & Extract
 
 The easiest and quickest way to set up CEF is to get the binary distribution.
-Building the source code is very time consuming.
+Building the source code is very very time consuming.
 You can get the latest prebuilt binaries [here](http://opensource.spotify.com/cefbuilds/index.html#windows64).
-The minimal version is fine.
-You can also get 32-bit binaries if you really want.
+The minimal version will be fine.
+You can also get the 32-bit binaries if you really want.
 
 You need to extract this archive.
 These .tar.bz files are not supported by Windows itself.
@@ -36,10 +36,11 @@ Then click on the "Environment variables..." button.
     1. Add the same Release folder to your %PATH% variable.
     2. Copy all .dll files in the Release folder to the executables working directory.
        This is target/debug or target/release within your crate's folder.
-* Copy all .bin files from the Release folder, into target/debug or target/release.
-* Copy all files from the Resource folder, into the same folder.
+* Copy all .bin files from the Release folder, into the working directory.
+* Copy all files from the Resource folder, into the working directory.
 
 That's it!
+A call to `cargo run` will do it.
 
 ##### Building From Source
 
