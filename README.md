@@ -73,3 +73,4 @@ These are the features that are awaiting implementation:
 * Linux support (through GTK+)
 * MacOS support (through Cocoa)
 * Cookie support (including HttpOnly cookies)
+* Events
