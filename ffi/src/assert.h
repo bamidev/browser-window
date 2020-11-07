@@ -26,6 +26,9 @@ extern "C" {
 		assert( CONDITION ); \
 	}
 
+#define BW_PANIC( ... ) \
+	BW_ASSERT( 0, __VA_ARGS__ )
+
 
 
 #endif//BW_ASSERT_H

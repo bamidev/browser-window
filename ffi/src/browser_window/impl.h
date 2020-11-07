@@ -19,6 +19,8 @@ bw_BrowserWindowImpl bw_BrowserWindowImpl_new(
 	void* callback_data
 );
 
+void bw_BrowserWindowImpl_onResize( const bw_Window* window, unsigned int width, unsigned int height );
+
 
 
 #ifdef __cplusplus

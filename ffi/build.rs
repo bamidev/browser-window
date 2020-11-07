@@ -23,14 +23,14 @@ fn main() {
 	 *	The Platform source files
 	 **************************************/
 	if target.contains("windows") {
-		std_flag = "/std:c++17";
 
 		// Win32 API
 		build
 			.file("src/win32.c")
 			.file("src/application/win32.c")
 			.file("src/window/win32.c")
-			.define("BW_WIN32", None);
+			.define("BW_WIN32", None)
+			.define("_CRT_SECURE_NO_WARNINGS", None);	// Disable sprintf_s warnings. sprintf_s tends to cause segfaults.
 	}
 	// Non-Windows platforms:
 	else {
@@ -68,7 +68,12 @@ fn main() {
 	}
 	// CEF 3
 	else {
-		std_flag = "-std=c++17";
+		if target.contains("windows") {
+			std_flag = "/std:c++17";
+		}
+		else {
+			std_flag = "-std=c++17";
+		}
 
 		// Make sure CEF_PATH is set
 		match env::var("CEF_PATH") {
@@ -82,8 +87,8 @@ fn main() {
 				build.include( &cef_path );
 				println!("cargo:rustc-link-search={}/libcef_dll_wrapper", &cef_path );
 				println!("cargo:rustc-link-search={}/Release", &cef_path );
-				println!("cargo:rustc-link-lib=static={}", "cef_dll_wrapper");
-				println!("cargo:rustc-link-lib=dylib={}", "cef");
+				println!("cargo:rustc-link-lib=static={}", "libcef_dll_wrapper");
+				println!("cargo:rustc-link-lib=dylib={}", "libcef");
 			}
 		}
 

@@ -39,6 +39,12 @@ typedef struct bw_Application bw_Application;
 typedef struct bw_ApplicationEngineData bw_ApplicationEngineData;
 typedef struct bw_ApplicationDispatchData bw_ApplicationDispatchData;
 
+
+
+/// Safety check that makes sure the given application handle is used on the correct thread.
+/// Does nothing in release mode.
+void bw_Application_checkThread( const bw_Application* );
+
 /// Initializes browser window.
 /// Starts up browser engine process(es).
 /// Returns an application handle.
@@ -59,7 +65,7 @@ void bw_Application_dispatch( bw_Application* app, bw_ApplicationDispatchFn func
 
 /// Should be called on the application handle at the end of the program.
 /// This invalidates the handle.
-void bw_Application_finish( bw_Application* app );
+void bw_Application_free( bw_Application* app );
 
 /// Runs the event loop.
 int bw_Application_run( bw_Application* app );

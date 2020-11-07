@@ -8,7 +8,9 @@
 
 
 
-typedef HWND bw_WindowHandle;
+typedef struct {
+	HWND handle;
+} bw_WindowImpl;
 
 
 

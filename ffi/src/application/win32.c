@@ -2,9 +2,9 @@
 #pragma comment(lib, "gdi32.lib")
 #pragma comment(lib, "ole32.lib")
 
-//#include "win32.h"
+#include "../assert.h"
 #include "../application.h"
-#include "../debug.h"
+#include "../common.h"
 
 #include <stdlib.h>
 #define WIN32_LEAN_AND_MEAN
@@ -18,11 +18,23 @@
 
 
 
-void bw_ApplicationImpl_dispatch( bw_Application* app, bw_ApplicationDispatchData* dispatch_data ) {
-	PostThreadMessageW( app->thread_id, WM_APP, (WPARAM)NULL, (LPARAM)dispatch_data );
+void bw_Application_checkThread( const bw_Application* app ) {
+#ifndef NDEBUG
+	if ( app->impl.handle != GetModuleHandle(NULL) )
+		BW_PANIC("Application handle used in invalid thread!");
+#else
+	UNUSED(app);
+#endif
 }
 
-bw_ApplicationImpl bw_ApplicationImpl_start( int argc, char** argv ) {
+void bw_ApplicationImpl_dispatch( bw_Application* app, bw_ApplicationDispatchData* dispatch_data ) {
+	PostThreadMessageW( app->impl.thread_id, WM_APP, (WPARAM)NULL, (LPARAM)dispatch_data );
+}
+
+bw_ApplicationImpl bw_ApplicationImpl_start( bw_Application* _app, int argc, char** argv ) {
+	UNUSED(_app);
+	UNUSED(argc);
+	UNUSED(argv);
 
 	bw_ApplicationImpl app;
 	app.thread_id = GetCurrentThreadId();
@@ -31,16 +43,12 @@ bw_ApplicationImpl bw_ApplicationImpl_start( int argc, char** argv ) {
 	// Register window class
 	memset( &app.wc, 0, sizeof(WNDCLASSEXW) );
 	app.wc.cbSize = sizeof( WNDCLASSEXW );
-	app.wc.hInstance = app->handle;
+	app.wc.hInstance = app.handle;
 	app.wc.lpfnWndProc = bw_Window_proc;
 	app.wc.lpszClassName = L"bw-window";
 	RegisterClassExW( &app.wc );
 
 	return app;
-}
-
-void bw_ApplicationImpl_finish( bw_Application* app ) {
-	free( app );
 }
 
 
@@ -49,7 +57,7 @@ void bw_Application_exit( bw_Application* app, int exit_code ) {
 	// This should be true for 32 and 64 bit systems in general.
 	_STATIC_ASSERT( sizeof(int) <= sizeof(WPARAM) );
 
-	PostThreadMessageW( app->thread_id, WM_QUIT, (WPARAM)exit_code, (LPARAM)NULL );
+	PostThreadMessageW( app->impl.thread_id, WM_QUIT, (WPARAM)exit_code, (LPARAM)NULL );
 }
 
 void bw_Application_exitAsync( bw_Application* app, int code ) {
@@ -57,7 +65,11 @@ void bw_Application_exitAsync( bw_Application* app, int code ) {
 	bw_Application_exit( app, code );
 }
 
+void bw_ApplicationImpl_finish( bw_ApplicationImpl* app ) {}
+
 int bw_Application_run( bw_Application* app ) {
+	bw_Application_checkThread( app );
+
 	MSG msg;
 	int exit_code = 0;
 
@@ -77,9 +89,7 @@ int bw_Application_run( bw_Application* app ) {
 			// Execute the dispatch functions when given
 			if ( msg.message == WM_APP ) {
 				bw_ApplicationDispatchData* params = (bw_ApplicationDispatchData*)msg.lParam;
-
 				(params->func)( app, params->data );
-
 				free( params );
 			}
 			/*else if ( msg.message == WM_APP + 1 ) {
@@ -92,9 +102,7 @@ int bw_Application_run( bw_Application* app ) {
 		}
 	}
 
-	bw_Application_uninit( app );
-
-	UnregisterClassW( L"bw-window", app->handle );
+	UnregisterClassW( L"bw-window", app->impl.handle );
 
 	return exit_code;
 }

@@ -22,7 +22,7 @@ typedef struct {
 	DWORD thread_id;
 	HINSTANCE handle;
 	WNDCLASSEXW wc;
-} bw_ApplicationInner;
+} bw_ApplicationImpl;
 
 struct bw_ApplicationDispatchData {
 	bw_ApplicationDispatchFn func;

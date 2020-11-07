@@ -1,6 +1,34 @@
+#include "../common.h"
 #include "../window.h"
 
 #include "impl.h"
+
+#include <stdlib.h>
+
+
+
+void bw_Window_destroy( bw_Window* window ) {
+
+	// Check and see if we need to destroy our parent as well
+	if ( window->parent != 0 && window->parent->dropped && window->parent->closed )
+		bw_Window_destroy( window->parent );
+
+	// Call cleanup handler
+	if ( window->callbacks.do_cleanup != 0 )
+		window->callbacks.do_cleanup( window );
+
+	// Actually destroy and free our window
+	bw_WindowImpl_destroy( window );
+	free( window );
+
+	// Decrease the window counter
+	bw_Application* app = window->app;
+	app->windows_alive -= 1;
+
+	// Exit application if this was our last window
+	if ( app->windows_alive == 0 )
+		bw_Application_exit( app, 0 );
+}
 
 
 
@@ -19,8 +47,7 @@ void bw_Window_close( bw_Window* window ) {
 	window->closed = true;
 
 	if ( window->dropped ) {
-		bw_WindowImpl_destroy( window );
-		free( window );
+		bw_Window_destroy( window );
 	}
 	else
 		bw_WindowImpl_hide( window );
@@ -34,7 +61,7 @@ void bw_Window_drop( bw_Window* window ) {
 	window->dropped = true;
 
 	if ( window->closed ) {
-		bw_WindowImpl_destroy( window );
+		bw_Window_destroy( window );
 		free( window );
 	}
 }
@@ -47,6 +74,8 @@ bw_Window* bw_Window_new(
 	const bw_WindowOptions* options,
 	void* user_data
 ) {
+	bw_Application_checkThread( app );
+
 	bw_Window* window = (bw_Window*)malloc( sizeof(bw_Window) );
 
 	window->app = app;
@@ -54,10 +83,9 @@ bw_Window* bw_Window_new(
 	window->closed = false;
 	window->dropped = false;
 	window->user_data = user_data;
+	memset( &window->callbacks, 0, sizeof( window->callbacks ) );
 
 	window->impl = bw_WindowImpl_new( window, title, width, height, options );
-
-	memset( &window->callbacks, 0, sizeof( window->callbacks ) );
 
 	return window;
 }

@@ -110,7 +110,6 @@ pub trait HasAppHandle {
 extern "C" fn ffi_dispatch_handler<H,R>( _app: *mut bw_Application, _data: *mut c_void ) where
 	H: Clone
 {
-
 	unsafe {
 		let data_ptr: *mut DispatchData<H,R> = mem::transmute( _data );
 		let data = Box::from_raw( data_ptr );	// Take ownership of the data struct

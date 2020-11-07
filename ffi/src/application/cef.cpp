@@ -9,12 +9,10 @@
 #include <include/cef_base.h>
 #include <stdlib.h>
 
+// Link with win32 libraries
 #if defined(BW_WIN32)
 #pragma comment(lib, "shell32.lib")
 #pragma comment(lib, "user32.lib")
-
-#pragma comment(lib, "libcef.lib")
-#pragma comment(lib, "libcef_dll_wrapper.lib")
 #endif
 
 // Causes the current process to exit with the given exit code.
@@ -68,15 +66,20 @@ void bw_Application_exit( bw_Application* app, int exit_code ) {
 bw_ApplicationEngineImpl bw_ApplicationEngineImpl_start( bw_Application* app, int argc, char** argv ) {
 	bw_ApplicationEngineImpl impl;
 
+	// For some reason the Windows implementation for CEF doesn't have the constructor for argc and argv.
+#ifdef BW_WIN32
+	CefMainArgs main_args( GetModuleHandle(NULL) );
+#else
 	CefMainArgs main_args( argc, argv );
+#endif
 
 	CefSettings app_settings;
 	// Only works on Windows:
 	app_settings.multi_threaded_message_loop = true;
 #ifndef BW_WIN32
-	// FIXME: For some reason the sandbox feature cannot be made to work on my debian system.
+	// FIXME: For some reason the sandbox feature cannot be made to work on Debian.
 	//        I'm not sure where else it isn't working though...
-	//        Have a sandbox is crucial for security though, so this needs to be enabled.
+	//        Having a sandbox is crucial for security though, so this needs to be enabled.
 	app_settings.no_sandbox = true;
 #endif
 	CefBrowserSettings browser_settings;
@@ -84,11 +87,10 @@ bw_ApplicationEngineImpl bw_ApplicationEngineImpl_start( bw_Application* app, in
 	CefRefPtr<CefApp> cef_app_handle( new AppHandler( app ) );
 
 	int exit_code = CefExecuteProcess( main_args, cef_app_handle.get(), 0 );
+
 	// If the current process returns a non-negative number, it is not the main process on which we run user code.
 	if ( exit_code >= 0 ) {
-		BW_DEBUG("EXIT CODE %i", exit_code);
-		exit( 0 );
-		assert(0);
+		exit( exit_code );
 		return impl;
 	}
 
@@ -101,10 +103,6 @@ bw_ApplicationEngineImpl bw_ApplicationEngineImpl_start( bw_Application* app, in
 	impl.cef_client = (void*)client;
 
 	return impl;
-}
-
-void bw_Application_step() {
-	CefDoMessageLoopWork();
 }
 
 void bw_ApplicationEngineImpl_finish( bw_ApplicationEngineImpl* app ) {

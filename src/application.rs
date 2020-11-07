@@ -185,6 +185,7 @@ impl Deref for ApplicationInner {
 
 impl Drop for ApplicationInner {
 	fn drop( &mut self ) {
-		unsafe { bw_Application_finish( self.handle._ffi_handle ); }
+		// FIXME: Needs to somehow finish on the main thread.
+		unsafe { bw_Application_free( self.handle._ffi_handle ); }
 	}
 }

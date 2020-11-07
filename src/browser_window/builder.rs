@@ -145,6 +145,7 @@ impl BrowserWindowBuilder {
 		let app_handle = (**app).clone();
 
 		self._spawn( app_handle, move |inner_handle| {
+			eprintln!("test");
 			let bw = BrowserWindow {
 				inner: Rc::new( BrowserWindowInner {
 					app: app_inner,

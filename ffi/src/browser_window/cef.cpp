@@ -4,6 +4,7 @@
 #include "../browser_window.h"
 #include "../cef/bw_handle_map.hpp"
 #include "../cef/exception.hpp"
+#include "../common.h"
 #include "../debug.h"
 #include "impl.h"
 
@@ -26,7 +27,6 @@ RECT bw_BrowserWindow_window_rect( int width, int height );
 // script_id should be a script id obtained from storing a callback in the eval callback store.
 void bw_BrowserWindow_sendJsToRendererProcess( bw_BrowserWindow* bw, CefRefPtr<CefBrowser>& cef_browser, CefString& code, bw_BrowserWindowJsCallbackFn cb, void* user_data );
 char* bw_cef_errorMessage( bw_ErrCode code, const void* data );
-void _bw_BrowserWindow_onResize( const bw_Window* window, unsigned int width, unsigned int height );
 /// Constructs the platform-specific window info needed by CEF.
 CefWindowInfo _bw_BrowserWindow_windowInfo( bw_Window* window, int width, int height );
 
@@ -89,8 +89,8 @@ bw_BrowserWindowImpl bw_BrowserWindowImpl_new(
 	void* callback_data
 ) {
 	// Unused parameters
-	(void)(width);
-	(void)(height);
+	UNUSED(width);
+	UNUSED(height);
 	// TODO: Implement browser_window_options
 
 	CefWindowInfo info;
@@ -110,8 +110,8 @@ bw_BrowserWindowImpl bw_BrowserWindowImpl_new(
 	// Update window size in CefWindowInfo
 #ifdef BW_WIN32
 	RECT rect;
-	GetClientRect( browser->window->handle, &rect );
-	info.SetAsChild( browser->window->handle, rect );
+	GetClientRect( browser->window->impl.handle, &rect );
+	info.SetAsChild( browser->window->impl.handle, rect );
 #endif
 
 	// Create the browser window handle
@@ -178,7 +178,7 @@ RECT bw_BrowserWindow_window_rect( int width, int height) {
 }
 #endif
 
-void _bw_BrowserWindow_onResize( const bw_Window* window, unsigned int width, unsigned int height ) {
+void bw_BrowserWindowImpl_onResize( const bw_Window* window, unsigned int width, unsigned int height ) {
 	bw_BrowserWindow* bw = (bw_BrowserWindow*)window->user_data;
 
 	if ( bw != 0 ) {

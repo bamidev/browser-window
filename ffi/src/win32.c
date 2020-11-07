@@ -1,7 +1,5 @@
 #include "win32.h"
 
-#include "debug.h"
-
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,8 +10,8 @@
 
 
 
-char* bw_win32_unhandledHresultMessage( bw_ErrCode code, void* data );
-char* bw_win32_unknownHresultMessage( bw_ErrCode code, void* data );
+char* bw_win32_unhandledHresultMessage( bw_ErrCode code, const void* data );
+char* bw_win32_unknownHresultMessage( bw_ErrCode code, const void* data );
 
 
 
@@ -39,14 +37,14 @@ void bw_win32_print_error() {
 
 void bw_win32_print_hresult_error( HRESULT hresult ) {
 
-	wchar_t* message = 0;
+	WCHAR* message = 0;
 
 	if ( FormatMessageW(
 		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
 		NULL,
 		hresult,
 		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		&message,
+		(LPWSTR)&message,
 		0, NULL )
 	) {
 		fwprintf( stderr, L"win32 hresult assertion [%x]: %s\n", hresult, message );
@@ -73,7 +71,7 @@ WCHAR* bw_win32_copyAsNewWstr( bw_CStrSlice slice ) {
 	return str;
 }
 
-char* bw_win32_copyAsNewCstr( bw_StrSlice str ) {
+char* bw_win32_copyAsNewCstr( bw_CStrSlice str ) {
 	char* new_str = malloc( str.len + 1 );
 
 	memcpy( new_str, str.data, str.len );
@@ -82,7 +80,7 @@ char* bw_win32_copyAsNewCstr( bw_StrSlice str ) {
 	return new_str;
 }
 
-char* bw_win32_copyWstrAsNewCstr( WCHAR* str ) {
+char* bw_win32_copyWstrAsNewCstr( const WCHAR* str ) {
 
 	size_t len = wcslen( str );
 	DWORD size_needed = WideCharToMultiByte( CP_UTF8, WC_COMPOSITECHECK | WC_DEFAULTCHAR | WC_NO_BEST_FIT_CHARS, str, (int)len, 0, 0, 0, 0 );
@@ -96,12 +94,12 @@ char* bw_win32_copyWstrAsNewCstr( WCHAR* str ) {
 
 bw_Err bw_win32_unhandledHresult( HRESULT hResult ) {
 
-	TCHAR* message;
+	WCHAR* message;
 
 	if ( FACILITY_WINDOWS == HRESULT_FACILITY( hResult ) )
 		hResult = HRESULT_CODE( hResult );
 
-		if( FormatMessage(
+		if( FormatMessageW(
 			FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
 			NULL,
 			hResult,
@@ -126,7 +124,7 @@ bw_Err bw_win32_unhandledHresult( HRESULT hResult ) {
 }
 
 
-char* bw_win32_unhandledHresultMessage( bw_ErrCode code, void* data ) {
+char* bw_win32_unhandledHresultMessage( bw_ErrCode code, const void* data ) {
 
 	char* hresult_msg = bw_win32_copyWstrAsNewCstr( (WCHAR*)data );
 
@@ -137,7 +135,7 @@ char* bw_win32_unhandledHresultMessage( bw_ErrCode code, void* data ) {
 	return message;
 }
 
-char* bw_win32_unknownHresultMessage( bw_ErrCode code, void* _ ) {
+char* bw_win32_unknownHresultMessage( bw_ErrCode code, const void* _ ) {
 
 	char* message = calloc( strlen("Unknown win32 hresult error: 0x00000000") + 9, sizeof( char ) );
 
