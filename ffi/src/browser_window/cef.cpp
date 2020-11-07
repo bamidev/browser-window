@@ -20,9 +20,6 @@
 
 
 
-#ifdef BW_WIN32
-RECT bw_BrowserWindow_window_rect( int width, int height );
-#endif
 // Sends the given Javascript code to the renderer process, expecting the code to be executed over there.
 // script_id should be a script id obtained from storing a callback in the eval callback store.
 void bw_BrowserWindow_sendJsToRendererProcess( bw_BrowserWindow* bw, CefRefPtr<CefBrowser>& cef_browser, CefString& code, bw_BrowserWindowJsCallbackFn cb, void* user_data );
@@ -80,8 +77,8 @@ bw_Err bw_BrowserWindow_navigate( bw_BrowserWindow* bw, bw_CStrSlice url ) {
 	BW_ERR_RETURN_SUCCESS;
 }
 
-bw_BrowserWindowImpl bw_BrowserWindowImpl_new(
-	const bw_BrowserWindow* browser,
+void bw_BrowserWindowImpl_new(
+	bw_BrowserWindow* browser,
 	bw_BrowserWindowSource source,
 	int width, int height,
 	const bw_BrowserWindowOptions* browser_window_options,
@@ -129,7 +126,7 @@ bw_BrowserWindowImpl bw_BrowserWindowImpl_new(
 	bool success = CefBrowserHost::CreateBrowser( info, *cef_client, source_string, settings, dict, NULL );
 	BW_ASSERT( success, "CefBrowserHost::CreateBrowser failed!\n" );
 
-	return bw;
+	browser->impl = bw;
 }
 
 void bw_BrowserWindow_sendJsToRendererProcess( bw_BrowserWindow* bw, CefRefPtr<CefBrowser>& cef_browser, CefString& code, bw_BrowserWindowJsCallbackFn cb, void* user_data ) {
@@ -148,35 +145,6 @@ void bw_BrowserWindow_sendJsToRendererProcess( bw_BrowserWindow* bw, CefRefPtr<C
 
 	cef_browser->GetMainFrame()->SendProcessMessage( PID_RENDERER, msg );
 }
-
-#ifdef BW_WIN32
-RECT bw_BrowserWindow_window_rect( int width, int height) {
-
-	RECT desktop_rect;
-	GetClientRect( GetDesktopWindow(), &desktop_rect );
-	LONG desktop_width = desktop_rect.right - desktop_rect.left;
-	LONG desktop_height = desktop_rect.bottom - desktop_rect.top;
-
-	RECT rect;
-	rect.left = 0;
-	rect.top = 0;
-	rect.right = width;
-	rect.bottom = height;
-
-	return rect;
-
-	if ( width != -1 ) {
-		rect.left = ( desktop_width - width ) / 2;
-		rect.right = rect.left + width;
-	}
-	if ( height != -1 ) {
-		rect.bottom = ( desktop_height - height ) / 2;
-		rect.top = rect.bottom + height;
-	}
-
-	return rect;
-}
-#endif
 
 void bw_BrowserWindowImpl_onResize( const bw_Window* window, unsigned int width, unsigned int height ) {
 	bw_BrowserWindow* bw = (bw_BrowserWindow*)window->user_data;

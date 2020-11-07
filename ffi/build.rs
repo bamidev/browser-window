@@ -23,6 +23,7 @@ fn main() {
 	 *	The Platform source files
 	 **************************************/
 	if target.contains("windows") {
+		std_flag = "/std:c++17";
 
 		// Win32 API
 		build
@@ -55,6 +56,7 @@ fn main() {
 	 *	The Browser Engine source files
 	 **************************************/
 	if cfg!(feature = "edge") {
+
 		// Egde WebView
 		if !target.contains("windows") {
 			panic!("The Edge WebView API only works on Windows!");

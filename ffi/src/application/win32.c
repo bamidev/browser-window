@@ -65,7 +65,9 @@ void bw_Application_exitAsync( bw_Application* app, int code ) {
 	bw_Application_exit( app, code );
 }
 
-void bw_ApplicationImpl_finish( bw_ApplicationImpl* app ) {}
+void bw_ApplicationImpl_finish( bw_ApplicationImpl* app ) {
+	UNUSED(app);
+}
 
 int bw_Application_run( bw_Application* app ) {
 	bw_Application_checkThread( app );

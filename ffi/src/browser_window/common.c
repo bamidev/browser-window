@@ -56,7 +56,7 @@ void bw_BrowserWindow_new(
 	browser->user_data = user_data;
 
 
-	browser->impl = bw_BrowserWindowImpl_new(
+	bw_BrowserWindowImpl_new(
 		browser,
 		source,
 		width,

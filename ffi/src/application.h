@@ -23,7 +23,7 @@ typedef void (*bw_ApplicationDispatchFn)( struct bw_Application* app, void* data
 #if defined(BW_CEF)
 #include "application/cef.h"
 #elif defined(BW_EDGE)
-#include "applicaiton/edge.h"
+#include "application/edge.h"
 #else
 #error Unsupported engine
 #endif

@@ -1,4 +1,5 @@
 #include "win32.h"
+#include "common.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -136,6 +137,7 @@ char* bw_win32_unhandledHresultMessage( bw_ErrCode code, const void* data ) {
 }
 
 char* bw_win32_unknownHresultMessage( bw_ErrCode code, const void* _ ) {
+	UNUSED(_);
 
 	char* message = calloc( strlen("Unknown win32 hresult error: 0x00000000") + 9, sizeof( char ) );
 

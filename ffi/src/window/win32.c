@@ -16,11 +16,11 @@ typedef struct {
 } bw_Window_DropCheckData;
 
 // The callback that is called when enumerating over child windows.
-BOOL CALLBACK _bw_Window_closeChild( HWND handle, LPARAM lparam );
+/*BOOL CALLBACK _bw_Window_closeChild( HWND handle, LPARAM lparam );
 // Returns whether or not the window still has children, that haven't been dropped.
 bool _bw_Window_hasUndroppedChildren( const bw_Window* window );
-BOOL CALLBACK _bw_Window_isDroppedCheck( HWND handle, LPARAM lparam );
-LRESULT CALLBACK _bw_Window_proc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp);
+BOOL CALLBACK _bw_Window_isDroppedCheck( HWND handle, LPARAM lparam );*/
+LRESULT CALLBACK bw_Window_proc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp);
 
 
 
@@ -32,8 +32,6 @@ void bw_WindowImpl_hide( bw_Window* window ) {
 
 	// Hide window and hide all its children, to emulate DestroyWindow without actually destroying it:
 	ShowWindow( window->impl.handle, SW_HIDE );
-
-	EnumWindows( _bw_Window_closeChild, (LPARAM)window );
 }
 
 bw_WindowImpl bw_WindowImpl_new(
@@ -43,7 +41,7 @@ bw_WindowImpl bw_WindowImpl_new(
 	const bw_WindowOptions* options
 ) {
 	bw_WindowImpl impl;
-	
+
 	DWORD window_style = WS_OVERLAPPEDWINDOW;
 
 	if ( !options->borders )
@@ -131,7 +129,7 @@ void bw_WindowImpl_show( bw_Window* window ) {
 	ShowWindow( window->impl.handle, SW_SHOW );
 }
 
-BOOL CALLBACK _bw_Window_closeChild( HWND handle, LPARAM _window ) {
+/*BOOL CALLBACK _bw_Window_closeChild( HWND handle, LPARAM _window ) {
 	bw_Window* window = (bw_Window*)_window;
 
 	bw_Window* enum_window = (bw_Window*)GetWindowLongPtrW( handle, GWLP_USERDATA );
@@ -157,4 +155,4 @@ BOOL CALLBACK _bw_Window_closeChild( HWND handle, LPARAM _window ) {
 	}
 
 	return true;
-}
+}*/

@@ -7,9 +7,9 @@ extern "C" {
 
 
 
-struct bw_BrowserWindowInner {
-	void* webview;
-};
+typedef struct {
+	void* data;
+} bw_BrowserWindowImpl;
 
 
 

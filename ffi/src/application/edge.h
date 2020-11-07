@@ -7,9 +7,9 @@ extern "C" {
 
 
 
-struct bw_ApplicationEngineData {
+typedef struct {
 	void* _;
-};
+} bw_ApplicationEngineImpl;
 
 
 

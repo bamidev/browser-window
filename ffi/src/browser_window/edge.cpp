@@ -3,6 +3,7 @@
 #include "../debug.h"
 #include "../err.h"
 #include "../win32.h"
+#include "impl.h"
 
 #include <sstream>
 #include <string>
@@ -23,7 +24,7 @@ struct HandleData {
 
 
 // Handles the resizing of the browser
-void _bw_BrowserWindow_onResize( const bw_Window* window, unsigned int width, unsigned int height );
+void bw_BrowserWindowImpl_onResize( const bw_Window* window, unsigned int width, unsigned int height );
 
 
 
@@ -52,7 +53,7 @@ std::vector<bw_CStrSlice> args_slices( const std::vector<std::string>& args ) {
 }
 
 void bw_BrowserWindow_evalJs( bw_BrowserWindow* bw, bw_CStrSlice js_slice, bw_BrowserWindowJsCallbackFn callback, void* cb_data ) {
-	auto hd = (HandleData*)bw->inner.webview;
+	auto hd = (HandleData*)bw->impl.data;
 
 	// Wrap the given javascript into a try/catch statement so that we can actually know if it returns an error or not
 	std::string js = "(function(){try{return 'ok:'+(";
@@ -107,15 +108,17 @@ void bw_BrowserWindow_evalJs( bw_BrowserWindow* bw, bw_CStrSlice js_slice, bw_Br
 	});
 }
 
-void _bw_BrowserWindow_doCleanup( const bw_Window* window ) {
+void bw_BrowserWindowImpl_doCleanup( bw_Window* window ) {
+	BW_DEBUG("bw_Windbw_BrowserWindowImpl_doCleanupow_destroy")
 
 	auto bw = (bw_BrowserWindow*)window->user_data;
-	auto hd = (HandleData*)bw->inner.webview;
+	auto hd = (HandleData*)bw->impl.data;
 	delete hd;
+		BW_DEBUG("bw_Windbw_BrowserWindowImpl_doCleanupow_destroy")
 }
 
 bw_Err bw_BrowserWindow_navigate( bw_BrowserWindow* bw, bw_CStrSlice url ) {
-	auto hd = (HandleData*)bw->inner.webview;
+	auto hd = (HandleData*)bw->impl.data;
 
 	std::string url_std_str( url.data, url.len );
 	Uri uri( winrt::to_hstring( url_std_str ) );
@@ -126,16 +129,11 @@ bw_Err bw_BrowserWindow_navigate( bw_BrowserWindow* bw, bw_CStrSlice url ) {
 	BW_ERR_RETURN_SUCCESS;
 }
 
-void bw_BrowserWindow_new(
-	bw_Application* app,
-	const bw_BrowserWindow* parent,
+void bw_BrowserWindowImpl_new(
+	bw_BrowserWindow* browser,
 	bw_BrowserWindowSource _source,
-	bw_CStrSlice title,
 	int width, int height,
-	const bw_WindowOptions* window_options,
 	const bw_BrowserWindowOptions* browser_window_options,
-	bw_BrowserWindowHandlerFn external_handler,
-	void* user_data,
 	bw_BrowserWindowCreationCallbackFn callback,
 	void* callback_data
 ) {
@@ -144,10 +142,7 @@ void bw_BrowserWindow_new(
 
 	auto process = WebViewControlProcess();
 
-	bw_Window* parent_window = parent == 0 ? 0 : parent->window;
-	bw_Window* window = bw_Window_new( app, parent_window, title, width, height, window_options, 0 );
-
-	auto op = process.CreateWebViewControlAsync( reinterpret_cast<long>(window->handle), Rect( 0.0, 0.0, (float)width, (float)height ) );
+	auto op = process.CreateWebViewControlAsync( reinterpret_cast<long>(browser->window->impl.handle), Rect( 0.0, 0.0, (float)width, (float)height ) );
 
 	op.Completed([=](auto op, auto status) {
 
@@ -155,19 +150,9 @@ void bw_BrowserWindow_new(
 			BW_WIN32_ASSERT_HRESULT( op.ErrorCode() );
 
 		if ( status == AsyncStatus::Completed ) {
+			bw_BrowserWindowImpl impl;
 			HandleData* handle_data = new HandleData( op.GetResults() );
-
-			// Construct browser window handle
-			bw_BrowserWindow* bw = new bw_BrowserWindow;
-			bw->window = window;
-			bw->inner.webview = (void*)handle_data;
-			bw->external_handler = external_handler;
-			bw->user_data = user_data;
-			window->user_data = (void*)bw;	// Store a pointer of our browser window into the window
-
-			_bw_BrowserWindow_initWindowCallbacks( bw );
-			window->callbacks.do_cleanup = _bw_BrowserWindow_doCleanup;
-			window->callbacks.on_resize = _bw_BrowserWindow_onResize;
+			browser->impl.data = (void*)handle_data;
 
 			// Allow calling back to us from js
 			handle_data->control.Settings().IsScriptNotifyAllowed( true );
@@ -179,7 +164,7 @@ void bw_BrowserWindow_new(
 				std::vector<std::string> parsed_args = parse_args( args_str.c_str() );
 				std::vector<bw_CStrSlice> slices = args_slices( parsed_args );
 
-				external_handler( bw, slices[0], &slices[1], slices.size() - 1 );
+				browser->external_handler( browser, slices[0], &slices[1], slices.size() - 1 );
 			});
 
 			// Inject javascript that creates the invoke_extern function
@@ -207,15 +192,15 @@ void bw_BrowserWindow_new(
 			}
 
 			// Invoke callback
-			callback( bw, callback_data );
+			callback( browser, callback_data );
 		}
 	});
 }
 
-void _bw_BrowserWindow_onResize( const bw_Window* window, unsigned int width, unsigned int height ) {
+void bw_BrowserWindowImpl_onResize( const bw_Window* window, unsigned int width, unsigned int height ) {
 
 	auto bw = (bw_BrowserWindow*)window->user_data;
-	auto hd = (HandleData*)bw->inner.webview;
+	auto hd = (HandleData*)bw->impl.data;
 
 	Rect rect( 0.0, 0.0, (float)width, (float)height );
 	hd->control.Bounds( rect );

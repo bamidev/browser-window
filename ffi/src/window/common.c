@@ -9,10 +9,6 @@
 
 void bw_Window_destroy( bw_Window* window ) {
 
-	// Check and see if we need to destroy our parent as well
-	if ( window->parent != 0 && window->parent->dropped && window->parent->closed )
-		bw_Window_destroy( window->parent );
-
 	// Call cleanup handler
 	if ( window->callbacks.do_cleanup != 0 )
 		window->callbacks.do_cleanup( window );
@@ -62,7 +58,6 @@ void bw_Window_drop( bw_Window* window ) {
 
 	if ( window->closed ) {
 		bw_Window_destroy( window );
-		free( window );
 	}
 }
 
