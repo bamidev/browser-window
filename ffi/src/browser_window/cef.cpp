@@ -5,6 +5,7 @@
 #include "../cef/bw_handle_map.hpp"
 #include "../cef/exception.hpp"
 #include "../debug.h"
+#include "impl.h"
 
 #include <string>
 #include <include/base/cef_bind.h>
@@ -25,7 +26,6 @@ RECT bw_BrowserWindow_window_rect( int width, int height );
 // script_id should be a script id obtained from storing a callback in the eval callback store.
 void bw_BrowserWindow_sendJsToRendererProcess( bw_BrowserWindow* bw, CefRefPtr<CefBrowser>& cef_browser, CefString& code, bw_BrowserWindowJsCallbackFn cb, void* user_data );
 char* bw_cef_errorMessage( bw_ErrCode code, const void* data );
-void _bw_BrowserWindow_doCleanup( const bw_Window* bw );
 void _bw_BrowserWindow_onResize( const bw_Window* window, unsigned int width, unsigned int height );
 /// Constructs the platform-specific window info needed by CEF.
 CefWindowInfo _bw_BrowserWindow_windowInfo( bw_Window* window, int width, int height );
@@ -34,7 +34,7 @@ CefWindowInfo _bw_BrowserWindow_windowInfo( bw_Window* window, int width, int he
 
 /*void bw_BrowserWindow_close( bw_BrowserWindow* bw ) { BW_DEBUG("bw_BrowserWindow_close")
 	// Actually close the brower
-	CefRefPtr<CefBrowser>* cef_ptr = (CefRefPtr<CefBrowser>*)bw->inner.cef_ptr;
+	CefRefPtr<CefBrowser>* cef_ptr = (CefRefPtr<CefBrowser>*)bw->impl.cef_ptr;
 	(*cef_ptr)->GetHost()->CloseBrowser( true );
 }*/
 
@@ -51,24 +51,21 @@ void bw_BrowserWindow_evalJs( bw_BrowserWindow* bw, bw_CStrSlice js, bw_BrowserW
 	//       There is some overhead because of this, but for now it is ok.
 
 	// Execute the javascript on the renderer process, and invoke the callback from there:
-	CefRefPtr<CefBrowser> cef_browser = *(CefRefPtr<CefBrowser>*)(bw->inner.cef_ptr);
+	CefRefPtr<CefBrowser> cef_browser = *(CefRefPtr<CefBrowser>*)(bw->impl.cef_ptr);
 
 	bw_BrowserWindow_sendJsToRendererProcess( bw, cef_browser, code, cb, user_data );
 }
 
-void _bw_BrowserWindow_doCleanup( const bw_Window* window ) {
+void bw_BrowserWindowImpl_doCleanup( bw_Window* window ) {
 
 	auto bw_ptr = (bw_BrowserWindow*)window->user_data;
 
 	// Remove the link between our bw_BrowserWindow handle and the CefBrowser handle
-	CefRefPtr<CefBrowser>* cef_ptr = (CefRefPtr<CefBrowser>*)bw_ptr->inner.cef_ptr;
+	CefRefPtr<CefBrowser>* cef_ptr = (CefRefPtr<CefBrowser>*)bw_ptr->impl.cef_ptr;
 	bw::bw_handle_map.drop( *cef_ptr );
 
 	// Delete the CefBrowser pointer that we have stored in our bw_BrowserWindow handle
 	delete cef_ptr;
-
-	// Then free (a c feature) the browser window itself
-	free( bw_ptr );
 }
 
 bw_Err bw_BrowserWindow_navigate( bw_BrowserWindow* bw, bw_CStrSlice url ) {
@@ -77,26 +74,24 @@ bw_Err bw_BrowserWindow_navigate( bw_BrowserWindow* bw, bw_CStrSlice url ) {
 	std::string std_str( url.data, url.len );
 	CefString cef_str( std_str );
 
-	CefRefPtr<CefBrowser>* cef_ptr = (CefRefPtr<CefBrowser>*)bw->inner.cef_ptr;
+	CefRefPtr<CefBrowser>* cef_ptr = (CefRefPtr<CefBrowser>*)bw->impl.cef_ptr;
 	(*cef_ptr)->GetMainFrame()->LoadURL( cef_str );
 
 	BW_ERR_RETURN_SUCCESS;
 }
 
-void bw_BrowserWindow_new(
-	bw_Application* app,
-	const bw_BrowserWindow* parent,
+bw_BrowserWindowImpl bw_BrowserWindowImpl_new(
+	const bw_BrowserWindow* browser,
 	bw_BrowserWindowSource source,
-	bw_CStrSlice _title,
 	int width, int height,
-	const bw_WindowOptions* window_options,
 	const bw_BrowserWindowOptions* browser_window_options,
-	bw_BrowserWindowHandlerFn external_handler,	/// A function that gets invoked when javascript the appropriate call is made in javascript.
-	void* user_data,	/// The data that will be passed to the above handler function when it is invoked.
 	bw_BrowserWindowCreationCallbackFn callback,
 	void* callback_data
 ) {
-	CefString title( std::string( _title.data, _title.len ) );
+	// Unused parameters
+	(void)(width);
+	(void)(height);
+	// TODO: Implement browser_window_options
 
 	CefWindowInfo info;
 	CefBrowserSettings settings;
@@ -112,39 +107,29 @@ void bw_BrowserWindow_new(
 		source_string = CefString( data );
 	}
 
-	bw_Window* parent_window = parent == 0 ? 0 : parent->window;
-	bw_Window* window = bw_Window_new( app, parent_window, _title, width, height, window_options, 0 );
-
 	// Update window size in CefWindowInfo
 #ifdef BW_WIN32
 	RECT rect;
-	GetClientRect( window->handle, &rect );
-	info.SetAsChild( window->handle, rect );
+	GetClientRect( browser->window->handle, &rect );
+	info.SetAsChild( browser->window->handle, rect );
 #endif
 
 	// Create the browser window handle
-	bw_BrowserWindow* bw = new bw_BrowserWindow;
-	bw->window = window;
-	bw->inner.cef_ptr = 0;
-	bw->external_handler = external_handler;
-	bw->user_data = user_data;
-	// Store a pointer of our browser window into the window
-	bw->window->user_data = (void*)bw;
-	_bw_BrowserWindow_initWindowCallbacks( bw );
-
-	window->callbacks.do_cleanup = _bw_BrowserWindow_doCleanup;
-	window->callbacks.on_resize = _bw_BrowserWindow_onResize;
+	bw_BrowserWindowImpl bw;
+	bw.cef_ptr = 0;
 
 	// Create a CefDictionary containing the bw_BrowserWindow pointer to pass along CreateBrowser
 	CefRefPtr<CefDictionaryValue> dict = CefDictionaryValue::Create();
-	dict->SetBinary( "handle", CefBinaryValue::Create( (const void*)&bw, sizeof(bw) ) );
+	dict->SetBinary( "handle", CefBinaryValue::Create( (const void*)&browser, sizeof(browser) ) );
 	dict->SetBinary( "callback", CefBinaryValue::Create( (const void*)&callback, sizeof(callback) ) );
 	dict->SetBinary( "callback-data", CefBinaryValue::Create( (const void*)&callback_data, sizeof(callback_data) ) );
 
 	// Create the browser
-	CefRefPtr<CefClient>* cef_client = (CefRefPtr<CefClient>*)app->engine_data->cef_client;
+	CefRefPtr<CefClient>* cef_client = (CefRefPtr<CefClient>*)browser->window->app->engine_impl.cef_client;
 	bool success = CefBrowserHost::CreateBrowser( info, *cef_client, source_string, settings, dict, NULL );
 	BW_ASSERT( success, "CefBrowserHost::CreateBrowser failed!\n" );
+
+	return bw;
 }
 
 void bw_BrowserWindow_sendJsToRendererProcess( bw_BrowserWindow* bw, CefRefPtr<CefBrowser>& cef_browser, CefString& code, bw_BrowserWindowJsCallbackFn cb, void* user_data ) {
@@ -197,10 +182,12 @@ void _bw_BrowserWindow_onResize( const bw_Window* window, unsigned int width, un
 	bw_BrowserWindow* bw = (bw_BrowserWindow*)window->user_data;
 
 	if ( bw != 0 ) {
-		CefRefPtr<CefBrowser> cef = *(CefRefPtr<CefBrowser>*)bw->inner.cef_ptr;
+		CefRefPtr<CefBrowser> cef = *(CefRefPtr<CefBrowser>*)bw->impl.cef_ptr;
 
 #ifdef BW_WIN32
 		SetWindowPos( cef->GetHost()->GetWindowHandle(), 0, 0, 0, width, height, SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOACTIVATE );
+#elif defined(BW_GTK)
+		gtk_window_resize( GTK_WINDOW(bw->window->impl.handle), width, height );
 #endif
 	}
 }

@@ -24,6 +24,9 @@ namespace bw {
 			CefRefPtr<CefV8Value>& retval,
 			CefString& exception
 		) override  {
+			(void)(object);
+			(void)(retval);
+			(void)(exception);
 
 			if ( name == "invoke_extern" ) {
 

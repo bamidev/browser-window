@@ -36,6 +36,8 @@ public:
 	}
 
 	virtual void OnContextCreated( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefV8Context> context ) override {
+		// Unused parameters
+		(void)(frame);
 
 		CefRefPtr<CefV8Value> object = context->GetGlobal();
 
@@ -53,9 +55,13 @@ public:
 	virtual bool OnProcessMessageReceived(
 		CefRefPtr<CefBrowser> browser,
 		CefRefPtr<CefFrame> frame,
-		CefProcessId _source_process,
+		CefProcessId source_process,
 		CefRefPtr<CefProcessMessage> message
 	) override {
+		// Unused parameters
+		(void)(browser);
+		(void)(frame);
+		(void)(source_process);
 
 		// The message to execute some javascript, and return its output
 		if ( message->GetName() == "eval-js" ) {
@@ -89,6 +95,9 @@ public:
 		CefRefPtr<CefBinaryValue> callback_binary,
 		CefRefPtr<CefBinaryValue> user_data_binary
 	) {
+		// Unused parameters
+		(void)(browser);
+
 		CefString script_url( "eval" );
 		CefRefPtr<CefV8Value> ret_val;
 		CefRefPtr<CefV8Exception> exception;

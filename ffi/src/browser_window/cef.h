@@ -7,9 +7,9 @@ extern "C" {
 
 
 
-struct bw_BrowserWindowInner {
+typedef struct {
 	void* cef_ptr;
-};
+} bw_BrowserWindowImpl;
 
 
 

@@ -1,7 +1,11 @@
 #ifndef BW_STRING_H
 #define BW_STRING_H
 
-#include <stdint.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include <stddef.h>
 
 
 
@@ -27,5 +31,9 @@ char* bw_string_copyAsNewCstr( bw_CStrSlice str );
 void bw_string_freeCstr( char* str );
 
 
+
+#ifdef __cplusplus
+} // extern "C"
+#endif
 
 #endif//BW_STRING_H

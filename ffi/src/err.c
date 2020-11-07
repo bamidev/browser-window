@@ -7,13 +7,15 @@
 BW_ERR_MSG_DEF( bw_Err_msg_success, "success" )
 
 char* bw_Err_msg_string( bw_ErrCode code, const void* message ) {
+	(void)(code);
+
 	return (char*)message;
 }
 
 
 
 void bw_Err_free( bw_Err* err ) {
-	free( err->data );
+	free( (void*)err->data );
 }
 
 bw_Err bw_Err_new_with_msg( bw_ErrCode code, const char* msg ) {

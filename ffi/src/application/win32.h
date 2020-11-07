@@ -18,13 +18,11 @@ extern "C" {
 
 
 
-struct bw_Application {
+typedef struct {
 	DWORD thread_id;
 	HINSTANCE handle;
 	WNDCLASSEXW wc;
-	struct bw_ApplicationEngineData* engine_data;	/// Can be set by the implementation of a browser engine
-	unsigned int windows_alive;
-};
+} bw_ApplicationInner;
 
 struct bw_ApplicationDispatchData {
 	bw_ApplicationDispatchFn func;

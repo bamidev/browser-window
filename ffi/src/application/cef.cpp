@@ -1,18 +1,20 @@
-#pragma comment(lib, "libcef.lib")
-#pragma comment(lib, "libcef_dll_wrapper.lib")
-
 #include "../application.h"
+#include "../debug.h"
 #include "../cef/app_handler.hpp"
 #include "../cef/client_handler.hpp"
 
+#include "impl.h"
+
 #include <include/cef_app.h>
 #include <include/cef_base.h>
+#include <stdlib.h>
 
-#ifdef BW_WIN32
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
+#if defined(BW_WIN32)
 #pragma comment(lib, "shell32.lib")
 #pragma comment(lib, "user32.lib")
+
+#pragma comment(lib, "libcef.lib")
+#pragma comment(lib, "libcef_dll_wrapper.lib")
 #endif
 
 // Causes the current process to exit with the given exit code.
@@ -56,12 +58,6 @@ void bw_Application_exit( bw_Application* app, int exit_code ) {
 	CefQuitMessageLoop();
 }*/
 
-void _bw_Application_exitProcess( int exit_code ) {
-#ifdef BW_WIN32
-	ExitProcess( exit_code );
-#endif
-}
-
 /*void bw_Application_exit_async( bw_Application* app, int exit_code ) {
 	int* param = new int( exit_code );
 
@@ -69,26 +65,31 @@ void _bw_Application_exitProcess( int exit_code ) {
 	bw_Application_dispatch( app, _bw_Application_dispatch_exit, (void*)param );
 }*/
 
-void bw_Application_init( bw_Application* app ) {
-	app->engine_data = new bw_ApplicationEngineData;
+bw_ApplicationEngineImpl bw_ApplicationEngineImpl_start( bw_Application* app, int argc, char** argv ) {
+	bw_ApplicationEngineImpl impl;
 
-#ifdef BW_WIN32
-	CefMainArgs main_args( GetModuleHandle( NULL ) );
-#else
-#error Platform not yet supported
-#endif
+	CefMainArgs main_args( argc, argv );
 
 	CefSettings app_settings;
 	// Only works on Windows:
-	app_settings.multi_threaded_message_loop = 1;
+	app_settings.multi_threaded_message_loop = true;
+#ifndef BW_WIN32
+	// FIXME: For some reason the sandbox feature cannot be made to work on my debian system.
+	//        I'm not sure where else it isn't working though...
+	//        Have a sandbox is crucial for security though, so this needs to be enabled.
+	app_settings.no_sandbox = true;
+#endif
 	CefBrowserSettings browser_settings;
+
 	CefRefPtr<CefApp> cef_app_handle( new AppHandler( app ) );
 
 	int exit_code = CefExecuteProcess( main_args, cef_app_handle.get(), 0 );
 	// If the current process returns a non-negative number, it is not the main process on which we run user code.
 	if ( exit_code >= 0 ) {
-		_bw_Application_exitProcess( exit_code );
-		return;
+		BW_DEBUG("EXIT CODE %i", exit_code);
+		exit( 0 );
+		assert(0);
+		return impl;
 	}
 
 	CefRefPtr<CefClient>* client = new CefRefPtr<CefClient>(new ClientHandler( app ));
@@ -96,16 +97,18 @@ void bw_Application_init( bw_Application* app ) {
 
 	CefInitialize( main_args, app_settings, cef_app_handle.get(), 0 );
 
-	app->engine_data->exit_code = 0;
-	app->engine_data->cef_client = (void*)client;
+	impl.exit_code = 0;
+	impl.cef_client = (void*)client;
+
+	return impl;
 }
 
 void bw_Application_step() {
 	CefDoMessageLoopWork();
 }
 
-void bw_Application_uninit( bw_Application* app ) {
-	delete app->engine_data;
+void bw_ApplicationEngineImpl_finish( bw_ApplicationEngineImpl* app ) {
+	delete (CefRefPtr<CefClient>*)app->cef_client;
 }
 
 /*int bw_Application_run( bw_Application* app ) {

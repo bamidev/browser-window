@@ -28,16 +28,13 @@ extern "C" {
 
 typedef struct bw_BrowserWindow bw_BrowserWindow;
 
-typedef struct bw_BrowserWindowInner bw_BrowserWindowInner;
 
-typedef struct bw_BrowserWindowCallbacks {
-	void (*on_close)( bw_BrowserWindow* bw );
-	void (*on_loaded)( bw_BrowserWindow* bw );
-} bw_BrowserWindowCallbacks;
 
 typedef void (*bw_BrowserWindowCreationCallbackFn)( bw_BrowserWindow* window, void* data );
 typedef void (*bw_BrowserWindowHandlerFn)( bw_BrowserWindow* window, bw_CStrSlice cmd, bw_CStrSlice* args, size_t arg_count );
 typedef void (*bw_BrowserWindowJsCallbackFn)( bw_BrowserWindow* window, void* user_data, const char* result, const bw_Err* err );
+
+
 
 typedef struct bw_BrowserWindowOptions {
 	bool dev_tools;
@@ -52,10 +49,9 @@ typedef struct bw_BrowserWindowSource {
 
 struct bw_BrowserWindow {
 	bw_Window* window;
-	bw_BrowserWindowInner inner;
+	bw_BrowserWindowImpl impl;
 	bw_BrowserWindowHandlerFn external_handler;
 	void* user_data;
-	bw_BrowserWindowCallbacks callbacks;
 };
 
 
@@ -88,9 +84,6 @@ void bw_BrowserWindow_new(
 	bw_BrowserWindowCreationCallbackFn callback,	// A function that gets invoked when the browser window has been created.
 	void* callback_data	// Data that will be passed to the creation callback
 );
-
-/// Sets up the callbacks of the internal window handle to redirect the callbacks of the browser window callbacks.
-void _bw_BrowserWindow_initWindowCallbacks( bw_BrowserWindow* bw );
 
 
 

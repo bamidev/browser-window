@@ -1,13 +1,12 @@
 #include "../browser_window.h"
 
+#include "impl.h"
 
 
 
-void bw_BrowserWindow_doCleanup( bw_Window* w );
+
 void bw_BrowserWindow_onLoad( bw_Window* w );
-void bw_BrowserWindow_onClose( bw_Window* w );
 void bw_BrowserWindow_onDestroy( bw_Window* w );
-void bw_BrowserWindow_onLoaded( bw_Window* w );
 
 
 
@@ -16,7 +15,6 @@ void bw_BrowserWindow_close( bw_BrowserWindow* bw ) {
 }
 
 void bw_BrowserWindow_drop( bw_BrowserWindow* bw ) {
-
 	// Let the window module know that the user has dropped the handle and doesn't use it anymore
 	bw_Window_drop( bw->window );
 }
@@ -29,25 +27,36 @@ void* bw_BrowserWindow_getUserData( bw_BrowserWindow* bw ) {
 	return bw->user_data;
 }
 
-void _bw_BrowserWindow_initWindowCallbacks( bw_BrowserWindow* bw ) {
+void bw_BrowserWindow_new(
+	bw_Application* app,
+	const bw_BrowserWindow* _parent,
+	bw_BrowserWindowSource source,
+	bw_CStrSlice title,
+	int width, int height,
+	const bw_WindowOptions* window_options,
+	const bw_BrowserWindowOptions* browser_window_options,
+	bw_BrowserWindowHandlerFn handler,	/// A function that gets invoked when javascript the appropriate call is made in javascript.
+	void* user_data,	// The data that will be passed to the above handler function and the creation-callback when they are invoked.
+	bw_BrowserWindowCreationCallbackFn callback,	// A function that gets invoked when the browser window has been created.
+	void* callback_data	// Data that will be passed to the creation callback
+) {
+	bw_BrowserWindow* browser = (bw_BrowserWindow*)malloc( sizeof( bw_BrowserWindow ) );
 
-	// Default the callbacks of the browser window to do nothing
-	memset( &bw->callbacks, 0, sizeof( bw->callbacks ) );
+	bw_Window* parent = _parent == 0 ? 0 : _parent->window;
 
-	bw_Window* w = bw->window;
+	browser->window = bw_Window_new( app, parent, title, width, height, window_options, browser );
+	browser->external_handler = handler;
+	browser->user_data = user_data;
 
-	w->callbacks.on_close = bw_BrowserWindow_onClose;
-	w->callbacks.on_loaded = bw_BrowserWindow_onLoaded;
-}
+	browser->window->callbacks.do_cleanup = bw_BrowserWindowImpl_doCleanup;
 
-void bw_BrowserWindow_onClose( bw_Window* w ) {
-	bw_BrowserWindow* bw = (bw_BrowserWindow*)w->user_data;
-	if ( bw->callbacks.on_close != 0 )
-		bw->callbacks.on_close( bw );
-}
-
-void bw_BrowserWindow_onLoaded( bw_Window* w ) {
-	bw_BrowserWindow* bw = (bw_BrowserWindow*)w->user_data;
-	if ( bw->callbacks.on_loaded != 0 )
-		bw->callbacks.on_loaded( bw );
+	browser->impl = bw_BrowserWindowImpl_new(
+		browser,
+		source,
+		width,
+		height,
+		browser_window_options,
+		callback,
+		callback_data
+	);
 }

@@ -18,10 +18,10 @@ extern "C" {
 // MESSAGE will be printed in standard error output.
 // The same arguments provided to fprintf can be provided in this macro, like this:
 //     BW_ASSERT( false, "Unable to find number %i", my_number )
-#define BW_ASSERT( CONDITION, MESSAGE, ... ) \
+#define BW_ASSERT( CONDITION, ... ) \
 	if ( !(CONDITION) ) { \
-		fprintf( stderr, "[ASSERTION %s:%s] ", __FILE__, __LINE__ ); \
-		fprintf( stderr, MESSAGE, __VA_ARGS__ ); \
+		fprintf( stderr, "[ASSERTION %s:%i] ", __FILE__, __LINE__ ); \
+		fprintf( stderr, __VA_ARGS__ ); \
 		fprintf( stderr, "\n" ); \
 		assert( CONDITION ); \
 	}

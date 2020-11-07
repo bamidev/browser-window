@@ -7,15 +7,10 @@ extern "C" {
 
 
 
-struct bw_ApplicationEngineData {
+typedef struct {
 	void* cef_client;
 	int exit_code;
-};
-
-/*struct bw_ApplicationDispatchData {
-	bw_ApplicationDispatchFn func;
-	void* data;
-};*/
+} bw_ApplicationEngineImpl;
 
 
 

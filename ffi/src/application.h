@@ -1,23 +1,39 @@
 #ifndef BW_APPLICATION_H
 #define BW_APPLICATION_H
 
-
-
-typedef void (*bw_ApplicationDispatchFn)( struct bw_Application* app, void* data );
-
-
-
-#ifdef BW_WIN32
-#include "application/win32.h"
-#else
-#error Unsupported platform
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 
+
+struct bw_Application;
+typedef void (*bw_ApplicationDispatchFn)( struct bw_Application* app, void* data );
+
+
+
+// Import bw_ApplicationImpl and bw_ApplicationEngineImpl definitions
+#if defined(BW_WIN32)
+#include "application/win32.h"
+#elif defined(BW_GTK)
+#include "application/gtk.h"
+#else
+#error Unsupported platform
+#endif
+#if defined(BW_CEF)
+#include "application/cef.h"
+#elif defined(BW_EDGE)
+#include "applicaiton/edge.h"
+#else
+#error Unsupported engine
+#endif
+
+
+struct bw_Application {
+	bw_ApplicationImpl impl;
+	bw_ApplicationEngineImpl engine_impl;	/// Can be set by the implementation of a browser engine
+	unsigned int windows_alive;
+};
 
 typedef struct bw_Application bw_Application;
 typedef struct bw_ApplicationEngineData bw_ApplicationEngineData;
@@ -26,7 +42,7 @@ typedef struct bw_ApplicationDispatchData bw_ApplicationDispatchData;
 /// Initializes browser window.
 /// Starts up browser engine process(es).
 /// Returns an application handle.
-bw_Application* bw_Application_start();
+bw_Application* bw_Application_start( int argc, char** argv );
 
 /// Exits the main loop, returning execution to the function that invoked the run call.
 /// The exit_code will be returned by bw_Application_run.
@@ -40,24 +56,13 @@ void bw_Application_exitAsync(  bw_Application* app, int exit_code );
 ///     and passes the given data to it.
 /// This function is thread safe.
 void bw_Application_dispatch( bw_Application* app, bw_ApplicationDispatchFn func, void* data );
-void bw_Application_free( bw_Application* app );
 
-/// Should be implemented by the source files implementing the browser engines.
-/// Called by bw_Application_new.
-int _bw_Application_init( bw_Application* app, int argc, const char* argv );
+/// Should be called on the application handle at the end of the program.
+/// This invalidates the handle.
+void bw_Application_finish( bw_Application* app );
 
-/// Should be implemented by the browser engine source files.
-void bw_Application_init( bw_Application* app );
-
+/// Runs the event loop.
 int bw_Application_run( bw_Application* app );
-
-/// Should be implemented by the engine source files.
-/// Can be used to perform work in the message loop.
-void bw_Application_step();
-
-/// Should be implemented by the source files implementing the browser engines.
-/// Called by bw_Application_free.
-void bw_Application_uninit( bw_Application* app );
 
 
 

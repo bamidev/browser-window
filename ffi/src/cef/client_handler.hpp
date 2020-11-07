@@ -71,7 +71,7 @@ protected:
 
 		// Make a copy on the heap to store in our handle
 		CefRefPtr<CefBrowser>* cef_ptr = new CefRefPtr<CefBrowser>( browser );
-		bw_handle->inner.cef_ptr = (void*)cef_ptr;
+		bw_handle->impl.cef_ptr = (void*)cef_ptr;
 
 		// Store a link with the cef browser handle and our handle in a global map
 		bw::bw_handle_map.store( *cef_ptr, bw_handle );
@@ -86,6 +86,11 @@ protected:
 		CefProcessId source_process,
 		CefRefPtr<CefProcessMessage> message
 	) {
+		// Unused parameters
+		(void)(browser);
+		(void)(frame);
+		(void)(source_process);
+
 		auto msg_args = message->GetArgumentList();
 
 		// Parameters
@@ -123,10 +128,13 @@ protected:
 
 	void onInvokeHandlerReceived(
 		CefRefPtr<CefBrowser> browser,
-		CefRefPtr<CefFrame> _frame,
-		CefProcessId _source_process,
+		CefRefPtr<CefFrame> frame,
+		CefProcessId source_process,
 		CefRefPtr<CefProcessMessage> msg
 	) {
+		(void)(frame);
+		(void)(source_process);
+
 		// Obtain our browser window handle
 		std::optional<bw_BrowserWindow*> _bw_handle = bw::bw_handle_map.fetch( browser );
 		BW_ASSERT( _bw_handle.has_value(), "Link between CEF's browser handle and our handle does not exist!\n" );

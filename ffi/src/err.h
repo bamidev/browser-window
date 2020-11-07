@@ -28,6 +28,8 @@ typedef struct bw_Err {
 
 #define BW_ERR_MSG_DEF( FUNC, MSG ) \
 	char* FUNC( bw_ErrCode code, const void* data ) { \
+		(void)(code); \
+		(void)(data); \
 		char* msg = (char*)malloc( strlen( MSG ) + 1 ); \
 		strcpy( msg, MSG ); \
 		return msg; \

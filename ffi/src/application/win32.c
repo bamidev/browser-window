@@ -18,38 +18,28 @@
 
 
 
-void bw_Application_dispatch( bw_Application* app, bw_ApplicationDispatchFn func, void* data ) {
-
-	bw_ApplicationDispatchData* dispatch_data = malloc( sizeof( bw_ApplicationDispatchData ) );
-	dispatch_data->func = func;
-	dispatch_data->data = data;
-
+void bw_ApplicationImpl_dispatch( bw_Application* app, bw_ApplicationDispatchData* dispatch_data ) {
 	PostThreadMessageW( app->thread_id, WM_APP, (WPARAM)NULL, (LPARAM)dispatch_data );
 }
 
-bw_Application* bw_Application_start() {
+bw_ApplicationImpl bw_ApplicationImpl_start( int argc, char** argv ) {
 
-	bw_Application* app = malloc( sizeof( bw_Application ) );
-
-	app->thread_id = GetCurrentThreadId();
- 	app->handle = GetModuleHandle( NULL );
-	app->engine_data = 0;
-	app->windows_alive = 0;
-
-	bw_Application_init( app );
+	bw_ApplicationImpl app;
+	app.thread_id = GetCurrentThreadId();
+ 	app.handle = GetModuleHandle( NULL );
 
 	// Register window class
-	memset( &app->wc, 0, sizeof(WNDCLASSEXW) );
-	app->wc.cbSize = sizeof( WNDCLASSEXW );
-	app->wc.hInstance = app->handle;
-	app->wc.lpfnWndProc = bw_Window_proc;
-	app->wc.lpszClassName = L"bw-window";
-	RegisterClassExW( &app->wc );
+	memset( &app.wc, 0, sizeof(WNDCLASSEXW) );
+	app.wc.cbSize = sizeof( WNDCLASSEXW );
+	app.wc.hInstance = app->handle;
+	app.wc.lpfnWndProc = bw_Window_proc;
+	app.wc.lpszClassName = L"bw-window";
+	RegisterClassExW( &app.wc );
 
 	return app;
 }
 
-void bw_Application_free( bw_Application* app ) {
+void bw_ApplicationImpl_finish( bw_Application* app ) {
 	free( app );
 }
 

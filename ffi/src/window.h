@@ -7,10 +7,13 @@ extern "C" {
 
 #include "application.h"
 #include "string.h"
-#ifdef BW_WIN32
-#include "win32/window.h"
+
+#if defined(BW_WIN32)
+#include "win32/window.h"	// TODO: Make this "window/win32.h"
+#elif defined(BW_GTK)
+#include "window/gtk.h"
 #else
-#include "window/void.h"
+#error Unsupported GUI implementation
 #endif
 
 #include <stdbool.h>
@@ -22,7 +25,7 @@ typedef struct bw_Window bw_Window;
 typedef struct bw_WindowCallbacks {
 	/// Fired just before the window gets destroyed and freed from memory.
 	/// Should be implemented to free the user data provided to the window.
-	void (*do_cleanup)( const bw_Window* );
+	void (*do_cleanup)( bw_Window* );
 	/// Fired when the window has been closed, either by the user or programmatically.
 	void (*on_close)( const bw_Window* );
 	/// Fired when a window has finished loading
@@ -30,8 +33,6 @@ typedef struct bw_WindowCallbacks {
 	/// Fired when a window is resizing
 	void (*on_resize)( const bw_Window*, unsigned int width, unsigned int height );
 } bw_WindowCallbacks;
-
-typedef struct bw_WindowInner bw_WindowInner; // struct bw_WindowInner should already be declared.
 
 typedef struct bw_WindowOptions {
 	bool maximizable;
@@ -49,7 +50,7 @@ typedef struct bw_WindowDispatchData bw_WindowDispatchData;
 struct bw_Window {
 	bw_Application* app;	// The application handle that this window belongs to.
 	const bw_Window* parent;	// An optional window that acts as the parent to this window. If the parent gets destroyed, children will get destroyed too.
-	bw_WindowHandle handle;	// The underlying handle to the window
+	bw_WindowImpl impl;	// The underlying handle to the window
 	bool closed;	// Whether or not the window has been closed already
 	bool dropped;	// Whether or not the window may be destroyed when it is actually closed
 	bw_WindowCallbacks callbacks;
@@ -76,16 +77,15 @@ bw_Window* bw_Window_new(
 /// It will just not be visible anymore.
 void bw_Window_close( bw_Window* window );
 
+/// Invalidates the window handle.
+/// The window will get destroyed when it is deemed possible.
 void bw_Window_drop( bw_Window* window );
-
-/// Dispatches the given function on the GUI thread, and passes the given data along.
-/// This function is thread-safe.
-//void bw_Window_dispatch( bw_Window* window, bw_WindowDispatchFn fn, void* data );
-
-void _bw_Window_init( bw_Application* app );
 
 /// Returns whether or not the window has been closed.
 bool bw_Window_isClosed( const bw_Window* window );
+
+/// Reopens a previously closed window.
+void bw_Window_open( bw_Window* window );
 
 
 

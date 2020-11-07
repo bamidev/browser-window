@@ -1,6 +1,8 @@
 use browser_window_ffi::*;
+use std::env;
 use std::marker::PhantomData;
 use std::ops::Deref;
+use std::os::raw::{c_char, c_int};
 use std::rc::Rc;
 use std::sync::Arc;
 
@@ -77,7 +79,11 @@ impl Application {
 	/// Everything that runs before this function, runs as well on the other (browser engine related) processes.
 	/// This is generally unnecessary.
 	pub fn start() -> Self {
-		let ffi_handle = unsafe { bw_Application_start() };
+		let mut args_vec = Self::args_ptr_vec();
+		let argc: c_int = args_vec.len() as _;
+		let argv = args_vec.as_mut_ptr();
+
+		let ffi_handle = unsafe { bw_Application_start( argc, argv ) };
 
 		Self {
 			inner: Arc::new( ApplicationInner{
@@ -85,6 +91,24 @@ impl Application {
 			} ),
 			_not_send: PhantomData
 		}
+	}
+
+	fn args_ptr_vec() -> Vec<*mut c_char> {
+		let args = env::args_os();
+		let mut vec = Vec::with_capacity( args.len() );
+
+		for arg in args {
+			vec.push(
+				arg
+					.as_os_str()
+					.to_str()
+					.expect("Invalid Unicode in console arguments!")
+					.as_ptr()
+					 as _
+			);
+		}
+
+		vec
 	}
 }
 
@@ -161,6 +185,6 @@ impl Deref for ApplicationInner {
 
 impl Drop for ApplicationInner {
 	fn drop( &mut self ) {
-		unsafe { bw_Application_free( self.handle._ffi_handle ); }
+		unsafe { bw_Application_finish( self.handle._ffi_handle ); }
 	}
 }
