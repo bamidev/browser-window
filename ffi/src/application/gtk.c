@@ -16,6 +16,15 @@ gboolean _bw_ApplicationImpl_exitHandler( gpointer data );
 
 
 
+void bw_Application_checkThread( const bw_Application* app ) {
+#ifndef NDEBUG
+	// TODO: Check if called from the correct thread
+	
+#else
+	UNUSED(app);
+#endif
+}
+
 void bw_Application_exit( bw_Application* app, int exit_code ) {
 	app->impl.exit_code = exit_code;
 	gtk_main_quit();
