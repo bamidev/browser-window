@@ -13,9 +13,9 @@ fn main() {
 		return
 	}
 
-    let mut build = cc::Build::new();
+	let mut build = cc::Build::new();
 
-    let target = env::var("TARGET").unwrap();
+	let target = env::var("TARGET").unwrap();
 
 	let mut std_flag = "-std=c11";
 
@@ -89,8 +89,14 @@ fn main() {
 				build.include( &cef_path );
 				println!("cargo:rustc-link-search={}/libcef_dll_wrapper", &cef_path );
 				println!("cargo:rustc-link-search={}/Release", &cef_path );
-				println!("cargo:rustc-link-lib=static={}", "libcef_dll_wrapper");
-				println!("cargo:rustc-link-lib=dylib={}", "libcef");
+				if target.contains("msvc") {
+					println!("cargo:rustc-link-lib=static={}", "libcef_dll_wrapper");
+					println!("cargo:rustc-link-lib=dylib={}", "libcef");
+				}
+				else {
+					println!("cargo:rustc-link-lib=static={}", "cef_dll_wrapper");
+					println!("cargo:rustc-link-lib=dylib={}", "cef");
+				}
 			}
 		}
 

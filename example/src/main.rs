@@ -69,7 +69,7 @@ async fn program_logic( app: ApplicationAsync ) {
 		bw2
 	};
 
-	tokio::time::delay_for( tokio::time::Duration::from_millis(30000) ).await;
+	tokio::time::delay_for( tokio::time::Duration::from_millis(10000) ).await;
 
 	match x.eval_js("document.cookie").await {
 		Err(e) => { eprintln!("This javascript error is expected when using CEF: {}", e) },
