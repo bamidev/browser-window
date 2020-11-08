@@ -12,7 +12,7 @@ You could use the following commands (as root) to install the development files:
 ###### On Debian & Ubuntu
 `apt install pkg-config libgtk-3-dev`
 
-###### Arch
+###### On Arch
 `pacman -S gtk3`
 
 In any case, just make sure that `pkg-config gtk+-3.0 --cflags` works.
@@ -25,7 +25,7 @@ CEF takes a bit more effort to have it set up properly.
 
 The easiest and quickest way to set up CEF is to get the binary distribution.
 Building the source code is very, very time consuming.
-You can get the latest prebuilt binaries [here](http://opensource.spotify.com/cefbuilds/index.html#windows64).
+You can get the latest prebuilt binaries [here](http://opensource.spotify.com/cefbuilds/index.html).
 The minimal version will be fine.
 
 You need to extract this archive:
