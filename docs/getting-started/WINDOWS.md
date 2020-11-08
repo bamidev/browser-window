@@ -15,29 +15,24 @@ However, it is recommended to compile it with CEF3 (Chromium Embedding Framework
 ##### Download & Extract
 
 The easiest and quickest way to set up CEF is to get the binary distribution.
-Building the source code is very very time consuming.
+Building the source code is very, very time consuming.
 You can get the latest prebuilt binaries [here](http://opensource.spotify.com/cefbuilds/index.html#windows64).
 The minimal version will be fine.
 You can also get the 32-bit binaries if you really want.
 
 You need to extract this archive.
 These .tar.bz files are not supported by Windows itself.
-You could use the good old [WinRAR](https://www.rarlab.com/download.htm) to extract this.
+Perhaps [WinRAR](https://www.rarlab.com/download.htm) will do.
 
 ##### Environment Variables & Resource Files
 
-Once you have extracted everything, we need to set up some environment variables, so that the MSVC compiler knows where it can find the header and library files.
-You can find your system environment variables by going to: Control Panel > System and Security > System > Advanced system settings.
-Then click on the "Environment variables..." button.
+Once you have extracted everything, we need to let Browser Window know where it can find the header and library files to link to.
+If you set environment variable `CEF_PATH` to the directory that you have extracted, Browser Window is able to find them.
 
-* Add the extracted folder to your `%INCLUDE%` variable.
-* Add the Release folder inside that extracted folder to your %LIB% variable.
-* Do one of the following:
-    1. Add the same Release folder to your `%PATH%` variable.
-    2. Copy all .dll files in the Release folder to the executables working directory.
-       This is target/debug or target/release within your crate's folder.
-* Copy all .bin files from the Release folder, into the working directory.
-* Copy all files from the Resource folder, into the working directory.
+You also need to copy all resource files, found in the Resource directory, to the executables working directory.
+
+To last thing that needs to be done is that the library files need to be made available to the executable.
+Copy all .dll and .bin files to the working directory as well, or add the Release folder to your `%PATH%` environment variable.
 
 That's it!
 A call to `cargo run` will do it.
