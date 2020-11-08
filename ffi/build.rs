@@ -120,6 +120,5 @@ fn main() {
 		.file("src/string.c")
 		.file("src/window/common.c")
 		.flag( std_flag )
-		.flag_if_supported("-Wunused-parameter")
 		.compile("browser_window");
 }

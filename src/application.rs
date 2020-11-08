@@ -1,8 +1,9 @@
 use browser_window_ffi::*;
 use std::env;
+use std::ffi::OsString;
 use std::marker::PhantomData;
 use std::ops::Deref;
-use std::os::raw::{c_char, c_int};
+use std::os::raw::c_int;
 use std::rc::Rc;
 use std::sync::Arc;
 
@@ -79,11 +80,11 @@ impl Application {
 	/// Everything that runs before this function, runs as well on the other (browser engine related) processes.
 	/// This is generally unnecessary.
 	pub fn start() -> Self {
-		let mut args_vec = Self::args_ptr_vec();
+		let (args_vec, mut ptrs_vec) = Self::args_ptr_vec();
 		let argc: c_int = args_vec.len() as _;
-		let argv = args_vec.as_mut_ptr();
+		let argv = ptrs_vec.as_mut_ptr();
 
-		let ffi_handle = unsafe { bw_Application_start( argc, argv ) };
+		let ffi_handle = unsafe { bw_Application_start( argc, argv as _ ) };
 
 		Self {
 			inner: Arc::new( ApplicationInner{
@@ -93,22 +94,20 @@ impl Application {
 		}
 	}
 
-	fn args_ptr_vec() -> Vec<*mut c_char> {
+	fn args_ptr_vec() -> (Vec<OsString>, Vec<*mut u8>) {
 		let args = env::args_os();
-		let mut vec = Vec::with_capacity( args.len() );
+		let mut store = Vec::with_capacity( args.len() );
+		let mut ptrs: Vec<*mut u8> = Vec::with_capacity( args.len() );
 
 		for arg in args {
-			vec.push(
-				arg
-					.as_os_str()
-					.to_str()
-					.expect("Invalid Unicode in console arguments!")
-					.as_ptr()
-					 as _
-			);
+			let ptr = arg.to_str().expect("Invalid Unicode in console arguments!").as_ptr();
+
+			store.push( arg );
+			ptrs.push( ptr as _ );
+
 		}
 
-		vec
+		( store, ptrs )
 	}
 }
 
