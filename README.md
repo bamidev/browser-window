@@ -55,7 +55,7 @@ However, Edge's WebView has this problem where no HTTP Only cookies are availabl
 
 ## Getting Started
 
-Click [here](./docs/getting-started/WINDOWS.md) for a manual on how to set up everything that's needed to use Browser Window.
+Click [here](./docs/getting-started) for a manual on how to set up everything that's needed to use Browser Window.
 
 ## License
 
