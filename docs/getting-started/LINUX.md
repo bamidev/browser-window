@@ -50,7 +50,8 @@ Then we need to tell our compiler & linker where they can find our library files
 ```export CEF_PATH=/my/path/to/cef_binary_ ... _minimal```
 
 To last thing that needs to be done is that some files need to be made available to the executable.
-Copy all .dll and .bin files to the working directory, or add the Release folder to your `$PATH` environment variable.
+Copy all .bin files from the Release folder to the working directory.
+Also copy all files from the Resource folder to the working directory.
 
 That's it!
 A call to `cargo run` will do it.
