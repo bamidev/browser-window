@@ -1,6 +1,6 @@
 //! Browser Window is a Rust crate that allows you to have and manipulate windows with browsers in them.
 //! Just like Electron, you can build graphical user interfaces with HTML/CSS/JS technology, but you can also use it to just have some browser functionality in your application.
-//! 
+//!
 //! To start using Browser Window, you need to start it before anything else, and preferably on the main thread.
 //! To do this we use `Application::start()`, which gives you an application handle that can be used to create the browser windows.
 //!
@@ -17,14 +17,15 @@
 //! 	});
 //! }
 //! ```
-//! 
+//!
 //! For an example that uses Browser Window in an asynchronous context, see [this example code](https://github.com/bamilab/browser-window/blob/master/example/src/main.rs).
 
 #![cfg_attr(feature = "nightly", feature(negative_impls))]
 
 mod application;
-mod browser_window;
+mod browser;
 mod common;
+//mod treelink;
 
 
 
@@ -32,15 +33,14 @@ pub use application::{
 	Application,
 	ApplicationAsync,
 	ApplicationDispatchFuture,
-	ApplicationHandle
+	Runtime
 };
-pub use browser_window::{
-	BrowserWindow,
-	BrowserWindowAsync,
-	BrowserWindowDispatchFuture,
-	BrowserWindowHandle
+pub use browser::{
+	Browser,
+	BrowserAsync,
+	BrowserDispatchFuture
 };
-pub use browser_window::builder::{
-	BrowserWindowBuilder,
+pub use browser::builder::{
+	BrowserBuilder,
 	Source
 };

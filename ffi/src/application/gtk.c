@@ -19,7 +19,7 @@ gboolean _bw_ApplicationImpl_exitHandler( gpointer data );
 void bw_Application_checkThread( const bw_Application* app ) {
 #ifndef NDEBUG
 	// TODO: Check if called from the correct thread
-	
+
 #else
 	UNUSED(app);
 #endif
@@ -38,7 +38,7 @@ void bw_Application_exitAsync( bw_Application* app, int exit_code ) {
 	gdk_threads_add_idle( _bw_ApplicationImpl_exitHandler, (gpointer)&data );
 }
 
-int bw_Application_run( bw_Application* app ) {
+int bw_Application_run( bw_Application* app, bw_ApplicationReadyFn on_ready, void* user_data ) {
 	gtk_main();
 	return app->impl.exit_code;
 }

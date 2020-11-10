@@ -6,13 +6,14 @@ use tokio;
 
 fn main() {
 
-	let app = Application::start();
+	let bw_runtime = Runtime::start();
+	let tokio_runtime = tokio::runtime::Runtime::new().unwrap();
 
-	// Start the tokio runtime and run our program logic on it
-	let runtime = tokio::runtime::Runtime::new().unwrap();
-	runtime.spawn( program_logic( app.clone().into() ) );
+	let exit_code = bw_runtime.run_alongside(|app| {
+		// Start the tokio runtime and run our program logic on it
 
-	let exit_code = app.run();
+		tokio_runtime.spawn( program_logic( app ) );
+	});
 
 	// Return exit code
 	exit( exit_code );
@@ -21,7 +22,7 @@ fn main() {
 async fn program_logic( app: ApplicationAsync ) {
 
 	let x = {
-		let bw = BrowserWindowBuilder::new( Source::Html( include_str!("example.html").into() ) )
+		let bw = BrowserBuilder::new( Source::Html( include_str!("example.html").into() ) )
 		.title("Example")
 		.width( 800 )
 		.height( 600 )
@@ -38,7 +39,7 @@ async fn program_logic( app: ApplicationAsync ) {
 		})
 		.spawn_async( &app ).await;
 
-		let bw2 = BrowserWindowBuilder::new( Source::Html( include_str!("example.html").into() ) )
+		let bw2 = BrowserBuilder::new( Source::Html( include_str!("example.html").into() ) )
 			.title("Example")
 			.width( 800 )
 			.height( 600 )
@@ -65,7 +66,7 @@ async fn program_logic( app: ApplicationAsync ) {
 				eprintln!("Available cookies: {}", cookies);
 			}
 		}
-
+		
 		bw2
 	};
 

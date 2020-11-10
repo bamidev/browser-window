@@ -1,10 +1,12 @@
-use super::application::{ApplicationHandle};
+use super::application::ApplicationHandle;
 use boxfnonce::SendBoxFnOnce;
 use browser_window_ffi::*;
 use std::future::Future;
 use std::mem;
 use std::os::raw::*;
 use std::pin::Pin;
+use std::rc::Rc;
+use std::sync::Arc;
 use std::task::{
 	Context,
 	Poll,
@@ -17,7 +19,7 @@ pub struct DispatchData<'a,H,R> {
 
 	handle: H,
 	func: Option<SendBoxFnOnce<'a,( H, ),R>>,
-	result_ptr: *mut Option<Box<R>>,
+	result_ptr: *mut Option<R>,
 	waker: Waker
 }
 unsafe impl<'a,H,R> Send for DispatchData<'a,H,R> {}
@@ -26,11 +28,10 @@ pub struct DispatchFuture<'a,H,R> {
 
 	handle: H,
 	func: Option<SendBoxFnOnce<'a,( H, ),R>>,
-	result: Option<Box<R>>,
+	result: Option<R>,
 	started: bool
 }
 impl<'a,H,R> Unpin for DispatchFuture<'a,H,R> {}
-//unsafe impl<'a,H,R> Send for DispatchFuture<'a,H,R> {}
 
 impl<'a,H,R> DispatchFuture<'a,H,R> {
 
@@ -49,9 +50,8 @@ impl<'a,H,R> DispatchFuture<'a,H,R> {
 
 impl<'a,H,R> Future for DispatchFuture<'a,H,R> where
 	H: HasAppHandle + Clone
-	//R: Send
 {
-	type Output = Box<R>;
+	type Output = R;
 
 	fn poll( mut self: Pin<&mut Self>, cx: &mut Context ) -> Poll<Self::Output> {
 
@@ -61,12 +61,13 @@ impl<'a,H,R> Future for DispatchFuture<'a,H,R> where
 			// This includes the closure to actually call,
 			// a pointer to set the output with,
 			// and a waker to finish our future with.
-			let mut data = Box::new( DispatchData {
+			let mut data = Box::new( DispatchData::<H,R> {
 				handle: self.handle.clone(),
 				func: None,
 				result_ptr: &mut self.result as _,
 				waker: cx.waker().clone()
 			} );
+
 			// Move ownership of the boxed FnOnce to the data struct
 			// Our future doesn't need it itself
 			mem::swap( &mut self.func, &mut data.func );
@@ -74,7 +75,7 @@ impl<'a,H,R> Future for DispatchFuture<'a,H,R> where
 				let data_ptr = Box::into_raw( data );
 
 				bw_Application_dispatch(
-					self.handle.app_handle()._ffi_handle,
+					self.handle.app_handle().ffi_handle,
 					ffi_dispatch_handler::<H,R>,
 					data_ptr as _
 				);
@@ -89,7 +90,7 @@ impl<'a,H,R> Future for DispatchFuture<'a,H,R> where
 			}
 
 			// Move ownership of output to temporary value so we can return it
-			let mut temp: Option<Box<R>> = None;
+			let mut temp: Option<R> = None;
 			mem::swap( &mut self.result, &mut temp );
 
 			Poll::Ready( temp.unwrap() )
@@ -107,8 +108,30 @@ pub trait HasAppHandle {
 
 
 
-extern "C" fn ffi_dispatch_handler<H,R>( _app: *mut bw_Application, _data: *mut c_void ) where
-	H: Clone
+/// A trait that is able to tell whether or not the pointer-like type that implements it,
+///  points to the same location as another instance of the pointer.
+pub trait PointerEq {
+	fn ptr_eq( &self, other: &Self ) -> bool;
+}
+
+
+
+impl<T> PointerEq for Rc<T> {
+	fn ptr_eq( &self, other: &Self  ) -> bool {
+		Rc::ptr_eq( self, other )
+	}
+}
+
+impl<T> PointerEq for Arc<T> {
+	fn ptr_eq( &self, other: &Self  ) -> bool {
+		Arc::ptr_eq( self, other )
+	}
+}
+
+
+
+
+extern "C" fn ffi_dispatch_handler<H,R>( _app: *mut bw_Application, _data: *mut c_void )
 {
 	unsafe {
 		let data_ptr: *mut DispatchData<H,R> = mem::transmute( _data );
@@ -116,10 +139,9 @@ extern "C" fn ffi_dispatch_handler<H,R>( _app: *mut bw_Application, _data: *mut 
 
 		match *data {
 			DispatchData{ handle, func, result_ptr, waker } => {
-				let handle: H = handle.clone();
 
 				let result = func.unwrap().call( handle );
-				*result_ptr = Some( Box::new( result ) );
+				*result_ptr = Some( result );
 				waker.wake();	// Notify that the result value has been set
 			}
 		}

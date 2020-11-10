@@ -74,9 +74,10 @@ public:
 			CefRefPtr<CefBinaryValue> bw_bin = msg_args->GetBinary( 1 );
 			CefRefPtr<CefBinaryValue> cb_bin = msg_args->GetBinary( 2 );
 			CefRefPtr<CefBinaryValue> user_data_bin = msg_args->GetBinary( 3 );
+			bool cb_async = msg_args->GetBool( 4 );
 
 
-			this->eval_js( browser, frame, js, bw_bin, cb_bin, user_data_bin );
+			this->eval_js( browser, frame, js, bw_bin, cb_bin, user_data_bin, cb_async );
 
 			return true;
 		}
@@ -93,7 +94,8 @@ public:
 		const CefString& js,
 		CefRefPtr<CefBinaryValue> bw_handle_binary,
 		CefRefPtr<CefBinaryValue> callback_binary,
-		CefRefPtr<CefBinaryValue> user_data_binary
+		CefRefPtr<CefBinaryValue> user_data_binary,
+		bool cb_async
 	) {
 		// Unused parameters
 		(void)(browser);
@@ -129,6 +131,7 @@ public:
 		msg_args->SetBinary( 2, bw_handle_binary );
 		msg_args->SetBinary( 3, callback_binary );
 		msg_args->SetBinary( 4, user_data_binary );
+		msg_args->SetBool( 5, cb_async );
 
 		// Send the message back to the browser process
 		frame->SendProcessMessage( PID_BROWSER, msg );

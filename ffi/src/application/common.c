@@ -7,7 +7,7 @@
 
 
 
-void bw_Application_free( bw_Application* app ) {
+void bw_Application_finish( bw_Application* app ) {
 
 	bw_ApplicationEngineImpl_finish( &app->engine_impl );
 	bw_ApplicationImpl_finish( &app->impl );
