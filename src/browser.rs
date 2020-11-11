@@ -65,6 +65,18 @@ impl Browser {
 		unsafe { bw_BrowserWindow_close( self.handle.ffi_handle ); }
 	}
 
+	pub async fn eval_js( &self, js: &str ) -> Result<String, Box<dyn Error>> {
+		let (tx, rx) = oneshot::channel::<Result<String, Box<dyn Error>>>();
+
+		self._eval_js( js, |_, result| {
+			if let Err(_) = tx.send( result ) {
+				panic!("Unable to send JavaScript result back")
+			}
+		} );
+
+		rx.await.unwrap()
+	}
+
 	/// Executes the given javascript code, and returns the output via a callback.
 	/// If you don't need the result, see "exec_js".
 	///
@@ -73,7 +85,7 @@ impl Browser {
 	/// * `on_complete` - The 'callback'. This closure will be invoked, with the result provided as the first argument.
 	///                   The result contains the output of the javascript code when it succeeded.
 	///                   Otherwise the error explains the javascript exception.
-	pub fn eval_js<'a,H>( &self, js: &str, on_complete: H ) where
+	fn _eval_js<'a,H>( &self, js: &str, on_complete: H ) where
 		H: FnOnce( Browser, Result<String, Box<dyn Error>> ) + 'a
 	{
 		let data_ptr: *mut H = Box::into_raw(
@@ -93,7 +105,7 @@ impl Browser {
 	/// # Arguments:
 	/// * `js` - The javascript code
 	pub fn exec_js( &self, js: &str ) {
-		self.eval_js( js, |_,_|{} );
+		self._eval_js( js, |_,_|{} );
 	}
 
 	fn from_ffi_handle( ptr: *mut bw_BrowserWindow ) -> Self {
