@@ -1,13 +1,11 @@
 use browser_window::*;
 use std::process::exit;
-use tokio;
 
 
 
 fn main() {
 
 	let bw_runtime = Runtime::start();
-	//let tokio_runtime = tokio::runtime::Runtime::new().unwrap();
 
 	let exit_code = bw_runtime.spawn( program_logic( bw_runtime.app() ) );
 
@@ -16,13 +14,13 @@ fn main() {
 }
 
 async fn program_logic( app: Application ) {
+
 	let x = {
 		let bw = BrowserBuilder::new( Source::Html( include_str!("example.html").into() ) )
 		.title("Example")
 		.width( 800 )
 		.height( 600 )
 		.minimizable( false )
-		.maximizable( false )
 		.borders( false )
 		.resizable( false )
 		.handler(|_, cmd, args| {
@@ -33,16 +31,17 @@ async fn program_logic( app: Application ) {
 			}
 		})
 		.build( app.clone() ).await;
+
 		let bw2 = BrowserBuilder::new( Source::Html( include_str!("example.html").into() ) )
 			.title("Example")
 			.width( 800 )
 			.height( 600 )
 			.minimizable( false )
-			.maximizable( false )
 			.borders( false )
 			.resizable( true )
 			.parent( &bw )
 			.build( app.clone() ).await;
+
 		// Let's fetch the title through Javascript
 		match bw.eval_js("document.title").await {
 			Err(e) => { eprintln!("Something went wrong with evaluating javascript: {}", e) },
@@ -59,11 +58,11 @@ async fn program_logic( app: Application ) {
 				eprintln!("Available cookies: {}", cookies);
 			}
 		}
-		
+
 		bw2
 	};
 
-	tokio::time::delay_for( tokio::time::Duration::from_millis(10000) ).await;
+	//tokio::time::delay_for( tokio::time::Duration::from_millis(10000) ).await;
 
 	match x.eval_js("document.cookie").await {
 		Err(e) => { eprintln!("This javascript error is expected when using CEF: {}", e) },
