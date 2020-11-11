@@ -11,25 +11,25 @@ However, they lack a few important things.
 
 The main problem is that they (except on Linux) use browser engine's already available on the operating system.
 This is useful if you want to ship your application as a single executable file.
-However, using different engines on each platform makes it harder to make your application work consistently on each platform, especially when using newer features that are not yet supported by some browsers engines.
+However, using different engines makes it harder to make your application work consistently on each platform, especially when using newer features that are not yet supported by some browsers engines.
 Using the same engine for each platform is a good idea.
 
 Another problem you run into when using preinstalled browser engines, is that in the case of Windows, that engine is not being maintained anymore.
 Windows uses the EdgeHTML engine that Edge used before it switched to using CEF as well.
 If you want to use newest HTML5/CSS3 features, you shouldn't rely on an old browser engine.
+A new API for Edge's new browser engine is now available, however you still need to install the Edge Runtime, and its just a wrapper around CEF basically.
 
-Moreover, some other simple features that would make life so much better, are unfortunately not available in other crates.
-For example, getting the resulting output back from a JavaScript evaluation is not self-evident.
+Moreover, some other simple features that would make life so much better, are unfortunately also not available in other crates.
+For example, getting output back from your JavaScript evaluation is not self-evident.
 
 Another thing is, as multi-core processors are becoming the norm, multi-threading is becoming more and more relevant.
 GUI libraries are often single-threaded by design, and need some way of delegating heavy work to another thread.
 Fortunately, Rust has a pretty mechanism for writing asynchronous code with its async/await syntax, which can be extremely efficient as well.
-We'd be wrong not to utilise this!
+Browser Window utilizes this syntax.
+Moreover, you could use our thread-safe handles if you want to manipulate the GUI from a multi-threaded environment as well.
+So Browser Window is designed with concurrency in mind from the ground up.
 
-So Browser Window is designed with asynchronous programming in mind from the ground up.
-The developer(s) have the ability to use this API within an async/await environment without much hassle.
-Single-threaded applications are also still possible.
-You can view the [example](https://github.com/bamilab/browser-window/tree/master/example) to see how easily a GUI with Browser Window can be made, within a multi-threaded environment.
+You can view the [example](https://github.com/bamilab/browser-window/tree/master/example) to see how easily a GUI with Browser Window can be made, within a single-threaded environment.
 
 ## Requirements
 
@@ -70,8 +70,7 @@ If you want to help out, you're more than welcome! I could use some help with im
 At the moment, basic functionality is available, but there is more to come.
 These are the features that are awaiting implementation:
 
-* Linux support (through GTK+)
+* Linux support (through GTK+) [underway]
 * MacOS support (through Cocoa)
 * Cookie support (including HttpOnly cookies)
 * Events
-* No C/C++ warnings

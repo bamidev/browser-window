@@ -22,7 +22,7 @@ void bw_BrowserWindow_drop( bw_BrowserWindow* bw ) {
 	bw_Window_drop( bw->window );
 }
 
-const bw_Application* bw_BrowserWindow_getApp( bw_BrowserWindow* bw ) {
+bw_Application* bw_BrowserWindow_getApp( bw_BrowserWindow* bw ) {
 	return bw->window->app;
 }
 

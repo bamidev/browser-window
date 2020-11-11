@@ -1,3 +1,4 @@
+#include "../application.h"
 #include "../assert.h"
 #include "../browser_window.h"
 #include "../debug.h"
@@ -19,6 +20,13 @@ struct HandleData {
 	WebViewControl control;
 
 	HandleData( const WebViewControl& ctrl ) : control(ctrl) {}
+};
+
+struct bw_BrowserWindowEdge_EvalJsCallbackData {
+	bw_BrowserWindow* bw;
+	bw_CStrSlice js_slice;
+	bw_BrowserWindowJsCallbackFn callback;
+	void* cb_data;
 };
 
 
@@ -108,13 +116,30 @@ void bw_BrowserWindow_evalJs( bw_BrowserWindow* bw, bw_CStrSlice js_slice, bw_Br
 	});
 }
 
+void bw_BrowserWindowEdge_evalJsHandler( bw_Application* app, void* _data ) {
+	auto data = (bw_BrowserWindowEdge_EvalJsCallbackData*)_data;
+
+	bw_BrowserWindow_evalJs( data->bw, data->js_slice, data->callback, data->cb_data );
+
+	delete data;
+}
+
+void bw_BrowserWindow_evalJsThreaded( bw_BrowserWindow* bw, bw_CStrSlice js_slice, bw_BrowserWindowJsCallbackFn callback, void* cb_data ) {
+
+	bw_BrowserWindowEdge_EvalJsCallbackData* data = new bw_BrowserWindowEdge_EvalJsCallbackData;
+	data->bw = bw;
+	data->js_slice = js_slice;
+	data->callback = callback;
+	data->cb_data = cb_data;
+
+	bw_Application_dispatch( bw->window->app, bw_BrowserWindowEdge_evalJsHandler, (void*)data );
+}
+
 void bw_BrowserWindowImpl_doCleanup( bw_Window* window ) {
-	BW_DEBUG("bw_Windbw_BrowserWindowImpl_doCleanupow_destroy")
 
 	auto bw = (bw_BrowserWindow*)window->user_data;
 	auto hd = (HandleData*)bw->impl.data;
 	delete hd;
-		BW_DEBUG("bw_Windbw_BrowserWindowImpl_doCleanupow_destroy")
 }
 
 bw_Err bw_BrowserWindow_navigate( bw_BrowserWindow* bw, bw_CStrSlice url ) {

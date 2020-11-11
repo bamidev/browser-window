@@ -113,6 +113,8 @@ protected:
 		CefRefPtr<CefBinaryValue> user_data_bin = msg_args->GetBinary( 4 );
 		user_data_bin->GetData( (void*)&user_data, sizeof( user_data ), 0 );
 
+		// FIXME: call the relevant code on the right thread...
+
 		// // Invoke the callback with either a result string or an error
 		if (success) {
 			callback( bw_handle, user_data, result.c_str(), 0 );
@@ -121,7 +123,6 @@ protected:
 			bw_Err error = bw_Err_new_with_msg( 1, result.c_str() );
 
 			callback( bw_handle, user_data, 0, &error );
-
 			bw_Err_free( &error );
 		}
 	}

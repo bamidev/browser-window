@@ -22,7 +22,13 @@
 
 // Sends the given Javascript code to the renderer process, expecting the code to be executed over there.
 // script_id should be a script id obtained from storing a callback in the eval callback store.
-void bw_BrowserWindow_sendJsToRendererProcess( bw_BrowserWindow* bw, CefRefPtr<CefBrowser>& cef_browser, CefString& code, bw_BrowserWindowJsCallbackFn cb, void* user_data );
+void bw_BrowserWindowCef_sendJsToRendererProcess(
+	bw_BrowserWindow* bw,
+	CefRefPtr<CefBrowser>& cef_browser,
+	CefString& code,
+	bw_BrowserWindowJsCallbackFn cb,
+	void* user_data
+);
 char* bw_cef_errorMessage( bw_ErrCode code, const void* data );
 /// Constructs the platform-specific window info needed by CEF.
 CefWindowInfo _bw_BrowserWindow_windowInfo( bw_Window* window, int width, int height );
@@ -50,7 +56,13 @@ void bw_BrowserWindow_evalJs( bw_BrowserWindow* bw, bw_CStrSlice js, bw_BrowserW
 	// Execute the javascript on the renderer process, and invoke the callback from there:
 	CefRefPtr<CefBrowser> cef_browser = *(CefRefPtr<CefBrowser>*)(bw->impl.cef_ptr);
 
-	bw_BrowserWindow_sendJsToRendererProcess( bw, cef_browser, code, cb, user_data );
+	bw_BrowserWindowCef_sendJsToRendererProcess( bw, cef_browser, code, cb, user_data );
+}
+
+// It really doesn't matter from which thread we're sending the JavaScript code from,
+//  we're sending it off to another process anyway.
+void bw_BrowserWindow_evalJsThreaded( bw_BrowserWindow* bw, bw_CStrSlice js, bw_BrowserWindowJsCallbackFn cb, void* user_data ) {
+	bw_BrowserWindow_evalJs( bw, js, cb, user_data );
 }
 
 void bw_BrowserWindowImpl_doCleanup( bw_Window* window ) {
@@ -129,7 +141,13 @@ void bw_BrowserWindowImpl_new(
 	browser->impl = bw;
 }
 
-void bw_BrowserWindow_sendJsToRendererProcess( bw_BrowserWindow* bw, CefRefPtr<CefBrowser>& cef_browser, CefString& code, bw_BrowserWindowJsCallbackFn cb, void* user_data ) {
+void bw_BrowserWindowCef_sendJsToRendererProcess(
+	bw_BrowserWindow* bw,
+	CefRefPtr<CefBrowser>& cef_browser,
+	CefString& code,
+	bw_BrowserWindowJsCallbackFn cb,
+	void* user_data
+) {
 	CefRefPtr<CefProcessMessage> msg = CefProcessMessage::Create("eval-js");
 	CefRefPtr<CefListValue> args = msg->GetArgumentList();
 

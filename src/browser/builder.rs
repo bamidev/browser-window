@@ -3,15 +3,13 @@ use browser_window_ffi::*;
 use boxfnonce::{BoxFnOnce};
 use std::ffi::*;
 
-use crate::application::{Application, ApplicationAsync, ApplicationHandle};
-use crate::browser_window::*;
+use crate::application::{Application, ApplicationThreaded};
+use crate::browser::*;
 
 use std::{
 	mem,
 	ops::Deref,
-	ptr,
-	rc::Rc,
-	sync::Arc
+	ptr
 };
 
 
@@ -22,15 +20,15 @@ pub enum Source {
 	Html( String )
 }
 
-/// Used to create a BrowserWindow instance.
-pub struct BrowserWindowBuilder {
+/// Used to create a `Browser` or `BrowserThreaded` instance.
+pub struct BrowserBuilder {
 
-	parent: Option<BrowserWindowHandle>,
+	parent: Option<BrowserHandle>,
 	source: Source,
 	title: Option<String>,
 	width: Option<u32>,
 	height: Option<u32>,
-	handler: Option<Box<dyn FnMut(BrowserWindowHandle, &str, &[&str]) + Send>>,
+	handler: Option<Box<dyn FnMut(Browser, &str, &[&str]) + Send>>,
 
 	borders: bool,
 	maximizable: bool,
@@ -40,28 +38,22 @@ pub struct BrowserWindowBuilder {
 
 
 
-impl BrowserWindowBuilder {
+impl BrowserBuilder {
 
-	/// Sets whether or not the window has borders
+	/// Sets whether or not the window has borders.
 	/// Default is true.
 	pub fn borders( mut self, value: bool ) -> Self {
 		self.borders = value;	self
 	}
 
 	/// Configure a closure that can be invoked from within JavaScript.
-	/// The closure's first parameter specifies a command name.
-	/// The closure's second parameter specifies an array of string arguments.
+	/// The closure's second parameter specifies a command name.
+	/// The closure's third parameter specifies an array of string arguments.
 	pub fn handler<H>( mut self, handler: H ) -> Self where
-		H: FnMut(BrowserWindowHandle, &str, &[&str]) + Send + 'static
+		H: FnMut(Browser, &str, &[&str]) + Send + 'static
 	{
 		self.handler = Some( Box::new( handler ) );
 		self
-	}
-
-	/// Sets whether or not the window has a maximize button on the title bar
-	/// Default is true.
-	pub fn maximizable( mut self, value: bool ) -> Self {
-		self.maximizable = value;	self
 	}
 
 	/// Sets whether or not the window has a minimize button on the title bar
@@ -72,9 +64,9 @@ impl BrowserWindowBuilder {
 
 	/// Configure a parent window.
 	/// When a parent window closes, this browser window will close as well.
-	/// This could be a reference to a BrowserWindow or BrowserWindowAsync handle.
+	/// This could be a reference to a `Browser` or `BrowserThreaded` handle.
 	pub fn parent<B>( mut self, bw: &B ) -> Self where
-		B: Deref<Target=BrowserWindowHandle>
+		B: Deref<Target=BrowserHandle>
 	{
 		self.parent = Some( (**bw).clone() );
 		self
@@ -137,39 +129,32 @@ impl BrowserWindowBuilder {
 	///
 	/// # Arguments
 	/// * `app` - An application handle that this browser window can spawn into
-	/// * `on_created` - A callback closure that will be invoked when the browser window is created and ready.
-	pub fn spawn<H>( self, app: &Application, on_created: H ) where
-		H: FnOnce( BrowserWindow )
+	pub async fn build( self, app: Application ) -> Browser
 	{
-		let app_inner = app.inner.clone();
-		let app_handle = (**app).clone();
+		let (tx, rx) = oneshot::channel::<BrowserHandle>();
 
-		self._spawn( app_handle, move |inner_handle| {
-			eprintln!("test");
-			let bw = BrowserWindow {
-				inner: Rc::new( BrowserWindowInner {
-					app: app_inner,
-					handle: inner_handle
-				} )
-			};
+		self._build( app, move |handle| {
 
-			on_created( bw );
+			if let Err(_) = tx.send( handle ) {
+				panic!("Unable to send browser handle back")
+			}
 		} );
+
+		rx.await.unwrap().into()
 	}
 
-	/// Same as spawn, but asynchronous.
-	/// Instead of providing a callback, the handle is simply returned.
+	/// Same as build, but gives back a browser handle that is thread-safe.
 	///
 	/// # Arguments
-	/// * `app` - An async application handle.
-	pub async fn spawn_async( self, app: &ApplicationAsync ) -> BrowserWindowAsync {
+	/// * `app` - An thread-safe application handle.
+	pub async fn build_threaded( self, app: ApplicationThreaded ) -> BrowserThreaded {
 
-		let (tx, rx) = oneshot::channel::<BrowserWindowHandle>();
+		let (tx, rx) = oneshot::channel::<BrowserHandle>();
 
-		// We need to dispatch the spawning to the GUI thread
-		app.dispatch(|app_handle| {
+		// We need to dispatch the spawning of the browser to the GUI thread
+		app.delegate(|app_handle| {
 
-			self._spawn(app_handle, |inner_handle| {
+			self._build(app_handle, |inner_handle| {
 
 				if let Err(_) = tx.send( inner_handle ) {
 					panic!("Unable to send browser handle back")
@@ -177,24 +162,19 @@ impl BrowserWindowBuilder {
 			} );
 		}).await;
 
-		BrowserWindowAsync {
-			inner: Arc::new( BrowserWindowInnerAsync {
-				app: app.inner.clone(),
-				handle: rx.await.unwrap()
-			} )
-		}
+		rx.await.unwrap().into()
 	}
 
-	fn _spawn<H>( self, app: ApplicationHandle, on_created: H ) where
-		H: FnOnce( BrowserWindowHandle )
+	fn _build<H>( self, app: Application, on_created: H ) where
+		H: FnOnce( BrowserHandle )
 	{
 		match self {
-			BrowserWindowBuilder { parent, source, title, width, height, handler, borders, minimizable, maximizable, resizable } => {
+			Self { parent, source, title, width, height, handler, borders, minimizable, maximizable, resizable } => {
 
 				// Parent
 				let parent_handle = match parent {
 					None => ptr::null(),
-					Some( p ) => p._ffi_handle
+					Some( p ) => p.ffi_handle
 				};
 
 				// Source
@@ -225,15 +205,15 @@ impl BrowserWindowBuilder {
 				};
 
 				let user_data = Box::into_raw( Box::new(
-					BrowserWindowUserData {
+					BrowserUserData {
 						handler: match handler {
-							None => Box::new(|_,_,_| {}),
-							Some(f) => Box::new(f)
+							Some(f) => f,
+							None => Box::new(|_,_,_| {})
 						}
 					}
 				) );
 				let callback_data = Box::into_raw( Box::new(
-					BrowserWindowCreationCallbackData::from( on_created )
+					BrowserCreationCallbackData::from( on_created )
 				) );
 
 				let window_options = bw_WindowOptions {
@@ -248,7 +228,7 @@ impl BrowserWindowBuilder {
 				};
 
 				unsafe { bw_BrowserWindow_new(
-					app._ffi_handle.clone(),
+					app.handle.ffi_handle,
 					parent_handle,
 					csource,
 					title_ptr,
@@ -267,12 +247,12 @@ impl BrowserWindowBuilder {
 }
 
 /// The data that is passed to the C FFI handler function
-struct BrowserWindowUserData {
-	handler: Box<dyn FnMut( BrowserWindowHandle, &str, &[&str])>
+struct BrowserUserData {
+	handler: Box<dyn FnMut( Browser, &str, &[&str])>
 }
 
 /// The data that is passed to the creation callback function
-type BrowserWindowCreationCallbackData<'a> = BoxFnOnce<'a, ( BrowserWindowHandle, )>;
+type BrowserCreationCallbackData<'a> = BoxFnOnce<'a, ( BrowserHandle, )>;
 
 
 
@@ -294,12 +274,12 @@ fn args_to_vec<'a>( args: *const bw_CStrSlice, args_count: usize ) -> Vec<&'a st
 extern "C" fn ffi_window_invoke_handler( inner_handle: *mut bw_BrowserWindow, _command: bw_CStrSlice, _args: *const bw_CStrSlice, args_count: usize ) {
 
 	unsafe {
-		let data_ptr: *mut BrowserWindowUserData = mem::transmute( bw_BrowserWindow_getUserData( inner_handle ) );
-		let data: &mut BrowserWindowUserData = &mut *data_ptr;
+		let data_ptr: *mut BrowserUserData = mem::transmute( bw_BrowserWindow_getUserData( inner_handle ) );
+		let data: &mut BrowserUserData = &mut *data_ptr;
 
 		match data {
-			BrowserWindowUserData{ handler } => {
-				let outer_handle = BrowserWindowHandle::from_ptr( inner_handle );
+			BrowserUserData{ handler } => {
+				let outer_handle = Browser::from_ffi_handle( inner_handle );
 
 				let args = args_to_vec( _args, args_count );
 
@@ -313,10 +293,10 @@ extern "C" fn ffi_window_invoke_handler( inner_handle: *mut bw_BrowserWindow, _c
 extern "C" fn ffi_browser_window_created_callback( inner_handle: *mut bw_BrowserWindow, data: *mut c_void ) {
 
 	unsafe {
-		let data_ptr: *mut BrowserWindowCreationCallbackData = mem::transmute( data );
+		let data_ptr: *mut BrowserCreationCallbackData = mem::transmute( data );
 		let data = Box::from_raw( data_ptr );
 
-		let outer_handle = BrowserWindowHandle::from_ptr( inner_handle );
+		let outer_handle = BrowserHandle::new( inner_handle );
 
 		data.call( outer_handle );
 	}

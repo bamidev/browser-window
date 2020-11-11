@@ -69,11 +69,14 @@ void bw_ApplicationImpl_finish( bw_ApplicationImpl* app ) {
 	UNUSED(app);
 }
 
-int bw_Application_run( bw_Application* app ) {
+int bw_Application_run( bw_Application* app, bw_ApplicationReadyFn on_ready, void* user_data ) {
 	bw_Application_checkThread( app );
-
+	
 	MSG msg;
 	int exit_code = 0;
+
+	// We are ready immediately because all messages get queued anyway.
+	on_ready( app, user_data );
 
 	while ( 1 ) {
 		BOOL res = GetMessageW( &msg, 0, 0, 0);

@@ -1,46 +1,52 @@
 //! Browser Window is a Rust crate that allows you to have and manipulate windows with browsers in them.
 //! Just like Electron, you can build graphical user interfaces with HTML/CSS/JS technology, but you can also use it to just have some browser functionality in your application.
-//! 
-//! To start using Browser Window, you need to start it before anything else, and preferably on the main thread.
-//! To do this we use `Application::start()`, which gives you an application handle that can be used to create the browser windows.
+//!
+//! To start using Browser Window, you need to start it (before anything else) and run it, preferably on the main thread.
 //!
 //! Your program might look something like this:
 //! ```
 //! use browser_window::*;
+//! use std::process::exit;
 //!
 //! fn main() {
-//! 	let app = Application::start();
+//! 	let runtime = Runtime::start();
 //!
-//! 	BrowserWindowBuilder::new( Source::Url("https://www.duckduckgo.com/".to_owned()) )
-//! 	.spawn( &app, |browser| {
-//! 		browser.exec_js(" ... ");
+//! 	let app = runtime.app();
+//! 	let exit_code = runtime.spawn(async move {
+//!
+//! 		let browser = BrowserWindowBuilder::new( Source::Url("https://www.duckduckgo.com/".into()) )
+//! 			.build( app ).await;
+//!
+//! 		browser.exec_js("document.getElementById('search_form_input_homepage').value = 'Hello World!'");
 //! 	});
+//!
+//! 	exit( exit_code );
 //! }
 //! ```
-//! 
-//! For an example that uses Browser Window in an asynchronous context, see [this example code](https://github.com/bamilab/browser-window/blob/master/example/src/main.rs).
-
-#![cfg_attr(feature = "nightly", feature(negative_impls))]
+//!
+//! For an more elaborate example, see [this example code](https://github.com/bamilab/browser-window/blob/master/example/src/main.rs).
+//!
+//! To get everything setup in order to use this crate, take a look at [this getting started guide](https://github.com/bamilab/browser-window/tree/master/docs/getting-started).
 
 mod application;
-mod browser_window;
+mod browser;
 mod common;
 
 
 
 pub use application::{
 	Application,
-	ApplicationAsync,
-	ApplicationDispatchFuture,
-	ApplicationHandle
+	ApplicationThreaded,
+	ApplicationDelegateFuture,
+	Runtime
 };
-pub use browser_window::{
-	BrowserWindow,
-	BrowserWindowAsync,
-	BrowserWindowDispatchFuture,
-	BrowserWindowHandle
+pub use browser::{
+	Browser,
+	BrowserThreaded,
+	BrowserDelegateFuture,
+	JsEvaluationError
 };
-pub use browser_window::builder::{
-	BrowserWindowBuilder,
+pub use browser::builder::{
+	BrowserBuilder,
 	Source
 };

@@ -63,9 +63,11 @@ void bw_BrowserWindow_close( bw_BrowserWindow* bw );
 /// This function can be called from any thread so it needs to be thread safe.
 void bw_BrowserWindow_drop( bw_BrowserWindow* bw );
 
+/// Executes the given JavaScript and calls the given callback (on the GUI thread) to provide the result.
 void bw_BrowserWindow_evalJs( bw_BrowserWindow* bw, bw_CStrSlice js, bw_BrowserWindowJsCallbackFn callback, void* cb_data );
+void bw_BrowserWindow_evalJsThreaded( bw_BrowserWindow* bw, bw_CStrSlice js, bw_BrowserWindowJsCallbackFn callback, void* cb_data );
 
-const bw_Application* bw_BrowserWindow_getApp( bw_BrowserWindow* bw );
+bw_Application* bw_BrowserWindow_getApp( bw_BrowserWindow* bw );
 void* bw_BrowserWindow_getUserData( bw_BrowserWindow* bw );
 
 bw_Err bw_BrowserWindow_navigate( bw_BrowserWindow* bw, bw_CStrSlice url );

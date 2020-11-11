@@ -32,7 +32,8 @@ If you set environment variable `CEF_PATH` to the directory that you have extrac
 You also need to copy all resource files, found in the Resource directory, to the executables working directory.
 
 To last thing that needs to be done is that the library files need to be made available to the executable.
-Copy all .dll and .bin files to the working directory as well, or add the Release folder to your `%PATH%` environment variable.
+Copy all .dll and .bin files to the working directory as well.
+You could also just add the Release folder to your `%PATH%` environment variable for the .dll files.
 
 That's it!
 A call to `cargo run` will do it.

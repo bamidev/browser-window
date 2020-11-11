@@ -1,7 +1,7 @@
 [package]
 name = "browser-window"
-version = "0.2.3"
-description = "An async/await aware browser (GUI) toolkit like Electron."
+version = "0.3.1"
+description = "A simple async/await aware browser (GUI) toolkit."
 edition = "2018"
 authors = ["Danny de Jong"]
 license = "MIT"
@@ -20,8 +20,9 @@ path = "src/lib.rs"
 
 [dependencies]
 boxfnonce = "0.1"
-browser-window-ffi = { path = "./ffi", version = "0.2.3" }
+browser-window-ffi = { path = "./ffi", version = "0.3.0" }
 futures-channel = { version = "0.3" }
+lazy_static = "1"
 
 [package.metadata.docs.rs]
 all-features = true
