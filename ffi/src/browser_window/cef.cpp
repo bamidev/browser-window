@@ -117,10 +117,19 @@ void bw_BrowserWindowImpl_new(
 	}
 
 	// Update window size in CefWindowInfo
-#ifdef BW_WIN32
+#if defined(BW_WIN32)
+
 	RECT rect;
 	GetClientRect( browser->window->impl.handle, &rect );
 	info.SetAsChild( browser->window->impl.handle, rect );
+
+#elif defined(BW_GTK)
+
+	CefRect rect( 0, 0, width, height );
+	GtkWidget* vbox = gtk_box_new( GTK_ORIENTATION_VERTICAL, 0);
+	info.SetAsChild( (long unsigned int)vbox, rect );
+	gtk_container_add( GTK_CONTAINER( browser->window->impl.handle ), vbox );
+gtk_widget_show_all( GTK_WIDGET(browser->window->impl.handle) );
 #endif
 
 	// Create the browser window handle

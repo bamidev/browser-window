@@ -30,7 +30,8 @@ void bw_Application_checkThread( const bw_Application* app ) {
 
 void bw_Application_exit( bw_Application* app, int exit_code ) {
 	app->impl.exit_code = exit_code;
-	gtk_main_quit();
+
+	g_application_quit( G_APPLICATION( app->impl.handle ) );
 }
 
 void bw_Application_exitAsync( bw_Application* app, int exit_code ) {
