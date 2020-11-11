@@ -1,10 +1,14 @@
 use browser_window_ffi::*;
+use lazy_static::lazy_static;
 use std::env;
 use std::ffi::c_void;
+use std::future::Future;
 use std::marker::PhantomData;
 use std::ops::Deref;
 use std::os::raw::{c_char, c_int};
+use std::pin::Pin;
 use std::rc::Rc;
+use std::task::{Context, Poll, Waker, RawWaker, RawWakerVTable};
 
 use super::common::*;
 
@@ -39,10 +43,28 @@ pub struct Runtime {
 	pub(in super) handle: ApplicationHandle
 }
 
+struct WakerData {
+	handle: ApplicationHandle,
+	future: Pin<Box<dyn Future<Output=()>>>
+}
+
 
 
 /// The future that dispatches a closure onto the GUI thread
 pub type ApplicationDispatchFuture<'a,R> = DispatchFuture<'a, ApplicationHandle, R>;
+
+
+
+lazy_static! {
+	static ref WAKER_VTABLE: RawWakerVTable = {
+		RawWakerVTable::new(
+			waker_clone,
+			waker_wake,
+			waker_wake_by_ref,
+			waker_drop
+		)
+	};
+}
 
 
 
@@ -66,40 +88,54 @@ impl Runtime {
 		vec
 	}
 
-	/// Run the main loop.
-	/// This method finishes when all windows are closed, or when the application has been signalled to exit.
-	/// When ready, the provided closure will be called, which will be given an application handle that can be used to create browser windows.
-	///
-	/// # Arguments
-	/// * `on_ready` - This closure will be called when all setup work is completed.
-	pub fn run<H>( self, on_ready: H ) -> i32 where
-		H: FnOnce( Application )
-	{
-		let ready_data = Box::into_raw( Box::new( on_ready ) );
+	fn poll_future( data: *mut WakerData ) {
+		let waker = Self::new_waker( data );
+		let mut ctx = Context::from_waker( &waker );
 
-		unsafe {
-			let exit_code = bw_Application_run( self.handle.ffi_handle, ffi_ready_handler::<H>, ready_data as _ );
-			bw_Application_finish( self.handle.ffi_handle );
-			return exit_code;
+		let result = unsafe { (*data).future.as_mut().poll( &mut ctx ) };
+
+		// When the future is ready, free the memory allocated for the waker data
+		match result {
+			Poll::Ready(_) => {
+				unsafe { Box::from_raw( data ) };
+			},
+			Poll::Pending => {}
 		}
 	}
 
-	/// Run the main loop synchronously, despite what the name might suggest.
-	/// This basically does the same as `Runtime::run`, but provides an thread-safe application handle when ready.
+	/// Constructs a `Waker` for our runtime
+	fn new_waker( data: *mut WakerData ) -> Waker {
+		unsafe { Waker::from_raw(
+			RawWaker::new( data as _, &WAKER_VTABLE )
+		) }
+	}
+
+	/// Run the main loop.
 	/// This is useful if you want to manipulate the GUI from other threads.
 	///
 	/// # Arguments
-	/// * `on_ready` - This closure will be called when all setup work is completed.
-	pub fn run_alongside<H>( self, on_ready: H ) -> i32 where
+	/// * `on_ready` - This closure will be called when the runtime has initialized, and will provide an application handle.
+	pub fn run<H>( self, on_ready: H ) -> i32 where
 		H: FnOnce( ApplicationAsync )
 	{
-		let ready_data = Box::into_raw( Box::new( on_ready ) );
+		return self._run( |handle| {
+			on_ready( handle.into() )
+		} )
+	}
 
-		unsafe {
-			let exit_code = bw_Application_run( self.handle.ffi_handle, ffi_ready_async_handler::<H>, ready_data as _ );
-			bw_Application_finish( self.handle.ffi_handle );
-			return exit_code;
-		}
+	pub fn spawn<F>( &self, future: F ) where
+		F: Future<Output=()> + 'static
+	{
+		// Create a context with our own waker
+		let waker_data = Box::into_raw( Box::new(
+			WakerData {
+				handle: self.handle.clone(),
+				future: Box::pin( future )
+			}
+		) );
+
+		// First poll
+		Runtime::poll_future( waker_data );
 	}
 
 	/// Starts the GUI application.
@@ -115,6 +151,18 @@ impl Runtime {
 
 		Self {
 			handle: ApplicationHandle::new( ffi_handle )
+		}
+	}
+
+	fn _run<H>( self, on_ready: H ) -> i32 where
+		H: FnOnce( ApplicationHandle )
+	{
+		let ready_data = Box::into_raw( Box::new( on_ready ) );
+
+		unsafe {
+			let exit_code = bw_Application_run( self.handle.ffi_handle, ffi_ready_handler::<H>, ready_data as _ );
+			bw_Application_finish( self.handle.ffi_handle );
+			return exit_code;
 		}
 	}
 }
@@ -145,6 +193,21 @@ impl Application {
 		ApplicationAsync {
 			handle: self.handle
 		}
+	}
+
+	pub fn spawn<F>( &self, future: F ) where
+		F: Future<Output=()> + 'static
+	{
+		// Create a context with our own waker
+		let waker_data = Box::into_raw( Box::new(
+			WakerData {
+				handle: self.handle.clone(),
+				future: Box::pin( future )
+			}
+		) );
+
+		// First poll
+		Runtime::poll_future( waker_data );
 	}
 }
 
@@ -192,6 +255,21 @@ impl ApplicationAsync {
 			handle: ApplicationHandle::new( ffi_handle )
 		}
 	}
+
+	pub fn spawn<F>( &self, future: F ) where
+		F: Future<Output=()> + 'static
+	{
+		// Create a context with our own waker
+		let waker_data = Box::into_raw( Box::new(
+			WakerData {
+				handle: self.handle.clone(),
+				future: Box::pin( future )
+			}
+		) );
+
+		// First poll
+		Runtime::poll_future( waker_data );
+	}
 }
 
 impl Deref for ApplicationAsync {
@@ -199,6 +277,14 @@ impl Deref for ApplicationAsync {
 
 	fn deref( &self ) -> &Self::Target {
 		&self.handle
+	}
+}
+
+impl From<ApplicationHandle> for ApplicationAsync {
+	fn from( other: ApplicationHandle ) -> Self {
+		Self {
+			handle: other
+		}
 	}
 }
 
@@ -222,20 +308,40 @@ impl HasAppHandle for ApplicationHandle {
 
 
 extern "C" fn ffi_ready_handler<H>( ffi_handle: *mut bw_Application, user_data: *mut c_void ) where
-	H: FnOnce( Application )
+	H: FnOnce( ApplicationHandle )
 {
 
-	let app = Application::from_ffi_handle( ffi_handle );
+	let app = ApplicationHandle::new( ffi_handle );
 	let closure = unsafe { Box::from_raw( user_data as *mut Box<H> ) };
 
 	closure( app );
 }
 
-extern "C" fn ffi_ready_async_handler<H>( ffi_handle: *mut bw_Application, user_data: *mut c_void ) where
-	H: FnOnce( ApplicationAsync )
-{
-	let app = ApplicationAsync::from_ffi_handle( ffi_handle );
-	let closure = unsafe { Box::from_raw( user_data as *mut H ) };
+extern "C" fn ffi_wakeup( ffi_handle: *mut bw_Application, user_data: *mut c_void ) {
 
-	closure( app );
+	let	data = user_data as *mut WakerData;
+
+	Runtime::poll_future( data );
 }
+
+fn waker_clone( data: *const () ) -> RawWaker {
+	RawWaker::new( data, &WAKER_VTABLE )
+}
+
+fn waker_wake( data: *const () ) {
+	let data_ptr = data as *const WakerData;
+
+	unsafe {
+		bw_Application_dispatch(
+			(*data_ptr).handle.ffi_handle,
+			ffi_wakeup,
+			data_ptr as _
+		);
+	}
+}
+
+fn waker_wake_by_ref( data: *const () ) {
+	waker_wake( data );
+}
+
+fn waker_drop( data: *const () ) {}
