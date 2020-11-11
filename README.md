@@ -11,7 +11,7 @@ However, they lack a few important things.
 
 The main problem is that they (except on Linux) use browser engine's already available on the operating system.
 This is useful if you want to ship your application as a single executable file.
-However, using different engines makes it harder to make your application work consistently on each platform, especially when using newer features that are not yet supported by some browsers engines.
+However, using different engines makes it harder to make your application work consistently on all platforms, especially when using newer features that are not yet supported by some browsers engines.
 Using the same engine for each platform is a good idea.
 
 Another problem you run into when using preinstalled browser engines, is that in the case of Windows, that engine is not being maintained anymore.
