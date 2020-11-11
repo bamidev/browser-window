@@ -31,7 +31,6 @@
 mod application;
 mod browser;
 mod common;
-//mod treelink;
 
 
 
@@ -44,7 +43,8 @@ pub use application::{
 pub use browser::{
 	Browser,
 	BrowserThreaded,
-	BrowserDelegateFuture
+	BrowserDelegateFuture,
+	JsEvaluationError
 };
 pub use browser::builder::{
 	BrowserBuilder,
