@@ -212,13 +212,6 @@ impl Application {
 			_not_send: PhantomData
 		}
 	}
-
-	/// Transforms the application handle into an asynchronous one.
-	fn into_async( self ) -> ApplicationThreaded {
-		ApplicationThreaded {
-			handle: self.handle
-		}
-	}
 }
 
 impl Deref for Application {
