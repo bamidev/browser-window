@@ -135,30 +135,32 @@ impl BrowserBuilder {
 	///
 	/// # Arguments
 	/// * `app` - An application handle that this browser window can spawn into
-	/// * `on_created` - A callback closure that will be invoked when the browser window is created and ready.
-	pub fn spawn<H>( self, app: &Application, on_created: H ) where
-		H: FnOnce( Browser )
+	pub async fn build( self, app: Application ) -> Browser
 	{
+		let (tx, rx) = oneshot::channel::<BrowserHandle>();
 
-		self._spawn( app.clone(), move |bw| {
+		self._build( app, move |handle| {
 
-			on_created( bw.into() );
+			if let Err(_) = tx.send( handle ) {
+				panic!("Unable to send browser handle back")
+			}
 		} );
+
+		rx.await.unwrap().into()
 	}
 
-	/// Same as spawn, but asynchronous.
-	/// Instead of providing a callback, the handle is simply returned.
+	/// Same as build, but gives back a browser handle that is thread-safe.
 	///
 	/// # Arguments
-	/// * `app` - An async application handle.
-	pub async fn spawn_async( self, app: &ApplicationAsync ) -> BrowserAsync {
+	/// * `app` - An thread-safe application handle.
+	pub async fn build_threaded( self, app: ApplicationAsync ) -> BrowserAsync {
 
 		let (tx, rx) = oneshot::channel::<BrowserHandle>();
 
 		// We need to dispatch the spawning of the browser to the GUI thread
 		app.dispatch(|app_handle| {
 
-			self._spawn(app_handle, |inner_handle| {
+			self._build(app_handle, |inner_handle| {
 
 				if let Err(_) = tx.send( inner_handle ) {
 					panic!("Unable to send browser handle back")
@@ -169,7 +171,7 @@ impl BrowserBuilder {
 		rx.await.unwrap().into()
 	}
 
-	fn _spawn<H>( self, app: Application, on_created: H ) where
+	fn _build<H>( self, app: Application, on_created: H ) where
 		H: FnOnce( BrowserHandle )
 	{
 		match self {
@@ -232,7 +234,7 @@ impl BrowserBuilder {
 				};
 
 				unsafe { bw_BrowserWindow_new(
-					app.handle.ffi_handle.clone(),
+					app.handle.ffi_handle,
 					parent_handle,
 					csource,
 					title_ptr,
