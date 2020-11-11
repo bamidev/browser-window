@@ -7,6 +7,7 @@ use std::marker::PhantomData;
 use std::ops::Deref;
 use std::os::raw::{c_char, c_int};
 use std::pin::Pin;
+use std::ptr;
 use std::rc::Rc;
 use std::task::{Context, Poll, Waker, RawWaker, RawWakerVTable};
 
@@ -70,6 +71,10 @@ lazy_static! {
 
 impl Runtime {
 
+	pub fn app( &self ) -> Application {
+		self.handle.clone().into()
+	}
+
 	fn args_ptr_vec() -> Vec<*mut c_char> {
 		let args = env::args_os();
 		let mut vec = Vec::with_capacity( args.len() );
@@ -88,11 +93,13 @@ impl Runtime {
 		vec
 	}
 
-	fn poll_future( data: *mut WakerData ) {
+	unsafe fn poll_future( data: *mut WakerData ) {
+		debug_assert!( data != ptr::null_mut(), "WakerData pointer can't be zero!" );
+
 		let waker = Self::new_waker( data );
 		let mut ctx = Context::from_waker( &waker );
 
-		let result = unsafe { (*data).future.as_mut().poll( &mut ctx ) };
+		let result = (*data).future.as_mut().poll( &mut ctx );
 
 		// When the future is ready, free the memory allocated for the waker data
 		match result {
@@ -104,10 +111,12 @@ impl Runtime {
 	}
 
 	/// Constructs a `Waker` for our runtime
-	fn new_waker( data: *mut WakerData ) -> Waker {
-		unsafe { Waker::from_raw(
+	unsafe fn new_waker( data: *mut WakerData ) -> Waker {
+		debug_assert!( data != ptr::null_mut(), "WakerData pointer can't be zero!" );
+
+		Waker::from_raw(
 			RawWaker::new( data as _, &WAKER_VTABLE )
-		) }
+		)
 	}
 
 	/// Run the main loop.
@@ -115,7 +124,7 @@ impl Runtime {
 	///
 	/// # Arguments
 	/// * `on_ready` - This closure will be called when the runtime has initialized, and will provide an application handle.
-	pub fn run<H>( self, on_ready: H ) -> i32 where
+	pub fn run<H>( &self, on_ready: H ) -> i32 where
 		H: FnOnce( ApplicationAsync )
 	{
 		return self._run( |handle| {
@@ -123,19 +132,22 @@ impl Runtime {
 		} )
 	}
 
-	pub fn spawn<F>( &self, future: F ) where
+	pub fn spawn<F>( &self, future: F ) -> i32 where
 		F: Future<Output=()> + 'static
 	{
-		// Create a context with our own waker
-		let waker_data = Box::into_raw( Box::new(
-			WakerData {
-				handle: self.handle.clone(),
-				future: Box::pin( future )
-			}
-		) );
+		self._run(|handle| {
 
-		// First poll
-		Runtime::poll_future( waker_data );
+			// Create a context with our own waker
+			let waker_data = Box::into_raw( Box::new(
+				WakerData {
+					handle: handle,
+					future: Box::pin( future )
+				}
+			) );
+
+			// First poll
+			unsafe { Runtime::poll_future( waker_data ) };
+		})
 	}
 
 	/// Starts the GUI application.
@@ -154,7 +166,7 @@ impl Runtime {
 		}
 	}
 
-	fn _run<H>( self, on_ready: H ) -> i32 where
+	fn _run<H>( &self, on_ready: H ) -> i32 where
 		H: FnOnce( ApplicationHandle )
 	{
 		let ready_data = Box::into_raw( Box::new( on_ready ) );
@@ -207,7 +219,7 @@ impl Application {
 		) );
 
 		// First poll
-		Runtime::poll_future( waker_data );
+		unsafe { Runtime::poll_future( waker_data ) };
 	}
 }
 
@@ -268,7 +280,7 @@ impl ApplicationAsync {
 		) );
 
 		// First poll
-		Runtime::poll_future( waker_data );
+		unsafe { Runtime::poll_future( waker_data ) };
 	}
 }
 
@@ -307,21 +319,20 @@ impl HasAppHandle for ApplicationHandle {
 
 
 
-extern "C" fn ffi_ready_handler<H>( ffi_handle: *mut bw_Application, user_data: *mut c_void ) where
+unsafe extern "C" fn ffi_ready_handler<H>( ffi_handle: *mut bw_Application, user_data: *mut c_void ) where
 	H: FnOnce( ApplicationHandle )
 {
-
 	let app = ApplicationHandle::new( ffi_handle );
-	let closure = unsafe { Box::from_raw( user_data as *mut Box<H> ) };
+	let closure = unsafe { Box::from_raw( user_data as *mut H ) };
 
 	closure( app );
 }
 
-extern "C" fn ffi_wakeup( ffi_handle: *mut bw_Application, user_data: *mut c_void ) {
+unsafe extern "C" fn ffi_wakeup( ffi_handle: *mut bw_Application, user_data: *mut c_void ) {
 
 	let	data = user_data as *mut WakerData;
 
-	Runtime::poll_future( data );
+	unsafe { Runtime::poll_future( data ) };
 }
 
 fn waker_clone( data: *const () ) -> RawWaker {

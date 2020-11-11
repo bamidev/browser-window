@@ -6,7 +6,7 @@ use std::os::raw::*;
 
 
 pub enum bw_Application {}
-type bw_ApplicationDispatchFn = extern "C" fn( app: *mut bw_Application, data: *mut c_void );
+type bw_ApplicationDispatchFn = unsafe extern "C" fn( app: *mut bw_Application, data: *mut c_void );
 type bw_ApplicationReadyFn = bw_ApplicationDispatchFn;
 
 
