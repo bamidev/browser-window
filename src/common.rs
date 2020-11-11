@@ -15,25 +15,25 @@ use std::task::{
 
 
 
-pub struct DispatchData<'a,H,R> {
+pub struct DelegateData<'a,H,R> {
 
 	handle: H,
 	func: Option<SendBoxFnOnce<'a,( H, ),R>>,
 	result_ptr: *mut Option<R>,
 	waker: Waker
 }
-unsafe impl<'a,H,R> Send for DispatchData<'a,H,R> {}
+unsafe impl<'a,H,R> Send for DelegateData<'a,H,R> {}
 
-pub struct DispatchFuture<'a,H,R> {
+pub struct DelegateFuture<'a,H,R> {
 
 	handle: H,
 	func: Option<SendBoxFnOnce<'a,( H, ),R>>,
 	result: Option<R>,
 	started: bool
 }
-impl<'a,H,R> Unpin for DispatchFuture<'a,H,R> {}
+impl<'a,H,R> Unpin for DelegateFuture<'a,H,R> {}
 
-impl<'a,H,R> DispatchFuture<'a,H,R> {
+impl<'a,H,R> DelegateFuture<'a,H,R> {
 
 	pub fn new<F>( handle: H, func: F ) -> Self where
 		F: FnOnce( H ) -> R + Send + 'a,
@@ -48,7 +48,7 @@ impl<'a,H,R> DispatchFuture<'a,H,R> {
 	}
 }
 
-impl<'a,H,R> Future for DispatchFuture<'a,H,R> where
+impl<'a,H,R> Future for DelegateFuture<'a,H,R> where
 	H: HasAppHandle + Clone
 {
 	type Output = R;
@@ -61,7 +61,7 @@ impl<'a,H,R> Future for DispatchFuture<'a,H,R> where
 			// This includes the closure to actually call,
 			// a pointer to set the output with,
 			// and a waker to finish our future with.
-			let mut data = Box::new( DispatchData::<H,R> {
+			let mut data = Box::new( DelegateData::<H,R> {
 				handle: self.handle.clone(),
 				func: None,
 				result_ptr: &mut self.result as _,
@@ -134,11 +134,11 @@ impl<T> PointerEq for Arc<T> {
 extern "C" fn ffi_dispatch_handler<H,R>( _app: *mut bw_Application, _data: *mut c_void )
 {
 	unsafe {
-		let data_ptr: *mut DispatchData<H,R> = mem::transmute( _data );
+		let data_ptr: *mut DelegateData<H,R> = mem::transmute( _data );
 		let data = Box::from_raw( data_ptr );	// Take ownership of the data struct
 
 		match *data {
-			DispatchData{ handle, func, result_ptr, waker } => {
+			DelegateData{ handle, func, result_ptr, waker } => {
 
 				let result = func.unwrap().call( handle );
 				*result_ptr = Some( result );

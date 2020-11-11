@@ -20,7 +20,7 @@ pub enum Source {
 	Html( String )
 }
 
-/// Used to create a BrowserWindow instance.
+/// Used to create a `Browser` or `BrowserThreaded` instance.
 pub struct BrowserBuilder {
 
 	parent: Option<BrowserHandle>,
@@ -158,7 +158,7 @@ impl BrowserBuilder {
 		let (tx, rx) = oneshot::channel::<BrowserHandle>();
 
 		// We need to dispatch the spawning of the browser to the GUI thread
-		app.dispatch(|app_handle| {
+		app.delegate(|app_handle| {
 
 			self._build(app_handle, |inner_handle| {
 

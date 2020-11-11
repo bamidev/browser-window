@@ -16,8 +16,7 @@ use super::common::*;
 
 
 /// An handle for this application.
-/// Can be seen as an interface for the `Application` and `ApplicationThreaded` handles.
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub struct Application {
 	pub(in super) handle: ApplicationHandle,
 	_not_send: PhantomData<Rc<()>>
@@ -25,13 +24,13 @@ pub struct Application {
 
 /// A thread-safe application handle.
 /// This handle also allows you to dispatch code to be executed on the GUI thread.
+#[derive(Clone, Copy)]
 pub struct ApplicationThreaded {
 	pub(in super) handle: ApplicationHandle
 }
 unsafe impl Sync for ApplicationThreaded {}
 
-/// The `ApplicationHandle` i
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub struct ApplicationHandle {
 	pub(in super) ffi_handle: *mut bw_Application
 }
@@ -39,6 +38,12 @@ pub struct ApplicationHandle {
 // `ApplicationHandle` is Send because it is used extensively by `ApplicationThreaded`,
 //  which only uses the handle with thread-safe functions.
 unsafe impl Send for ApplicationHandle {}
+
+struct ApplicationDispatchData<'a> {
+
+	handle: ApplicationHandle,
+	func: Box<dyn FnOnce(Application) + Send + 'a>
+}
 
 /// Use this to start and run the application with.
 pub struct Runtime {
@@ -54,7 +59,7 @@ struct WakerData {
 
 
 /// The future that dispatches a closure onto the GUI thread
-pub type ApplicationDispatchFuture<'a,R> = DispatchFuture<'a, ApplicationHandle, R>;
+pub type ApplicationDelegateFuture<'a,R> = DelegateFuture<'a, ApplicationHandle, R>;
 
 
 
@@ -73,7 +78,13 @@ lazy_static! {
 
 impl Runtime {
 
+	/// Obtains an application handle for this runtime.
 	pub fn app( &self ) -> Application {
+		self.handle.clone().into()
+	}
+
+	/// Obtains an thread-safe application handle for this runtime.
+	pub fn app_threaded( &self ) -> ApplicationThreaded {
 		self.handle.clone().into()
 	}
 
@@ -249,14 +260,34 @@ impl From<ApplicationHandle> for Application {
 
 impl ApplicationThreaded {
 
-	/// Executes the given closure on the GUI thread.
-	pub fn dispatch<'a,F,R>( &self, func: F ) -> ApplicationDispatchFuture<'a,R> where
+	/// Executes the given closure on the GUI thread, and gives back the result when done.
+	/// Keep in mind that in multi-threaded environments, it is generally a good idea to use a Box return type,
+	///  or use something else to put the value on the heap when dealing with large types.
+	pub fn delegate<'a,F,R>( &self, func: F ) -> ApplicationDelegateFuture<'a,R> where
 		F: FnOnce( Application ) -> R + Send + 'a,
 		R: Send
 	{
-		ApplicationDispatchFuture::<'a,R>::new( self.handle.clone(), |handle| {
+		ApplicationDelegateFuture::<'a,R>::new( self.handle.clone(), |handle| {
 			func( handle.into() )
 		} )
+	}
+
+	/// Executes the given closure on the GUI thread.
+	pub fn dispatch<'a,F>( &self, func: F ) where
+		F:  FnOnce( Application ) + Send + 'a
+	{
+		let data = Box::into_raw( Box::new( ApplicationDispatchData {
+			handle: self.handle,
+			func: Box::new( func )
+		} ) );
+
+		unsafe {
+			bw_Application_dispatch(
+				self.handle.ffi_handle,
+				ffi_application_dispatch_handler,
+				data as _
+			)
+		}
 	}
 
 	/// Signals the runtime to exit.
@@ -323,6 +354,14 @@ impl HasAppHandle for ApplicationHandle {
 }
 
 
+
+unsafe extern "C" fn ffi_application_dispatch_handler( _app: *mut bw_Application, _data: *mut c_void ) {
+
+	let data_ptr = _data as *mut ApplicationDispatchData<'static>;
+	let data = Box::from_raw( data_ptr );
+
+	(data.func)( data.handle.into() );
+}
 
 /// The handler that is invoked when the runtime is deemed 'ready'.
 unsafe extern "C" fn ffi_ready_handler<H>( ffi_handle: *mut bw_Application, user_data: *mut c_void ) where
