@@ -3,7 +3,7 @@ use browser_window_ffi::*;
 use boxfnonce::{BoxFnOnce};
 use std::ffi::*;
 
-use crate::application::{Application, ApplicationAsync};
+use crate::application::{Application, ApplicationThreaded};
 use crate::browser::*;
 
 use std::{
@@ -153,7 +153,7 @@ impl BrowserBuilder {
 	///
 	/// # Arguments
 	/// * `app` - An thread-safe application handle.
-	pub async fn build_threaded( self, app: ApplicationAsync ) -> BrowserAsync {
+	pub async fn build_threaded( self, app: ApplicationThreaded ) -> BrowserThreaded {
 
 		let (tx, rx) = oneshot::channel::<BrowserHandle>();
 

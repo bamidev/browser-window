@@ -34,13 +34,13 @@ mod common;
 
 pub use application::{
 	Application,
-	ApplicationAsync,
+	ApplicationThreaded,
 	ApplicationDispatchFuture,
 	Runtime
 };
 pub use browser::{
 	Browser,
-	BrowserAsync,
+	BrowserThreaded,
 	BrowserDispatchFuture
 };
 pub use browser::builder::{

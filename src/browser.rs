@@ -40,10 +40,10 @@ pub struct Browser {
 /// It allows you to dispatch code to the GUI thread.
 // It provides the same functionality as `Browser`.
 // However, each function is async: it runs on the GUI thread, and returns when it is done.
-pub struct BrowserAsync {
+pub struct BrowserThreaded {
 	pub(in super) handle: BrowserHandle
 }
-unsafe impl Sync for BrowserAsync {}
+unsafe impl Sync for BrowserThreaded {}
 
 #[derive(Clone)]
 pub struct BrowserHandle {
@@ -163,10 +163,10 @@ impl HasAppHandle for Browser {
 
 
 
-impl BrowserAsync {
+impl BrowserThreaded {
 
-	pub fn app( &self ) -> ApplicationAsync {
-		ApplicationAsync::from_ffi_handle( unsafe { bw_BrowserWindow_getApp( self.handle.ffi_handle ) } )
+	pub fn app( &self ) -> ApplicationThreaded {
+		ApplicationThreaded::from_ffi_handle( unsafe { bw_BrowserWindow_getApp( self.handle.ffi_handle ) } )
 	}
 
 	/// Closes the browser.
@@ -235,7 +235,7 @@ impl BrowserAsync {
 	}
 }
 
-impl Deref for BrowserAsync {
+impl Deref for BrowserThreaded {
 	type Target = BrowserHandle;
 
 	fn deref( &self ) -> &BrowserHandle {
@@ -243,13 +243,13 @@ impl Deref for BrowserAsync {
 	}
 }
 
-impl Drop for BrowserAsync {
+impl Drop for BrowserThreaded {
 	fn drop( &mut self ) {
 		unsafe { bw_Application_dispatch( self.app().handle.ffi_handle, ffi_free_browser_window, self.handle.ffi_handle as _ ); }
 	}
 }
 
-impl From<BrowserHandle> for BrowserAsync {
+impl From<BrowserHandle> for BrowserThreaded {
 
 	fn from( handle: BrowserHandle ) -> Self {
 		Self {
@@ -258,7 +258,7 @@ impl From<BrowserHandle> for BrowserAsync {
 	}
 }
 
-impl HasAppHandle for BrowserAsync {
+impl HasAppHandle for BrowserThreaded {
 
 	fn app_handle( &self ) -> ApplicationHandle {
 		self.handle.app_handle()

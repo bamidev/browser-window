@@ -16,7 +16,7 @@ use super::common::*;
 
 
 /// An handle for this application.
-/// Can be seen as an interface for the Application and ApplicationAsync 'handles'.
+/// Can be seen as an interface for the `Application` and `ApplicationThreaded` handles.
 #[derive(Clone)]
 pub struct Application {
 	pub(in super) handle: ApplicationHandle,
@@ -25,10 +25,10 @@ pub struct Application {
 
 /// A thread-safe application handle.
 /// This handle also allows you to dispatch code to be executed on the GUI thread.
-pub struct ApplicationAsync {
+pub struct ApplicationThreaded {
 	pub(in super) handle: ApplicationHandle
 }
-unsafe impl Sync for ApplicationAsync {}
+unsafe impl Sync for ApplicationThreaded {}
 
 /// The `ApplicationHandle` i
 #[derive(Clone)]
@@ -128,7 +128,7 @@ impl Runtime {
 	/// # Arguments
 	/// * `on_ready` - This closure will be called when the runtime has initialized, and will provide an application handle.
 	pub fn run<H>( &self, on_ready: H ) -> i32 where
-		H: FnOnce( ApplicationAsync )
+		H: FnOnce( ApplicationThreaded )
 	{
 		return self._run( |handle| {
 			on_ready( handle.into() )
@@ -206,8 +206,8 @@ impl Application {
 	}
 
 	/// Transforms the application handle into a asynchronous one.
-	pub fn into_async( self ) -> ApplicationAsync {
-		ApplicationAsync {
+	pub fn into_async( self ) -> ApplicationThreaded {
+		ApplicationThreaded {
 			handle: self.handle
 		}
 	}
@@ -247,7 +247,7 @@ impl From<ApplicationHandle> for Application {
 
 
 
-impl ApplicationAsync {
+impl ApplicationThreaded {
 
 	/// Executes the given closure on the GUI thread.
 	pub fn dispatch<'a,F,R>( &self, func: F ) -> ApplicationDispatchFuture<'a,R> where
@@ -266,7 +266,7 @@ impl ApplicationAsync {
 		unsafe { bw_Application_exitAsync( self.handle.ffi_handle, exit_code as _ ); }
 	}
 
-	/// Constructs an `ApplicationAsync` handle from a ffi handle
+	/// Constructs an `ApplicationThreaded` handle from a ffi handle
 	pub(in super) fn from_ffi_handle( ffi_handle: *mut bw_Application ) -> Self {
 		Self {
 			handle: ApplicationHandle::new( ffi_handle )
@@ -289,7 +289,7 @@ impl ApplicationAsync {
 	}
 }
 
-impl Deref for ApplicationAsync {
+impl Deref for ApplicationThreaded {
 	type Target = ApplicationHandle;
 
 	fn deref( &self ) -> &Self::Target {
@@ -297,7 +297,7 @@ impl Deref for ApplicationAsync {
 	}
 }
 
-impl From<ApplicationHandle> for ApplicationAsync {
+impl From<ApplicationHandle> for ApplicationThreaded {
 	fn from( other: ApplicationHandle ) -> Self {
 		Self {
 			handle: other
