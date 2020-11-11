@@ -200,10 +200,7 @@ impl Runtime {
 impl Application {
 
 	/// Signals the application to exit.
-	/// The run command will return the exit code provided.
-	///
-	/// # Arguments
-	/// * `exit_code` - The code that will be returned by the run function when it stops.
+	/// The run or spawn command will return the exit code provided.
 	pub fn exit( &self, exit_code: i32 ) {
 		unsafe { bw_Application_exit( self.handle.ffi_handle, exit_code as _ ); }
 	}
@@ -216,26 +213,11 @@ impl Application {
 		}
 	}
 
-	/// Transforms the application handle into a asynchronous one.
-	pub fn into_async( self ) -> ApplicationThreaded {
+	/// Transforms the application handle into an asynchronous one.
+	fn into_async( self ) -> ApplicationThreaded {
 		ApplicationThreaded {
 			handle: self.handle
 		}
-	}
-
-	pub fn spawn<F>( &self, future: F ) where
-		F: Future<Output=()> + 'static
-	{
-		// Create a context with our own waker
-		let waker_data = Box::into_raw( Box::new(
-			WakerData {
-				handle: self.handle.clone(),
-				future: Box::pin( future )
-			}
-		) );
-
-		// First poll
-		unsafe { Runtime::poll_future( waker_data ) };
 	}
 }
 
@@ -302,21 +284,6 @@ impl ApplicationThreaded {
 		Self {
 			handle: ApplicationHandle::new( ffi_handle )
 		}
-	}
-
-	pub fn spawn<F>( &self, future: F ) where
-		F: Future<Output=()> + 'static
-	{
-		// Create a context with our own waker
-		let waker_data = Box::into_raw( Box::new(
-			WakerData {
-				handle: self.handle.clone(),
-				future: Box::pin( future )
-			}
-		) );
-
-		// First poll
-		unsafe { Runtime::poll_future( waker_data ) };
 	}
 }
 

@@ -24,7 +24,7 @@
 //! }
 //! ```
 //!
-//! For an example that uses Browser Window in an asynchronous context, see [this example code](https://github.com/bamilab/browser-window/blob/master/example/src/main.rs).
+//! For an more elaborate example, see [this example code](https://github.com/bamilab/browser-window/blob/master/example/src/main.rs).
 
 mod application;
 mod browser;

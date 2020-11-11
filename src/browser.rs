@@ -73,6 +73,8 @@ impl Browser {
 		unsafe { bw_BrowserWindow_close( self.handle.ffi_handle ); }
 	}
 
+	/// Executes the given javascript code and returns the output as a string.
+	/// If you don't need the result, see `exec_js`.
 	pub async fn eval_js( &self, js: &str ) -> Result<String, JsEvaluationError> {
 		let (tx, rx) = oneshot::channel::<Result<String, JsEvaluationError>>();
 
@@ -85,15 +87,6 @@ impl Browser {
 		rx.await.unwrap()
 	}
 
-
-	/// Executes the given javascript code, and returns the output via a callback.
-	/// If you don't need the result, see "exec_js".
-	///
-	/// # Arguments:
-	/// * `js` - The javascript code to execute.
-	/// * `on_complete` - The 'callback'. This closure will be invoked, with the result provided as the first argument.
-	///                   The result contains the output of the javascript code when it succeeded.
-	///                   Otherwise the error explains the javascript exception.
 	fn _eval_js<'a,H>( &self, js: &str, on_complete: H ) where
 		H: FnOnce( Browser, Result<String, JsEvaluationError> ) + 'a
 	{
@@ -110,9 +103,6 @@ impl Browser {
 	}
 
 	/// Executes the given javascript code without waiting on it to finish.
-	///
-	/// # Arguments:
-	/// * `js` - The javascript code
 	pub fn exec_js( &self, js: &str ) {
 		self._eval_js( js, |_,_|{} );
 	}
@@ -125,9 +115,6 @@ impl Browser {
 	}
 
 	/// Causes the browser to navigate to the given url.
-	///
-	/// # Arguments
-	/// * `url` - The url to navigate to
 	pub fn navigate( &self, url: &str ) -> Result<(), Box<dyn Error + Send>> {
 		let err = unsafe { bw_BrowserWindow_navigate( self.handle.ffi_handle, url.into() ) };
 
@@ -174,6 +161,7 @@ impl HasAppHandle for Browser {
 
 impl BrowserThreaded {
 
+	/// The thread-safe application handle associated with this browser window.
 	pub fn app( &self ) -> ApplicationThreaded {
 		ApplicationThreaded::from_ffi_handle( unsafe { bw_BrowserWindow_getApp( self.handle.ffi_handle ) } )
 	}
@@ -209,9 +197,6 @@ impl BrowserThreaded {
 	}
 
 	/// Executes the given javascript code, and returns the resulting output as a string when done.
-	///
-	/// # Arguments:
-	/// * `js` - Javascript code
 	pub async fn eval_js( &self, js: &str ) -> Result<String, JsEvaluationError> {
 		let (tx, rx) = oneshot::channel::<Result<String, JsEvaluationError>>();
 
@@ -225,9 +210,6 @@ impl BrowserThreaded {
 	}
 
 	/// Causes the browser to navigate to the given url.
-	///
-	/// # Arguments
-	/// * `url` - The url to navigate to
 	pub async fn navigate( &self, url: &str ) -> Result<(), Box<dyn Error + Send>> {
 		self.delegate(|bw| {
 			bw.navigate( url )

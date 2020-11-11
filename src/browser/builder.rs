@@ -40,26 +40,20 @@ pub struct BrowserBuilder {
 
 impl BrowserBuilder {
 
-	/// Sets whether or not the window has borders
+	/// Sets whether or not the window has borders.
 	/// Default is true.
 	pub fn borders( mut self, value: bool ) -> Self {
 		self.borders = value;	self
 	}
 
 	/// Configure a closure that can be invoked from within JavaScript.
-	/// The closure's first parameter specifies a command name.
-	/// The closure's second parameter specifies an array of string arguments.
+	/// The closure's second parameter specifies a command name.
+	/// The closure's third parameter specifies an array of string arguments.
 	pub fn handler<H>( mut self, handler: H ) -> Self where
 		H: FnMut(Browser, &str, &[&str]) + Send + 'static
 	{
 		self.handler = Some( Box::new( handler ) );
 		self
-	}
-
-	/// Sets whether or not the window has a maximize button on the title bar
-	/// Default is true.
-	pub fn maximizable( mut self, value: bool ) -> Self {
-		self.maximizable = value;	self
 	}
 
 	/// Sets whether or not the window has a minimize button on the title bar
@@ -70,7 +64,7 @@ impl BrowserBuilder {
 
 	/// Configure a parent window.
 	/// When a parent window closes, this browser window will close as well.
-	/// This could be a reference to a BrowserWindow or BrowserWindowAsync handle.
+	/// This could be a reference to a `Browser` or `BrowserThreaded` handle.
 	pub fn parent<B>( mut self, bw: &B ) -> Self where
 		B: Deref<Target=BrowserHandle>
 	{
