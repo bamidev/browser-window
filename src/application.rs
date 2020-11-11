@@ -107,7 +107,7 @@ impl Runtime {
 		// When the future is ready, free the memory allocated for the waker data
 		match result {
 			Poll::Ready(_) => {
-				unsafe { Box::from_raw( data ) };
+				Box::from_raw( data );
 			},
 			Poll::Pending => {}
 		}
@@ -328,36 +328,34 @@ unsafe extern "C" fn ffi_ready_handler<H>( ffi_handle: *mut bw_Application, user
 	H: FnOnce( ApplicationHandle )
 {
 	let app = ApplicationHandle::new( ffi_handle );
-	let closure = unsafe { Box::from_raw( user_data as *mut H ) };
+	let closure = Box::from_raw( user_data as *mut H );
 
 	closure( app );
 }
 
-unsafe extern "C" fn ffi_wakeup( ffi_handle: *mut bw_Application, user_data: *mut c_void ) {
+unsafe extern "C" fn ffi_wakeup( _ffi_handle: *mut bw_Application, user_data: *mut c_void ) {
 
 	let	data = user_data as *mut WakerData;
 
-	unsafe { Runtime::poll_future( data ) };
+	Runtime::poll_future( data );
 }
 
-fn waker_clone( data: *const () ) -> RawWaker {
+unsafe fn waker_clone( data: *const () ) -> RawWaker {
 	RawWaker::new( data, &WAKER_VTABLE )
 }
 
-fn waker_wake( data: *const () ) {
+unsafe fn waker_wake( data: *const () ) {
 	let data_ptr = data as *const WakerData;
 
-	unsafe {
-		bw_Application_dispatch(
-			(*data_ptr).handle.ffi_handle,
-			ffi_wakeup,
-			data_ptr as _
-		);
-	}
+	bw_Application_dispatch(
+		(*data_ptr).handle.ffi_handle,
+		ffi_wakeup,
+		data_ptr as _
+	);
 }
 
-fn waker_wake_by_ref( data: *const () ) {
+unsafe fn waker_wake_by_ref( data: *const () ) {
 	waker_wake( data );
 }
 
-fn waker_drop( data: *const () ) {}
+fn waker_drop( _data: *const () ) {}
