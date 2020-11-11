@@ -17,7 +17,7 @@
 //! 		let browser = BrowserWindowBuilder::new( Source::Url("https://www.duckduckgo.com/".into()) )
 //! 			.build( app ).await;
 //!
-//! 		browser.exec_js("document.getElementById('search_form_input_homepage').value = 'Hello World!'").await;
+//! 		browser.exec_js("document.getElementById('search_form_input_homepage').value = 'Hello World!'");
 //! 	});
 //!
 //! 	exit( exit_code );
