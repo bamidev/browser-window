@@ -35,8 +35,9 @@ unsafe impl Sync for ApplicationAsync {}
 pub struct ApplicationHandle {
 	pub(in super) ffi_handle: *mut bw_Application
 }
-// ApplicationHandle needs to be Send and Sync because internally it is so widely used across async code,
-//  that the constraints are unworkable.
+// # Safety
+// `ApplicationHandle` is Send because it is used extensively by `ApplicationThreaded`,
+//  which only uses the handle with thread-safe functions.
 unsafe impl Send for ApplicationHandle {}
 
 /// Use this to start and run the application with.
@@ -44,6 +45,7 @@ pub struct Runtime {
 	pub(in super) handle: ApplicationHandle
 }
 
+/// The data that is available to a waker, allowing it to poll a future.
 struct WakerData {
 	handle: ApplicationHandle,
 	future: Pin<Box<dyn Future<Output=()>>>
@@ -93,6 +95,7 @@ impl Runtime {
 		vec
 	}
 
+	/// Polls a future given a pointer to the waker data.
 	unsafe fn poll_future( data: *mut WakerData ) {
 		debug_assert!( data != ptr::null_mut(), "WakerData pointer can't be zero!" );
 
@@ -132,12 +135,14 @@ impl Runtime {
 		} )
 	}
 
+	/// Runs the main loop and executes the given future within that loop.
+	/// Use this when you are fine with running Browser Window single-threaded.
 	pub fn spawn<F>( &self, future: F ) -> i32 where
 		F: Future<Output=()> + 'static
 	{
 		self._run(|handle| {
 
-			// Create a context with our own waker
+			// Data for the waker.
 			let waker_data = Box::into_raw( Box::new(
 				WakerData {
 					handle: handle,
