@@ -75,13 +75,10 @@ bw_ApplicationEngineImpl bw_ApplicationEngineImpl_start( bw_Application* app, in
 
 	CefSettings app_settings;
 	// Only works on Windows:
+#ifdef BW_WIN32
 	app_settings.multi_threaded_message_loop = true;
-#ifndef BW_WIN32
-	// FIXME: For some reason the sandbox feature cannot be made to work on Debian.
-	//        I'm not sure where else it isn't working though...
-	//        Having a sandbox is crucial for security though, so this needs to be enabled.
-	app_settings.no_sandbox = true;
 #endif
+
 	CefBrowserSettings browser_settings;
 
 	CefRefPtr<CefApp> cef_app_handle( new AppHandler( app ) );

@@ -1,6 +1,9 @@
 #include "../application.h"
 
 #include "impl.h"
+#include "../common.h"
+
+#include <gtk/gtk.h>
 
 
 
@@ -27,7 +30,8 @@ void bw_Application_checkThread( const bw_Application* app ) {
 
 void bw_Application_exit( bw_Application* app, int exit_code ) {
 	app->impl.exit_code = exit_code;
-	gtk_main_quit();
+
+	g_application_quit( G_APPLICATION( app->impl.handle ) );
 }
 
 void bw_Application_exitAsync( bw_Application* app, int exit_code ) {
@@ -38,8 +42,20 @@ void bw_Application_exitAsync( bw_Application* app, int exit_code ) {
 	gdk_threads_add_idle( _bw_ApplicationImpl_exitHandler, (gpointer)&data );
 }
 
-int bw_Application_run( bw_Application* app, bw_ApplicationReadyFn on_ready, void* user_data ) {
-	gtk_main();
+void bw_ApplicationGtk_onActivate( GtkApplication* gtk_handle, gpointer data ) {
+	UNUSED( gtk_handle );
+
+	bw_ApplicationImpl_ReadyHandlerData* ready_handler_data = (bw_ApplicationImpl_ReadyHandlerData*)data;
+
+	(ready_handler_data->func)( ready_handler_data->app, ready_handler_data->data );
+}
+
+int bw_ApplicationImpl_run( bw_Application* app, bw_ApplicationImpl_ReadyHandlerData* ready_handler_data ) {
+
+	g_signal_connect( app->impl.handle, "activate", G_CALLBACK( bw_ApplicationGtk_onActivate ), (void*)ready_handler_data );
+
+	g_application_run( G_APPLICATION(app->impl.handle), app->impl.argc, app->impl.argv );
+
 	return app->impl.exit_code;
 }
 
@@ -63,7 +79,7 @@ bw_ApplicationImpl bw_ApplicationImpl_start( bw_Application* _app, int argc, cha
 
 // There is no 'free' function for GtkApplication*
 void bw_ApplicationImpl_finish( bw_ApplicationImpl* app ) {
-	(void)(app);
+	g_object_unref( app->handle );
 }
 
 

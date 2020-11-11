@@ -1,11 +1,11 @@
 use browser_window_ffi::*;
 use lazy_static::lazy_static;
 use std::env;
-use std::ffi::c_void;
+use std::ffi::{c_void, CString};
 use std::future::Future;
 use std::marker::PhantomData;
 use std::ops::Deref;
-use std::os::raw::{c_char, c_int};
+use std::os::raw::{c_int};
 use std::pin::Pin;
 use std::ptr;
 use std::rc::Rc;
@@ -88,22 +88,22 @@ impl Runtime {
 		self.handle.clone().into()
 	}
 
-	fn args_ptr_vec() -> Vec<*mut c_char> {
+	fn args_ptr_vec() -> (Vec<CString>, Vec<*mut u8>) {
 		let args = env::args_os();
 		let mut vec = Vec::with_capacity( args.len() );
+		let mut vec_ptrs = Vec::with_capacity( args.len() );
 
 		for arg in args {
+			let string = CString::new( arg.to_string_lossy().to_string() ).expect("Unable to convert OsString into CString!");
+
+			vec_ptrs.push( string.as_ptr() as _ );
+
 			vec.push(
-				arg
-					.as_os_str()
-					.to_str()
-					.expect("Invalid Unicode in console arguments!")
-					.as_ptr()
-					 as _
+				string
 			);
 		}
 
-		vec
+		( vec, vec_ptrs )
 	}
 
 	/// Polls a future given a pointer to the waker data.
@@ -171,11 +171,11 @@ impl Runtime {
 	/// Everything that runs before this function, runs as well on the other (browser engine related) processes.
 	/// That is generally unnecessary.
 	pub fn start() -> Self {
-		let mut args_vec = Self::args_ptr_vec();
+		let (args_vec, mut ptrs_vec) = Self::args_ptr_vec();
 		let argc: c_int = args_vec.len() as _;
-		let argv = args_vec.as_mut_ptr();
+		let argv = ptrs_vec.as_mut_ptr();
 
-		let ffi_handle = unsafe { bw_Application_start( argc, argv ) };
+		let ffi_handle = unsafe { bw_Application_start( argc, argv as _ ) };
 
 		Self {
 			handle: ApplicationHandle::new( ffi_handle )

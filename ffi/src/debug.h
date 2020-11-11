@@ -17,10 +17,10 @@ extern "C" {
 // Print MESSAGE to the standard error output.
 // Additional information can be provided into the message, just like printf.
 #ifndef NDEBUG
-#define BW_DEBUG( MESSAGE, ... ) \
+#define BW_DEBUG( ... ) \
 { \
 	fprintf( stderr, "[DEBUG %s:%d] ", __FILE__, __LINE__ ); \
-	fprintf( stderr, MESSAGE, __VA_ARGS__ ); \
+	fprintf( stderr, __VA_ARGS__ ); \
 	fprintf( stderr, "\n" ); \
 }
 #else

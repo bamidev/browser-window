@@ -14,6 +14,17 @@ void bw_Application_finish( bw_Application* app ) {
 	free( app );
 }
 
+int bw_Application_run( bw_Application* app, bw_ApplicationReadyFn on_ready, void* user_data ) {
+
+	bw_ApplicationImpl_ReadyHandlerData ready_handler_data = {
+		app,
+		on_ready,
+		user_data
+	};
+
+	return bw_ApplicationImpl_run( app, &ready_handler_data );
+}
+
 bw_Application* bw_Application_start( int argc, char** argv ) {
 
     bw_Application* app = (bw_Application*)malloc( sizeof( bw_Application ) );
