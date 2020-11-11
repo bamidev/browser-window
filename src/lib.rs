@@ -11,12 +11,13 @@
 //! fn main() {
 //! 	let runtime = Runtime::start();
 //!
-//! 	let exit_code = runtime.run(|app| {
+//! 	let app = runtime.app();
+//! 	let exit_code = runtime.spawn(async move {
 //!
-//! 		BrowserWindowBuilder::new( Source::Url("https://www.duckduckgo.com/".into()) )
-//! 			.spawn( &app, |browser| {
-//! 				browser.exec_js("document.getElementById('search_form_input_homepage').value = 'Hello World!'");
-//! 			});
+//! 		let browser = BrowserWindowBuilder::new( Source::Url("https://www.duckduckgo.com/".into()) )
+//! 			.build( app ).await;
+//!
+//! 		browser.exec_js("document.getElementById('search_form_input_homepage').value = 'Hello World!'").await;
 //! 	});
 //!
 //! 	exit( exit_code );
