@@ -25,6 +25,8 @@
 //! ```
 //!
 //! For an more elaborate example, see [this example code](https://github.com/bamilab/browser-window/blob/master/example/src/main.rs).
+//!
+//! To get everything setup in order to use this crate, take a look at [this getting started guide](https://github.com/bamilab/browser-window/tree/master/docs/getting-started).
 
 mod application;
 mod browser;
