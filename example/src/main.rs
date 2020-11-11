@@ -7,20 +7,15 @@ use tokio;
 fn main() {
 
 	let bw_runtime = Runtime::start();
-	let tokio_runtime = tokio::runtime::Runtime::new().unwrap();
+	//let tokio_runtime = tokio::runtime::Runtime::new().unwrap();
 
-	let exit_code = bw_runtime.run_alongside(|app| {
-		// Start the tokio runtime and run our program logic on it
-
-		tokio_runtime.spawn( program_logic( app ) );
-	});
+	let exit_code = bw_runtime.spawn( program_logic( bw_runtime.app() ) );
 
 	// Return exit code
 	exit( exit_code );
 }
 
-async fn program_logic( app: ApplicationAsync ) {
-
+async fn program_logic( app: Application ) {
 	let x = {
 		let bw = BrowserBuilder::new( Source::Html( include_str!("example.html").into() ) )
 		.title("Example")
@@ -37,8 +32,7 @@ async fn program_logic( app: ApplicationAsync ) {
 				println!("\tArg {}: {}", i+1, args[i]);
 			}
 		})
-		.spawn_async( &app ).await;
-
+		.build( app.clone() ).await;
 		let bw2 = BrowserBuilder::new( Source::Html( include_str!("example.html").into() ) )
 			.title("Example")
 			.width( 800 )
@@ -48,8 +42,7 @@ async fn program_logic( app: ApplicationAsync ) {
 			.borders( false )
 			.resizable( true )
 			.parent( &bw )
-			.spawn_async( &app ).await;
-
+			.build( app.clone() ).await;
 		// Let's fetch the title through Javascript
 		match bw.eval_js("document.title").await {
 			Err(e) => { eprintln!("Something went wrong with evaluating javascript: {}", e) },
