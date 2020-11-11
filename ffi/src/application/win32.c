@@ -6,6 +6,8 @@
 #include "../application.h"
 #include "../common.h"
 
+#include "impl.h"
+
 #include <stdlib.h>
 #define WIN32_LEAN_AND_MEAN
 #include <WinDef.h>
@@ -112,8 +114,4 @@ void bw_Application_exitAsync( bw_Application* app, int code ) {
 
 void bw_ApplicationImpl_finish( bw_ApplicationImpl* app ) {
 	UNUSED(app);
-}
-
-int bw_Application_run( bw_Application* app, bw_ApplicationReadyFn on_ready, void* user_data ) {
-
 }
