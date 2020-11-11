@@ -4,6 +4,7 @@ use futures_channel::oneshot;
 use std::{
 	error::Error,
 	ffi::CStr,
+	fmt,
 	marker::PhantomData,
 	ops::Deref,
 	os::raw::*,
@@ -19,8 +20,8 @@ pub use builder::BrowserBuilder;
 
 
 
-//type BrowserJsCallbackData<'a> = Box<dyn FnOnce(Browser, Result<String, Box<dyn Error>>) + 'a>;
-type BrowserJsAsyncCallbackData<'a> = SendBoxFnOnce<'a,(BrowserHandle, Result<String, Box<dyn Error + Send>>),()>;
+type BrowserJsCallbackData<'a> = Box<dyn FnOnce(Browser, Result<String, JsEvaluationError>) + 'a>;
+type BrowserJsThreadedCallbackData<'a> = SendBoxFnOnce<'a,(BrowserHandle, Result<String, JsEvaluationError>),()>;
 
 /// The future that dispatches a closure on the GUI thread.
 pub type BrowserDispatchFuture<'a,R> = DispatchFuture<'a, BrowserHandle, R>;
@@ -51,10 +52,18 @@ pub struct BrowserHandle {
 }
 unsafe impl Send for BrowserHandle {}
 
+/// An error that may occur when evaluating or executing JavaScript code.
+#[derive(Debug)]
+pub struct JsEvaluationError {
+	message: String
+	// TODO: Add line and column number files, and perhaps even more info about the JS error
+}
+
 
 
 impl Browser {
 
+	/// Returns the application handle associated with this browser window.
 	pub fn app( &self ) -> Application {
 		Application::from_ffi_handle( unsafe { bw_BrowserWindow_getApp( self.handle.ffi_handle ) } )
 	}
@@ -65,8 +74,8 @@ impl Browser {
 		unsafe { bw_BrowserWindow_close( self.handle.ffi_handle ); }
 	}
 
-	pub async fn eval_js( &self, js: &str ) -> Result<String, Box<dyn Error>> {
-		let (tx, rx) = oneshot::channel::<Result<String, Box<dyn Error>>>();
+	pub async fn eval_js( &self, js: &str ) -> Result<String, JsEvaluationError> {
+		let (tx, rx) = oneshot::channel::<Result<String, JsEvaluationError>>();
 
 		self._eval_js( js, |_, result| {
 			if let Err(_) = tx.send( result ) {
@@ -77,6 +86,7 @@ impl Browser {
 		rx.await.unwrap()
 	}
 
+
 	/// Executes the given javascript code, and returns the output via a callback.
 	/// If you don't need the result, see "exec_js".
 	///
@@ -86,7 +96,7 @@ impl Browser {
 	///                   The result contains the output of the javascript code when it succeeded.
 	///                   Otherwise the error explains the javascript exception.
 	fn _eval_js<'a,H>( &self, js: &str, on_complete: H ) where
-		H: FnOnce( Browser, Result<String, Box<dyn Error>> ) + 'a
+		H: FnOnce( Browser, Result<String, JsEvaluationError> ) + 'a
 	{
 		let data_ptr: *mut H = Box::into_raw(
 			Box::new( on_complete )
@@ -195,31 +205,14 @@ impl BrowserThreaded {
 	///
 	/// # Arguments:
 	/// * `js` - Javascript code
-	pub async fn eval_js( &self, js: &str ) -> Result<String, Box<dyn Error + Send>>
-	{
-		let (tx, rx) = oneshot::channel::<Result<String, Box<dyn Error + Send>>>();
+	pub async fn eval_js( &self, js: &str ) -> Result<String, JsEvaluationError> {
+		let (tx, rx) = oneshot::channel::<Result<String, JsEvaluationError>>();
 
-		let handle = self.handle.clone();
-
-		self.dispatch(move |_| {
-
-			// Send the value back with the oneshot channel when the result is available
-			//let on_complete = UnsafeSync::new(  );
-
-			let data_ptr = Box::into_raw( Box::new(
-				BrowserJsAsyncCallbackData::new( |_, result| {
-					tx.send( result ).unwrap();
-				} )
-			) );
-
-			unsafe { bw_BrowserWindow_evalJsAsync(
-				handle.ffi_handle,
-				js.into(),
-				ffi_eval_js_async_callback,
-				data_ptr as _
-			) };
-		}).await;
-
+		self._eval_js( js, |_, result| {
+			if let Err(_) = tx.send( result ) {
+				panic!("Unable to send JavaScript result back")
+			}
+		} );
 
 		rx.await.unwrap()
 	}
@@ -232,6 +225,21 @@ impl BrowserThreaded {
 		self.dispatch(|bw| {
 			bw.navigate( url )
 		}).await
+	}
+
+	fn _eval_js<'a,H>( &self, js: &str, on_complete: H ) where
+		H: FnOnce( BrowserThreaded, Result<String, JsEvaluationError> ) + Send + 'a
+	{
+		let data_ptr: *mut H = Box::into_raw(
+			Box::new( on_complete )
+		);
+
+		unsafe { bw_BrowserWindow_evalJsThreaded(
+			self.handle.ffi_handle,
+			js.into(),
+			ffi_eval_js_threaded_callback::<H>,
+			data_ptr as _
+		) };
 	}
 }
 
@@ -286,46 +294,83 @@ impl HasAppHandle for BrowserHandle {
 
 
 
-extern "C" fn ffi_free_browser_window( _app: *mut bw_Application, data: *mut c_void ) {
+impl JsEvaluationError {
+	pub(in super) unsafe fn new( err: *const bw_Err ) -> Self {
+
+		let msg_ptr = ((*err).alloc_message)( (*err).code, (*err).data );
+		let cstr = CStr::from_ptr( msg_ptr );
+		let message: String = cstr.to_string_lossy().into();
+
+		Self {
+			message: message
+		}
+	}
+}
+
+impl Error for JsEvaluationError {
+	fn source(&self) -> Option<&(dyn Error + 'static)> { None }
+}
+
+impl fmt::Display for JsEvaluationError {
+
+	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+
+		write!(f, "{}", self.message.as_str())
+	}
+}
+
+
+
+/// Callback for dropping a browser window.
+/// This gets dispatch to the GUI thread when a `BrowserThreaded` handle gets dropped.
+unsafe extern "C" fn ffi_free_browser_window( _app: *mut bw_Application, data: *mut c_void ) {
 	unsafe { bw_BrowserWindow_drop( data as *mut bw_BrowserWindow ); }
 }
 
-extern "C" fn ffi_eval_js_callback<H>( bw: *mut bw_BrowserWindow, cb_data: *mut c_void, result: *const c_char, error: *const bw_Err ) where
-	H: FnOnce(Browser, Result<String, Box<dyn Error>>)
+unsafe extern "C" fn ffi_eval_js_callback<H>( bw: *mut bw_BrowserWindow, cb_data: *mut c_void, _result: *const c_char, error: *const bw_Err ) where
+	H: FnOnce(Browser, Result<String, JsEvaluationError>)
 {
-
 	let data_ptr = cb_data as *mut H;
 	let data = unsafe { Box::from_raw( data_ptr ) };
 
-	// Construct a result value depending on whether the result or error parameters are set
-	let result_val: Result<String, Box<dyn Error>> = if error.is_null() {
-		let result_str = unsafe { CStr::from_ptr( result ).to_string_lossy().to_owned().to_string() };
-		Ok( result_str )
-	}
-	else {
-		Err( Box::new( unsafe { (*error).clone() } ) )
-	};
+	let (handle, result) = ffi_eval_js_callback_result( bw, _result, error );
 
-	let handle = Browser::from_ffi_handle( bw );
-
-	(*data)( handle, result_val );
+	(*data)( handle.into(), result );
 }
 
-extern "C" fn ffi_eval_js_async_callback( bw: *mut bw_BrowserWindow, cb_data: *mut c_void, result: *const c_char, error: *const bw_Err ) {
+unsafe fn ffi_eval_js_callback_result(
+	bw: *mut bw_BrowserWindow,
+	result: *const c_char,
+	error: *const bw_Err
+) -> ( BrowserHandle, Result<String, JsEvaluationError> ) {
 
-	let data_ptr = cb_data as *mut BrowserJsAsyncCallbackData;
-	let data = unsafe { Box::from_raw( data_ptr ) };
 
 	// Construct a result value depending on whether the result or error parameters are set
-	let result_val: Result<String, Box<dyn Error + Send>> = if error.is_null() {
-		let result_str = unsafe { CStr::from_ptr( result ).to_string_lossy().to_owned().to_string() };
+	let result_val: Result<String, JsEvaluationError> = if error.is_null() {
+		let result_str = CStr::from_ptr( result ).to_string_lossy().to_owned().to_string();
 		Ok( result_str )
 	}
 	else {
-		Err( Box::new( unsafe { (*error).clone() } ) )
+		Err( JsEvaluationError::new( error ) )
 	};
 
 	let handle = BrowserHandle::new( bw );
 
-	data.call( handle, result_val );
+	// return
+	( handle, result_val )
+}
+
+/// Callback for catching JavaScript results.
+///
+/// # Warning
+/// This may get invoked from another thread than the GUI thread, depending on the implementation of the browser engine.
+unsafe extern "C" fn ffi_eval_js_threaded_callback<H>( bw: *mut bw_BrowserWindow, cb_data: *mut c_void, _result: *const c_char, error: *const bw_Err ) where
+	H: FnOnce(BrowserThreaded, Result<String, JsEvaluationError>) + Send
+{
+	let data_ptr = cb_data as *mut H;
+	let data = unsafe { Box::from_raw( data_ptr ) };
+
+	let (handle, result) = ffi_eval_js_callback_result( bw, _result, error );
+
+	(*data)( handle.into(), result );
 }

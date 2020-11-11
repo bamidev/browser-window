@@ -113,28 +113,17 @@ protected:
 		CefRefPtr<CefBinaryValue> user_data_bin = msg_args->GetBinary( 4 );
 		user_data_bin->GetData( (void*)&user_data, sizeof( user_data ), 0 );
 
-		bool cb_async = msg_args->GetBool( 5 );
-
 		// FIXME: call the relevant code on the right thread...
 
 		// // Invoke the callback with either a result string or an error
 		if (success) {
-			if ( cb_async )
-				callback( bw_handle, user_data, result.c_str(), 0 );
-			else {
-				// TODO: Implement
-			}
+			callback( bw_handle, user_data, result.c_str(), 0 );
 		}
 		else {
 			bw_Err error = bw_Err_new_with_msg( 1, result.c_str() );
 
-			if ( cb_async ) {
-				callback( bw_handle, user_data, 0, &error );
-				bw_Err_free( &error );
-			}
-			else {
-				// TODO: Implement
-			}
+			callback( bw_handle, user_data, 0, &error );
+			bw_Err_free( &error );
 		}
 	}
 

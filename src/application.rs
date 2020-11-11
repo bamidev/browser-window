@@ -324,6 +324,7 @@ impl HasAppHandle for ApplicationHandle {
 
 
 
+/// The handler that is invoked when the runtime is deemed 'ready'.
 unsafe extern "C" fn ffi_ready_handler<H>( ffi_handle: *mut bw_Application, user_data: *mut c_void ) where
 	H: FnOnce( ApplicationHandle )
 {
@@ -333,6 +334,7 @@ unsafe extern "C" fn ffi_ready_handler<H>( ffi_handle: *mut bw_Application, user
 	closure( app );
 }
 
+/// A handler that is invoked by wakers.
 unsafe extern "C" fn ffi_wakeup( _ffi_handle: *mut bw_Application, user_data: *mut c_void ) {
 
 	let	data = user_data as *mut WakerData;

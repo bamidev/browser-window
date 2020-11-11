@@ -65,9 +65,7 @@ void bw_BrowserWindow_drop( bw_BrowserWindow* bw );
 
 /// Executes the given JavaScript and calls the given callback (on the GUI thread) to provide the result.
 void bw_BrowserWindow_evalJs( bw_BrowserWindow* bw, bw_CStrSlice js, bw_BrowserWindowJsCallbackFn callback, void* cb_data );
-/// Executes the given JavaScript and calls the given callback (on any thread) to provide the result.
-/// This is more effecient if you don't care about where the callback is called than `bw_BrowserWindow_evalJs`.
-void bw_BrowserWindow_evalJsAsync( bw_BrowserWindow* bw, bw_CStrSlice js, bw_BrowserWindowJsCallbackFn callback, void* cb_data );
+void bw_BrowserWindow_evalJsThreaded( bw_BrowserWindow* bw, bw_CStrSlice js, bw_BrowserWindowJsCallbackFn callback, void* cb_data );
 
 bw_Application* bw_BrowserWindow_getApp( bw_BrowserWindow* bw );
 void* bw_BrowserWindow_getUserData( bw_BrowserWindow* bw );
