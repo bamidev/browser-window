@@ -141,6 +141,7 @@ gtk_widget_show_all( GTK_WIDGET(browser->window->impl.handle) );
 	dict->SetBinary( "handle", CefBinaryValue::Create( (const void*)&browser, sizeof(browser) ) );
 	dict->SetBinary( "callback", CefBinaryValue::Create( (const void*)&callback, sizeof(callback) ) );
 	dict->SetBinary( "callback-data", CefBinaryValue::Create( (const void*)&callback_data, sizeof(callback_data) ) );
+	dict->SetBool( "dev-tools", browser_window_options->dev_tools );
 
 	// Create the browser
 	CefRefPtr<CefClient>* cef_client = (CefRefPtr<CefClient>*)browser->window->app->engine_impl.cef_client;
