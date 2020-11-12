@@ -87,6 +87,10 @@ impl Browser {
 		rx.await.unwrap()
 	}
 
+	/// Executes the given JavaScript code, and provides the output via a callback.
+	///
+	/// # Arguments
+	/// * `on_complete` - The closure that will be called when the output is ready.
 	fn _eval_js<'a,H>( &self, js: &str, on_complete: H ) where
 		H: FnOnce( Browser, Result<String, JsEvaluationError> ) + 'a
 	{
