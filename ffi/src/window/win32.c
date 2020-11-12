@@ -21,6 +21,7 @@ typedef struct {
 bool _bw_Window_hasUndroppedChildren( const bw_Window* window );
 BOOL CALLBACK _bw_Window_isDroppedCheck( HWND handle, LPARAM lparam );*/
 LRESULT CALLBACK bw_Window_proc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp);
+void bw_WindowWin32_calculatePositionCentered( int width, int height, int* x, int* y );
 
 
 
@@ -58,7 +59,8 @@ bw_WindowImpl bw_WindowImpl_new(
 		L"bw-window",
 		title,
 		window_style,
-		0, 0,
+		CW_USEDEFAULT,  // Let Windows decide where to place our window
+		0,
 		width,
 		height,
 		HWND_DESKTOP,	// Always set the window to be top level. Parent relationships are dealt with ourself
@@ -124,6 +126,18 @@ LRESULT CALLBACK bw_Window_proc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 
 void bw_WindowImpl_show( bw_Window* window ) {
 	ShowWindow( window->impl.handle, SW_SHOW );
+}
+
+void bw_WindowWin32_calculatePositionCentered( int width, int height, int* x, int* y ) {
+    RECT rect;
+
+    GetClientRect( GetDesktopWindow(), &rect );
+
+    int desktop_width = rect.right - rect.left;
+    int desktop_height = rect.bottom - rect.top;
+
+    *x = ( desktop_width - width ) / 2;
+    *y = ( desktop_height - height ) / 2;
 }
 
 /*BOOL CALLBACK _bw_Window_closeChild( HWND handle, LPARAM _window ) {
