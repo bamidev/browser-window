@@ -31,6 +31,7 @@ pub struct BrowserBuilder {
 	handler: Option<Box<dyn FnMut(Browser, &str, &[&str]) + Send>>,
 
 	borders: bool,
+	dev_tools: bool,
 	maximizable: bool,
 	minimizable: bool,
 	resizable: bool
@@ -44,6 +45,13 @@ impl BrowserBuilder {
 	/// Default is true.
 	pub fn borders( mut self, value: bool ) -> Self {
 		self.borders = value;	self
+	}
+
+	/// Sets whether or not an extra window with developer tools will be opened together with this browser.
+	/// When in debug mode the default is `true`.
+	/// When in release mode the default is `false`.
+	pub fn dev_tools( mut self, enabled: bool ) -> Self {
+		self.dev_tools = enabled;	self
 	}
 
 	/// Configure a closure that can be invoked from within JavaScript.
@@ -86,6 +94,7 @@ impl BrowserBuilder {
 			height: None,
 
 			borders: true,
+			dev_tools: cfg!(debug_assertions),
 			minimizable: true,
 			maximizable: true,
 			resizable: true
@@ -169,7 +178,18 @@ impl BrowserBuilder {
 		H: FnOnce( BrowserHandle )
 	{
 		match self {
-			Self { parent, source, title, width, height, handler, borders, minimizable, maximizable, resizable } => {
+			Self { parent,
+				   source,
+				   title,
+				   width,
+				   height,
+				   handler,
+				   borders,
+				   minimizable,
+				   maximizable,
+				   resizable,
+				   dev_tools
+			} => {
 
 				// Parent
 				let parent_handle = match parent {
@@ -224,7 +244,7 @@ impl BrowserBuilder {
 					borders: borders
 				};
 				let other_options = bw_BrowserWindowOptions {
-					dev_tools: true
+					dev_tools: dev_tools
 				};
 
 				unsafe { bw_BrowserWindow_new(

@@ -68,6 +68,7 @@ protected:
 		args->GetBinary( 1 )->GetData( (void*)&callback, sizeof( callback ), 0 );
 		void* callback_data;
 		args->GetBinary( 2 )->GetData( (void*)&callback_data, sizeof( callback_data ), 0 );
+		bool dev_tools_enabled = args->GetBool( 3 );
 
 		// Make a copy on the heap to store in our handle
 		CefRefPtr<CefBrowser>* cef_ptr = new CefRefPtr<CefBrowser>( browser );
@@ -76,7 +77,11 @@ protected:
 		// Store a link with the cef browser handle and our handle in a global map
 		bw::bw_handle_map.store( *cef_ptr, bw_handle );
 
-		// Invoke the callback
+        // Open dev-tools window
+        if ( dev_tools_enabled )
+            this->openDevTools( bw_handle, browser->GetHost() );
+
+		// Invoke the completion callback
 		callback( bw_handle, callback_data );
 	}
 
@@ -170,6 +175,18 @@ protected:
 		// TODO: Move this conversion into its own function
 
 		our_handle->external_handler( our_handle, cmd_str_slice, params_slices.data(), params.size() );
+	}
+
+	void openDevTools( bw_BrowserWindow* bw, const CefRefPtr<CefBrowserHost>& host ) {
+
+        CefRefPtr<CefClient> client;
+        CefBrowserSettings settings;
+        CefPoint point;
+
+	    CefWindowInfo info;
+	    info.SetAsPopup( bw->window->impl.handle, "Dev Tools" );
+
+	    host->ShowDevTools( info, client, settings, point );
 	}
 
 	IMPLEMENT_REFCOUNTING(ClientHandler);
