@@ -50,9 +50,6 @@ bw_WindowImpl bw_WindowImpl_new(
 		window_style ^= WS_SIZEBOX & WS_MAXIMIZEBOX;
 	if ( !options->minimizable )
 		window_style ^= WS_MINIMIZEBOX;
-	// Only disable maximize box if already resizable
-	if ( options->resizable && !options->maximizable )
-		window_style ^= WS_MAXIMIZEBOX;
 
 	wchar_t* title = bw_win32_copyAsNewWstr( _title );
 

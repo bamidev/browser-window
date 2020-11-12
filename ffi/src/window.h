@@ -35,7 +35,6 @@ typedef struct bw_WindowCallbacks {
 } bw_WindowCallbacks;
 
 typedef struct bw_WindowOptions {
-	bool maximizable;
 	bool minimizable;
 	bool resizable;
 	bool closable;

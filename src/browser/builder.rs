@@ -32,7 +32,6 @@ pub struct BrowserBuilder {
 
 	borders: bool,
 	dev_tools: bool,
-	maximizable: bool,
 	minimizable: bool,
 	resizable: bool
 }
@@ -96,7 +95,6 @@ impl BrowserBuilder {
 			borders: true,
 			dev_tools: cfg!(debug_assertions),
 			minimizable: true,
-			maximizable: true,
 			resizable: true
 		}
 	}
@@ -186,7 +184,6 @@ impl BrowserBuilder {
 				   handler,
 				   borders,
 				   minimizable,
-				   maximizable,
 				   resizable,
 				   dev_tools
 			} => {
@@ -237,7 +234,6 @@ impl BrowserBuilder {
 				) );
 
 				let window_options = bw_WindowOptions {
-					maximizable: maximizable,
 					minimizable: minimizable,
 					resizable: resizable,
 					closable: true,
