@@ -14,7 +14,7 @@
 //! 	let app = runtime.app();
 //! 	let exit_code = runtime.spawn(async move {
 //!
-//! 		let browser = BrowserWindowBuilder::new( Source::Url("https://www.duckduckgo.com/".into()) )
+//! 		let browser = BrowserBuilder::new( Source::Url("https://www.duckduckgo.com/".into()) )
 //! 			.build( app ).await;
 //!
 //! 		browser.exec_js("document.getElementById('search_form_input_homepage').value = 'Hello World!'");
