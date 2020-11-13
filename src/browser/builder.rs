@@ -147,7 +147,7 @@ impl BrowserBuilder {
 			}
 		} );
 
-		rx.await.unwrap().into()
+		Browser::new( rx.await.unwrap() )
 	}
 
 	/// Same as build, but gives back a browser handle that is thread-safe.

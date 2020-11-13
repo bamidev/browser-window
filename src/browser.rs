@@ -4,6 +4,7 @@ use std::{
 	error::Error,
 	ffi::CStr,
 	fmt,
+	future::Future,
 	marker::PhantomData,
 	ops::Deref,
 	os::raw::*,
@@ -45,6 +46,7 @@ pub struct BrowserThreaded {
 }
 unsafe impl Sync for BrowserThreaded {}
 
+/// This is a handle to an existing browser window.
 #[derive(Clone, Copy)]
 pub struct BrowserHandle {
 	pub(in super) ffi_handle: *mut bw_BrowserWindow
@@ -62,15 +64,55 @@ pub struct JsEvaluationError {
 
 impl Browser {
 
+	fn from_ffi_handle( ptr: *mut bw_BrowserWindow ) -> Self {
+		Self {
+			handle: BrowserHandle::new( ptr ),
+			_not_send: PhantomData
+		}
+	}
+
+	fn new( handle: BrowserHandle ) -> Self {
+		Self {
+			handle: handle,
+			_not_send: PhantomData
+		}
+	}
+}
+
+impl Deref for Browser {
+	type Target = BrowserHandle;
+
+	fn deref( &self ) -> &Self::Target {
+		&self.handle
+	}
+}
+
+impl Drop for Browser {
+	fn drop( &mut self ) {
+		unsafe { bw_BrowserWindow_drop( self.handle.ffi_handle ) }
+	}
+}
+
+impl HasAppHandle for Browser {
+
+	fn app_handle( &self ) -> ApplicationHandle {
+		self.handle.app_handle()
+	}
+}
+
+
+
+impl BrowserHandle {
+
 	/// Returns the application handle associated with this browser window.
 	pub fn app( &self ) -> Application {
-		Application::from_ffi_handle( unsafe { bw_BrowserWindow_getApp( self.handle.ffi_handle ) } )
+		Application::from_ffi_handle( unsafe { bw_BrowserWindow_getApp( self.ffi_handle ) } )
 	}
 
 	/// Closes the browser.
 	// The browser will be freed from memory when the last handle to it gets dropped.
 	pub fn close( self ) {
-		unsafe { bw_BrowserWindow_close( self.handle.ffi_handle ); }
+		unsafe { bw_BrowserWindow_close( self.ffi_handle ); }
 	}
 
 	/// Executes the given javascript code and returns the output as a string.
@@ -92,14 +134,14 @@ impl Browser {
 	/// # Arguments
 	/// * `on_complete` - The closure that will be called when the output is ready.
 	fn _eval_js<'a,H>( &self, js: &str, on_complete: H ) where
-		H: FnOnce( Browser, Result<String, JsEvaluationError> ) + 'a
+		H: FnOnce( BrowserHandle, Result<String, JsEvaluationError> ) + 'a
 	{
 		let data_ptr: *mut H = Box::into_raw(
 			Box::new( on_complete )
 		);
 
 		unsafe { bw_BrowserWindow_evalJs(
-			self.handle.ffi_handle,
+			self.ffi_handle,
 			js.into(),
 			ffi_eval_js_callback::<H>,
 			data_ptr as _
@@ -111,53 +153,9 @@ impl Browser {
 		self._eval_js( js, |_,_|{} );
 	}
 
-	fn from_ffi_handle( ptr: *mut bw_BrowserWindow ) -> Self {
-		Self {
-			handle: BrowserHandle::new( ptr ),
-			_not_send: PhantomData
-		}
-	}
-
 	/// Causes the browser to navigate to the given url.
-	pub fn navigate( &self, url: &str ) -> Result<(), Box<dyn Error + Send>> {
-		let err = unsafe { bw_BrowserWindow_navigate( self.handle.ffi_handle, url.into() ) };
-
-		if err.code == 0 {
-			return Ok(());
-		}
-
-		Err( Box::new( err ) )
-	}
-}
-
-impl Deref for Browser {
-	type Target = BrowserHandle;
-
-	fn deref( &self ) -> &BrowserHandle {
-		&self.handle
-	}
-}
-
-impl Drop for Browser {
-	fn drop( &mut self ) {
-		unsafe { bw_BrowserWindow_drop( self.handle.ffi_handle ) }
-	}
-}
-
-impl From<BrowserHandle> for Browser {
-
-	fn from( handle: BrowserHandle ) -> Self {
-		Self {
-			handle: handle,
-			_not_send: PhantomData
-		}
-	}
-}
-
-impl HasAppHandle for Browser {
-
-	fn app_handle( &self ) -> ApplicationHandle {
-		self.handle.app_handle()
+	pub fn navigate( &self, url: &str ) {
+		unsafe { bw_BrowserWindow_navigate( self.ffi_handle, url.into() ) };
 	}
 }
 
@@ -181,22 +179,52 @@ impl BrowserThreaded {
 	/// Keep in mind that in multi-threaded environments, it is generally a good idea to use a Box return type,
 	///  or use something else to put the value on the heap when dealing with large types.
 	pub fn delegate<'a,F,R>( &self, func: F ) -> BrowserDelegateFuture<'a,R> where
-		F: FnOnce( Browser ) -> R + Send + 'a,
+		F: FnOnce( BrowserHandle ) -> R + Send + 'a,
 		R: Send
 	{
-		BrowserDelegateFuture::new( self.handle.clone(), |handle| {
-			func( handle.into() )
-		} )
+		BrowserDelegateFuture::new( self.handle.clone(), func )
+	}
+
+	/// Executes the given async closure on the GUI thread, and returns the value that the async closure returns.
+	/// Keep in mind that in multi-threaded environments, it is generally a good idea to use a Box return type,
+	///  or use something else to put the value on the heap when dealing with large types.
+	///
+	/// # Note
+	/// Keep in mind that the whole closure will be executed on the GUI thread.
+	/// Just because this method is thread-safe, doesn't mean that the closure is.
+	pub async fn delegate_async<'a,F,G,R>( &self, func: F ) -> R where
+		F: FnOnce( BrowserHandle ) -> G + Send + 'a,
+		G: Future<Output=R> + 'static,
+		R: Send + 'static
+	{
+		let (tx, rx) = oneshot::channel::<R>();
+
+		// First of all, execute the closure on the GUI thread.
+		self.dispatch( move |handle| {
+			let future = func( handle );
+
+			// Then spawn the resulting future on the GUI thread,
+			//  and send its output back to our calling thread
+			handle.app().spawn( async move {
+				let result = future.await;
+
+				if let Err(_) = tx.send( result ) {
+					panic!("Unable to send result back");
+				}
+			} );
+		});
+
+		rx.await.unwrap()
 	}
 
 	/// Executes the given close on the GUI thread.
-	pub fn dispatch<'a,F>( &self, func: F ) where
-		F:  FnOnce( Browser ) + Send + 'a
+	pub fn dispatch<'a,'b:'a,F>( &self, func: F ) where
+		F:  FnOnce( BrowserHandle ) + Send + 'b
 	{
 		let handle = self.handle;
 
 		self.app().dispatch(move |_| {
-			func( handle.into() );
+			func( handle );
 		})
 	}
 
@@ -214,10 +242,10 @@ impl BrowserThreaded {
 	}
 
 	/// Causes the browser to navigate to the given url.
-	pub async fn navigate( &self, url: &str ) -> Result<(), Box<dyn Error + Send>> {
-		self.delegate(|bw| {
+	pub fn navigate( &self, url: &str ) {
+		self.dispatch(|bw| {
 			bw.navigate( url )
-		}).await
+		});
 	}
 
 	fn _eval_js<'a,H>( &self, js: &str, on_complete: H ) where
@@ -321,14 +349,14 @@ unsafe extern "C" fn ffi_free_browser_window( _app: *mut bw_Application, data: *
 }
 
 unsafe extern "C" fn ffi_eval_js_callback<H>( bw: *mut bw_BrowserWindow, cb_data: *mut c_void, _result: *const c_char, error: *const bw_Err ) where
-	H: FnOnce(Browser, Result<String, JsEvaluationError>)
+	H: FnOnce(BrowserHandle, Result<String, JsEvaluationError>)
 {
 	let data_ptr = cb_data as *mut H;
 	let data = Box::from_raw( data_ptr );
 
 	let (handle, result) = ffi_eval_js_callback_result( bw, _result, error );
 
-	(*data)( handle.into(), result );
+	(*data)( handle, result );
 }
 
 unsafe fn ffi_eval_js_callback_result(

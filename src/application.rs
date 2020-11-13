@@ -152,17 +152,7 @@ impl Runtime {
 		F: Future<Output=()> + 'static
 	{
 		self._run(|handle| {
-
-			// Data for the waker.
-			let waker_data = Box::into_raw( Box::new(
-				WakerData {
-					handle: handle,
-					future: Box::pin( future )
-				}
-			) );
-
-			// First poll
-			unsafe { Runtime::poll_future( waker_data ) };
+			handle.spawn( future );
 		})
 	}
 
@@ -233,6 +223,34 @@ impl From<ApplicationHandle> for Application {
 
 
 
+impl ApplicationHandle {
+
+	pub(in super) fn new( ffi_handle: *mut bw_Application ) -> Self {
+		Self {
+			ffi_handle: ffi_handle
+		}
+	}
+
+	/// Spawns the given future, executing it on the GUI thread somewhere in the near future.
+	pub fn spawn<F>( &self, future: F ) where
+	    F: Future<Output=()> + 'static
+	{
+
+		// Data for the waker.
+		let waker_data = Box::into_raw( Box::new(
+			WakerData {
+				handle: self.clone(),
+				future: Box::pin( future )
+			}
+		) );
+
+		// First poll
+		unsafe { Runtime::poll_future( waker_data ) };
+	}
+}
+
+
+
 impl ApplicationThreaded {
 
 	/// Executes the given closure on the GUI thread, and gives back the result when done.
@@ -278,6 +296,12 @@ impl ApplicationThreaded {
 			handle: ApplicationHandle::new( ffi_handle )
 		}
 	}
+
+	pub fn spawn<F>( &self, future: F ) where
+		F: Future<Output=()> + 'static
+	{
+		self.handle.spawn( future );
+	}
 }
 
 impl Deref for ApplicationThreaded {
@@ -297,14 +321,6 @@ impl From<ApplicationHandle> for ApplicationThreaded {
 }
 
 
-
-impl ApplicationHandle {
-	pub(in super) fn new( ffi_handle: *mut bw_Application ) -> Self {
-		Self {
-			ffi_handle: ffi_handle
-		}
-	}
-}
 
 impl HasAppHandle for ApplicationHandle {
 
