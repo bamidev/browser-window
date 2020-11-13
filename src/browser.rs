@@ -267,7 +267,7 @@ impl BrowserThreaded {
 impl Deref for BrowserThreaded {
 	type Target = BrowserHandle;
 
-	fn deref( &self ) -> &BrowserHandle {
+	fn deref( &self ) -> &Self::Target {
 		&self.handle
 	}
 }

@@ -28,7 +28,7 @@ pub struct BrowserBuilder {
 	title: Option<String>,
 	width: Option<u32>,
 	height: Option<u32>,
-	handler: Option<Box<dyn FnMut(Browser, &str, &[&str]) + Send>>,
+	handler: Option<Box<dyn FnMut(BrowserHandle, &str, &[&str]) + Send>>,
 
 	borders: bool,
 	dev_tools: bool,
@@ -57,7 +57,7 @@ impl BrowserBuilder {
 	/// The closure's second parameter specifies a command name.
 	/// The closure's third parameter specifies an array of string arguments.
 	pub fn handler<H>( mut self, handler: H ) -> Self where
-		H: FnMut(Browser, &str, &[&str]) + Send + 'static
+		H: FnMut(BrowserHandle, &str, &[&str]) + Send + 'static
 	{
 		self.handler = Some( Box::new( handler ) );
 		self
@@ -264,7 +264,7 @@ impl BrowserBuilder {
 
 /// The data that is passed to the C FFI handler function
 struct BrowserUserData {
-	handler: Box<dyn FnMut( Browser, &str, &[&str])>
+	handler: Box<dyn FnMut( BrowserHandle, &str, &[&str])>
 }
 
 /// The data that is passed to the creation callback function
@@ -295,7 +295,7 @@ extern "C" fn ffi_window_invoke_handler( inner_handle: *mut bw_BrowserWindow, _c
 
 		match data {
 			BrowserUserData{ handler } => {
-				let outer_handle = Browser::from_ffi_handle( inner_handle );
+				let outer_handle = BrowserHandle::new( inner_handle );
 
 				let args = args_to_vec( _args, args_count );
 
