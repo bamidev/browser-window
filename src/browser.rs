@@ -249,7 +249,7 @@ impl BrowserThreaded {
 	}
 
 	fn _eval_js<'a,H>( &self, js: &str, on_complete: H ) where
-		H: FnOnce( BrowserThreaded, Result<String, JsEvaluationError> ) + Send + 'a
+		H: FnOnce( BrowserHandle, Result<String, JsEvaluationError> ) + Send + 'a
 	{
 		let data_ptr: *mut H = Box::into_raw(
 			Box::new( on_complete )
@@ -386,12 +386,12 @@ unsafe fn ffi_eval_js_callback_result(
 /// # Warning
 /// This may get invoked from another thread than the GUI thread, depending on the implementation of the browser engine.
 unsafe extern "C" fn ffi_eval_js_threaded_callback<H>( bw: *mut bw_BrowserWindow, cb_data: *mut c_void, _result: *const c_char, error: *const bw_Err ) where
-	H: FnOnce(BrowserThreaded, Result<String, JsEvaluationError>) + Send
+	H: FnOnce(BrowserHandle, Result<String, JsEvaluationError>) + Send
 {
 	let data_ptr = cb_data as *mut H;
 	let data = Box::from_raw( data_ptr );
 
 	let (handle, result) = ffi_eval_js_callback_result( bw, _result, error );
 
-	(*data)( handle.into(), result );
+	(*data)( handle, result );
 }
