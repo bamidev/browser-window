@@ -7,27 +7,14 @@ Browser Window was born from the lack of a good and simple Electron alternative 
 There are actually a few ones out there already.
 However, they lack a few important things.
 
-## The problems Browser Window is solving
+## Goals
 
-The main problem is that they (except on Linux) use browser engine's already available on the operating system.
-This is useful if you want to ship your application as a single executable file.
-However, using different engines makes it harder to make your application work consistently on all platforms, especially when using newer features that are not yet supported by some browsers engines.
-Using the same engine for each platform is a good idea.
+Browser Window aims to be cross-platform, very simple, and straight forward.
+Many methods in Browser Window are asynchronous, such as evaluating JavaScript code and getting back its output.
+Browser Window utilizes and benefits from Rust's async/await syntax, so this should make it a breeze.
 
-Another problem you run into when using preinstalled browser engines, is that in the case of Windows, that engine is not being maintained anymore.
-Windows uses the EdgeHTML engine that Edge used before it switched to using CEF as well.
-If you want to use newest HTML5/CSS3 features, you shouldn't rely on an old browser engine.
-A new API for Edge's new browser engine is now available, however you still need to install the Edge Runtime, and its just a wrapper around CEF basically.
-
-Moreover, some other simple features that would make life so much better, are unfortunately also not available in other crates.
-For example, getting output back from your JavaScript evaluation is not self-evident.
-
-Another thing is, as multi-core processors are becoming the norm, multi-threading is becoming more and more relevant.
-GUI libraries are often single-threaded by design, and need some way of delegating heavy work to another thread.
-Fortunately, Rust has a pretty mechanism for writing asynchronous code with its async/await syntax, which can be extremely efficient as well.
-Browser Window utilizes this syntax.
-Moreover, you could use our thread-safe handles if you want to manipulate the GUI from a multi-threaded environment as well.
-So Browser Window is designed with concurrency in mind from the ground up.
+Moreover, multi-threading is becoming more and more important.
+If you need to access the GUI from other threads, Browser Window also provides thread-safe handles to do this.
 
 You can view the [example](https://github.com/bamilab/browser-window/tree/master/example) to see how easily a GUI with Browser Window can be made, within a single-threaded environment.
 
