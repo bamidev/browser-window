@@ -19,14 +19,14 @@ pub enum Source {
 }
 
 /// Used to create a `Browser` or `BrowserThreaded` instance.
-pub struct BrowserBuilder {
+pub struct BrowserWindowBuilder {
 
-	parent: Option<BrowserHandle>,
+	parent: Option<BrowserWindowHandle>,
 	source: Source,
 	title: Option<String>,
 	width: Option<u32>,
 	height: Option<u32>,
-	handler: Option<Box<dyn FnMut(BrowserHandle, &str, &[&str]) + Send>>,
+	handler: Option<Box<dyn FnMut(BrowserWindowHandle, &str, &[&str]) + Send>>,
 
 	borders: bool,
 	dev_tools: bool,
@@ -36,7 +36,7 @@ pub struct BrowserBuilder {
 
 
 
-impl BrowserBuilder {
+impl BrowserWindowBuilder {
 
 	/// Sets whether or not the window has borders.
 	/// Default is true.
@@ -55,7 +55,7 @@ impl BrowserBuilder {
 	/// The closure's second parameter specifies a command name.
 	/// The closure's third parameter specifies an array of string arguments.
 	pub fn handler<H>( mut self, handler: H ) -> Self where
-		H: FnMut(BrowserHandle, &str, &[&str]) + Send + 'static
+		H: FnMut(BrowserWindowHandle, &str, &[&str]) + Send + 'static
 	{
 		self.handler = Some( Box::new( handler ) );
 		self
@@ -71,7 +71,7 @@ impl BrowserBuilder {
 	/// When a parent window closes, this browser window will close as well.
 	/// This could be a reference to a `Browser` or `BrowserThreaded` handle.
 	pub fn parent<B>( mut self, bw: &B ) -> Self where
-		B: OwnedBrowser
+		B: OwnedBrowserWindow
 	{
 		self.parent = Some( bw.handle() );
 		self
@@ -134,9 +134,9 @@ impl BrowserBuilder {
 	///
 	/// # Arguments
 	/// * `app` - An application handle that this browser window can spawn into
-	pub async fn build( self, app: Application ) -> Browser
+	pub async fn build( self, app: Application ) -> BrowserWindow
 	{
-		let (tx, rx) = oneshot::channel::<BrowserHandle>();
+		let (tx, rx) = oneshot::channel::<BrowserWindowHandle>();
 
 		self._build( app, move |handle| {
 
@@ -145,16 +145,16 @@ impl BrowserBuilder {
 			}
 		} );
 
-		Browser::new( rx.await.unwrap() )
+		BrowserWindow::new( rx.await.unwrap() )
 	}
 
 	/// Same as build, but gives back a browser handle that is thread-safe.
 	///
 	/// # Arguments
 	/// * `app` - An thread-safe application handle.
-	pub async fn build_threaded( self, app: ApplicationThreaded ) -> Result<BrowserThreaded, DelegateError> {
+	pub async fn build_threaded( self, app: ApplicationThreaded ) -> Result<BrowserWindowThreaded, DelegateError> {
 
-		let (tx, rx) = oneshot::channel::<BrowserHandle>();
+		let (tx, rx) = oneshot::channel::<BrowserWindowHandle>();
 
 		// We need to dispatch the spawning of the browser to the GUI thread
 		app.delegate(|app_handle| {
@@ -167,11 +167,11 @@ impl BrowserBuilder {
 			} );
 		}).await?;
 
-		Ok( BrowserThreaded::new( rx.await.unwrap() ) )
+		Ok( BrowserWindowThreaded::new( rx.await.unwrap() ) )
 	}
 
 	fn _build<H>( self, app: Application, on_created: H ) where
-		H: FnOnce( BrowserHandle )
+		H: FnOnce( BrowserWindowHandle )
 	{
 		match self {
 			Self { parent,
@@ -227,7 +227,7 @@ impl BrowserBuilder {
 						}
 					}
 				) );
-				let callback_data: *mut Box<dyn FnOnce( BrowserHandle )> = Box::into_raw( Box::new( Box::new(on_created ) ) );
+				let callback_data: *mut Box<dyn FnOnce( BrowserWindowHandle )> = Box::into_raw( Box::new( Box::new(on_created ) ) );
 
 				let window_options = bw_WindowOptions {
 					minimizable: minimizable,
@@ -260,7 +260,7 @@ impl BrowserBuilder {
 
 /// The data that is passed to the C FFI handler function
 struct BrowserUserData {
-	handler: Box<dyn FnMut( BrowserHandle, &str, &[&str])>
+	handler: Box<dyn FnMut( BrowserWindowHandle, &str, &[&str])>
 }
 
 /// The data that is passed to the creation callback function
@@ -291,7 +291,7 @@ extern "C" fn ffi_window_invoke_handler( inner_handle: *mut bw_BrowserWindow, _c
 
 		match data {
 			BrowserUserData{ handler } => {
-				let outer_handle = BrowserHandle::new( inner_handle );
+				let outer_handle = BrowserWindowHandle::new( inner_handle );
 
 				let args = args_to_vec( _args, args_count );
 
@@ -305,10 +305,10 @@ extern "C" fn ffi_window_invoke_handler( inner_handle: *mut bw_BrowserWindow, _c
 extern "C" fn ffi_browser_window_created_callback( inner_handle: *mut bw_BrowserWindow, data: *mut c_void ) {
 
 	unsafe {
-		let data_ptr: *mut Box<dyn FnOnce( BrowserHandle )> = mem::transmute( data );
+		let data_ptr: *mut Box<dyn FnOnce( BrowserWindowHandle )> = mem::transmute( data );
 		let data = Box::from_raw( data_ptr );
 
-		let outer_handle = BrowserHandle::new( inner_handle );
+		let outer_handle = BrowserWindowHandle::new( inner_handle );
 
 		data( outer_handle )
 	}

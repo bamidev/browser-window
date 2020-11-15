@@ -41,13 +41,13 @@ pub use application::{
 	Runtime
 };
 pub use browser::{
-	Browser,
-	BrowserHandle,
-	BrowserThreaded,
+	BrowserWindow,
+	BrowserWindowHandle,
+	BrowserWindowThreaded,
 	BrowserDelegateFuture,
 	JsEvaluationError
 };
 pub use browser::builder::{
-	BrowserBuilder,
+	BrowserWindowBuilder,
 	Source
 };
