@@ -7,7 +7,6 @@ use crate::browser::*;
 
 use std::{
 	mem,
-	ops::Deref,
 	ptr
 };
 
