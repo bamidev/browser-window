@@ -31,12 +31,12 @@ void bw_Application_checkThread( const bw_Application* app ) {
 
 bool bw_ApplicationImpl_dispatch( bw_Application* app, bw_ApplicationDispatchData* dispatch_data ) {
 
-    // Check if the runtime is still running
-    AcquireSRWLockShared( &app->impl.is_running_mtx );
-    bool result = app->impl.is_running;
-    ReleaseSRWLockShared( &app->impl.is_running_mtx );
-    if ( result == false )
-        return false;
+	// Check if the runtime is still running
+	AcquireSRWLockShared( &app->impl.is_running_mtx );
+	bool result = app->impl.is_running;
+	ReleaseSRWLockShared( &app->impl.is_running_mtx );
+	if ( result == false )
+		return false;
 
 	PostThreadMessageW( app->impl.thread_id, WM_APP, (WPARAM)NULL, (LPARAM)dispatch_data );
 
@@ -46,11 +46,11 @@ bool bw_ApplicationImpl_dispatch( bw_Application* app, bw_ApplicationDispatchDat
 
 bool bw_Application_isRunning( const bw_Application* app ) {
 
-    AcquireSRWLockShared( &app->impl.is_running_mtx );
-    bool result = app->impl.is_running;
-    ReleaseSRWLockShared( &app->impl.is_running_mtx );
+	AcquireSRWLockShared( &app->impl.is_running_mtx );
+	bool result = app->impl.is_running;
+	ReleaseSRWLockShared( &app->impl.is_running_mtx );
 
-    return result;
+	return result;
 }
 
 
@@ -69,22 +69,34 @@ int bw_ApplicationImpl_run( bw_Application* app, bw_ApplicationImpl_ReadyHandler
 
 	(ready_handler_data->func)( app, ready_handler_data->data );
 
+	bool exiting = false;
 	while ( true ) {
 
-		res = GetMessageW( &msg, 0, 0, 0);
+		// When not exitting, just wait on messages normally.
+		if ( !exiting ) {
+			res = GetMessageW( &msg, 0, 0, 0 );
 
-		// Graceful shutdown
-		if ( res == 0 ) {
-			exit_code = (int)msg.wParam;
+			// When WM_QUIT is received, turn on exiting mode
+			if ( res == 0 ) {
+				exit_code = (int)msg.wParam;
+				exiting = true;
 
-			// Set running flag to false
-			AcquireSRWLockExclusive( &app->impl.is_running_mtx );
-            app->impl.is_running = false;
-            ReleaseSRWLockExclusive( &app->impl.is_running_mtx );
-
-            break;
+				// Set running flag to false
+				AcquireSRWLockExclusive( &app->impl.is_running_mtx );
+				app->impl.is_running = false;
+				ReleaseSRWLockExclusive( &app->impl.is_running_mtx );
+			}
 		}
-		else if (res == -1) {
+		// If exiting, don't wait on messages.
+		// Only process those that are left for a graceful shutdown.
+		else {
+			res = PeekMessage( &msg, 0, 0, 0, PM_REMOVE );
+
+			if ( res == 0 )
+				break;
+		}
+
+		if (res == -1) {
 			BW_WIN32_ASSERT_ERROR;
 		}
 		else {
@@ -117,7 +129,7 @@ bw_ApplicationImpl bw_ApplicationImpl_start( bw_Application* _app, int argc, cha
 	app.is_running = false;
 	InitializeSRWLock( &app.is_running_mtx );
 	app.thread_id = GetCurrentThreadId();
- 	app.handle = GetModuleHandle( NULL );
+	app.handle = GetModuleHandle( NULL );
 
 	// Register window class
 	memset( &app.wc, 0, sizeof(WNDCLASSEXW) );
