@@ -61,6 +61,10 @@ pub struct JsEvaluationError {
 
 pub type EvalJsResult = Result<String, JsEvaluationError>;
 
+pub trait OwnedBrowser {
+	fn handle( &self ) -> BrowserHandle;
+}
+
 
 
 impl Browser {
@@ -98,6 +102,12 @@ impl HasAppHandle for Browser {
 
 	fn app_handle( &self ) -> ApplicationHandle {
 		self.handle.app_handle()
+	}
+}
+
+impl OwnedBrowser for Browser {
+	fn handle( &self ) -> BrowserHandle {
+		self.handle.clone()
 	}
 }
 
@@ -243,14 +253,12 @@ impl BrowserThreaded {
 			ffi_eval_js_threaded_callback::<H>,
 			data_ptr as _
 		) };
-	}
-}
+	}*/
 
-impl Deref for BrowserThreaded {
-	type Target = BrowserHandle;
-
-	fn deref( &self ) -> &Self::Target {
-		&self.handle
+	fn new( handle: BrowserHandle ) -> Self {
+		Self {
+			handle
+		}
 	}
 }
 
@@ -260,19 +268,16 @@ impl Drop for BrowserThreaded {
 	}
 }
 
-impl From<BrowserHandle> for BrowserThreaded {
-
-	fn from( handle: BrowserHandle ) -> Self {
-		Self {
-			handle: handle
-		}
-	}
-}
-
 impl HasAppHandle for BrowserThreaded {
 
 	fn app_handle( &self ) -> ApplicationHandle {
 		self.handle.app_handle()
+	}
+}
+
+impl OwnedBrowser for BrowserThreaded {
+	fn handle( &self ) -> BrowserHandle {
+		self.handle.clone()
 	}
 }
 

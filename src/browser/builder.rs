@@ -72,9 +72,9 @@ impl BrowserBuilder {
 	/// When a parent window closes, this browser window will close as well.
 	/// This could be a reference to a `Browser` or `BrowserThreaded` handle.
 	pub fn parent<B>( mut self, bw: &B ) -> Self where
-		B: Deref<Target=BrowserHandle>
+		B: OwnedBrowser
 	{
-		self.parent = Some( (**bw).clone() );
+		self.parent = Some( bw.handle() );
 		self
 	}
 
@@ -168,7 +168,7 @@ impl BrowserBuilder {
 			} );
 		}).await?;
 
-		Ok( rx.await.unwrap().into() )
+		Ok( BrowserThreaded::new( rx.await.unwrap() ) )
 	}
 
 	fn _build<H>( self, app: Application, on_created: H ) where
