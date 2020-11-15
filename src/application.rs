@@ -321,6 +321,21 @@ impl ApplicationThreaded {
 		}
 	}
 
+	/// Queues the given async closure `func` to be executed on the GUI thread somewhere in the future.
+	/// The closure will only execute when and if the runtime is still running.
+	/// However, there is no guarantee that the whole closure will execute.
+	/// The runtime might exit when the given closure is at a point of waiting.
+	/// Returns whether or not the closure will be able to execute its first part.
+	pub fn dispatch_async<'a,C,F>( &self, func: C ) -> bool where
+		C: FnOnce( Application ) -> F + Send + 'a,
+		F: Future<Output=()> + 'static
+	{
+		self.dispatch(|handle| {
+			let future = func( handle );
+			handle.spawn( future );
+		})
+	}
+
 	/// Signals the runtime to exit.
 	/// This will cause `Runtime::run` to stop and return the provided exit code.
 	pub fn exit( &self, exit_code: i32 ) {
