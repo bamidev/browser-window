@@ -59,8 +59,6 @@ pub struct JsEvaluationError {
 	// TODO: Add line and column number files, and perhaps even more info about the JS error
 }
 
-pub type EvalJsResult = Result<String, JsEvaluationError>;
-
 pub trait OwnedBrowser {
 	fn handle( &self ) -> BrowserHandle;
 }
@@ -219,28 +217,7 @@ impl BrowserThreaded {
 		})
 	}
 
-	/// Executes the given javascript code, and returns the resulting output as a string when done.
-	pub async fn eval_js( &self, js: &str ) -> Result<EvalJsResult, DelegateError> {
-		// FIXME: `eval_js` doesn't return Err( DelegateError::RuntimeNotAvailable ) correctly.
-		let (tx, rx) = oneshot::channel::<Result<String, JsEvaluationError>>();
-
-		self._eval_js( js, |_, result| {
-			if let Err(_) = tx.send( result ) {
-				panic!("Unable to send JavaScript result back")
-			}
-		} );
-
-		Ok( rx.await.unwrap() )
-	}
-
-	/// Causes the browser to navigate to the given url.
-	pub fn navigate( &self, url: &str ) {
-		self.dispatch(|bw| {
-			bw.navigate( url )
-		});
-	}
-
-	fn _eval_js<'a,H>( &self, js: &str, on_complete: H ) where
+	/*fn _eval_js<'a,H>( &self, js: &str, on_complete: H ) where
 		H: FnOnce( BrowserHandle, Result<String, JsEvaluationError> ) + Send + 'a
 	{
 		let data_ptr: *mut H = Box::into_raw(
@@ -368,11 +345,11 @@ unsafe fn ffi_eval_js_callback_result(
 	( handle, result_val )
 }
 
-/// Callback for catching JavaScript results.
-///
-/// # Warning
-/// This may get invoked from another thread than the GUI thread, depending on the implementation of the browser engine.
-unsafe extern "C" fn ffi_eval_js_threaded_callback<H>( bw: *mut bw_BrowserWindow, cb_data: *mut c_void, _result: *const c_char, error: *const bw_Err ) where
+// Callback for catching JavaScript results.
+//
+// # Warning
+// This may get invoked from another thread than the GUI thread, depending on the implementation of the browser engine.
+/*unsafe extern "C" fn ffi_eval_js_threaded_callback<H>( bw: *mut bw_BrowserWindow, cb_data: *mut c_void, _result: *const c_char, error: *const bw_Err ) where
 	H: FnOnce(BrowserHandle, Result<String, JsEvaluationError>) + Send
 {
 	let data_ptr = cb_data as *mut H;
@@ -381,4 +358,4 @@ unsafe extern "C" fn ffi_eval_js_threaded_callback<H>( bw: *mut bw_BrowserWindow
 	let (handle, result) = ffi_eval_js_callback_result( bw, _result, error );
 
 	(*data)( handle, result );
-}
+}*/
