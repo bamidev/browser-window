@@ -1,6 +1,5 @@
 use browser_window_ffi::*;
 
-use boxfnonce::{BoxFnOnce};
 use std::ffi::*;
 
 use crate::application::{Application, ApplicationThreaded};
@@ -154,7 +153,7 @@ impl BrowserBuilder {
 	///
 	/// # Arguments
 	/// * `app` - An thread-safe application handle.
-	pub async fn build_threaded( self, app: ApplicationThreaded ) -> BrowserThreaded {
+	pub async fn build_threaded( self, app: ApplicationThreaded ) -> Result<BrowserThreaded, DelegateError> {
 
 		let (tx, rx) = oneshot::channel::<BrowserHandle>();
 
@@ -167,9 +166,9 @@ impl BrowserBuilder {
 					panic!("Unable to send browser handle back")
 				}
 			} );
-		}).await;
+		}).await?;
 
-		rx.await.unwrap().into()
+		Ok( rx.await.unwrap().into() )
 	}
 
 	fn _build<H>( self, app: Application, on_created: H ) where
@@ -229,9 +228,7 @@ impl BrowserBuilder {
 						}
 					}
 				) );
-				let callback_data = Box::into_raw( Box::new(
-					BrowserCreationCallbackData::from( on_created )
-				) );
+				let callback_data: *mut Box<dyn FnOnce( BrowserHandle )> = Box::into_raw( Box::new( Box::new(on_created ) ) );
 
 				let window_options = bw_WindowOptions {
 					minimizable: minimizable,
@@ -268,7 +265,7 @@ struct BrowserUserData {
 }
 
 /// The data that is passed to the creation callback function
-type BrowserCreationCallbackData<'a> = BoxFnOnce<'a, ( BrowserHandle, )>;
+//type BrowserCreationCallbackData<'a> = Box<dyn FnOnce( BrowserHandle ) + 'a>;
 
 
 
@@ -309,11 +306,11 @@ extern "C" fn ffi_window_invoke_handler( inner_handle: *mut bw_BrowserWindow, _c
 extern "C" fn ffi_browser_window_created_callback( inner_handle: *mut bw_BrowserWindow, data: *mut c_void ) {
 
 	unsafe {
-		let data_ptr: *mut BrowserCreationCallbackData = mem::transmute( data );
+		let data_ptr: *mut Box<dyn FnOnce( BrowserHandle )> = mem::transmute( data );
 		let data = Box::from_raw( data_ptr );
 
 		let outer_handle = BrowserHandle::new( inner_handle );
 
-		data.call( outer_handle );
+		data( outer_handle )
 	}
 }

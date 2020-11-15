@@ -42,6 +42,7 @@ pub use application::{
 };
 pub use browser::{
 	Browser,
+	BrowserHandle,
 	BrowserThreaded,
 	BrowserDelegateFuture,
 	JsEvaluationError

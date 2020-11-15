@@ -16,7 +16,7 @@ typedef struct {
 
 
 
-void bw_ApplicationImpl_dispatch( bw_Application* app, bw_ApplicationDispatchData* data );
+bool bw_ApplicationImpl_dispatch( bw_Application* app, bw_ApplicationDispatchData* data );
 void bw_ApplicationImpl_finish( bw_ApplicationImpl* );
 int bw_ApplicationImpl_run( bw_Application* app, bw_ApplicationImpl_ReadyHandlerData* ready_handler_data );
 bw_ApplicationImpl bw_ApplicationImpl_start( bw_Application* app, int argc, char** argv );

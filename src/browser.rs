@@ -19,7 +19,6 @@ pub mod builder;
 pub use builder::BrowserBuilder;
 
 
-
 //type BrowserJsCallbackData<'a> = Box<dyn FnOnce(Browser, Result<String, JsEvaluationError>) + 'a>;
 //type BrowserJsThreadedCallbackData<'a> = SendBoxFnOnce<'a,(BrowserHandle, Result<String, JsEvaluationError>),()>;
 
@@ -60,16 +59,18 @@ pub struct JsEvaluationError {
 	// TODO: Add line and column number files, and perhaps even more info about the JS error
 }
 
+pub type EvalJsResult = Result<String, JsEvaluationError>;
+
 
 
 impl Browser {
 
-	fn from_ffi_handle( ptr: *mut bw_BrowserWindow ) -> Self {
+	/*fn from_ffi_handle( ptr: *mut bw_BrowserWindow ) -> Self {
 		Self {
 			handle: BrowserHandle::new( ptr ),
 			_not_send: PhantomData
 		}
-	}
+	}*/
 
 	fn new( handle: BrowserHandle ) -> Self {
 		Self {
@@ -169,15 +170,14 @@ impl BrowserThreaded {
 	}
 
 	/// Closes the browser.
-	pub fn close( self ) {
+	pub fn close( self ) -> bool {
 		self.dispatch(|bw| {
 			bw.close()
-		});
+		})
 	}
 
 	/// Executes the given closure within the GUI thread, and return the value that the closure returned.
-	/// Keep in mind that in multi-threaded environments, it is generally a good idea to use a Box return type,
-	///  or use something else to put the value on the heap when dealing with large types.
+	/// Also see `ApplicationThreaded::delegate`.
 	pub fn delegate<'a,F,R>( &self, func: F ) -> BrowserDelegateFuture<'a,R> where
 		F: FnOnce( BrowserHandle ) -> R + Send + 'a,
 		R: Send
@@ -185,40 +185,21 @@ impl BrowserThreaded {
 		BrowserDelegateFuture::new( self.handle.clone(), func )
 	}
 
-	/// Executes the given async closure on the GUI thread, and returns the value that the async closure returns.
-	/// Keep in mind that in multi-threaded environments, it is generally a good idea to use a Box return type,
-	///  or use something else to put the value on the heap when dealing with large types.
-	///
-	/// # Note
-	/// Keep in mind that the whole closure will be executed on the GUI thread.
-	/// Just because this method is thread-safe, doesn't mean that the closure is.
-	pub async fn delegate_async<'a,F,G,R>( &self, func: F ) -> R where
-		F: FnOnce( BrowserHandle ) -> G + Send + 'a,
-		G: Future<Output=R> + 'static,
+	/// Executes the given async closure `func` on the GUI thread, and gives back the result when done.
+	/// Also see `ApplicationThreaded::delegate_async`.
+	pub fn delegate_async<'a,C,F,R>( &self, func: C ) -> DelegateFutureFuture<'a,R> where
+		C: FnOnce( BrowserHandle ) -> F + Send + 'a,
+		F: Future<Output=R>,
 		R: Send + 'static
 	{
-		let (tx, rx) = oneshot::channel::<R>();
-
-		// First of all, execute the closure on the GUI thread.
-		self.dispatch( move |handle| {
-			let future = func( handle );
-
-			// Then spawn the resulting future on the GUI thread,
-			//  and send its output back to our calling thread
-			handle.app().spawn( async move {
-				let result = future.await;
-
-				if let Err(_) = tx.send( result ) {
-					panic!("Unable to send result back");
-				}
-			} );
-		});
-
-		rx.await.unwrap()
+		let handle = self.handle.clone();
+		DelegateFutureFuture::new( self.app().handle.clone(), async move {
+			func( handle.into() ).await
+		})
 	}
 
 	/// Executes the given close on the GUI thread.
-	pub fn dispatch<'a,'b:'a,F>( &self, func: F ) where
+	pub fn dispatch<'a,'b:'a,F>( &self, func: F ) -> bool where
 		F:  FnOnce( BrowserHandle ) + Send + 'b
 	{
 		let handle = self.handle;
@@ -229,7 +210,8 @@ impl BrowserThreaded {
 	}
 
 	/// Executes the given javascript code, and returns the resulting output as a string when done.
-	pub async fn eval_js( &self, js: &str ) -> Result<String, JsEvaluationError> {
+	pub async fn eval_js( &self, js: &str ) -> Result<EvalJsResult, DelegateError> {
+		// FIXME: `eval_js` doesn't return Err( DelegateError::RuntimeNotAvailable ) correctly.
 		let (tx, rx) = oneshot::channel::<Result<String, JsEvaluationError>>();
 
 		self._eval_js( js, |_, result| {
@@ -238,7 +220,7 @@ impl BrowserThreaded {
 			}
 		} );
 
-		rx.await.unwrap()
+		Ok( rx.await.unwrap() )
 	}
 
 	/// Causes the browser to navigate to the given url.

@@ -14,7 +14,6 @@ use std::task::{Context, Poll, Waker, RawWaker, RawWakerVTable};
 use super::common::*;
 
 
-
 /// An handle for this application.
 #[derive(Clone, Copy)]
 pub struct Application {
@@ -138,8 +137,11 @@ impl Runtime {
 	///
 	/// # Arguments
 	/// * `on_ready` - This closure will be called when the runtime has initialized, and will provide an application handle.
+	///
+	/// # Reserved Codes
+	/// -1 is used as the return code for when the main thread panicked during a delegated closure.
 	pub fn run<H>( &self, on_ready: H ) -> i32 where
-		H: FnOnce( ApplicationThreaded )
+		H: FnOnce( ApplicationHandle )
 	{
 		return self._run( |handle| {
 			on_ready( handle.into() )
@@ -147,8 +149,12 @@ impl Runtime {
 	}
 
 	/// Runs the main loop and executes the given future within that loop.
-	/// Use this when you are fine with running Browser Window single-threaded.
-	pub fn spawn<F>( &self, future: F ) -> i32 where
+	/// This function exits when the future finishes or when `exit` is called.
+	///
+	/// # Reserved Codes
+	/// The same reserved codes apply as `run`.
+	// TODO: Turn this future into an async closure.
+	pub fn run_async<F>( &self, future: F ) -> i32 where
 		F: Future<Output=()> + 'static
 	{
 		self._run(|handle| {
@@ -189,8 +195,10 @@ impl Runtime {
 
 impl Application {
 
-	/// Signals the application to exit.
-	/// The run or spawn command will return the exit code provided.
+	/// Causes the `Runtime` to terminate.
+	/// The `Runtime`'s run or spawn command will return the exit code provided.
+	/// This will mean that not all tasks might complete.
+	/// If you were awaiting
 	pub fn exit( &self, exit_code: i32 ) {
 		unsafe { bw_Application_exit( self.handle.ffi_handle, exit_code as _ ); }
 	}
@@ -235,7 +243,6 @@ impl ApplicationHandle {
 	pub fn spawn<F>( &self, future: F ) where
 	    F: Future<Output=()> + 'static
 	{
-
 		// Data for the waker.
 		let waker_data = Box::into_raw( Box::new(
 			WakerData {
@@ -253,9 +260,12 @@ impl ApplicationHandle {
 
 impl ApplicationThreaded {
 
-	/// Executes the given closure on the GUI thread, and gives back the result when done.
-	/// Keep in mind that in multi-threaded environments, it is generally a good idea to use a Box return type,
-	///  or use something else to put the value on the heap when dealing with large types.
+	/// Executes the given closure `func` on the GUI thread, and gives back the result when done.
+	/// This only works when the runtime is still running.
+	/// If the closure panicked, or the runtime is not running, this will return an error.
+	///
+	/// Keep in mind that in multi-threaded environments, it is generally a good idea to put the output on the heap.
+	/// The output value _will_ be copied.
 	pub fn delegate<'a,F,R>( &self, func: F ) -> ApplicationDelegateFuture<'a,R> where
 		F: FnOnce( Application ) -> R + Send + 'a,
 		R: Send
@@ -265,8 +275,36 @@ impl ApplicationThreaded {
 		} )
 	}
 
-	/// Executes the given closure on the GUI thread.
-	pub fn dispatch<'a,F>( &self, func: F ) where
+	/// Executes the given `future` on the GUI thread, and gives back the output when done.
+	/// This only works when the runtime is still running.
+	/// If the future panicked during a poll, or the runtime is not running, this will return an error.
+	///
+	/// See also `delegate`.
+	pub fn delegate_future<F,R>( &self, future: F ) -> DelegateFutureFuture<R> where
+		F: Future<Output=R> + 'static,
+		R: Send + 'static
+	{
+		DelegateFutureFuture::new( self.handle.clone(), future )
+	}
+
+	/// Executes the given async closure `func` on the GUI thread, and gives back the result when done.
+	/// This only works when the runtime is still running.
+	/// If the closure panicked, or the runtime is not running, this will return an error.
+	pub fn delegate_async<'a,C,F,R>( &self, func: C ) -> DelegateFutureFuture<'a,R> where
+		C: FnOnce( Application ) -> F + Send + 'a,
+		F: Future<Output=R>,
+		R: Send + 'static
+	{
+		let handle = self.handle.clone();
+		DelegateFutureFuture::new( self.handle.clone(),async move {
+			func( handle.into() ).await
+		})
+	}
+
+	/// Queues the given closure `func` to be executed on the GUI thread somewhere in the future.
+	/// The closure will only execute when and if the runtime is still running.
+	/// Returns whether or not the closure will be able to execute.
+	pub fn dispatch<'a,F>( &self, func: F ) -> bool where
 		F:  FnOnce( Application ) + Send + 'a
 	{
 		let data = Box::into_raw( Box::new( ApplicationDispatchData {

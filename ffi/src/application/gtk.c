@@ -3,6 +3,8 @@
 #include "impl.h"
 #include "../common.h"
 
+#include <stdatomic.h>
+
 #include <gtk/gtk.h>
 
 
@@ -46,6 +48,9 @@ void bw_ApplicationGtk_onActivate( GtkApplication* gtk_handle, gpointer data ) {
 	UNUSED( gtk_handle );
 
 	bw_ApplicationImpl_ReadyHandlerData* ready_handler_data = (bw_ApplicationImpl_ReadyHandlerData*)data;
+
+	// Mark the application as 'running'
+	atomic_store( ready_handler_data->app->is_running, true );
 
 	(ready_handler_data->func)( ready_handler_data->app, ready_handler_data->data );
 }

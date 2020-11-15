@@ -38,7 +38,7 @@ bw_WindowImpl bw_WindowImpl_new(
 	gtk_window_set_type_hint( GTK_WINDOW(gtk_handle), GDK_WINDOW_TYPE_HINT_DIALOG );
 
 	g_signal_connect( gtk_handle, "window-state-event", G_CALLBACK( _bw_WindowGtk_stateHandler ), (gpointer)window );
-	g_signal_connect( gtk_handle, "destroy-event", G_CALLBACK( _bw_WindowGtk_closeHandler ), (gpointer)window );
+	//g_signal_connect( gtk_handle, "destroy-event", G_CALLBACK( _bw_WindowGtk_closeHandler ), (gpointer)window );
 
 	gtk_widget_show_all( gtk_handle );
 
@@ -80,6 +80,6 @@ gboolean _bw_WindowGtk_closeHandler( GtkWidget* handle, gpointer data ) {
 
 	bw_Window* window = (bw_Window*)data;
 
-	bw_Window_close( window );
+	bw_WindowImpl_hide( window );
 	return FALSE;
 }

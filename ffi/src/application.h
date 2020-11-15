@@ -62,11 +62,17 @@ void bw_Application_exitAsync(  bw_Application* app, int exit_code );
 /// Dispatches the given function to be executed on the thread this application instance has been created on,
 ///     and passes the given data to it.
 /// This function is thread safe.
-void bw_Application_dispatch( bw_Application* app, bw_ApplicationDispatchFn func, void* data );
+///
+/// # Returns
+/// An indication of whether or not the function was able to be dispatched.
+/// Dispatching a function fails when the application has already been terminated.
+bool bw_Application_dispatch( bw_Application* app, bw_ApplicationDispatchFn func, void* data );
 
 /// Should be called on the application handle at the end of the program.
 /// This invalidates the handle.
 void bw_Application_finish( bw_Application* app );
+
+bool bw_Application_isRunning( const bw_Application* app );
 
 /// Runs the event loop.
 /// Calls the `on_ready` callback when `app` can be used.

@@ -19,7 +19,6 @@ name = "browser_window"
 path = "src/lib.rs"
 
 [dependencies]
-boxfnonce = "0.1"
 browser-window-ffi = { path = "./ffi", version = "0.3.0" }
 futures-channel = { version = "0.3" }
 lazy_static = "1"

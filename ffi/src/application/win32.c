@@ -29,25 +29,60 @@ void bw_Application_checkThread( const bw_Application* app ) {
 #endif
 }
 
-void bw_ApplicationImpl_dispatch( bw_Application* app, bw_ApplicationDispatchData* dispatch_data ) {
+bool bw_ApplicationImpl_dispatch( bw_Application* app, bw_ApplicationDispatchData* dispatch_data ) {
+
+    // Check if the runtime is still running
+    AcquireSRWLockShared( &app->impl.is_running_mtx );
+    bool result = app->impl.is_running;
+    ReleaseSRWLockShared( &app->impl.is_running_mtx );
+    if ( result == false )
+        return false;
+
 	PostThreadMessageW( app->impl.thread_id, WM_APP, (WPARAM)NULL, (LPARAM)dispatch_data );
+
+	return true;
 }
+
+
+bool bw_Application_isRunning( const bw_Application* app ) {
+
+    AcquireSRWLockShared( &app->impl.is_running_mtx );
+    bool result = app->impl.is_running;
+    ReleaseSRWLockShared( &app->impl.is_running_mtx );
+
+    return result;
+}
+
 
 int bw_ApplicationImpl_run( bw_Application* app, bw_ApplicationImpl_ReadyHandlerData* ready_handler_data ) {
 
 	bw_Application_checkThread( app );
 
 	MSG msg;
+	BOOL res;
 	int exit_code = 0;
 
 	// We are ready immediately because all messages get queued anyway.
+	AcquireSRWLockExclusive( &app->impl.is_running_mtx );
+	app->impl.is_running = true;
+	ReleaseSRWLockExclusive( &app->impl.is_running_mtx );
+
 	(ready_handler_data->func)( app, ready_handler_data->data );
 
-	while ( 1 ) {
-		BOOL res = GetMessageW( &msg, 0, 0, 0);
+	while ( true ) {
+
+		res = GetMessageW( &msg, 0, 0, 0);
+
+		// Graceful shutdown
 		if ( res == 0 ) {
 			exit_code = (int)msg.wParam;
-			break;
+
+			// Set running flag to false
+			AcquireSRWLockExclusive( &app->impl.is_running_mtx );
+            app->impl.is_running = false;
+            ReleaseSRWLockExclusive( &app->impl.is_running_mtx );
+
+            break;
 		}
 		else if (res == -1) {
 			BW_WIN32_ASSERT_ERROR;
@@ -62,15 +97,10 @@ int bw_ApplicationImpl_run( bw_Application* app, bw_ApplicationImpl_ReadyHandler
 				(params->func)( app, params->data );
 				free( params );
 			}
-			/*else if ( msg.message == WM_APP + 1 ) {
-				bw_WindowDispatchData* params = (bw_WindowDispatchData*)msg.lParam;
-
-				(params->func)( params->window, params->data );
-
-				free( params );
-			}*/
 		}
 	}
+
+	// TODO: Wakeup all waiting delegation futures, so that they an return an error indiating that the runtime has exitted.
 
 	UnregisterClassW( L"bw-window", app->impl.handle );
 
@@ -84,6 +114,8 @@ bw_ApplicationImpl bw_ApplicationImpl_start( bw_Application* _app, int argc, cha
 	UNUSED(argv);
 
 	bw_ApplicationImpl app;
+	app.is_running = false;
+	InitializeSRWLock( &app.is_running_mtx );
 	app.thread_id = GetCurrentThreadId();
  	app.handle = GetModuleHandle( NULL );
 

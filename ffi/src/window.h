@@ -71,9 +71,7 @@ bw_Window* bw_Window_new(
 	void* user_data
 );
 
-/// Closes the window
-/// Anything called for this window will still succeed after it is closed.
-/// It will just not be visible anymore.
+/// Hides the window from the user
 void bw_Window_close( bw_Window* window );
 
 /// Invalidates the window handle.
@@ -83,7 +81,7 @@ void bw_Window_drop( bw_Window* window );
 /// Returns whether or not the window has been closed.
 bool bw_Window_isClosed( const bw_Window* window );
 
-/// Reopens a previously closed window.
+/// Shows the window if it was previously hidden
 void bw_Window_open( bw_Window* window );
 
 

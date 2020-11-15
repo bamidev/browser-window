@@ -13,6 +13,7 @@
 extern "C" {
 #endif
 
+#include <stdbool.h>
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
@@ -22,6 +23,8 @@ typedef struct {
 	DWORD thread_id;
 	HINSTANCE handle;
 	WNDCLASSEXW wc;
+	bool is_running;
+	SRWLOCK is_running_mtx;
 } bw_ApplicationImpl;
 
 struct bw_ApplicationDispatchData {

@@ -140,7 +140,7 @@ void bw_WindowWin32_calculatePositionCentered( int width, int height, int* x, in
     *y = ( desktop_height - height ) / 2;
 }
 
-/*BOOL CALLBACK _bw_Window_closeChild( HWND handle, LPARAM _window ) {
+BOOL CALLBACK _bw_Window_closeChild( HWND handle, LPARAM _window ) {
 	bw_Window* window = (bw_Window*)_window;
 
 	bw_Window* enum_window = (bw_Window*)GetWindowLongPtrW( handle, GWLP_USERDATA );
@@ -166,4 +166,4 @@ void bw_WindowWin32_calculatePositionCentered( int width, int height, int* x, in
 	}
 
 	return true;
-}*/
+}
