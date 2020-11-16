@@ -71,18 +71,6 @@ lazy_static! {
 
 impl Runtime {
 
-	/// Obtains an application handle for this runtime.
-	pub fn app( &self ) -> Application {
-		self.handle.clone().into()
-	}
-
-	/// Obtains an thread-safe application handle for this runtime.
-	pub fn app_threaded( &self ) -> ApplicationThreaded {
-		ApplicationThreaded {
-			handle: self.handle.clone()
-		}
-	}
-
 	fn args_ptr_vec() -> (Vec<CString>, Vec<*mut u8>) {
 		let args = env::args_os();
 		let mut vec = Vec::with_capacity( args.len() );
