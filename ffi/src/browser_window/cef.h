@@ -9,6 +9,7 @@ extern "C" {
 
 typedef struct {
 	void* cef_ptr;
+	char* resource_path;
 } bw_BrowserWindowImpl;
 
 

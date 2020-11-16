@@ -173,12 +173,11 @@ impl Runtime {
 	pub fn run_async<'a,C,F>( &'a self, func: C ) -> i32 where
 		C: FnOnce( ApplicationHandle ) -> F + 'a,
 		F: Future<Output=()> + 'a
-	{	eprintln!("begin run_async");
+	{
 		self._run(|handle| {
-			eprintln!("_run run_async");
-			self.spawn( async move {	eprintln!("spawn run_async");
+
+			self.spawn( async move {
 				func( handle.into() ).await;
-				handle.exit(0);
 			} );
 		})
 	}

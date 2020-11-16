@@ -7,6 +7,7 @@ use crate::browser::*;
 
 use std::{
 	mem,
+	path::{Path, PathBuf},
 	ptr
 };
 
@@ -14,8 +15,9 @@ use std::{
 
 /// The type of content to display in a browser window
 pub enum Source {
-	Url( String ),
-	Html( String )
+	Html( String ),
+	File( PathBuf ),
+	Url( String )
 }
 
 /// Used to create a `Browser` or `BrowserThreaded` instance.
@@ -84,7 +86,7 @@ impl BrowserWindowBuilder {
 	pub fn new( source: Source ) -> Self {
 		Self {
 			parent: None,
-			source: source,
+			source,
 			handler: None,
 			title: None,
 			width: None,
@@ -193,14 +195,23 @@ impl BrowserWindowBuilder {
 				};
 
 				// Source
+				let mut _url: PathBuf = "file:///".into();	// Stays here so that the reference to it that gets passed to C stays valid for the function call to `bw_BrowserWindow_new`.
 				let csource = match &source {	// Use a reference, we want source to live until the end of the function because bw_BrowserWindowSource holds a reference to its internal string.
-					Source::Url( url ) => { bw_BrowserWindowSource {
-						data: url.as_str().into(),
-						is_html: false
-					} },
+					Source::File( path ) => {
+						_url.push( path );
+
+						bw_BrowserWindowSource {
+							data: _url.to_str().unwrap().into(),
+							is_html: false
+						}
+					},
 					Source::Html( html ) => { bw_BrowserWindowSource {
 						data: html.as_str().into(),
 						is_html: true
+					} },
+					Source::Url( url ) => { bw_BrowserWindowSource {
+						data: url.as_str().into(),
+						is_html: false
 					} }
 				};
 
@@ -235,8 +246,21 @@ impl BrowserWindowBuilder {
 					closable: true,
 					borders: borders
 				};
+
+				// If using a file source, take the dir path as the resource path
+				let resource_path = "file:///".to_owned() + match &source {
+					Source::File( path ) => {
+						match path.parent() {
+							None => "",
+							Some( dir_path ) => dir_path.to_str().unwrap()
+						}
+					},
+					_ => ""
+				};
+
 				let other_options = bw_BrowserWindowOptions {
-					dev_tools: dev_tools
+					dev_tools,
+					resource_path: resource_path.as_str().into()
 				};
 
 				unsafe { bw_BrowserWindow_new(

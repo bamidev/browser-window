@@ -75,6 +75,7 @@ void bw_BrowserWindowImpl_doCleanup( bw_Window* window ) {
 
 	// Delete the CefBrowser pointer that we have stored in our bw_BrowserWindow handle
 	delete cef_ptr;
+	delete bw_ptr->impl.resource_path;
 }
 
 bw_Err bw_BrowserWindow_navigate( bw_BrowserWindow* bw, bw_CStrSlice url ) {
@@ -134,6 +135,14 @@ gtk_widget_show_all( GTK_WIDGET(browser->window->impl.handle) );
 	// Create the browser window handle
 	bw_BrowserWindowImpl bw;
 	bw.cef_ptr = 0;
+	bw.resource_path = 0;
+
+	// Store the resource path if set
+	if ( browser_window_options->resource_path.len != 0 ) {
+	    bw.resource_path = new char[ browser_window_options->resource_path.len + 1 ];
+        memcpy( bw.resource_path, browser_window_options->resource_path.data, browser_window_options->resource_path.len );
+        bw.resource_path[ browser_window_options->resource_path.len ] = '\0';
+	}
 
 	// Create a CefDictionary containing the bw_BrowserWindow pointer to pass along CreateBrowser
 	CefRefPtr<CefDictionaryValue> dict = CefDictionaryValue::Create();
