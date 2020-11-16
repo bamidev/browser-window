@@ -57,5 +57,7 @@ bw_ApplicationEngineImpl bw_ApplicationEngineImpl_initialize( bw_Application* ap
 }
 
 void bw_ApplicationEngineImpl_free( bw_ApplicationEngineImpl* app ) {
+    CefShutdown();
+
 	delete (CefRefPtr<CefClient>*)app->cef_client;
 }
