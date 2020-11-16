@@ -7,10 +7,10 @@
 
 
 
-void bw_Application_finish( bw_Application* app ) {
+void bw_Application_free( bw_Application* app ) {
 
-	bw_ApplicationEngineImpl_finish( &app->engine_impl );
-	bw_ApplicationImpl_finish( &app->impl );
+	bw_ApplicationEngineImpl_free( &app->engine_impl );
+	bw_ApplicationImpl_free( &app->impl );
 	free( app );
 }
 
@@ -25,13 +25,13 @@ int bw_Application_run( bw_Application* app, bw_ApplicationReadyFn on_ready, voi
 	return bw_ApplicationImpl_run( app, &ready_handler_data );
 }
 
-bw_Application* bw_Application_start( int argc, char** argv ) {
+bw_Application* bw_Application_initialize( int argc, char** argv ) {
 
     bw_Application* app = (bw_Application*)malloc( sizeof( bw_Application ) );
     app->windows_alive = 0;
 
-    app->engine_impl = bw_ApplicationEngineImpl_start( app, argc, argv );
-	app->impl = bw_ApplicationImpl_start( app, argc, argv );
+    app->engine_impl = bw_ApplicationEngineImpl_initialize( app, argc, argv );
+	app->impl = bw_ApplicationImpl_initialize( app, argc, argv );
 
     return app;
 }

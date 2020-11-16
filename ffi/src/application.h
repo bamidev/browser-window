@@ -46,11 +46,6 @@ typedef struct bw_ApplicationDispatchData bw_ApplicationDispatchData;
 /// Does nothing in release mode.
 void bw_Application_checkThread( const bw_Application* );
 
-/// Initializes browser window.
-/// Starts up browser engine process(es).
-/// Returns an application handle.
-bw_Application* bw_Application_start( int argc, char** argv );
-
 /// Exits the main loop, returning execution to the function that invoked the run call.
 /// The exit_code will be returned by bw_Application_run.
 void bw_Application_exit(  bw_Application* app, int exit_code );
@@ -69,8 +64,13 @@ void bw_Application_exitAsync(  bw_Application* app, int exit_code );
 bool bw_Application_dispatch( bw_Application* app, bw_ApplicationDispatchFn func, void* data );
 
 /// Should be called on the application handle at the end of the program.
-/// This invalidates the handle.
-void bw_Application_finish( bw_Application* app );
+/// This invalidates the handle and runs some cleanup code.
+void bw_Application_free( bw_Application* app );
+
+/// Initializes browser window.
+/// Starts up browser engine process(es).
+/// Returns an application handle.
+bw_Application* bw_Application_initialize( int argc, char** argv );
 
 bool bw_Application_isRunning( const bw_Application* app );
 

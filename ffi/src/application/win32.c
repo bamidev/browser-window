@@ -120,7 +120,7 @@ int bw_ApplicationImpl_run( bw_Application* app, bw_ApplicationImpl_ReadyHandler
 }
 
 
-bw_ApplicationImpl bw_ApplicationImpl_start( bw_Application* _app, int argc, char** argv ) {
+bw_ApplicationImpl bw_ApplicationImpl_initialize( bw_Application* _app, int argc, char** argv ) {
 	UNUSED(_app);
 	UNUSED(argc);
 	UNUSED(argv);
@@ -156,6 +156,6 @@ void bw_Application_exitAsync( bw_Application* app, int code ) {
 	bw_Application_exit( app, code );
 }
 
-void bw_ApplicationImpl_finish( bw_ApplicationImpl* app ) {
+void bw_ApplicationImpl_free( bw_ApplicationImpl* app ) {
 	UNUSED(app);
 }

@@ -2,7 +2,7 @@ use browser_window_ffi::*;
 
 use std::ffi::*;
 
-use crate::application::{Application, ApplicationThreaded};
+use crate::application::{ApplicationHandle, ApplicationHandleThreaded};
 use crate::browser::*;
 
 use std::{
@@ -134,7 +134,7 @@ impl BrowserWindowBuilder {
 	///
 	/// # Arguments
 	/// * `app` - An application handle that this browser window can spawn into
-	pub async fn build( self, app: Application ) -> BrowserWindow
+	pub async fn build( self, app: ApplicationHandle ) -> BrowserWindow
 	{
 		let (tx, rx) = oneshot::channel::<BrowserWindowHandle>();
 
@@ -152,7 +152,7 @@ impl BrowserWindowBuilder {
 	///
 	/// # Arguments
 	/// * `app` - An thread-safe application handle.
-	pub async fn build_threaded( self, app: ApplicationThreaded ) -> Result<BrowserWindowThreaded, DelegateError> {
+	pub async fn build_threaded( self, app: ApplicationHandleThreaded ) -> Result<BrowserWindowThreaded, DelegateError> {
 
 		let (tx, rx) = oneshot::channel::<BrowserWindowHandle>();
 
@@ -170,7 +170,7 @@ impl BrowserWindowBuilder {
 		Ok( BrowserWindowThreaded::new( rx.await.unwrap() ) )
 	}
 
-	fn _build<H>( self, app: Application, on_created: H ) where
+	fn _build<H>( self, app: ApplicationHandle, on_created: H ) where
 		H: FnOnce( BrowserWindowHandle )
 	{
 		match self {
@@ -240,7 +240,7 @@ impl BrowserWindowBuilder {
 				};
 
 				unsafe { bw_BrowserWindow_new(
-					app.handle.ffi_handle,
+					app.ffi_handle,
 					parent_handle,
 					csource,
 					title_ptr,

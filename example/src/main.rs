@@ -1,12 +1,13 @@
-use browser_window::*;
+use browser_window::application::*;
+use browser_window::browser::*;
 use std::process::exit;
 use tokio;
 
 
 
 fn main() {
-
-	let bw_runtime = Runtime::start();
+	let app = Application::initialize();
+	let bw_runtime = app.start();
 
 	let tk_runtime = tokio::runtime::Runtime::new().unwrap();
 	let exit_code = bw_runtime.run( |app| {
@@ -17,7 +18,7 @@ fn main() {
 	exit( exit_code );
 }
 
-async fn program_logic( app: ApplicationThreaded ) {
+async fn program_logic( app: ApplicationHandleThreaded ) {
 
 	let x = {
 		let bw = BrowserWindowBuilder::new( Source::Html( include_str!("example.html").into() ) )

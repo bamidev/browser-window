@@ -16,7 +16,7 @@ use crate::common::*;
 
 pub mod builder;
 
-pub use builder::BrowserWindowBuilder;
+pub use builder::{BrowserWindowBuilder, Source};
 
 
 //type BrowserJsCallbackData<'a> = Box<dyn FnOnce(Browser, Result<String, JsEvaluationError>) + 'a>;
@@ -173,8 +173,8 @@ impl BrowserWindowHandle {
 impl BrowserWindowThreaded {
 
 	/// The thread-safe application handle associated with this browser window.
-	pub fn app( &self ) -> ApplicationThreaded {
-		ApplicationThreaded::from_ffi_handle( unsafe { bw_BrowserWindow_getApp( self.handle.ffi_handle ) } )
+	pub fn app( &self ) -> ApplicationHandleThreaded {
+		ApplicationHandleThreaded::from_ffi_handle( unsafe { bw_BrowserWindow_getApp( self.handle.ffi_handle ) } )
 	}
 
 	/// Closes the browser.

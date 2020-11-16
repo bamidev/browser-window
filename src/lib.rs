@@ -28,26 +28,17 @@
 //!
 //! To get everything setup in order to use this crate, take a look at [this getting started guide](https://github.com/bamilab/browser-window/tree/master/docs/getting-started).
 
-mod application;
-mod browser;
+pub mod application;
+pub mod browser;
 mod common;
 
+#[cfg(test)]
+mod tests;
 
 
-pub use application::{
-	Application,
-	ApplicationThreaded,
-	ApplicationDelegateFuture,
-	Runtime
-};
-pub use browser::{
-	BrowserWindow,
-	BrowserWindowHandle,
-	BrowserWindowThreaded,
-	BrowserDelegateFuture,
-	JsEvaluationError
-};
-pub use browser::builder::{
-	BrowserWindowBuilder,
-	Source
+
+pub use common::{
+	DelegateError,
+	DelegateFuture,
+	DelegateFutureFuture
 };

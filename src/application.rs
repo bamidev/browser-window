@@ -13,7 +13,6 @@ use super::common::*;
 
 
 /// An handle for this application.
-#[derive(Clone, Copy)]
 pub struct Application {
 	pub(in super) handle: ApplicationHandle
 }
@@ -21,11 +20,11 @@ pub struct Application {
 /// A thread-safe application handle.
 /// This handle also allows you to dispatch code to be executed on the GUI thread.
 #[derive(Clone, Copy)]
-pub struct ApplicationThreaded {
+pub struct ApplicationHandleThreaded {
 	pub(in super) handle: ApplicationHandle
 }
-unsafe impl Send for ApplicationThreaded {}
-unsafe impl Sync for ApplicationThreaded {}
+unsafe impl Send for ApplicationHandleThreaded {}
+unsafe impl Sync for ApplicationHandleThreaded {}
 
 #[derive(Clone, Copy)]
 pub struct ApplicationHandle {
@@ -35,7 +34,7 @@ pub struct ApplicationHandle {
 struct ApplicationDispatchData<'a> {
 
 	handle: ApplicationHandle,
-	func: Box<dyn FnOnce(Application) + Send + 'a>
+	func: Box<dyn FnOnce(ApplicationHandle) + Send + 'a>
 }
 
 /// Use this to start and run the application with.
@@ -69,8 +68,9 @@ lazy_static! {
 
 
 
-impl Runtime {
+impl Application {
 
+	/// Prepares the os args as a vector of C compatible pointers.
 	fn args_ptr_vec() -> (Vec<CString>, Vec<*mut u8>) {
 		let args = env::args_os();
 		let mut vec = Vec::with_capacity( args.len() );
@@ -88,6 +88,39 @@ impl Runtime {
 
 		( vec, vec_ptrs )
 	}
+
+	/// In order to use BrowserWindow, you need to initialize BrowserWindow at the start of your application.
+	/// Preferably on the first line of your `main` function.
+	/// This will open another process of your application,
+	///  therefor any code that will be placed before initialization will also be executed on the other process.
+	/// This is generally unnecessary.
+	pub fn initialize() -> Application {
+
+		let (args_vec, mut ptrs_vec) = Self::args_ptr_vec();
+		let argc: c_int = args_vec.len() as _;
+		let argv = ptrs_vec.as_mut_ptr();
+
+		let ffi_handle = unsafe { bw_Application_initialize( argc, argv as _ ) };
+
+		Application::from_ffi_handle( ffi_handle )
+	}
+
+	/// Creates a `Runtime` from which you can run the application.
+	pub fn start( &self ) -> Runtime {
+
+		Runtime {
+			handle: self.handle
+		}
+	}
+}
+
+impl Drop for Application {
+	fn drop( &mut self ) {
+		unsafe { bw_Application_free( self.handle.ffi_handle ) };
+	}
+}
+
+impl Runtime {
 
 	/// Polls a future given a pointer to the waker data.
 	unsafe fn poll_future( data: *mut WakerData ) {
@@ -125,10 +158,10 @@ impl Runtime {
 	/// # Reserved Codes
 	/// -1 is used as the return code for when the main thread panicked during a delegated closure.
 	pub fn run<H>( &self, on_ready: H ) -> i32 where
-		H: FnOnce( Application )
+		H: FnOnce( ApplicationHandle )
 	{
 		return self._run( |handle| {
-			on_ready( handle.into() )
+			on_ready( handle )
 		} )
 	}
 
@@ -138,7 +171,7 @@ impl Runtime {
 	/// # Reserved Codes
 	/// The same reserved codes apply as `run`.
 	pub fn run_async<'a,C,F>( &'a self, func: C ) -> i32 where
-		C: FnOnce( Application ) -> F + 'a,
+		C: FnOnce( ApplicationHandle ) -> F + 'a,
 		F: Future<Output=()> + 'a
 	{	eprintln!("begin run_async");
 		self._run(|handle| {
@@ -166,22 +199,6 @@ impl Runtime {
 		unsafe { Runtime::poll_future( waker_data ) };
 	}
 
-	/// Starts the GUI application.
-	/// Only call this once, and at the start of your application, before anything else is done.
-	/// Everything that runs before this function, runs as well on the other (browser engine related) processes.
-	/// That is generally unnecessary.
-	pub fn start() -> Self {
-		let (args_vec, mut ptrs_vec) = Self::args_ptr_vec();
-		let argc: c_int = args_vec.len() as _;
-		let argv = ptrs_vec.as_mut_ptr();
-
-		let ffi_handle = unsafe { bw_Application_start( argc, argv as _ ) };
-
-		Self {
-			handle: ApplicationHandle::new( ffi_handle )
-		}
-	}
-
 	fn _run<'a,H>( &self, on_ready: H ) -> i32 where
 		H: FnOnce( ApplicationHandle ) + 'a
 	{
@@ -189,7 +206,6 @@ impl Runtime {
 
 		unsafe {
 			let exit_code = bw_Application_run( self.handle.ffi_handle, ffi_ready_handler::<H>, ready_data as _ );
-			bw_Application_finish( self.handle.ffi_handle );
 			return exit_code;
 		}
 	}
@@ -260,7 +276,7 @@ impl ApplicationHandle {
 
 
 
-impl ApplicationThreaded {
+impl ApplicationHandleThreaded {
 
 	/// Executes the given closure `func` on the GUI thread, and gives back the result when done.
 	/// This only works when the runtime is still running.
@@ -269,7 +285,7 @@ impl ApplicationThreaded {
 	/// Keep in mind that in multi-threaded environments, it is generally a good idea to put the output on the heap.
 	/// The output value _will_ be copied.
 	pub fn delegate<'a,F,R>( &self, func: F ) -> ApplicationDelegateFuture<'a,R> where
-		F: FnOnce( Application ) -> R + Send + 'a,
+		F: FnOnce( ApplicationHandle ) -> R + Send + 'a,
 		R: Send
 	{
 		ApplicationDelegateFuture::<'a,R>::new( self.handle.clone(), |handle| {
@@ -293,7 +309,7 @@ impl ApplicationThreaded {
 	/// This only works when the runtime is still running.
 	/// If the closure panicked, or the runtime is not running, this will return an error.
 	pub fn delegate_async<'a,C,F,R>( &self, func: C ) -> DelegateFutureFuture<'a,R> where
-		C: FnOnce( Application ) -> F + Send + 'a,
+		C: FnOnce( ApplicationHandle ) -> F + Send + 'a,
 		F: Future<Output=R>,
 		R: Send + 'static
 	{
@@ -307,7 +323,7 @@ impl ApplicationThreaded {
 	/// The closure will only execute when and if the runtime is still running.
 	/// Returns whether or not the closure will be able to execute.
 	pub fn dispatch<'a,F>( &self, func: F ) -> bool where
-		F:  FnOnce( Application ) + Send + 'a
+		F:  FnOnce( ApplicationHandle ) + Send + 'a
 	{
 		let data = Box::into_raw( Box::new( ApplicationDispatchData {
 			handle: self.handle,
@@ -329,7 +345,7 @@ impl ApplicationThreaded {
 	/// The runtime might exit when the given closure is at a point of waiting.
 	/// Returns whether or not the closure will be able to execute its first part.
 	pub fn dispatch_async<'a,C,F>( &self, func: C ) -> bool where
-		C: FnOnce( Application ) -> F + Send + 'a,
+		C: FnOnce( ApplicationHandle ) -> F + Send + 'a,
 		F: Future<Output=()> + 'static
 	{
 		self.dispatch(|handle| {
@@ -359,18 +375,10 @@ impl ApplicationThreaded {
 	}
 }
 
-impl Deref for ApplicationThreaded {
-	type Target = ApplicationHandle;
-
-	fn deref( &self ) -> &Self::Target {
-		&self.handle
-	}
-}
-
-impl From<Application> for ApplicationThreaded {
-	fn from( other: Application ) -> Self {
+impl From<ApplicationHandle> for ApplicationHandleThreaded {
+	fn from( other: ApplicationHandle ) -> Self {
 		Self {
-			handle: other.handle.clone()
+			handle: other.clone()
 		}
 	}
 }
