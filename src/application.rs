@@ -3,12 +3,10 @@ use lazy_static::lazy_static;
 use std::env;
 use std::ffi::{c_void, CString};
 use std::future::Future;
-use std::marker::PhantomData;
 use std::ops::Deref;
 use std::os::raw::{c_int};
 use std::pin::Pin;
 use std::ptr;
-use std::rc::Rc;
 use std::task::{Context, Poll, Waker, RawWaker, RawWakerVTable};
 
 use super::common::*;
@@ -17,8 +15,7 @@ use super::common::*;
 /// An handle for this application.
 #[derive(Clone, Copy)]
 pub struct Application {
-	pub(in super) handle: ApplicationHandle,
-	_not_send: PhantomData<Rc<()>>
+	pub(in super) handle: ApplicationHandle
 }
 
 /// A thread-safe application handle.
@@ -27,16 +24,13 @@ pub struct Application {
 pub struct ApplicationThreaded {
 	pub(in super) handle: ApplicationHandle
 }
+unsafe impl Send for ApplicationThreaded {}
 unsafe impl Sync for ApplicationThreaded {}
 
 #[derive(Clone, Copy)]
 pub struct ApplicationHandle {
 	pub(in super) ffi_handle: *mut bw_Application
 }
-// # Safety
-// `ApplicationHandle` is Send because it is used extensively by `ApplicationThreaded`,
-//  which only uses the handle with thread-safe functions.
-unsafe impl Send for ApplicationHandle {}
 
 struct ApplicationDispatchData<'a> {
 
@@ -84,7 +78,9 @@ impl Runtime {
 
 	/// Obtains an thread-safe application handle for this runtime.
 	pub fn app_threaded( &self ) -> ApplicationThreaded {
-		self.handle.clone().into()
+		ApplicationThreaded {
+			handle: self.handle.clone()
+		}
 	}
 
 	fn args_ptr_vec() -> (Vec<CString>, Vec<*mut u8>) {
@@ -141,7 +137,7 @@ impl Runtime {
 	/// # Reserved Codes
 	/// -1 is used as the return code for when the main thread panicked during a delegated closure.
 	pub fn run<H>( &self, on_ready: H ) -> i32 where
-		H: FnOnce( ApplicationHandle )
+		H: FnOnce( Application )
 	{
 		return self._run( |handle| {
 			on_ready( handle.into() )
@@ -154,12 +150,12 @@ impl Runtime {
 	/// # Reserved Codes
 	/// The same reserved codes apply as `run`.
 	pub fn run_async<'a,C,F>( &'a self, func: C ) -> i32 where
-		C: FnOnce( ApplicationHandle ) -> F + 'a,
-		F: Future<Output=()> + 'static
-	{
+		C: FnOnce( Application ) -> F + 'a,
+		F: Future<Output=()> + 'a
+	{	eprintln!("begin run_async");
 		self._run(|handle| {
-
-			self.spawn( async move {
+			eprintln!("_run run_async");
+			self.spawn( async move {	eprintln!("spawn run_async");
 				func( handle.into() ).await;
 				handle.exit(0);
 			} );
@@ -218,8 +214,7 @@ impl Application {
 	/// Constructs an `Application` from a ffi handle
 	pub(in super) fn from_ffi_handle( ffi_handle: *mut bw_Application ) -> Self {
 		Self {
-			handle: ApplicationHandle::new( ffi_handle ),
-			_not_send: PhantomData
+			handle: ApplicationHandle::new( ffi_handle )
 		}
 	}
 }
@@ -235,8 +230,7 @@ impl Deref for Application {
 impl From<ApplicationHandle> for Application {
 	fn from( other: ApplicationHandle ) -> Self {
 		Self {
-			handle: other,
-			_not_send: PhantomData
+			handle: other
 		}
 	}
 }
@@ -385,10 +379,10 @@ impl Deref for ApplicationThreaded {
 	}
 }
 
-impl From<ApplicationHandle> for ApplicationThreaded {
-	fn from( other: ApplicationHandle ) -> Self {
+impl From<Application> for ApplicationThreaded {
+	fn from( other: Application ) -> Self {
 		Self {
-			handle: other
+			handle: other.handle.clone()
 		}
 	}
 }

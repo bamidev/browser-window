@@ -68,6 +68,13 @@ pub struct DelegateFuture<'a,H,R> where
 	started: bool
 }
 impl<'a,H,R> Unpin for DelegateFuture<'a,H,R> where R: Send {}
+/// # Safety
+/// `DelegateFuture` by itself is not send.
+/// This is because we keep a handle `H`, which is not necessarily `Send`.
+/// However, because the closure only executes on the GUI thread,
+///  and because the handle is only provided to the closure that will be executed on the GUI thread,
+///  this should be fine.
+unsafe impl<'a,H,R> Send for DelegateFuture<'a,H,R> where R: Send {}
 
 /// This future runs a future on the GUI thread and returns its output.
 pub struct DelegateFutureFuture<'a,R> where
@@ -77,6 +84,13 @@ pub struct DelegateFutureFuture<'a,R> where
 	inner: DelegateFutureInner<'a,R>,
 	started: bool
 }
+/// # Safety
+/// `DelegateFutureFuture` by itself is not send.
+/// This is because of `ApplicationHandle`.
+/// However, because the closure only executes on the GUI thread,
+///  and because this handle that is provided to the closure is something that will only be sent with the closure to the GUI thread,
+///  this should be fine.
+unsafe impl<'a,R> Send for DelegateFutureFuture<'a,R> where R: Send {}
 impl<'a,R> Unpin for DelegateFutureFuture<'a,R> where R: Send {}
 
 /// This is not a future but the inner part that of `DelegateFutureFuture` that needs to have mutable reference.

@@ -100,7 +100,6 @@ void bw_BrowserWindowImpl_new(
 	// Unused parameters
 	UNUSED(width);
 	UNUSED(height);
-	// TODO: Implement browser_window_options
 
 	CefWindowInfo info;
 	CefBrowserSettings settings;

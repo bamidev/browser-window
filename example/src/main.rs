@@ -20,7 +20,7 @@ fn main() {
 async fn program_logic( app: ApplicationThreaded ) {
 
 	let x = {
-		let bw = BrowserBuilder::new( Source::Html( include_str!("example.html").into() ) )
+		let bw = BrowserWindowBuilder::new( Source::Html( include_str!("example.html").into() ) )
 		.title("Example")
 		.width( 800 )
 		.height( 600 )
@@ -36,7 +36,7 @@ async fn program_logic( app: ApplicationThreaded ) {
 		})
 		.build_threaded( app.clone() ).await.unwrap();
 
-		let bw2 = BrowserBuilder::new( Source::Html( include_str!("example.html").into() ) )
+		let bw2 = BrowserWindowBuilder::new( Source::Html( include_str!("example.html").into() ) )
 			.title("Example")
 			.width( 800 )
 			.height( 600 )
@@ -47,7 +47,7 @@ async fn program_logic( app: ApplicationThreaded ) {
 			.build_threaded( app.clone() ).await.unwrap();
 
 		// Let's fetch the title through Javascript
-		match bw.eval_js("document.title").await.unwrap() {
+		/*match bw.eval_js("document.title").await.unwrap() {
 			Err(e) => { eprintln!("Something went wrong with evaluating javascript: {}", e) },
 			Ok( cookies ) => {
 				eprintln!("This is the window title: {}", cookies);
@@ -61,7 +61,7 @@ async fn program_logic( app: ApplicationThreaded ) {
 			Ok( cookies ) => {
 				eprintln!("Available cookies: {}", cookies);
 			}
-		}
+		}*/
 
 		bw2
 	};
@@ -77,12 +77,15 @@ async fn program_logic( app: ApplicationThreaded ) {
 
 	tokio::time::delay_for( tokio::time::Duration::from_millis(20000) ).await;
 
-	match x.eval_js("document.cookie").await.unwrap() {
-		Err(e) => { eprintln!("This javascript error is expected when using CEF: {}", e) },
-		Ok( cookies ) => {
-			eprintln!("Available cookies: {}", cookies);
+	/*x.spawn(|bw| async {
+		match bw.eval_js("document.cookie").await.unwrap() {
+			Err(e) => { eprintln!("This javascript error is expected when using CEF: {}", e) },
+			Ok( cookies ) => {
+				eprintln!("Available cookies: {}", cookies);
+			}
 		}
-	}
+	});*/
+
 
 	eprintln!("END");
 }
