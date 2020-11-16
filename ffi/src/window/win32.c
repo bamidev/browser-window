@@ -52,6 +52,9 @@ bw_WindowImpl bw_WindowImpl_new(
 	if ( !options->minimizable )
 		window_style ^= WS_MINIMIZEBOX;
 
+	if ( width == -1 || height == -1 )
+	    width = CW_USEDEFAULT;
+
 	wchar_t* title = bw_win32_copyAsNewWstr( _title );
 
 	// Create the window
