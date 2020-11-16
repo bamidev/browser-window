@@ -19,7 +19,8 @@ pub type bw_BrowserWindowEvalJsCallbackFn = unsafe extern "C" fn( bw: *mut bw_Br
 
 #[repr(C)]
 pub struct bw_BrowserWindowOptions {
-	pub dev_tools: bool
+	pub dev_tools: bool,
+	pub resource_path: bw_CStrSlice
 }
 
 #[repr(C)]

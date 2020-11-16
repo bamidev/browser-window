@@ -7,7 +7,7 @@ use crate::browser::*;
 
 use std::{
 	mem,
-	path::{Path, PathBuf},
+	path::PathBuf,
 	ptr
 };
 
@@ -247,20 +247,9 @@ impl BrowserWindowBuilder {
 					borders: borders
 				};
 
-				// If using a file source, take the dir path as the resource path
-				let resource_path = "file:///".to_owned() + match &source {
-					Source::File( path ) => {
-						match path.parent() {
-							None => "",
-							Some( dir_path ) => dir_path.to_str().unwrap()
-						}
-					},
-					_ => ""
-				};
-
 				let other_options = bw_BrowserWindowOptions {
 					dev_tools,
-					resource_path: resource_path.as_str().into()
+					resource_path: "".into()
 				};
 
 				unsafe { bw_BrowserWindow_new(
