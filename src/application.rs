@@ -50,9 +50,9 @@ pub struct Runtime {
 }
 
 /// The data that is available to a waker, allowing it to poll a future.
-struct WakerData {
+struct WakerData<'a> {
 	handle: ApplicationHandle,
-	future: Pin<Box<dyn Future<Output=()>>>
+	future: Pin<Box<dyn Future<Output=()> + 'a>>
 }
 
 
@@ -153,13 +153,33 @@ impl Runtime {
 	///
 	/// # Reserved Codes
 	/// The same reserved codes apply as `run`.
-	// TODO: Turn this future into an async closure.
-	pub fn run_async<F>( &self, future: F ) -> i32 where
+	pub fn run_async<'a,C,F>( &'a self, func: C ) -> i32 where
+		C: FnOnce( ApplicationHandle ) -> F + 'a,
 		F: Future<Output=()> + 'static
 	{
 		self._run(|handle| {
-			handle.spawn( future );
+
+			self.spawn( async move {
+				func( handle.into() ).await;
+				handle.exit(0);
+			} );
 		})
+	}
+
+	/// Spawns the given future, executing it on the GUI thread somewhere in the near future.
+	pub fn spawn<'a,F>( &'a self, future: F ) where
+		F: Future<Output=()> + 'a
+	{
+		// Data for the waker.
+		let waker_data = Box::into_raw( Box::new(
+			WakerData {
+				handle: self.handle.clone(),
+				future: Box::pin( future )
+			}
+		) );
+
+		// First poll
+		unsafe { Runtime::poll_future( waker_data ) };
 	}
 
 	/// Starts the GUI application.
@@ -178,8 +198,8 @@ impl Runtime {
 		}
 	}
 
-	fn _run<H>( &self, on_ready: H ) -> i32 where
-		H: FnOnce( ApplicationHandle )
+	fn _run<'a,H>( &self, on_ready: H ) -> i32 where
+		H: FnOnce( ApplicationHandle ) + 'a
 	{
 		let ready_data = Box::into_raw( Box::new( on_ready ) );
 
@@ -194,14 +214,6 @@ impl Runtime {
 
 
 impl Application {
-
-	/// Causes the `Runtime` to terminate.
-	/// The `Runtime`'s run or spawn command will return the exit code provided.
-	/// This will mean that not all tasks might complete.
-	/// If you were awaiting
-	pub fn exit( &self, exit_code: i32 ) {
-		unsafe { bw_Application_exit( self.handle.ffi_handle, exit_code as _ ); }
-	}
 
 	/// Constructs an `Application` from a ffi handle
 	pub(in super) fn from_ffi_handle( ffi_handle: *mut bw_Application ) -> Self {
@@ -232,6 +244,14 @@ impl From<ApplicationHandle> for Application {
 
 
 impl ApplicationHandle {
+
+	/// Causes the `Runtime` to terminate.
+	/// The `Runtime`'s run or spawn command will return the exit code provided.
+	/// This will mean that not all tasks might complete.
+	/// If you were awaiting
+	pub fn exit( &self, exit_code: i32 ) {
+		unsafe { bw_Application_exit( self.ffi_handle, exit_code as _ ); }
+	}
 
 	pub(in super) fn new( ffi_handle: *mut bw_Application ) -> Self {
 		Self {
