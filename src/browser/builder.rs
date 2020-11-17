@@ -16,8 +16,11 @@ use std::{
 
 /// The type of content to display in a browser window
 pub enum Source {
+	/// Displays the given HTML code in the browser.
 	Html( String ),
+	/// Displays the local file for the given path.
 	File( PathBuf ),
+	/// Displays the given URL in the browser.
 	Url( String )
 }
 

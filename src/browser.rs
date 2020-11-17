@@ -1,3 +1,5 @@
+//! This module contains all browser related handles and stuff.
+
 use browser_window_ffi::*;
 use futures_channel::oneshot;
 use std::{
@@ -27,7 +29,8 @@ pub type BrowserDelegateFuture<'a,R> = DelegateFuture<'a, BrowserWindowHandle, R
 
 
 
-/// A thread-unsafe handle to a browser window
+/// An owned browser window handle.
+/// When this handle goes out of scope, its resource get scheduled for cleanup.
 // If the user closes the window, this handle remains valid.
 // Also, if you lose this handle, window destruction and cleanup is only done when the user actually closes it.
 // So you don't have to worry about lifetimes and/or propper destruction of the window either.
@@ -191,6 +194,13 @@ impl BrowserWindowThreaded {
 
 	/// Executes the given closure within the GUI thread, and return the value that the closure returned.
 	/// Also see `ApplicationThreaded::delegate`.
+	///
+	/// The function signature is practically the same as:
+	/// ```rust
+	/// pub async fn delegate<'a,F,R>( &self, func: F ) -> Result<R, DelegateError> where
+	/// 	F: FnOnce( BrowserWindowHandle ) -> R + Send + 'a,
+	/// 	R: Send { //...
+	/// ```
 	pub fn delegate<'a,F,R>( &self, func: F ) -> BrowserDelegateFuture<'a,R> where
 		F: FnOnce( BrowserWindowHandle ) -> R + Send + 'a,
 		R: Send
@@ -212,8 +222,9 @@ impl BrowserWindowThreaded {
 	}
 
 	/// Executes the given close on the GUI thread.
-	pub fn dispatch<'a,'b:'a,F>( &self, func: F ) -> bool where
-		F:  FnOnce( BrowserWindowHandle ) + Send + 'b
+	/// See also `Application::dispatch`.
+	pub fn dispatch<'a,F>( &self, func: F ) -> bool where
+		F:  FnOnce( BrowserWindowHandle ) + Send + 'a
 	{
 		let handle = self.handle;
 

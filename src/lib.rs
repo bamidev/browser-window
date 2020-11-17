@@ -1,32 +1,15 @@
-//! Browser Window is a Rust crate that allows you to have and manipulate windows with browsers in them.
-//! Just like Electron, you can build graphical user interfaces with HTML/CSS/JS technology, but you can also use it to just have some browser functionality in your application.
+//! Browser Window is a Rust crate that allows you manipulate simple browsers contained within simple windows.
+//! Just like Electron, you can use it to build graphical user interfaces with HTML/CSS/JS technology.
 //!
-//! To start using Browser Window, you need to start it (before anything else) and run it, preferably on the main thread.
+//! *Warning*: At the moment only Windows is suppored. (GTK support is on the way!)
 //!
-//! Your program might look something like this:
-//! ```
-//! use browser_window::*;
-//! use std::process::exit;
+//! Moreover, Browser Window uses the Chromium browser engine.
+//! So Browser Window uses CEF as a dependency.
+//! To get CEF set up properly, take a look [here](https://github.com/bamilab/browser-window/tree/master/docs/getting-started).
 //!
-//! fn main() {
-//! 	let runtime = Runtime::start();
+//! To start building apps with Browser Window, take a quick look at the [`application`](application/index.html) module.
 //!
-//! 	let app = runtime.app();
-//! 	let exit_code = runtime.spawn(async move {
-//!
-//! 		let browser = BrowserBuilder::new( Source::Url("https://www.duckduckgo.com/".into()) )
-//! 			.build( app ).await;
-//!
-//! 		browser.exec_js("document.getElementById('search_form_input_homepage').value = 'Hello World!'");
-//! 	});
-//!
-//! 	exit( exit_code );
-//! }
-//! ```
-//!
-//! For an more elaborate example, see [this example code](https://github.com/bamilab/browser-window/blob/master/example/src/main.rs).
-//!
-//! To get everything setup in order to use this crate, take a look at [this getting started guide](https://github.com/bamilab/browser-window/tree/master/docs/getting-started).
+//! For an example, see [this example code](https://github.com/bamilab/browser-window/blob/master/example/).
 
 pub mod application;
 pub mod browser;

@@ -1,17 +1,5 @@
 # Getting Started on Windows
 
-##### The TL;DR Solution
-
-If you want to get started as quick as possible, all you have to do is enable feature "edge" in your crate's Cargo.toml. Although, this does require Windows 10.
-
-```
-[dependencies]
-browser-window = { features = ["edge"] }
-```
-
-This compiles Browser Window with the EdgeHTML engine on Windows.
-However, it is recommended to compile it with CEF3 (Chromium Embedding Framework), for better support of the newest HTML5 features. No crate features need to be enabled when using CEF.
-
 ##### Download & Extract
 
 The easiest and quickest way to set up CEF is to get the binary distribution.

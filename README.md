@@ -1,8 +1,7 @@
 # Browser Window
 
-Browser Window is a simple Rust crate for working with windows that are actually browsers.
-Just like [Electron](https://www.electronjs.org/), you can build graphical user interfaces with HTML/CSS/JS technology, but you can also use it to just have some browser functionality in your application.
-
+Browser Window is a simple Rust crate for using Browsers in simple windows.
+Just like [Electron](https://www.electronjs.org/), you can use it to build graphical user interfaces with HTML/CSS/JS technology.
 Browser Window was born from the lack of a good and simple Electron alternative for Rust.
 There are actually a few ones out there already.
 However, they lack a few important things.
@@ -13,32 +12,15 @@ Browser Window aims to be cross-platform, very simple, and straight forward.
 Many methods in Browser Window are asynchronous, such as evaluating JavaScript code and getting back its output.
 Browser Window utilizes and benefits from Rust's async/await syntax, so this should make it a breeze.
 
-Moreover, multi-threading is becoming more and more important.
-If you need to access the GUI from other threads, Browser Window also provides thread-safe handles to do this.
+Moreover, if you want to use it in a multi-threaded environment, that's also possible with our thread-safe handles!
 
-You can view the [example](https://github.com/bamilab/browser-window/tree/master/example) to see how easily a GUI with Browser Window can be made, within a single-threaded environment.
+You can view an [example](https://github.com/bamilab/browser-window/tree/master/example) of a terminal emulator, to see how easily a GUI with Browser Window can be made.
 
 ## Requirements
 
 At this moment, Windows is the only supported platform, but support for other platforms will follow.
 
-Also, there needs to be one browser engine embedding library available.
-There currently are two options:
-* [CEF3](https://bitbucket.org/chromiumembedded/cef/wiki/Home) (the Chromium Embedding Framework)
-* [Edge WebView](https://docs.microsoft.com/en-us/microsoft-edge/hosting/webview) (only for Windows 10)
-
-### Comparison
-
-CEF is used as the default engine for Browser Window.
-It is being actively maintained and supports multiple platforms.
-So when Browser Window has multiple platform support in the future, CEF is available on all of them.
-
-Edge WebView is not being maintained anymore, in light of the new Edge WebView2 engine having just been released. (Which is just a wrapper for CEF actually.)
-However, it is already available on your Windows 10 system, so no additional setup is needed.
-This makes it possible to ship your executable as a single .exe file because of this.
-
-Support for cookies will be implemented in the future.
-However, Edge's WebView has this problem where no HTTP Only cookies are available, which kind of defeats the purpose of this feature.
+Also, Browser Window uses the Chromium engine. So the [Chromium Embedding Framework](https://bitbucket.org/chromiumembedded/cef/wiki/Home) is a required dependency.
 
 ## Getting Started
 

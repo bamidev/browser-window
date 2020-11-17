@@ -40,12 +40,13 @@ struct DelegateFutureData<'a,'b,R> where R: Send{
 	waker: Waker
 }
 
+/// The error that occurs when you're delegating work to the GUI thread, but it fails to finish and/or return a result.
 #[derive(Debug)]
 pub enum DelegateError {
 	/// The runtime has either not yet started or already ended.
-	/// This happens when the application has exited.
+	/// This happens when the application has already exited for example.
 	RuntimeNotAvailable,
-	/// The closure that has been delegated panicked.
+	/// The delegated closure has panicked.
 	ClosurePanicked
 }
 

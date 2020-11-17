@@ -1,3 +1,51 @@
+//! This module contains runtime and application related handles.
+//!
+//! Browser Window needs to be initialized, and also run its own runtime.
+//! Once that is set up and running, all windows can be constructed and played around with.
+//! To do this, you use `Application::initialize`.
+//! Then you have an `Application` instance, from which you can obtain a new `Runtime` instance.
+//! Running it will grant you access to an application handle which you can manage the application with, and from which you can create all your windows with.
+//!
+//! # Example #1
+//! Here is an example to show how you can construct your application:
+//! ```rust
+//! use browser_window::application::*;
+//!
+//! fn main() {
+//! 	let application = Application::initialize();
+//! 	let runtime = application.start();
+//!
+//!      runtime.run_async(|app| async move {
+//!
+//!         // Do something ...
+//!     });
+//! }
+//! ```
+//!
+//! # Example #2
+//! If you want to run another kind of runtime, like (tokio)[https://tokio.rs/] for example, its still possible to use Browser Window in conjunction with it.
+//! Here is an example:
+//! ```rust
+//! use browser_window::application::*;
+//! use tokio;
+//!
+//! async fn alternative_main( app: ApplicationHandleThreaded ) {
+//! 	// Do something...
+//! }
+//!
+//! fn main() {
+//! 	let application = Application::initialize();
+//!
+//! 	let tokio_runtime = tokio::runtime::Runtime::new().unwrap();
+//!     let bw_runtime = application.start();
+//!     runtime.run(|_app| {
+//!         let app: ApplicationHandleThreaded = _app.into();
+//!
+//! 		tokio_runtime.spawn( alternative_main( app ) );
+//! 	});
+//! }
+//! ```
+
 use browser_window_ffi::*;
 use lazy_static::lazy_static;
 use std::env;
@@ -12,13 +60,13 @@ use std::task::{Context, Poll, Waker, RawWaker, RawWakerVTable};
 use super::common::*;
 
 
-/// An handle for this application.
+/// Use this to initialize and start your application with.
 pub struct Application {
 	pub(in super) handle: ApplicationHandle
 }
 
 /// A thread-safe application handle.
-/// This handle also allows you to dispatch code to be executed on the GUI thread.
+/// This handle also allows you to dispatch code to be executed on the GUI thread from any other thread.
 #[derive(Clone, Copy)]
 pub struct ApplicationHandleThreaded {
 	pub(in super) handle: ApplicationHandle
@@ -27,6 +75,8 @@ unsafe impl Send for ApplicationHandleThreaded {}
 unsafe impl Sync for ApplicationHandleThreaded {}
 
 #[derive(Clone, Copy)]
+/// A thread-unsafe application handle.
+/// Often provided by for Browser Window.
 pub struct ApplicationHandle {
 	pub(in super) ffi_handle: *mut bw_Application
 }
@@ -37,7 +87,7 @@ struct ApplicationDispatchData<'a> {
 	func: Box<dyn FnOnce(ApplicationHandle) + Send + 'a>
 }
 
-/// Use this to start and run the application with.
+/// The runtime to run the application with.
 pub struct Runtime {
 	pub(in super) handle: ApplicationHandle
 }
@@ -89,10 +139,12 @@ impl Application {
 		( vec, vec_ptrs )
 	}
 
-	/// In order to use BrowserWindow, you need to initialize BrowserWindow at the start of your application.
+	/// In order to use the Browser Window API, you need to initialize Browser Window at the very start of your application.
 	/// Preferably on the first line of your `main` function.
-	/// This will open another process of your application,
-	///  therefor any code that will be placed before initialization will also be executed on the other process.
+	///
+	/// # Warning
+	/// This will open another process of your application.
+	/// Therefore, any code that will be placed before initialization will also be executed on all other processes.
 	/// This is generally unnecessary.
 	pub fn initialize() -> Application {
 
@@ -225,14 +277,6 @@ impl Application {
 	}
 }
 
-impl Deref for Application {
-	type Target = ApplicationHandle;
-
-	fn deref( &self ) -> &Self::Target {
-		&self.handle
-	}
-}
-
 impl From<ApplicationHandle> for Application {
 	fn from( other: ApplicationHandle ) -> Self {
 		Self {
@@ -284,8 +328,22 @@ impl ApplicationHandleThreaded {
 	/// This only works when the runtime is still running.
 	/// If the closure panicked, or the runtime is not running, this will return an error.
 	///
+	/// The function signature is practically the same as:
+	/// ```rust
+	/// pub async fn delegate<'a,F,R>( &self, func: F ) -> Result<R, DelegateError> where
+	/// 	F: FnOnce( ApplicationHandle ) -> R + Send + 'a,
+	/// 	R: Send { /* ... */ }
+	/// ```
+	///
 	/// Keep in mind that in multi-threaded environments, it is generally a good idea to put the output on the heap.
 	/// The output value _will_ be copied.
+	///
+	/// # Example
+	/// ```rust
+	/// let my_value: String = app.delegate(|handle| {
+	/// 	"String".to_owned()
+	/// }).unwrap();
+	/// ```
 	pub fn delegate<'a,F,R>( &self, func: F ) -> ApplicationDelegateFuture<'a,R> where
 		F: FnOnce( ApplicationHandle ) -> R + Send + 'a,
 		R: Send
@@ -295,11 +353,24 @@ impl ApplicationHandleThreaded {
 		} )
 	}
 
-	/// Executes the given `future` on the GUI thread, and gives back the output when done.
+	/// Executes the given `future` on the GUI thread, and gives back its output when done.
 	/// This only works when the runtime is still running.
 	/// If the future panicked during a poll, or the runtime is not running, this will return an error.
-	///
 	/// See also `delegate`.
+	///
+	/// The function signature is practically the same as:
+	/// ```rust
+	/// pub async fn delegate_future<'a,F,R>( &self, func: F ) -> Result<R, DelegateError> where
+	/// 	F: Future<Output=R> + 'static,,
+	/// 	R: Send { /* ... */ }
+	/// ```
+	///
+	/// # Example
+	/// ```rust
+	/// let my_value: String = app.delegate_future(async {
+	/// 	"String".to_owned()
+	/// }).unwrap();
+	/// ```
 	pub fn delegate_future<F,R>( &self, future: F ) -> DelegateFutureFuture<R> where
 		F: Future<Output=R> + 'static,
 		R: Send + 'static
@@ -310,6 +381,28 @@ impl ApplicationHandleThreaded {
 	/// Executes the given async closure `func` on the GUI thread, and gives back the result when done.
 	/// This only works when the runtime is still running.
 	/// If the closure panicked, or the runtime is not running, this will return an error.
+	///
+	/// Except, async closures are not yet supported in stable Rust.
+	/// What we actually mean are closures of the form:
+	/// ```rust
+	/// |handle| async move { /* ... */ }
+	/// ```
+	///
+	/// The function signature is practically the same as:
+	/// ```rust
+	/// pub async fn delegate_async<'a,C,F,R>( &self, func: C ) -> Result<R, DelegateError> where
+	/// 	C: FnOnce( ApplicationHandle ) -> F + Send + 'a,
+	/// 	F: Future<Output=R>,
+	/// 	R: Send + 'static
+	/// { /* ... */ }
+	/// ```
+	///
+	/// # Example
+	/// ```rust
+	/// let my_value: String = app.delegate_async(|handle| async move {
+	/// 	"String".to_owned()
+	/// }).unwrap();
+	/// ```
 	pub fn delegate_async<'a,C,F,R>( &self, func: C ) -> DelegateFutureFuture<'a,R> where
 		C: FnOnce( ApplicationHandle ) -> F + Send + 'a,
 		F: Future<Output=R>,
@@ -370,6 +463,7 @@ impl ApplicationHandleThreaded {
 		}
 	}
 
+	/// Executes the given future on the GUI thread somewhere in the near future.
 	pub fn spawn<F>( &self, future: F ) where
 		F: Future<Output=()> + 'static
 	{
