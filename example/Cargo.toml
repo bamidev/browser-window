@@ -10,4 +10,4 @@ edge = ["browser-window/edge"]
 
 [dependencies]
 browser-window = { path = ".." }
-tokio = { version = "0.2", features = ["rt-threaded", "time"] }
+serde_json = "1.0"

@@ -1,92 +1,83 @@
 use browser_window::application::*;
 use browser_window::browser::*;
-use std::process::exit;
-use tokio;
+use serde_json;
+use std::env;
+use std::io::prelude::*;
+use std::process::{Command, exit, Stdio};
 
 
+
+async fn execute_command( bw: BrowserWindowHandle, line: &str ) {
+	let working_dir = bw.eval_js("working_dir").await.expect("Unable to obtain working dir from JavaScript!");
+
+	let cmd = Command::new("cmd")
+		.arg("/C")
+		.arg( line )
+		.current_dir( working_dir )
+		.stdout( Stdio::piped() )
+		//.kill_on_drop(true)
+		.spawn()
+		.expect("Command failed to run!");
+
+	// Read the output
+	let mut output = cmd.stdout.unwrap();
+	let mut buffer: [u8;  1024] = [0xFF; 1024];
+	loop {
+		match output.read( &mut buffer ) {
+			Err(e) => eprintln!("Command error: {}", e),
+			Ok( read ) => {
+				if read == 0 {
+					bw.exec_js("onExecutionEnded()");
+					break;
+				}
+
+				// Convert to string
+				let string = String::from_utf8_lossy( &buffer[0..read] );
+				// Sanitize string input for JavaScript
+				let js_string = serde_json::to_string( &*string ).unwrap();
+
+				bw.exec_js(&("onOutputReceived(".to_owned() + js_string.as_str() + ")"));
+			}
+		}
+	}
+}
 
 fn main() {
-	let app = Application::initialize();
-	let bw_runtime = app.start();
+	let application = Application::initialize();
+	let runtime = application.start();
 
-	let tk_runtime = tokio::runtime::Runtime::new().unwrap();
-	let exit_code = bw_runtime.run( |app| {
-		tk_runtime.spawn( program_logic( app.into() ) );
+	let exit_code = runtime.run_async( |app| async move {
+
+		let working_dir = env::current_dir().unwrap();
+		let mut html_file = working_dir.clone();
+		html_file.push( "resources/terminal.html" );
+
+		let bw = BrowserWindowBuilder::new( Source::File( html_file ) )
+			.title("Terminal Example")
+			.async_handler(|handle, cmd, args| async move {
+
+				match cmd.as_str() {
+					"exec" => {
+						let cmd_line = &args[0];
+
+						execute_command( handle, cmd_line ).await;
+					},
+					other => {
+						eprintln!("Received unsupported command: {}", other);
+					}
+				}
+			})
+			.build( app ).await;
+
+		// Initialize the script with our working directory.
+		// Make sure that it is initializes whether document has been loaded already or not.
+		let working_dir_js = serde_json::to_string( working_dir.to_str().unwrap() ).expect("Invalid working directory characters!");
+		match bw.eval_js( format!("initialize({})", &working_dir_js ).as_str() ).await {
+			Err(_) => bw.exec_js( format!("window.onload = () => {{ initialize({}) }}", &working_dir_js ).as_str() ),
+			Ok(_) => {}
+		};
 	} );
 
 	// Return exit code
 	exit( exit_code );
-}
-
-async fn program_logic( app: ApplicationHandleThreaded ) {
-
-	let x = {
-		let bw = BrowserWindowBuilder::new( Source::Html( include_str!("example.html").into() ) )
-		.title("Example")
-		.width( 800 )
-		.height( 600 )
-		.minimizable( false )
-		.borders( false )
-		.resizable( false )
-		.handler(|_, cmd, args| {
-
-			println!("Command \"{}\" invoked!", cmd);
-			for i in 0..args.len() {
-				println!("\tArg {}: {}", i+1, args[i]);
-			}
-		})
-		.build_threaded( app.clone() ).await.unwrap();
-
-		let bw2 = BrowserWindowBuilder::new( Source::Html( include_str!("example.html").into() ) )
-			.title("Example")
-			.width( 800 )
-			.height( 600 )
-			.minimizable( false )
-			.borders( false )
-			.resizable( true )
-			.parent( &bw )
-			.build_threaded( app.clone() ).await.unwrap();
-
-		// Let's fetch the title through Javascript
-		/*match bw.eval_js("document.title").await.unwrap() {
-			Err(e) => { eprintln!("Something went wrong with evaluating javascript: {}", e) },
-			Ok( cookies ) => {
-				eprintln!("This is the window title: {}", cookies);
-			}
-		}
-
-		// Let's execute some bad code
-		// This doesn't work because cookies are not available when using Source::Html.
-		match bw.eval_js("document.cookie").await.unwrap() {
-			Err(e) => { eprintln!("This javascript error is expected when using CEF: {}", e) },
-			Ok( cookies ) => {
-				eprintln!("Available cookies: {}", cookies);
-			}
-		}*/
-
-		bw2
-	};
-
-	let number = x.delegate_async(|_| async {
-		eprintln!("Before panic");
-		panic!("Panic!");
-		eprintln!("After panic");
-
-		return 14
-	}).await.unwrap();
-	eprintln!("Delegate result: {}", number);
-
-	tokio::time::delay_for( tokio::time::Duration::from_millis(20000) ).await;
-
-	/*x.spawn(|bw| async {
-		match bw.eval_js("document.cookie").await.unwrap() {
-			Err(e) => { eprintln!("This javascript error is expected when using CEF: {}", e) },
-			Ok( cookies ) => {
-				eprintln!("Available cookies: {}", cookies);
-			}
-		}
-	});*/
-
-
-	eprintln!("END");
 }

@@ -1,0 +1,13 @@
+body {
+    background-color: #000;
+    color: #0F0;
+    font: 1em coolFont;
+    word-break: break-all;
+    word-wrap: break-word;
+    white-space: pre-line;
+}
+
+@font-face {
+    font-family: coolFont;
+    src: url('SyneMono-Regular.ttf');
+}
