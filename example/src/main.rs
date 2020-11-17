@@ -15,31 +15,48 @@ async fn execute_command( bw: BrowserWindowHandle, line: &str ) {
 		.arg( line )
 		.current_dir( working_dir )
 		.stdout( Stdio::piped() )
+		.stderr( Stdio::piped() )
 		//.kill_on_drop(true)
 		.spawn()
 		.expect("Command failed to run!");
 
 	// Read the output
-	let mut output = cmd.stdout.unwrap();
+	let mut stdout = cmd.stdout.unwrap();
+	let mut stderr = cmd.stderr.unwrap();
 	let mut buffer: [u8;  1024] = [0xFF; 1024];
 	loop {
-		match output.read( &mut buffer ) {
-			Err(e) => eprintln!("Command error: {}", e),
-			Ok( read ) => {
-				if read == 0 {
-					bw.exec_js("onExecutionEnded()");
-					break;
-				}
+		let stdout_empty = read_stream( bw, &mut stdout, &mut buffer, "onOutputReceived" );
+		let stderr_empty = read_stream( bw, &mut stderr, &mut buffer, "onErrorOutputReceived" );
 
-				// Convert to string
-				let string = String::from_utf8_lossy( &buffer[0..read] );
-				// Sanitize string input for JavaScript
-				let js_string = serde_json::to_string( &*string ).unwrap();
-
-				bw.exec_js(&("onOutputReceived(".to_owned() + js_string.as_str() + ")"));
-			}
+		if !stdout_empty && !stderr_empty {
+			break;
 		}
 	}
+
+	// Notify the terminal that it can type commands again
+	bw.exec_js("onExecutionEnded()");
+}
+
+fn read_stream<R>( bw: BrowserWindowHandle, reader: &mut R, buffer: &mut [u8], js_func: &str ) -> bool where
+	R: Read
+{
+	match reader.read( buffer ) {
+		Err(e) => eprintln!("Command error: {}", e),
+		Ok( read ) => {
+			if read == 0 {
+				return false;
+			}
+
+			// Convert to string
+			let string = String::from_utf8_lossy( &buffer[0..read] );
+			// Sanitize string input for JavaScript
+			let js_string = serde_json::to_string( &*string ).unwrap();
+
+			bw.exec_js(&(js_func.to_owned() + "(" + js_string.as_str() + ")"));
+		}
+	}
+
+	true
 }
 
 fn main() {

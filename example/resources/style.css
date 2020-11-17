@@ -11,3 +11,7 @@ body {
     font-family: coolFont;
     src: url('SyneMono-Regular.ttf');
 }
+
+.stderr {
+    color: #F00;
+}
