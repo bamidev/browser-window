@@ -114,8 +114,8 @@ impl OwnedBrowserWindow for BrowserWindow {
 impl BrowserWindowHandle {
 
 	/// Returns the application handle associated with this browser window.
-	pub fn app( &self ) -> Application {
-		Application::from_ffi_handle( unsafe { bw_BrowserWindow_getApp( self.ffi_handle ) } )
+	pub fn app( &self ) -> ApplicationHandle {
+		ApplicationHandle::new( unsafe { bw_BrowserWindow_getApp( self.ffi_handle ) } )
 	}
 
 	/// Closes the browser.
@@ -127,9 +127,14 @@ impl BrowserWindowHandle {
 	/// Executes the given javascript code and returns the output as a string.
 	/// If you don't need the result, see `exec_js`.
 	pub async fn eval_js( &self, js: &str ) -> Result<String, JsEvaluationError> {
+		//
 		let (tx, rx) = oneshot::channel::<Result<String, JsEvaluationError>>();
 
 		self._eval_js( js, |_, result| {
+
+			// The callback of `_eval_js` is not necessarily called from our GUI thread, so this is a quickfix to make that safe.
+			// Otherwise, the `panic` may not be propegated correctly!
+			// FIXME: Call this result callback closure form the GUI thread from within the CEF implementation.
 			if let Err(_) = tx.send( result ) {
 				panic!("Unable to send JavaScript result back")
 			}

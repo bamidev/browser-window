@@ -105,6 +105,7 @@ fn main() {
 			.file("src/application/cef.cpp")
 			.file("src/browser_window/cef.cpp")
 			.file("src/cef/bw_handle_map.cpp")
+			.file("src/cef/client_handler.cpp")
 			.file("src/cef/exception.cpp")
 			.define("BW_CEF", None)
 			.cpp(true);

@@ -39,8 +39,19 @@ impl From<&str> for bw_CStrSlice {
 
 impl<'a> Into<&'a str> for bw_CStrSlice {
 	fn into( self ) -> &'a str {
-		unsafe { str::from_utf8_unchecked(
-			slice::from_raw_parts( self.data as *const u8, self.len )
-		) }
+		let raw: &[u8] = unsafe { slice::from_raw_parts(self.data as _, self.len ) };
+
+		#[cfg(debug_assertions)]
+			return str::from_utf8( raw ).expect("Invalid UTF-8");
+		#[cfg(not(debug_assertions))]
+			return unsafe { str::from_utf8_unchecked( raw ) };
+	}
+}
+
+impl Into<String> for bw_CStrSlice {
+	fn into( self ) -> String {
+		let str: &str = self.into();
+
+		str.to_owned()
 	}
 }

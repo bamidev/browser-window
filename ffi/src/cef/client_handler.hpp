@@ -9,8 +9,15 @@
 
 #include "bw_handle_map.hpp"
 #include "../application.h"
+#include "../common.h"
 
 
+
+struct ExternalInvocationHandlerData {
+    bw_BrowserWindow* bw;
+    std::string cmd;
+    std::vector<std::string> params;
+};
 
 class ClientHandler : public CefClient, public CefLifeSpanHandler {
 
@@ -52,6 +59,8 @@ public:
 	}
 
 protected:
+
+	static void externalInvocationHandlerFunc( bw_Application* app, void* data );
 
 	void onBrowserCreated(
 		CefRefPtr<CefBrowser> browser,
@@ -150,31 +159,27 @@ protected:
 
 		// This argument is the command string
 		CefString cmd = msg_args->GetString( 0 );
+		std::string cmd_str = cmd.ToString();
 
+        // All next message arguments are the arguments of the command
 		std::vector<std::string> params; params.reserve( msg_args->GetSize() - 1 );
-		std::vector<bw_CStrSlice> params_slices; params_slices.reserve( params.capacity() );
 		for ( size_t i = 1; i < msg_args->GetSize(); i++ ) {
 			std::string param = msg_args->GetString( i ).ToString();
 
 			params.push_back( param );
-
-			// Convert the stored param into a bw_CStrSlice
-			bw_CStrSlice param_str_slice = {
-				param.length(),
-				params[i - 1].c_str()
-			};
-			params_slices.push_back( param_str_slice );
 		}
 
-		// Convert cmd from CefString to bw_CStrSlice
-		std::string cmd_str = cmd.ToString();
-		bw_CStrSlice cmd_str_slice = {
-			cmd_str.length(),
-			cmd_str.c_str()
-		};
-		// TODO: Move this conversion into its own function
-
-		our_handle->external_handler( our_handle, cmd_str_slice, params_slices.data(), params.size() );
+        // Dispatch the invocation of the external handler to the thread from which the BrowserWindow main loop runs.
+        auto dispatch_data = new ExternalInvocationHandlerData {
+            our_handle,
+            cmd_str,
+            params
+        };
+        bw_Application_dispatch(
+            our_handle->window->app,
+            externalInvocationHandlerFunc,
+            (void*)dispatch_data
+        );
 	}
 
 	void openDevTools( bw_BrowserWindow* bw, const CefRefPtr<CefBrowserHost>& host ) {

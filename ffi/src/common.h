@@ -7,6 +7,7 @@ extern "C" {
 
 
 
+#include "assert.h"
 #include "debug.h"
 
 

@@ -69,7 +69,7 @@ bw_Window* bw_Window_new(
 	const bw_WindowOptions* options,
 	void* user_data
 ) {
-	bw_Application_checkThread( app );
+	bw_Application_assertCorrectThread( app );
 
 	bw_Window* window = (bw_Window*)malloc( sizeof(bw_Window) );
 

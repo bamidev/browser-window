@@ -20,7 +20,7 @@
 
 
 
-void bw_Application_checkThread( const bw_Application* app ) {
+void bw_Application_assertCorrectThread( const bw_Application* app ) {
 #ifndef NDEBUG
 	if ( app->impl.handle != GetModuleHandle(NULL) )
 		BW_PANIC("Application handle used in invalid thread!");
@@ -56,8 +56,6 @@ bool bw_Application_isRunning( const bw_Application* app ) {
 
 int bw_ApplicationImpl_run( bw_Application* app, bw_ApplicationImpl_ReadyHandlerData* ready_handler_data ) {
 
-	bw_Application_checkThread( app );
-
 	MSG msg;
 	BOOL res;
 	int exit_code = 0;
@@ -77,7 +75,7 @@ int bw_ApplicationImpl_run( bw_Application* app, bw_ApplicationImpl_ReadyHandler
 			res = GetMessageW( &msg, 0, 0, 0 );
 
 			// When WM_QUIT is received, turn on exiting mode
-			if ( res == 0 ) {
+			if ( res == false ) {
 				exit_code = (int)msg.wParam;
 				exiting = true;
 
@@ -92,7 +90,7 @@ int bw_ApplicationImpl_run( bw_Application* app, bw_ApplicationImpl_ReadyHandler
 		else {
 			res = PeekMessage( &msg, 0, 0, 0, PM_REMOVE );
 
-			if ( res == 0 )
+			if ( res == false )
 				break;
 		}
 
@@ -112,7 +110,7 @@ int bw_ApplicationImpl_run( bw_Application* app, bw_ApplicationImpl_ReadyHandler
 		}
 	}
 
-	// TODO: Wakeup all waiting delegation futures, so that they an return an error indiating that the runtime has exitted.
+	// TODO: Wakeup all waiting delegation futures, so that they can return an error indiating that the runtime has exitted.
 
 	UnregisterClassW( L"bw-window", app->impl.handle );
 

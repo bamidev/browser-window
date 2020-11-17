@@ -12,6 +12,7 @@ type bw_ApplicationReadyFn = bw_ApplicationDispatchFn;
 
 
 extern "C" {
+	pub fn bw_Application_assertCorrectThread( app: *const bw_Application );
 	pub fn bw_Application_dispatch( app: *mut bw_Application, func: bw_ApplicationDispatchFn, data: *mut c_void ) -> bool;
 	pub fn bw_Application_exit( app: *mut bw_Application, result: c_int );
 	pub fn bw_Application_exitAsync( app: *mut bw_Application, result: c_int );

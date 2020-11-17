@@ -8,9 +8,10 @@ use crate::browser::*;
 use std::{
 	mem,
 	path::PathBuf,
-	ptr
+	pin::Pin,
+	ptr,
+	vec::Vec
 };
-
 
 
 /// The type of content to display in a browser window
@@ -28,7 +29,7 @@ pub struct BrowserWindowBuilder {
 	title: Option<String>,
 	width: Option<u32>,
 	height: Option<u32>,
-	handler: Option<Box<dyn FnMut(BrowserWindowHandle, &str, &[&str]) + Send>>,
+	handler: Option<Box<dyn FnMut(BrowserWindowHandle, String, Vec<String>) -> Pin<Box<dyn Future<Output=()>>> + Send>>,
 
 	borders: bool,
 	dev_tools: bool,
@@ -53,13 +54,25 @@ impl BrowserWindowBuilder {
 		self.dev_tools = enabled;	self
 	}
 
+	/*pub fn handler<H>( mut self, mut handler: H ) -> Self where
+		H: FnMut(BrowserWindowHandle, String, Vec<String>) + Send + 'static
+	{
+		self.handler = Some( Box::new( move |handle, cmd, args| Box::pin( async {
+			handler( handle, cmd, args );
+		} ) ) );
+		self
+	}*/
+
 	/// Configure a closure that can be invoked from within JavaScript.
 	/// The closure's second parameter specifies a command name.
 	/// The closure's third parameter specifies an array of string arguments.
-	pub fn handler<H>( mut self, handler: H ) -> Self where
-		H: FnMut(BrowserWindowHandle, &str, &[&str]) + Send + 'static
+	pub fn async_handler<H,F>( mut self, mut handler: H ) -> Self where
+		H: FnMut(BrowserWindowHandle, String, Vec<String>) -> F + Send + 'static,
+		F: Future<Output=()> + 'static
 	{
-		self.handler = Some( Box::new( handler ) );
+		self.handler = Some( Box::new(
+			move |handle, cmd, args| Box::pin(handler( handle, cmd, args ) )
+		) );
 		self
 	}
 
@@ -177,15 +190,15 @@ impl BrowserWindowBuilder {
 	{
 		match self {
 			Self { parent,
-				   source,
-				   title,
-				   width,
-				   height,
-				   handler,
-				   borders,
-				   minimizable,
-				   resizable,
-				   dev_tools
+			   source,
+			   title,
+			   width,
+			   height,
+			   handler,
+			   borders,
+			   minimizable,
+			   resizable,
+			   dev_tools
 			} => {
 
 				// Parent
@@ -234,7 +247,7 @@ impl BrowserWindowBuilder {
 					BrowserUserData {
 						handler: match handler {
 							Some(f) => f,
-							None => Box::new(|_,_,_| {})
+							None => Box::new(|_,_,_| Box::pin(async {}))
 						}
 					}
 				) );
@@ -273,7 +286,7 @@ impl BrowserWindowBuilder {
 
 /// The data that is passed to the C FFI handler function
 struct BrowserUserData {
-	handler: Box<dyn FnMut( BrowserWindowHandle, &str, &[&str])>
+	handler: Box<dyn FnMut( BrowserWindowHandle, String, Vec<String>) -> Pin<Box<dyn Future<Output=()>>>>
 }
 
 /// The data that is passed to the creation callback function
@@ -282,14 +295,14 @@ struct BrowserUserData {
 
 
 /// Takes the arguments received from the C FFI handler callback, and converts it to a vector of strings
-fn args_to_vec<'a>( args: *const bw_CStrSlice, args_count: usize ) -> Vec<&'a str> {
+fn args_to_vec( args: *const bw_CStrSlice, args_count: usize ) -> Vec<String> {
 
-	let mut vec = Vec::<&str>::with_capacity( args_count );
+	let mut vec = Vec::with_capacity( args_count );
 
 	for i in 0..args_count {
-		let str_ref: &str = unsafe { (*args.offset(i as _)).into() };
+		let str_arg: String = unsafe { *args.offset(i as _) }.into();
 
-		vec.push( str_ref );
+		vec.push( str_arg );
 	}
 
 	vec
@@ -308,7 +321,8 @@ extern "C" fn ffi_window_invoke_handler( inner_handle: *mut bw_BrowserWindow, _c
 
 				let args = args_to_vec( _args, args_count );
 
-				handler( outer_handle, _command.into(), &*args );
+				let future = handler( outer_handle, _command.into(), args );
+				outer_handle.app().spawn( future );
 			}
 		}
 	}

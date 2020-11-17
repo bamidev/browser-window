@@ -16,7 +16,7 @@ void bw_BrowserWindow_close( bw_BrowserWindow* bw ) {
 }
 
 void bw_BrowserWindow_drop( bw_BrowserWindow* bw ) {
-	bw_Application_checkThread( bw->window->app );
+	bw_Application_assertCorrectThread( bw->window->app );
 
 	// Let the window module know that the user has dropped the handle and doesn't use it anymore
 	bw_Window_drop( bw->window );
@@ -43,7 +43,7 @@ void bw_BrowserWindow_new(
 	bw_BrowserWindowCreationCallbackFn callback,	// A function that gets invoked when the browser window has been created.
 	void* callback_data	// Data that will be passed to the creation callback
 ) {
-	bw_Application_checkThread( app );
+	bw_Application_assertCorrectThread( app );
 
 	bw_BrowserWindow* browser = (bw_BrowserWindow*)malloc( sizeof( bw_BrowserWindow ) );
 

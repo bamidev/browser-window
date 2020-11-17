@@ -125,6 +125,9 @@ impl Runtime {
 	/// Polls a future given a pointer to the waker data.
 	unsafe fn poll_future( data: *mut WakerData ) {
 		debug_assert!( data != ptr::null_mut(), "WakerData pointer can't be zero!" );
+		// Test if polling from the right thread
+		#[cfg(debug_assertions)]
+		bw_Application_assertCorrectThread( (*data).handle.ffi_handle );
 
 		let waker = Self::new_waker( data );
 		let mut ctx = Context::from_waker( &waker );
@@ -332,7 +335,7 @@ impl ApplicationHandleThreaded {
 		unsafe {
 			bw_Application_dispatch(
 				self.handle.ffi_handle,
-				ffi_application_dispatch_handler,
+				ffi_dispatch_handler,
 				data as _
 			)
 		}
@@ -393,7 +396,7 @@ impl HasAppHandle for ApplicationHandle {
 
 
 
-unsafe extern "C" fn ffi_application_dispatch_handler( _app: *mut bw_Application, _data: *mut c_void ) {
+unsafe extern "C" fn ffi_dispatch_handler(_app: *mut bw_Application, _data: *mut c_void ) {
 
 	let data_ptr = _data as *mut ApplicationDispatchData<'static>;
 	let data = Box::from_raw( data_ptr );

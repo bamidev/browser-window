@@ -44,7 +44,7 @@ typedef struct bw_ApplicationDispatchData bw_ApplicationDispatchData;
 
 /// Safety check that makes sure the given application handle is used on the correct thread.
 /// Does nothing in release mode.
-void bw_Application_checkThread( const bw_Application* );
+void bw_Application_assertCorrectThread( const bw_Application* );
 
 /// Exits the main loop, returning execution to the function that invoked the run call.
 /// The exit_code will be returned by bw_Application_run.

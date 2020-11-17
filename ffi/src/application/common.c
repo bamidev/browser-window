@@ -15,6 +15,7 @@ void bw_Application_free( bw_Application* app ) {
 }
 
 int bw_Application_run( bw_Application* app, bw_ApplicationReadyFn on_ready, void* user_data ) {
+	bw_Application_assertCorrectThread( app );
 
 	bw_ApplicationImpl_ReadyHandlerData ready_handler_data = {
 		app,
