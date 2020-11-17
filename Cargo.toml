@@ -1,6 +1,6 @@
 [package]
 name = "browser-window"
-version = "0.3.1"
+version = "0.4.0"
 description = "A simple async/await aware browser (GUI) toolkit."
 edition = "2018"
 authors = ["Danny de Jong"]
@@ -19,7 +19,7 @@ name = "browser_window"
 path = "src/lib.rs"
 
 [dependencies]
-browser-window-ffi = { path = "./ffi", version = "0.3.0" }
+browser-window-ffi = { path = "./ffi", version = "0.4.0" }
 futures-channel = { version = "0.3" }
 lazy_static = "1"
 
