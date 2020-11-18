@@ -188,6 +188,13 @@ impl BrowserWindowBuilder {
 		Ok( BrowserWindowThreaded::new( rx.await.unwrap() ) )
 	}
 
+	/// Sets the width and height of the browser window
+	pub fn size( mut self, width: u32, height: u32 ) -> Self {
+		self.width = Some( width );
+		self.height = Some( height );
+		self
+	}
+
 	fn _build<H>( self, app: ApplicationHandle, on_created: H ) where
 		H: FnOnce( BrowserWindowHandle )
 	{
