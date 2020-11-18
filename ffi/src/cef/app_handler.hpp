@@ -7,6 +7,7 @@
 #include <include/cef_v8.h>
 
 #include "external_invocation_handler.hpp"
+#include "v8_to_string.hpp"
 #include "../assert.h"
 #include "../application.h"
 #include "../browser_window.h"
@@ -118,7 +119,7 @@ public:
 		}
 		else {
 
-			CefString result_string = ret_val->GetStringValue();
+			CefString result_string = V8ToString::convert( ret_val );
 
 			// The first parameter specifies whether or not an error has resulted
 			msg_args->SetBool( 0, true );

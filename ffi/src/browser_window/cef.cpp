@@ -47,7 +47,7 @@ void bw_BrowserWindow_evalJs( bw_BrowserWindow* bw, bw_CStrSlice js, bw_BrowserW
 	// This allows executing JS code that isn't terminated with a semicolon, and does the javascript value string conversion inside JS.
 	std::string _code = "(function () { return ";
 	_code.append( js.data, js.len );
-	_code += "; })().toString()";
+	_code += "; })()";
 	CefString code = _code;
 	// Note: For the sake of simplicity, I've used std::string to append some strings together.
 	//       CefString unfortunately doesn't provide this functionality.
