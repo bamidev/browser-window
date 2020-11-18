@@ -9,9 +9,6 @@ publish = true
 categories = ["api-bindings"]
 repository = "https://github.com/bamilab/browser-window/tree/master/ffi"
 
-[features]
-edge = []
-
 [lib]
 name = "browser_window_ffi"
 path = "src/lib.rs"
