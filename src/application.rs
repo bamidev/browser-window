@@ -3,7 +3,7 @@
 //! Browser Window needs to be initialized, and also run its own runtime.
 //! Once that is set up and running, all windows can be constructed and played around with.
 //! To do this, you use `Application::initialize`.
-//! Then you have an `Application` instance, from which you can obtain a new `Runtime` instance.
+//! Then you have an `Application` instance, from which you can obtain a `Runtime` instance.
 //! Running it will grant you access to an application handle which you can manage the application with, and from which you can create all your windows with.
 //!
 //! # Example #1
@@ -15,7 +15,7 @@
 //! 	let application = Application::initialize();
 //! 	let runtime = application.start();
 //!
-//!      runtime.run_async(|app| async move {
+//!      runtime.run_async(|handle| async move {
 //!
 //!         // Do something ...
 //!     });
@@ -29,7 +29,7 @@
 //! use browser_window::application::*;
 //! use tokio;
 //!
-//! async fn alternative_main( app: ApplicationHandleThreaded ) {
+//! async fn async_main( app: ApplicationHandleThreaded ) {
 //! 	// Do something...
 //! }
 //!
@@ -38,10 +38,11 @@
 //!
 //! 	let tokio_runtime = tokio::runtime::Runtime::new().unwrap();
 //!     let bw_runtime = application.start();
-//!     runtime.run(|_app| {
-//!         let app: ApplicationHandleThreaded = _app.into();
 //!
-//! 		tokio_runtime.spawn( alternative_main( app ) );
+//!     bw_runtime.run(|_handle| {
+//!         let handle: ApplicationHandleThreaded = _handle.into();
+//!
+//! 		tokio_runtime.spawn( async_main( app ) );
 //! 	});
 //! }
 //! ```
