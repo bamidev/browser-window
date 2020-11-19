@@ -223,6 +223,9 @@ impl Runtime {
 	/// Runs the main loop and executes the given future within that loop.
 	/// This function exits when the future finishes or when `exit` is called.
 	///
+	/// Keep in mind that calls to async functions or futures may not necessarily finish.
+	/// Exiting the application causes the runtime to stop, and it doesn't necessarily complete all waiting tasks.
+	///
 	/// # Reserved Codes
 	/// The same reserved codes apply as `run`.
 	pub fn run_async<'a,C,F>( &'a self, func: C ) -> i32 where

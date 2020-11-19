@@ -9,7 +9,7 @@ However, they lack a few important things.
 ## Goals
 
 Browser Window aims to be cross-platform, very simple, and straight forward.
-Many methods in Browser Window are asynchronous, such as evaluating JavaScript code and getting back its output.
+Some methods in Browser Window are asynchronous, such as evaluating JavaScript code and getting back its output.
 Browser Window utilizes and benefits from Rust's async/await syntax, so this should make it a breeze.
 
 Moreover, if you want to use it in a multi-threaded environment, that's also possible with our thread-safe handles!
@@ -36,7 +36,7 @@ If you want to help out, you're more than welcome! I could use some help with im
 
 ## Comming Soon
 
-At the moment, basic functionality is available, but there is more to come.
+At the moment, only basic functionality is available, but there is more to come.
 These are the features that are awaiting implementation:
 
 * Linux support (through GTK+) [underway]
