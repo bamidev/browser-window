@@ -28,7 +28,7 @@ pub enum Source {
 	Url( String )
 }
 
-/// Used to create a `Browser` or `BrowserThreaded` instance.
+/// Used to create a `BrowserWindow` or `BrowserWindowThreaded` instance.
 pub struct BrowserWindowBuilder {
 
 	dev_tools: bool,

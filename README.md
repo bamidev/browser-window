@@ -43,3 +43,4 @@ These are the features that are awaiting implementation:
 * MacOS support (through Cocoa)
 * Cookie support (including HttpOnly cookies)
 * Events
+* Servo engine support
