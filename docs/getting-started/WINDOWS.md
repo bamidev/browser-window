@@ -28,5 +28,5 @@ A call to `cargo run` will do it.
 
 ##### Building From Source
 
-If you really want to build CEF from source, take a look at [this](https://bitbucket.org/chromiumembedded/cef/wiki/MasterBuildQuickStart.md#markdown-header-windows-setup).
+If you really want to build CEF from source, take a look at [this](https://bitbucket.org/chromiumembedded/cef/wiki/BranchesAndBuilding.md#markdown-header-automated-method).
 You still need to set up the environment variables and copy the files into the working directory afterwards.

@@ -47,7 +47,9 @@ When done, the file is located at `./libcef_dll_wrapper/libcef_dll_wrapper.a`.
 ## Environment Variables & Resource Files
 
 Then we need to tell our compiler & linker where they can find our library files by setting `CEF_PATH` to the directory we've just extracted:
-```export CEF_PATH=/my/path/to/cef_binary_ ... _minimal```
+```
+export CEF_PATH=/my/path/to/cef_binary_ ... _minimal
+```
 
 To last thing that needs to be done is that some files need to be made available to the executable.
 Copy all .bin files from the Release folder to the working directory.
@@ -58,5 +60,5 @@ A call to `cargo run` will do it.
 
 ## Building From Source
 
-If you really want to build CEF from source, take a look at [this](https://bitbucket.org/chromiumembedded/cef/wiki/MasterBuildQuickStart.md#markdown-header-linux-setup).
+If you really want to build CEF from source, take a look at [this](https://bitbucket.org/chromiumembedded/cef/wiki/BranchesAndBuilding.md#markdown-header-automated-method).
 You still need to set up the environment variables and copy the files into the working directory afterwards.
