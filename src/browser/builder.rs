@@ -34,15 +34,30 @@ pub struct BrowserWindowBuilder {
 	height: Option<u32>,
 	handler: Option<Box<dyn FnMut(BrowserWindowHandle, String, Vec<String>) -> Pin<Box<dyn Future<Output=()>>> + Send>>,
 
+	// Window options
 	borders: bool,
 	dev_tools: bool,
 	minimizable: bool,
+	opacity: u8,
 	resizable: bool
 }
 
 
 
 impl BrowserWindowBuilder {
+
+	/// Configure a closure that can be invoked from within JavaScript.
+	/// The closure's second parameter specifies a command name.
+	/// The closure's third parameter specifies an array of string arguments.
+	pub fn async_handler<H,F>( mut self, mut handler: H ) -> Self where
+		H: FnMut(BrowserWindowHandle, String, Vec<String>) -> F + Send + 'static,
+		F: Future<Output=()> + 'static
+	{
+		self.handler = Some( Box::new(
+			move |handle, cmd, args| Box::pin(handler( handle, cmd, args ) )
+		) );
+		self
+	}
 
 	/// Sets whether or not the window has borders.
 	/// Default is true.
@@ -66,23 +81,14 @@ impl BrowserWindowBuilder {
 		self
 	}*/
 
-	/// Configure a closure that can be invoked from within JavaScript.
-	/// The closure's second parameter specifies a command name.
-	/// The closure's third parameter specifies an array of string arguments.
-	pub fn async_handler<H,F>( mut self, mut handler: H ) -> Self where
-		H: FnMut(BrowserWindowHandle, String, Vec<String>) -> F + Send + 'static,
-		F: Future<Output=()> + 'static
-	{
-		self.handler = Some( Box::new(
-			move |handle, cmd, args| Box::pin(handler( handle, cmd, args ) )
-		) );
-		self
-	}
-
 	/// Sets whether or not the window has a minimize button on the title bar
 	/// Default is true
 	pub fn minimizable( mut self, value: bool ) -> Self {
 		self.minimizable = value;	self
+	}
+
+	pub fn opacity( mut self, value: u8 ) -> Self {
+		self.opacity = value;	self
 	}
 
 	/// Configure a parent window.
@@ -111,6 +117,7 @@ impl BrowserWindowBuilder {
 			borders: true,
 			dev_tools: cfg!(debug_assertions),
 			minimizable: true,
+			opacity: 0,
 			resizable: true
 		}
 	}
@@ -200,15 +207,16 @@ impl BrowserWindowBuilder {
 	{
 		match self {
 			Self { parent,
-			   source,
-			   title,
-			   width,
-			   height,
-			   handler,
-			   borders,
-			   minimizable,
-			   resizable,
-			   dev_tools
+				source,
+				title,
+				width,
+				height,
+				handler,
+				borders,
+				minimizable,
+				opacity,
+				resizable,
+				dev_tools
 			} => {
 
 				// Parent
@@ -264,10 +272,11 @@ impl BrowserWindowBuilder {
 				let callback_data: *mut Box<dyn FnOnce( BrowserWindowHandle )> = Box::into_raw( Box::new( Box::new(on_created ) ) );
 
 				let window_options = bw_WindowOptions {
-					minimizable: minimizable,
-					resizable: resizable,
+					minimizable,
+					resizable,
 					closable: true,
-					borders: borders
+					borders,
+					opacity
 				};
 
 				let other_options = bw_BrowserWindowOptions {

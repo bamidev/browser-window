@@ -35,10 +35,11 @@ typedef struct bw_WindowCallbacks {
 } bw_WindowCallbacks;
 
 typedef struct bw_WindowOptions {
-	bool minimizable;
-	bool resizable;
-	bool closable;
 	bool borders;
+	bool closable;
+	bool minimizable;
+	unsigned char opacity;
+	bool resizable;
 } bw_WindowOptions;
 
 typedef void (*bw_WindowDispatchFn)( bw_Window* window, void* data );

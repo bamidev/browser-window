@@ -13,13 +13,13 @@
 
 pub mod application;
 pub mod browser;
-mod common;
 
 #[cfg(test)]
 mod tests;
 
 
 
+mod common;
 pub use common::{
 	DelegateError,
 	DelegateFuture,

@@ -57,8 +57,15 @@ bw_WindowImpl bw_WindowImpl_new(
 
 	wchar_t* title = bw_win32_copyAsNewWstr( _title );
 
+    // Set extended window style to 'layered', if opacity is set
+	DWORD ex_style = 0;
+	if ( options->opacity > 0 )
+	    ex_style = WS_EX_LAYERED;
+
+
 	// Create the window
-	impl.handle = CreateWindowExW( 0,
+	impl.handle = CreateWindowExW(
+	    ex_style,
 		L"bw-window",
 		title,
 		window_style,
@@ -78,6 +85,10 @@ bw_WindowImpl bw_WindowImpl_new(
 
 	// Store a pointer to our window handle in win32's window handle
 	SetWindowLongPtrW( impl.handle, GWLP_USERDATA, (LONG_PTR)window );
+
+	// Set opacity
+	if ( options->opacity > 0 )
+	    SetLayeredWindowAttributes( impl.handle, 0, 255 - options->opacity, LWA_ALPHA );
 
 	// Show window
 	ShowWindow( impl.handle, SW_SHOW );

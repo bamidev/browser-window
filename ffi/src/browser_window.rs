@@ -31,10 +31,11 @@ pub struct bw_BrowserWindowSource {
 
 #[repr(C)]
 pub struct bw_WindowOptions {
-	pub minimizable: bool,
-	pub resizable: bool,
+	pub borders: bool,
 	pub closable: bool,
-	pub borders: bool
+	pub minimizable: bool,
+	pub opacity: u8,
+	pub resizable: bool
 }
 
 
