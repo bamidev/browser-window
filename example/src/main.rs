@@ -71,6 +71,7 @@ fn main() {
 
 		let bw = BrowserWindowBuilder::new( Source::File( html_file ) )
 			.title("Terminal Example")
+			.opacity(32)
 			.async_handler(|handle, cmd, args| async move {
 
 				match cmd.as_str() {
