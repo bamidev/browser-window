@@ -13,6 +13,7 @@
 
 pub mod application;
 pub mod browser;
+pub mod event;
 pub mod window;
 
 #[cfg(test)]
