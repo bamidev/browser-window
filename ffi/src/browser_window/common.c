@@ -30,9 +30,13 @@ void* bw_BrowserWindow_getUserData( bw_BrowserWindow* bw ) {
 	return bw->user_data;
 }
 
+bw_Window* bw_BrowserWindow_getWindow( bw_BrowserWindow* bw ) {
+    return bw->window;
+}
+
 void bw_BrowserWindow_new(
 	bw_Application* app,
-	const bw_BrowserWindow* _parent,
+	const bw_Window* parent,
 	bw_BrowserWindowSource source,
 	bw_CStrSlice title,
 	int width, int height,
@@ -46,8 +50,6 @@ void bw_BrowserWindow_new(
 	bw_Application_assertCorrectThread( app );
 
 	bw_BrowserWindow* browser = (bw_BrowserWindow*)malloc( sizeof( bw_BrowserWindow ) );
-
-	bw_Window* parent = _parent == 0 ? 0 : _parent->window;
 
 	browser->window = bw_Window_new( app, parent, title, width, height, window_options, browser );
 	browser->window->callbacks.do_cleanup = bw_BrowserWindowImpl_doCleanup;

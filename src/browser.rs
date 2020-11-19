@@ -15,10 +15,13 @@ use std::{
 
 use crate::application::*;
 use crate::common::*;
+use crate::window::*;
 
 pub mod builder;
 
 pub use builder::{BrowserWindowBuilder, Source};
+
+use unsafe_send_sync::UnsafeSend;
 
 
 //type BrowserJsCallbackData<'a> = Box<dyn FnOnce(Browser, Result<String, JsEvaluationError>) + 'a>;
@@ -53,7 +56,7 @@ unsafe impl Sync for BrowserWindowThreaded {}
 pub struct BrowserWindowHandle {
 	pub(in super) ffi_handle: *mut bw_BrowserWindow
 }
-unsafe impl Send for BrowserWindowHandle {}
+//unsafe impl Send for BrowserWindowHandle {}
 
 /// An error that may occur when evaluating or executing JavaScript code.
 #[derive(Debug)]
@@ -62,8 +65,8 @@ pub struct JsEvaluationError {
 	// TODO: Add line and column number files, and perhaps even more info about the JS error
 }
 
-pub trait OwnedBrowserWindow {
-	fn handle( &self ) -> BrowserWindowHandle;
+pub trait OwnedBrowserWindow: OwnedWindow {
+	fn browser_handle( &self ) -> BrowserWindowHandle;
 }
 
 
@@ -106,8 +109,14 @@ impl HasAppHandle for BrowserWindow {
 	}
 }
 
+impl OwnedWindow for BrowserWindow {
+	fn window_handle( &self ) -> WindowHandle {
+		self.handle.window()
+	}
+}
+
 impl OwnedBrowserWindow for BrowserWindow {
-	fn handle( &self ) -> BrowserWindowHandle {
+	fn browser_handle( &self ) -> BrowserWindowHandle {
 		self.handle.clone()
 	}
 }
@@ -174,6 +183,12 @@ impl BrowserWindowHandle {
 	pub fn navigate( &self, url: &str ) {
 		unsafe { bw_BrowserWindow_navigate( self.ffi_handle, url.into() ) };
 	}
+
+	pub fn window( &self ) -> WindowHandle {
+		WindowHandle::new(
+			unsafe { bw_BrowserWindow_getWindow( self.ffi_handle ) }
+		)
+	}
 }
 
 
@@ -226,10 +241,10 @@ impl BrowserWindowThreaded {
 	pub fn dispatch<'a,F>( &self, func: F ) -> bool where
 		F:  FnOnce( BrowserWindowHandle ) + Send + 'a
 	{
-		let handle = self.handle;
+		let handle = UnsafeSend::new( self.handle );
 
 		self.app().dispatch(move |_| {
-			func( handle );
+			func( handle.i );
 		})
 	}
 
@@ -268,8 +283,14 @@ impl HasAppHandle for BrowserWindowThreaded {
 	}
 }
 
+impl OwnedWindow for BrowserWindowThreaded {
+	fn window_handle( &self ) -> WindowHandle {
+		self.handle.window()
+	}
+}
+
 impl OwnedBrowserWindow for BrowserWindowThreaded {
-	fn handle( &self ) -> BrowserWindowHandle {
+	fn browser_handle( &self ) -> BrowserWindowHandle {
 		self.handle.clone()
 	}
 }

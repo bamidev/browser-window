@@ -4,14 +4,18 @@ use std::ffi::*;
 
 use crate::application::{ApplicationHandle, ApplicationHandleThreaded};
 use crate::browser::*;
+use crate::window::WindowBuilder;
 
 use std::{
+	ops::DerefMut,
 	mem,
 	path::PathBuf,
 	pin::Pin,
 	ptr,
 	vec::Vec
 };
+
+use unsafe_send_sync::UnsafeSend;
 
 
 /// The type of content to display in a browser window
@@ -27,19 +31,10 @@ pub enum Source {
 /// Used to create a `Browser` or `BrowserThreaded` instance.
 pub struct BrowserWindowBuilder {
 
-	parent: Option<BrowserWindowHandle>,
-	source: Source,
-	title: Option<String>,
-	width: Option<u32>,
-	height: Option<u32>,
-	handler: Option<Box<dyn FnMut(BrowserWindowHandle, String, Vec<String>) -> Pin<Box<dyn Future<Output=()>>> + Send>>,
-
-	// Window options
-	borders: bool,
 	dev_tools: bool,
-	minimizable: bool,
-	opacity: u8,
-	resizable: bool
+	handler: Option<Box<dyn FnMut(BrowserWindowHandle, String, Vec<String>) -> Pin<Box<dyn Future<Output=()>>> + Send>>,
+	source: Source,
+	window: WindowBuilder
 }
 
 
@@ -49,7 +44,7 @@ impl BrowserWindowBuilder {
 	/// Configure a closure that can be invoked from within JavaScript.
 	/// The closure's second parameter specifies a command name.
 	/// The closure's third parameter specifies an array of string arguments.
-	pub fn async_handler<H,F>( mut self, mut handler: H ) -> Self where
+	pub fn async_handler<H,F>( &mut self, mut handler: H ) -> &mut Self where
 		H: FnMut(BrowserWindowHandle, String, Vec<String>) -> F + Send + 'static,
 		F: Future<Output=()> + 'static
 	{
@@ -59,20 +54,14 @@ impl BrowserWindowBuilder {
 		self
 	}
 
-	/// Sets whether or not the window has borders.
-	/// Default is true.
-	pub fn borders( mut self, value: bool ) -> Self {
-		self.borders = value;	self
-	}
-
 	/// Sets whether or not an extra window with developer tools will be opened together with this browser.
 	/// When in debug mode the default is `true`.
 	/// When in release mode the default is `false`.
-	pub fn dev_tools( mut self, enabled: bool ) -> Self {
+	pub fn dev_tools( &mut self, enabled: bool ) -> &mut Self {
 		self.dev_tools = enabled;	self
 	}
 
-	/*pub fn handler<H>( mut self, mut handler: H ) -> Self where
+	/*pub fn handler<H>( &mut self, mut handler: H ) -> &Self where
 		H: FnMut(BrowserWindowHandle, String, Vec<String>) + Send + 'static
 	{
 		self.handler = Some( Box::new( move |handle, cmd, args| Box::pin( async {
@@ -81,78 +70,17 @@ impl BrowserWindowBuilder {
 		self
 	}*/
 
-	/// Sets whether or not the window has a minimize button on the title bar
-	/// Default is true
-	pub fn minimizable( mut self, value: bool ) -> Self {
-		self.minimizable = value;	self
-	}
-
-	pub fn opacity( mut self, value: u8 ) -> Self {
-		self.opacity = value;	self
-	}
-
-	/// Configure a parent window.
-	/// When a parent window closes, this browser window will close as well.
-	/// This could be a reference to a `Browser` or `BrowserThreaded` handle.
-	pub fn parent<B>( mut self, bw: &B ) -> Self where
-		B: OwnedBrowserWindow
-	{
-		self.parent = Some( bw.handle() );
-		self
-	}
-
 	/// Creates an instance of a browser window builder.
 	///
 	/// # Arguments
 	/// * `source` - The content that will be displayed in the browser window.
 	pub fn new( source: Source ) -> Self {
 		Self {
-			parent: None,
+			dev_tools: cfg!(debug_assertions),
 			source,
 			handler: None,
-			title: None,
-			width: None,
-			height: None,
-
-			borders: true,
-			dev_tools: cfg!(debug_assertions),
-			minimizable: true,
-			opacity: 0,
-			resizable: true
+			window: WindowBuilder::new()
 		}
-	}
-
-	/// Sets the title of the window
-	///
-	/// # Arguments
-	/// * `title` - The text that will be displayed in the title bar
-	pub fn title<S: Into<String>>( mut self, title: S ) -> Self {
-		self.title = Some( title.into() );
-		self
-	}
-
-	/// Sets the width that the browser window will be created with initially
-	///
-	/// # Arguments
-	/// * `width` - Width in pixels
-	pub fn width( mut self, width: u32 ) -> Self {
-		self.width = Some( width );
-		self
-	}
-
-	/// Sets the height that the browser window will be created with initially
-	///
-	/// # Arguments
-	/// * `height` - Height in pixels
-	pub fn height( mut self, height: u32 ) -> Self {
-		self.height = Some( height );
-		self
-	}
-
-	/// Sets whether or not the window will be resizable
-	/// Default is true
-	pub fn resizable( mut self, resizable: bool ) -> Self {
-		self.resizable = resizable;	self
 	}
 
 	/// Creates the browser window.
@@ -179,50 +107,37 @@ impl BrowserWindowBuilder {
 	/// * `app` - An thread-safe application handle.
 	pub async fn build_threaded( self, app: ApplicationHandleThreaded ) -> Result<BrowserWindowThreaded, DelegateError> {
 
-		let (tx, rx) = oneshot::channel::<BrowserWindowHandle>();
+		let (tx, rx) = oneshot::channel::<UnsafeSend<BrowserWindowHandle>>();
 
 		// We need to dispatch the spawning of the browser to the GUI thread
 		app.delegate(|app_handle| {
 
 			self._build(app_handle, |inner_handle| {
 
-				if let Err(_) = tx.send( inner_handle ) {
+				if let Err(_) = tx.send( UnsafeSend::new( inner_handle ) ) {
 					panic!("Unable to send browser handle back")
 				}
 			} );
 		}).await?;
 
-		Ok( BrowserWindowThreaded::new( rx.await.unwrap() ) )
-	}
-
-	/// Sets the width and height of the browser window
-	pub fn size( mut self, width: u32, height: u32 ) -> Self {
-		self.width = Some( width );
-		self.height = Some( height );
-		self
+		Ok( BrowserWindowThreaded::new( rx.await.unwrap().i ) )
 	}
 
 	fn _build<H>( self, app: ApplicationHandle, on_created: H ) where
 		H: FnOnce( BrowserWindowHandle )
 	{
 		match self {
-			Self { parent,
+			Self {
 				source,
-				title,
-				width,
-				height,
 				handler,
-				borders,
-				minimizable,
-				opacity,
-				resizable,
-				dev_tools
+				dev_tools,
+				window
 			} => {
 
 				// Parent
-				let parent_handle = match parent {
+				let parent_handle = match window.parent {
 					None => ptr::null(),
-					Some( p ) => p.ffi_handle
+					Some( p ) => p.i.ffi_handle
 				};
 
 				// Source
@@ -246,21 +161,13 @@ impl BrowserWindowBuilder {
 					} }
 				};
 
-				let title_ptr = match title.as_ref() {
+				// Title
+				let title_ptr = match window.title.as_ref() {
 					None => "Browser Window".into(),
 					Some( t ) => t.as_str().into()
 				};
 
-				// Width and height use -1 as the 'use default' option within the c code
-				let w: i32 = match width {
-					Some(w) => w as i32,
-					None => -1
-				};
-				let h: i32 = match height {
-					Some(h) => h as i32,
-					None => -1
-				};
-
+				// Handler callback data
 				let user_data = Box::into_raw( Box::new(
 					BrowserUserData {
 						handler: match handler {
@@ -271,14 +178,14 @@ impl BrowserWindowBuilder {
 				) );
 				let callback_data: *mut Box<dyn FnOnce( BrowserWindowHandle )> = Box::into_raw( Box::new( Box::new(on_created ) ) );
 
+				// Convert options to FFI structs
 				let window_options = bw_WindowOptions {
-					minimizable,
-					resizable,
+					borders: window.borders,
 					closable: true,
-					borders,
-					opacity
+					minimizable: window.minimizable,
+					opacity: window.opacity,
+					resizable: window.resizable
 				};
-
 				let other_options = bw_BrowserWindowOptions {
 					dev_tools,
 					resource_path: "".into()
@@ -289,8 +196,8 @@ impl BrowserWindowBuilder {
 					parent_handle,
 					csource,
 					title_ptr,
-					w,
-					h,
+					window.width,
+					window.height,
 					&window_options,
 					&other_options,
 					ffi_window_invoke_handler,
@@ -300,6 +207,21 @@ impl BrowserWindowBuilder {
 				) };
 			}
 		}
+	}
+}
+
+impl Deref for BrowserWindowBuilder {
+	type Target = WindowBuilder;
+
+	fn deref( &self ) -> &Self::Target {
+		&self.window
+	}
+}
+
+impl DerefMut for BrowserWindowBuilder {
+
+	fn deref_mut( &mut self ) -> &mut Self::Target {
+		&mut self.window
 	}
 }
 

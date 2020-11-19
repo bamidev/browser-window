@@ -69,9 +69,8 @@ fn main() {
 		let mut html_file = working_dir.clone();
 		html_file.push( "resources/terminal.html" );
 
-		let bw = BrowserWindowBuilder::new( Source::File( html_file ) )
-			.title("Terminal Example")
-			.opacity(32)
+		let mut bwb = BrowserWindowBuilder::new( Source::File( html_file ) );
+		bwb
 			.async_handler(|handle, cmd, args| async move {
 
 				match cmd.as_str() {
@@ -85,7 +84,9 @@ fn main() {
 					}
 				}
 			})
-			.build( app ).await;
+			.title("Terminal Example")
+			.opacity(32);
+		let bw = bwb.build( app ).await;
 
 		// Initialize the script with our working directory.
 		// Make sure that it is initializes whether document has been loaded already or not.

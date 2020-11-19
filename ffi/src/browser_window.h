@@ -70,13 +70,14 @@ void bw_BrowserWindow_evalJsThreaded( bw_BrowserWindow* bw, bw_CStrSlice js, bw_
 
 bw_Application* bw_BrowserWindow_getApp( bw_BrowserWindow* bw );
 void* bw_BrowserWindow_getUserData( bw_BrowserWindow* bw );
+bw_Window* bw_BrowserWindow_getWindow( bw_BrowserWindow* bw );
 
 bw_Err bw_BrowserWindow_navigate( bw_BrowserWindow* bw, bw_CStrSlice url );
 
 /// Creates a new browser window
 void bw_BrowserWindow_new(
 	bw_Application* app,
-	const bw_BrowserWindow* parent,
+	const bw_Window* parent,
 	bw_BrowserWindowSource source,
 	bw_CStrSlice _title,
 	int width, int height,

@@ -6,6 +6,7 @@ use std::os::raw::*;
 use super::application::bw_Application;
 use super::err::bw_Err;
 use super::string::bw_CStrSlice;
+use super::window::*;
 
 
 
@@ -29,15 +30,6 @@ pub struct bw_BrowserWindowSource {
 	pub is_html: bool
 }
 
-#[repr(C)]
-pub struct bw_WindowOptions {
-	pub borders: bool,
-	pub closable: bool,
-	pub minimizable: bool,
-	pub opacity: u8,
-	pub resizable: bool
-}
-
 
 
 extern "C" {
@@ -48,10 +40,11 @@ extern "C" {
 	pub fn bw_BrowserWindow_evalJsThreaded( bw: *mut bw_BrowserWindow, js: bw_CStrSlice, callback: bw_BrowserWindowEvalJsCallbackFn, cb_data: *mut c_void );
 	pub fn bw_BrowserWindow_getApp( bw: *mut bw_BrowserWindow ) -> *mut bw_Application;
 	pub fn bw_BrowserWindow_getUserData( bw: *mut bw_BrowserWindow ) -> *mut c_void;
+	pub fn bw_BrowserWindow_getWindow( bw: *mut bw_BrowserWindow ) -> *mut bw_Window;
 	pub fn bw_BrowserWindow_navigate( bw: *mut bw_BrowserWindow, url: bw_CStrSlice ) -> bw_Err;
 	pub fn bw_BrowserWindow_new(
 		app: *mut bw_Application,
-		parent: *const bw_BrowserWindow,
+		parent: *const bw_Window,
 		source: bw_BrowserWindowSource,
 		title: bw_CStrSlice,
 		width: c_int,
