@@ -14,8 +14,10 @@
 pub mod application;
 pub mod browser;
 pub mod event;
+pub mod prelude;
 pub mod window;
 
+mod prop;
 #[cfg(test)]
 mod tests;
 
@@ -27,3 +29,4 @@ pub use common::{
 	DelegateFuture,
 	DelegateFutureFuture
 };
+pub use prop::Property;
