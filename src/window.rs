@@ -1,3 +1,5 @@
+//! This module contains all window related functionality.
+
 mod builder;
 
 use super::*;
@@ -36,21 +38,21 @@ impl WindowHandle {
 
 
 
-prop! { /// Gets or sets the current window outer size
+prop! { /// Gets or sets the width and height of the content of the window.
 	ContentDimensions<Dims2D>( this: WindowHandle ) {
 		get => unsafe{ bw_Window_getContentDimensions( this.ffi_handle ) }.into(),
 		set(val) => unsafe { bw_Window_setContentDimensions( this.ffi_handle, val.into() ) }
 	}
 }
 
-prop! { /// Gets or sets the position of the window
+prop! { /// Gets or sets the current position of the window.
 	Position<Pos2D>( this: WindowHandle ) {
 		get => unsafe { bw_Window_getPosition( this.ffi_handle ) }.into(),
 		set(val) => unsafe { bw_Window_setPosition( this.ffi_handle, val.into() ) }
 	}
 }
 
-prop!{ /// Gets or sets the title of the window
+prop!{ /// Gets or sets the title of the window.
 	pub Title<String, &str>( this: WindowHandle ) {
 		get => {
 			// First obtain string size
@@ -71,7 +73,7 @@ prop!{ /// Gets or sets the title of the window
 	}
 }
 
-prop! { /// Gets or sets the current window outer size
+prop! { /// Gets or sets the current window size including its border and titlebar.
 	WindowDimensions<Dims2D>( this: WindowHandle ) {
 		get => unsafe{ bw_Window_getWindowDimensions( this.ffi_handle ) }.into(),
 		set(val) => unsafe { bw_Window_setWindowDimensions( this.ffi_handle, val.into() ) }

@@ -4,6 +4,7 @@ use unsafe_send_sync::UnsafeSend;
 
 
 
+/// Exposes functionality related to constructing a window.
 pub struct WindowBuilder {
     pub(in crate) borders: bool,
     pub(in crate) height: i32,
@@ -37,7 +38,7 @@ impl WindowBuilder {
         self.minimizable = value;	self
     }
 
-    /// Makes the window transparent.
+    /// Makes the window (partially) transparent.
     /// A `value` of `255` indicates that the window should be fully transparent.
     /// A `value` of `0` indicates the the window should not be transparent at all.
     pub fn opacity( &mut self, value: u8 ) -> &mut Self {
