@@ -16,9 +16,7 @@ char* bw_win32_unknownHresultMessage( bw_ErrCode code, const void* data );
 
 
 
-void bw_win32_print_error() {
-
-	DWORD code = GetLastError();
+void bw_win32_print_error( DWORD code ) {
 
 	wchar_t msg[512];
 	FormatMessageW(
@@ -91,6 +89,29 @@ char* bw_win32_copyWstrAsNewCstr( const WCHAR* str ) {
 	cstr[ size_needed ] = '\0';
 
 	return cstr;
+}
+
+size_t bw_win32_copyAsNewUtf8Str( const WCHAR* string, char** output ) {
+
+    size_t len = WideCharToMultiByte( CP_UTF8, 0, string, -1, 0, 0, 0, 0  );
+    if ( len == 0 ) BW_WIN32_PANIC_LAST_ERROR;
+
+    *output = (char*)malloc( len );
+
+    if ( !WideCharToMultiByte(
+        CP_UTF8,
+        WC_ERR_INVALID_CHARS,
+        (LPCWCH)string,
+        -1,
+        *output,
+        (int)len,
+        0,
+        0
+    ) ) {
+        BW_WIN32_PANIC_LAST_ERROR;
+    }
+
+    return len;
 }
 
 bw_Err bw_win32_unhandledHresult( HRESULT hResult ) {

@@ -82,8 +82,15 @@ void bw_Window_drop( bw_Window* window );
 /// Returns whether or not the window has been closed.
 bool bw_Window_isClosed( const bw_Window* window );
 
+/// Copies as many bytes into `title` as fit there.
+/// Returns the number of characters the title actually has.
+size_t bw_Window_getTitle( bw_Window* window, bw_StrSlice title );
+
 /// Shows the window if it was previously hidden
 void bw_Window_open( bw_Window* window );
+
+/// Applies the given title;
+void bw_Window_setTitle( bw_Window* window, bw_CStrSlice title );
 
 
 

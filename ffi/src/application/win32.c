@@ -46,9 +46,9 @@ bool bw_ApplicationImpl_dispatch( bw_Application* app, bw_ApplicationDispatchDat
 
 bool bw_Application_isRunning( const bw_Application* app ) {
 
-	AcquireSRWLockShared( &app->impl.is_running_mtx );
+	AcquireSRWLockShared( (SRWLOCK*)&app->impl.is_running_mtx );
 	bool result = app->impl.is_running;
-	ReleaseSRWLockShared( &app->impl.is_running_mtx );
+	ReleaseSRWLockShared( (SRWLOCK*)&app->impl.is_running_mtx );
 
 	return result;
 }
@@ -95,7 +95,7 @@ int bw_ApplicationImpl_run( bw_Application* app, bw_ApplicationImpl_ReadyHandler
 		}
 
 		if (res == -1) {
-			BW_WIN32_ASSERT_ERROR;
+			BW_WIN32_PANIC_LAST_ERROR;
 		}
 		else {
 			TranslateMessage( &msg );

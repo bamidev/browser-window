@@ -25,6 +25,32 @@ void bw_WindowWin32_calculatePositionCentered( int width, int height, int* x, in
 
 
 
+size_t bw_Window_getTitle( bw_Window* window, bw_StrSlice title ) {
+
+    // First get the length of the window title
+    int length = GetWindowTextLengthW( window->impl.handle );
+    BW_WIN32_ASSERT_SUCCESS;
+
+    if ( length > 0 && title.len > 0 ) {
+        WCHAR* buffer = (WCHAR*)malloc( sizeof(WCHAR) * (length + 1) );
+
+        // Copy string
+        int copied = GetWindowTextW( window->impl.handle, (LPSTR)buffer, length + 1 );
+        if ( copied == 0 ) {
+            free( buffer );
+            BW_WIN32_PANIC_LAST_ERROR;
+        }
+
+        // Copy into our slice
+        char* utf8_str;
+        bw_win32_copyAsNewUtf8Str( buffer, &utf8_str );
+        memcpy( title.data, utf8_str, length );
+        free( utf8_str );
+    }
+
+    return length;
+}
+
 void bw_WindowImpl_destroy( bw_Window* window ) {
 	DestroyWindow( window->impl.handle );
 }
@@ -80,7 +106,7 @@ bw_WindowImpl bw_WindowImpl_new(
 	);
 	free( title );
 	if ( impl.handle == NULL ) {
-		BW_WIN32_ASSERT_ERROR;
+		BW_WIN32_PANIC_LAST_ERROR;
 	}
 
 	// Store a pointer to our window handle in win32's window handle
@@ -136,6 +162,14 @@ LRESULT CALLBACK bw_Window_proc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 	}
 
 	return 0;
+}
+
+void bw_Window_setTitle( bw_Window* window, bw_CStrSlice _title ) {
+    WCHAR* title = bw_win32_copyAsNewWstr( _title );
+
+    SetWindowTextW( window->impl.handle, title );
+
+    free( title );
 }
 
 void bw_WindowImpl_show( bw_Window* window ) {

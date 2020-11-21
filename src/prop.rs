@@ -70,7 +70,6 @@ macro_rules! _prop_internal {
 
 /// A macro to define a so called 'property'.
 /// The idea comes from C#.
-/// Macro's
 #[macro_export]
 macro_rules! prop {
 	( $(#[$meta:meta])* $name:ident<$tg:ty, $ts:ty>($this:ident: $stype:ty) { get => $get:expr, set( $val:ident ) => $set:expr } ) => {
@@ -90,6 +89,7 @@ macro_rules! prop {
 	};
 }
 
+/// A macro to implement the property for a struct.
 #[macro_export]
 macro_rules! impl_prop {
 	( $name:ident: $property:ident ) => {
