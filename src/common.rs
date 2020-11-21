@@ -109,6 +109,16 @@ struct DelegateFutureInner<'a,R> where R: Send {
 //  care should be taken to make sure that the future is safe to send to other threads.
 unsafe impl<'a,R> Send for DelegateFutureInner<'a,R> where R: Send {}
 
+pub struct Pos2D {
+	x: u16,
+	y: u16
+}
+
+pub struct Dims2D {
+	width: u16,
+	height: u16
+}
+
 
 
 impl<'a,H,R> DelegateFuture<'a,H,R> where R: Send {
@@ -335,6 +345,62 @@ extern "C" fn ffi_delegate_async_handler<R>( app: *mut bw_Application, _data: *m
 					}
 				}
 			}
+		}
+	}
+}
+
+
+
+impl Dims2D {
+	pub fn new( width: u16, height: u16 ) -> Self {
+		Self {
+			width,
+			height
+		}
+	}
+}
+
+impl From<bw_Dims2D> for Dims2D {
+	fn from( other: bw_Dims2D ) -> Self {
+		Self {
+			width: other.width,
+			height: other.height
+		}
+	}
+}
+
+impl Into<bw_Dims2D> for Dims2D {
+	fn into( self: Self ) -> bw_Dims2D {
+		bw_Dims2D {
+			width: self.width,
+			height: self.height
+		}
+	}
+}
+
+impl Pos2D {
+	pub fn new( x: u16, y: u16 ) -> Self {
+		Self {
+			x,
+			y
+		}
+	}
+}
+
+impl From<bw_Pos2D> for Pos2D {
+	fn from( other: bw_Pos2D ) -> Self {
+		Self {
+			x: other.x,
+			y: other.y
+		}
+	}
+}
+
+impl Into<bw_Pos2D> for Pos2D {
+	fn into( self: Self ) -> bw_Pos2D {
+		bw_Pos2D {
+			x: self.x,
+			y: self.y
 		}
 	}
 }

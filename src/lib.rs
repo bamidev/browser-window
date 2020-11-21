@@ -27,6 +27,8 @@ mod common;
 pub use common::{
 	DelegateError,
 	DelegateFuture,
-	DelegateFutureFuture
+	DelegateFutureFuture,
+	Dims2D,
+	Pos2D
 };
 pub use prop::Property;

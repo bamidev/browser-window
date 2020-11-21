@@ -25,6 +25,30 @@ void bw_WindowWin32_calculatePositionCentered( int width, int height, int* x, in
 
 
 
+bw_Dims2D bw_Window_getContentDimensions( bw_Window* window ) {
+    bw_Dims2D dims;
+
+    RECT rect;
+    GetClientRect( window->impl.handle, &rect );
+
+    dims.width = (uint16_t)(rect.right - rect.left);
+    dims.height = (uint16_t)(rect.bottom - rect.top);
+
+    return dims;
+}
+
+bw_Pos2D bw_Window_getPosition( bw_Window* window ) {
+    bw_Pos2D pos;
+
+    RECT rect;
+    GetWindowRect( window->impl.handle, &rect );
+
+    pos.x = (uint16_t)rect.left;
+    pos.y = (uint16_t)rect.top;
+
+    return pos;
+}
+
 size_t bw_Window_getTitle( bw_Window* window, bw_StrSlice title ) {
 
     // First get the length of the window title
@@ -35,7 +59,7 @@ size_t bw_Window_getTitle( bw_Window* window, bw_StrSlice title ) {
         WCHAR* buffer = (WCHAR*)malloc( sizeof(WCHAR) * (length + 1) );
 
         // Copy string
-        int copied = GetWindowTextW( window->impl.handle, (LPSTR)buffer, length + 1 );
+        int copied = GetWindowTextW( window->impl.handle, (LPWSTR)buffer, length + 1 );
         if ( copied == 0 ) {
             free( buffer );
             BW_WIN32_PANIC_LAST_ERROR;
@@ -50,6 +74,76 @@ size_t bw_Window_getTitle( bw_Window* window, bw_StrSlice title ) {
 
     return length;
 }
+
+bw_Dims2D bw_Window_getWindowDimensions( bw_Window* window ) {
+    bw_Dims2D dims;
+
+    RECT rect;
+    GetWindowRect( window->impl.handle, &rect );
+
+   dims.width = (uint16_t)(rect.right - rect.left);
+   dims.height = (uint16_t)(rect.bottom - rect.top);
+
+   return dims;
+}
+
+void bw_Window_setContentDimensions( bw_Window* window, bw_Dims2D dimensions ) {
+    RECT rect;
+    rect.left = 0; rect.right = dimensions.width;
+    rect.top = 0;  rect.bottom = dimensions.height;
+
+    // Obtained the window size based on our client area size
+    if ( !AdjustWindowRect( &rect, window->impl.style, FALSE ) )
+        BW_WIN32_PANIC_LAST_ERROR
+
+    LONG actual_width = rect.right - rect.left;
+    LONG actual_height = rect.bottom - rect.top;
+
+    // Get our x and y coordinate
+    if ( !GetWindowRect( window->impl.handle, &rect ) )
+        BW_WIN32_PANIC_LAST_ERROR
+
+    // Apply the current position with the new width and height
+    if ( !SetWindowPos( window->impl.handle, 0, rect.left, rect.top, actual_width, actual_height, 0  ) )
+        BW_WIN32_PANIC_LAST_ERROR
+}
+
+void bw_Window_setPosition( bw_Window* window, bw_Pos2D position ) {
+    RECT rect;
+
+    if ( !GetWindowRect( window->impl.handle, &rect ) )
+        BW_WIN32_PANIC_LAST_ERROR
+
+    // Width and height
+    LONG width = rect.right - rect.left;
+    LONG height = rect.bottom - rect.top;
+
+    if ( !SetWindowPos( window->impl.handle, 0, position.x, position.y, width, height, 0 ) )
+        BW_WIN32_PANIC_LAST_ERROR
+}
+
+void bw_Window_setTitle( bw_Window* window, bw_CStrSlice _title ) {
+    WCHAR* title = bw_win32_copyAsNewWstr( _title );
+
+    SetWindowTextW( window->impl.handle, title );
+
+    free( title );
+}
+
+void bw_Window_setWindowDimensions( bw_Window* window, bw_Dims2D dimensions ) {
+    RECT rect;
+
+    if ( !GetWindowRect( window->impl.handle, &rect ) )
+        BW_WIN32_PANIC_LAST_ERROR
+
+    rect.right = rect.left + dimensions.width;
+    rect.bottom = rect.top + dimensions.height;
+
+    if ( !SetWindowPos( window->impl.handle, 0, rect.left, rect.top, dimensions.width, dimensions.height, 0 ) )
+        BW_WIN32_PANIC_LAST_ERROR
+}
+
+
 
 void bw_WindowImpl_destroy( bw_Window* window ) {
 	DestroyWindow( window->impl.handle );
@@ -69,32 +163,27 @@ bw_WindowImpl bw_WindowImpl_new(
 ) {
 	bw_WindowImpl impl;
 
-	DWORD window_style = WS_OVERLAPPEDWINDOW;
+	impl.style = WS_OVERLAPPEDWINDOW;
 
 	if ( !options->borders )
-		window_style ^= WS_BORDER;
+		impl.style ^= WS_BORDER;
 	if ( !options->resizable )
-		window_style ^= WS_SIZEBOX & WS_MAXIMIZEBOX;
+		impl.style ^= WS_SIZEBOX & WS_MAXIMIZEBOX;
 	if ( !options->minimizable )
-		window_style ^= WS_MINIMIZEBOX;
+		impl.style ^= WS_MINIMIZEBOX;
 
 	if ( width == -1 || height == -1 )
 	    width = CW_USEDEFAULT;
 
 	wchar_t* title = bw_win32_copyAsNewWstr( _title );
 
-    // Set extended window style to 'layered', if opacity is set
-	DWORD ex_style = 0;
-	if ( options->opacity > 0 )
-	    ex_style = WS_EX_LAYERED;
-
-
 	// Create the window
+	DWORD ex_style = WS_EX_LAYERED;
 	impl.handle = CreateWindowExW(
 	    ex_style,
 		L"bw-window",
 		title,
-		window_style,
+		impl.style,
 		CW_USEDEFAULT,  // Let Windows decide where to place our window
 		0,
 		width,
@@ -162,14 +251,6 @@ LRESULT CALLBACK bw_Window_proc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 	}
 
 	return 0;
-}
-
-void bw_Window_setTitle( bw_Window* window, bw_CStrSlice _title ) {
-    WCHAR* title = bw_win32_copyAsNewWstr( _title );
-
-    SetWindowTextW( window->impl.handle, title );
-
-    free( title );
 }
 
 void bw_WindowImpl_show( bw_Window* window ) {

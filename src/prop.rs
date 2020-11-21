@@ -72,20 +72,20 @@ macro_rules! _prop_internal {
 /// The idea comes from C#.
 #[macro_export]
 macro_rules! prop {
-	( $(#[$meta:meta])* $name:ident<$tg:ty, $ts:ty>($this:ident: $stype:ty) { get => $get:expr, set( $val:ident ) => $set:expr } ) => {
-        _prop_internal!( $(#[$meta])*, , $name, $tg, $ts, $this, $stype, $get, $val, $set  );
+	( $(#[$metas:meta])* $name:ident<$type:ty>( $this:ident: $stype:ty ) { get => $get:expr, set( $val:ident ) => $set:expr } ) => {
+		 _prop_internal!( $(#[$metas])*, pub, $name, $type, $type, $this, $stype, $get, $val, $set  );
 	};
-	( $(#[$meta:meta])* pub $name:ident<$tg:ty, $ts:ty>($this:ident: $stype:ty) { get => $get:expr, set( $val:ident ) => $set:expr } ) => {
-        _prop_internal!( $(#[$meta])*, pub, $name, $tg, $ts, $this, $stype, $get, $val, $set  );
+	/*( $(#[$metas:meta])* pub $name:ident<$type:ty>( $this:ident: $stype:ty ) { get => $get:expr, set( $val:ident ) => $set:expr } ) => {
+		 _prop_internal!( $(#[metas])*, pub, $name, $type, $type, $this, $stype, $get, $val, $set  );
+	};*/
+	( $(#[$metas:meta])* $name:ident<$tg:ty, $ts:ty>($this:ident: $stype:ty) { get => $get:expr, set( $val:ident ) => $set:expr } ) => {
+        _prop_internal!( $(#[$metas])*, , $name, $tg, $ts, $this, $stype, $get, $val, $set  );
 	};
-	( $(#[$meta:meta])* pub($vis:tt) $name:ident<$tg:ty, $ts:ty>($this:ident: $stype:ty) { get => $get:expr, set( $val:ident ) => $set:expr } ) => {
-        _prop_internal!( $(#[$meta])*, pub($vis:tt), $name, $tg, $ts, $this, $stype, $get, $val, $set  );
+	( $(#[$metas:meta])* pub $name:ident<$tg:ty, $ts:ty>($this:ident: $stype:ty) { get => $get:expr, set( $val:ident ) => $set:expr } ) => {
+        _prop_internal!( $(#[$metas])*, pub, $name, $tg, $ts, $this, $stype, $get, $val, $set  );
 	};
-	( $(#[$meta:meta])* $name:ident<$type:ty>( $this:ident: $stype:ty ) { get => $get:expr, set( $val:ident ) => $set:expr } ) => {
-		 _prop_internal!( $(#[$meta])*, , $name, $type, $type, $this, $stype, $get, $val, $set  );
-	};
-	( $(#[$meta:meta])* pub $name:ident<$type:ty>( $this:ident: $stype:ty ) { get => $get:expr, set( $val:ident ) => $set:expr } ) => {
-		 _prop_internal!( $(#[meta])*, pub, $name, $type, $type, $this, $stype, $get, $val, $set  );
+	( $(#[$metas:meta])* pub($vis:tt) $name:ident<$tg:ty, $ts:ty>($this:ident: $stype:ty) { get => $get:expr, set( $val:ident ) => $set:expr } ) => {
+        _prop_internal!( $(#[$metas])*, pub($vis:tt), $name, $tg, $ts, $this, $stype, $get, $val, $set  );
 	};
 }
 

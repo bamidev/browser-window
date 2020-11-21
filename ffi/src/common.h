@@ -10,10 +10,23 @@ extern "C" {
 #include "assert.h"
 #include "debug.h"
 
+#include <stdint.h>
+
 
 
 #define UNUSED( X ) \
 	(void)( X );
+
+
+typedef struct {
+    uint16_t width;
+    uint16_t height;
+} bw_Dims2D;
+
+typedef struct {
+    uint16_t x;
+    uint16_t y;
+} bw_Pos2D;
 
 
 

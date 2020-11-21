@@ -10,6 +10,7 @@
 
 typedef struct {
 	HWND handle;
+	DWORD style;
 } bw_WindowImpl;
 
 

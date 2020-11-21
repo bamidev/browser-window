@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 #include "application.h"
+#include "common.h"
 #include "string.h"
 
 #if defined(BW_WIN32)
@@ -82,15 +83,30 @@ void bw_Window_drop( bw_Window* window );
 /// Returns whether or not the window has been closed.
 bool bw_Window_isClosed( const bw_Window* window );
 
+/// Gets the width and height of the usable area inside the window.
+bw_Dims2D bw_Window_getContentDimensions( bw_Window* window );
+
+/// Gets the X and Y coordinates of the window position relative to the desktop screen.
+bw_Pos2D bw_Window_getPosition( bw_Window* window );
+
 /// Copies as many bytes into `title` as fit there.
 /// Returns the number of characters the title actually has.
 size_t bw_Window_getTitle( bw_Window* window, bw_StrSlice title );
 
+/// Gets the width and height of the window including the title bar and borders.
+bw_Dims2D bw_Window_getWindowDimensions( bw_Window* window );
+
 /// Shows the window if it was previously hidden
 void bw_Window_open( bw_Window* window );
 
+void bw_Window_setContentDimensions( bw_Window* window, bw_Dims2D dimensions );
+
+void bw_Window_setPosition( bw_Window* window, bw_Pos2D position );
+
 /// Applies the given title;
 void bw_Window_setTitle( bw_Window* window, bw_CStrSlice title );
+
+void bw_Window_setWindowDimensions( bw_Window* window );
 
 
 
