@@ -41,6 +41,7 @@ Run from within the extracted folder:
 ```
 cd cef_binary_*
 cmake .
+make
 ```
 When done, the file is located at `./libcef_dll_wrapper/libcef_dll_wrapper.a`.
 
