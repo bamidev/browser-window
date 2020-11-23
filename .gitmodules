@@ -1,0 +1,4 @@
+[submodule "dep/cef"]
+	path = dep/cef
+	url = https://github.com/chromiumembedded/cef.git
+	branch = 4280
