@@ -41,7 +41,7 @@ bw_ApplicationEngineImpl bw_ApplicationEngineImpl_initialize( bw_Application* ap
 	}
 
 	CefSettings app_settings;
-	// Only works on Windows:
+	// Only works on Windows and Linux apparently:
 #ifdef BW_WIN32
 	app_settings.multi_threaded_message_loop = true;
 #endif

@@ -3,8 +3,6 @@
 #include "impl.h"
 #include "../common.h"
 
-#include <stdatomic.h>
-
 #include <gtk/gtk.h>
 
 
@@ -21,10 +19,9 @@ gboolean _bw_ApplicationImpl_exitHandler( gpointer data );
 
 
 
-void bw_Application_checkThread( const bw_Application* app ) {
+void bw_Application_assertCorrectThread( const bw_Application* app ) {
 #ifndef NDEBUG
-	// TODO: Check if called from the correct thread
-
+	BW_ASSERT( app->impl.thread_id == pthread_self(), "Browser Window C function called from non-GUI thread!" )
 #else
 	UNUSED(app);
 #endif
@@ -33,6 +30,12 @@ void bw_Application_checkThread( const bw_Application* app ) {
 void bw_Application_exit( bw_Application* app, int exit_code ) {
 	app->impl.exit_code = exit_code;
 
+	// Set `is_running` flag to false
+	pthread_mutex_lock( &app->impl.is_running_mtx );
+	app->impl.is_running = false;
+	pthread_mutex_unlock( &app->impl.is_running_mtx );
+
+	// Then quit the loop
 	g_application_quit( G_APPLICATION( app->impl.handle ) );
 }
 
@@ -48,9 +51,12 @@ void bw_ApplicationGtk_onActivate( GtkApplication* gtk_handle, gpointer data ) {
 	UNUSED( gtk_handle );
 
 	bw_ApplicationImpl_ReadyHandlerData* ready_handler_data = (bw_ApplicationImpl_ReadyHandlerData*)data;
+	bw_ApplicationImpl* app = &ready_handler_data->app->impl;
 
 	// Mark the application as 'running'
-	atomic_store( ready_handler_data->app->is_running, true );
+	pthread_mutex_lock( &app->is_running_mtx );
+	app->is_running = true;
+	pthread_mutex_unlock( &app->is_running_mtx );
 
 	(ready_handler_data->func)( ready_handler_data->app, ready_handler_data->data );
 }
@@ -64,13 +70,22 @@ int bw_ApplicationImpl_run( bw_Application* app, bw_ApplicationImpl_ReadyHandler
 	return app->impl.exit_code;
 }
 
-void bw_ApplicationImpl_dispatch( bw_Application* app, bw_ApplicationDispatchData* data ) {
-	(void)(app);
+bool bw_ApplicationImpl_dispatch( bw_Application* app, bw_ApplicationDispatchData* data ) {
+	bool is_running = true;
+	
+	pthread_mutex_lock( &app->impl.is_running_mtx );
 
-	gdk_threads_add_idle( _bw_ApplicationImpl_dispatchHandler, (gpointer)data );
+	if ( app->impl.is_running )
+		gdk_threads_add_idle( _bw_ApplicationImpl_dispatchHandler, (gpointer)data );
+	else
+		is_running = false;
+
+	pthread_mutex_unlock( &app->impl.is_running_mtx );
+
+	return is_running;
 }
 
-bw_ApplicationImpl bw_ApplicationImpl_start( bw_Application* _app, int argc, char** argv ) {
+bw_ApplicationImpl bw_ApplicationImpl_initialize( bw_Application* _app, int argc, char** argv ) {
 	(void)(_app);
 
 	bw_ApplicationImpl app;
@@ -78,12 +93,20 @@ bw_ApplicationImpl bw_ApplicationImpl_start( bw_Application* _app, int argc, cha
 	app.handle = gtk_application_new("bamilab.BrowserWindow", G_APPLICATION_FLAGS_NONE);
 	app.argc = argc;
 	app.argv = argv;
+	app.is_running = false;
+	app.thread_id = pthread_self();
+
+	// Initialize mutex
+	int result = pthread_mutex_init( &app.is_running_mtx, NULL );
+	BW_POSIX_ASSERT_SUCCESS( result );
 
 	return app;
 }
 
 // There is no 'free' function for GtkApplication*
-void bw_ApplicationImpl_finish( bw_ApplicationImpl* app ) {
+void bw_ApplicationImpl_free( bw_ApplicationImpl* app ) {
+
+	pthread_mutex_destroy( &app->is_running_mtx );
 	g_object_unref( app->handle );
 }
 
@@ -93,6 +116,8 @@ gboolean _bw_ApplicationImpl_dispatchHandler( gpointer _dispatch_data ) {
 	bw_ApplicationDispatchData* dispatch_data = (bw_ApplicationDispatchData*)(_dispatch_data);
 
 	dispatch_data->func( dispatch_data->app, dispatch_data->data );
+
+	free( dispatch_data );
 
 	return FALSE;
 }
