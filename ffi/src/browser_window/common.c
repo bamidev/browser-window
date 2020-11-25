@@ -11,8 +11,8 @@ void bw_BrowserWindow_onDestroy( bw_Window* w );
 
 
 
-void bw_BrowserWindow_close( bw_BrowserWindow* bw ) {
-	bw_Window_close( bw->window );
+void bw_BrowserWindow_destroy( bw_BrowserWindow* bw ) {
+	bw_Window_destroy( bw->window );
 }
 
 void bw_BrowserWindow_drop( bw_BrowserWindow* bw ) {

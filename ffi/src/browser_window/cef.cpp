@@ -122,7 +122,6 @@ void bw_BrowserWindowImpl_new(
 	RECT rect;
 	GetClientRect( browser->window->impl.handle, &rect );
 	info.SetAsChild( browser->window->impl.handle, rect );
-
 #elif defined(BW_GTK)
 
 	CefRect rect( 0, 0, width, height );

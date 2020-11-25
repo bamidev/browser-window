@@ -75,7 +75,7 @@ int bw_ApplicationImpl_run( bw_Application* app, bw_ApplicationImpl_ReadyHandler
 			res = GetMessageW( &msg, 0, 0, 0 );
 
 			// When WM_QUIT is received, turn on exiting mode
-			if ( res == false ) {
+			if ( res == 0 ) {
 				exit_code = (int)msg.wParam;
 				exiting = true;
 
@@ -90,7 +90,7 @@ int bw_ApplicationImpl_run( bw_Application* app, bw_ApplicationImpl_ReadyHandler
 		else {
 			res = PeekMessage( &msg, 0, 0, 0, PM_REMOVE );
 
-			if ( res == false )
+			if ( res == 0 )
 				break;
 		}
 
@@ -111,7 +111,6 @@ int bw_ApplicationImpl_run( bw_Application* app, bw_ApplicationImpl_ReadyHandler
 	}
 
 	// TODO: Wakeup all waiting delegation futures, so that they can return an error indiating that the runtime has exitted.
-
 	UnregisterClassW( L"bw-window", app->impl.handle );
 
 	return exit_code;
@@ -154,6 +153,6 @@ void bw_Application_exitAsync( bw_Application* app, int code ) {
 	bw_Application_exit( app, code );
 }
 
-void bw_ApplicationImpl_free( bw_ApplicationImpl* app ) {
+void bw_ApplicationImpl_finish( bw_ApplicationImpl* app ) {
 	UNUSED(app);
 }

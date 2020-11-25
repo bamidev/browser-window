@@ -14,7 +14,7 @@ void bw_Window_destroy( bw_Window* window ) {
 		window->callbacks.do_cleanup( window );
 
 	// Actually destroy and free our window
-	bw_WindowImpl_destroy( window );
+	bw_WindowImpl_destroy( &window->impl );
 	free( window );
 
 	// Decrease the window counter
@@ -32,23 +32,14 @@ const bw_Application* bw_Window_getApp( bw_Window* window ) {
 	return window->app;
 }
 
-bool bw_Window_isClosed( const bw_Window* window ) {
-	return window->closed;
+void bw_Window_hide( bw_Window* window ) {
+    window->closed = true;
+
+    bw_WindowImpl_hide( &window->impl );
 }
 
-// Closing a window hides the window,
-//  and if the window has been dropped, it will be destroyed.
-// This should also be called from the window implementations close event.
-void bw_Window_close( bw_Window* window ) {
-	window->closed = true;
-
-	if ( window->dropped ) {
-		bw_Window_destroy( window );
-	}
-	else
-		bw_WindowImpl_hide( window );
-
-	// TODO: Fire on_closed event
+bool bw_Window_isVisible( const bw_Window* window ) {
+	return !window->closed;
 }
 
 // Dropping the window handle may destroy if the window has also been closed.
@@ -75,7 +66,7 @@ bw_Window* bw_Window_new(
 
 	window->app = app;
 	window->parent = parent;
-	window->closed = false;
+	window->closed = true;  // Windows start out hidden to the user
 	window->dropped = false;
 	window->user_data = user_data;
 	memset( &window->callbacks, 0, sizeof( window->callbacks ) );
@@ -85,8 +76,24 @@ bw_Window* bw_Window_new(
 	return window;
 }
 
-void bw_Window_open( bw_Window* window ) {
-	window->closed = false;
+void bw_Window_show( bw_Window* window ) {
+    window->closed = false;
 
-	bw_WindowImpl_show( window );
+    bw_WindowImpl_show( &window->impl );
+}
+
+// Closing a window hides the window,
+//  and if the window has been dropped, it will be destroyed.
+// This should also be called from the window implementations close event.
+void bw_Window_triggerClose( bw_Window* window ) {
+	window->closed = true;
+
+	if ( window->dropped ) {
+		bw_Window_destroy( window );
+	}
+	else {
+		bw_WindowImpl_hide( window );
+    }
+
+	// TODO: Fire on_closed event
 }

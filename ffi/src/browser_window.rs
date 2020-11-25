@@ -33,7 +33,7 @@ pub struct bw_BrowserWindowSource {
 
 
 extern "C" {
-	pub fn bw_BrowserWindow_close( bw: *mut bw_BrowserWindow );
+	pub fn bw_BrowserWindow_destroy( bw: *mut bw_BrowserWindow );
 	pub fn bw_BrowserWindow_dispatch( bw: *mut bw_BrowserWindow, func: bw_BrowserWindowDispatchFn, data: *mut c_void );
 	pub fn bw_BrowserWindow_drop( bw: *mut bw_BrowserWindow );
 	pub fn bw_BrowserWindow_evalJs( bw: *mut bw_BrowserWindow, js: bw_CStrSlice, callback: bw_BrowserWindowEvalJsCallbackFn, cb_data: *mut c_void );

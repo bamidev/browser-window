@@ -184,9 +184,6 @@ protected:
 
 	void openDevTools( bw_BrowserWindow* bw, const CefRefPtr<CefBrowserHost>& host ) {
 
-		// FIXME: For some reason, CefWindowInfo.SetAsPopup is only available under Windows.
-		//        So at the moment the developer tools only work for windows.
-#ifdef BW_WIN32
         CefRefPtr<CefClient> client;
         CefBrowserSettings settings;
         CefPoint point;
@@ -195,7 +192,6 @@ protected:
 	    info.SetAsPopup( bw->window->impl.handle, "Dev Tools" );
 
 	    host->ShowDevTools( info, client, settings, point );
-#endif
 	}
 
 	IMPLEMENT_REFCOUNTING(ClientHandler);

@@ -41,7 +41,7 @@ bw_ApplicationEngineImpl bw_ApplicationEngineImpl_initialize( bw_Application* ap
 	}
 
 	CefSettings app_settings;
-	// Only works on Windows and Linux apparently:
+	// Only works on Windows:
 #ifdef BW_WIN32
 	app_settings.multi_threaded_message_loop = true;
 #endif
@@ -56,8 +56,7 @@ bw_ApplicationEngineImpl bw_ApplicationEngineImpl_initialize( bw_Application* ap
 	return impl;
 }
 
-void bw_ApplicationEngineImpl_free( bw_ApplicationEngineImpl* app ) {
+void bw_ApplicationEngineImpl_finish( bw_ApplicationEngineImpl* app ) {
     CefShutdown();
-
 	delete (CefRefPtr<CefClient>*)app->cef_client;
 }

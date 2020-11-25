@@ -1,5 +1,6 @@
 use browser_window::application::*;
 use browser_window::browser::*;
+use browser_window::prelude::*;
 use serde_json;
 use std::env;
 use std::io::prelude::*;
@@ -63,12 +64,14 @@ fn main() {
 	let application = Application::initialize();
 	let runtime = application.start();
 
+
 	let exit_code = runtime.run_async( |app| async move {
 
 		let working_dir = env::current_dir().unwrap();
-		let mut html_file = working_dir.clone();
-		html_file.push( "resources/terminal.html" );
 
+		let mut html_file = working_dir.clone();	html_file.push( "resources/terminal.html" );		
+
+		// Our browser window
 		let mut bwb = BrowserWindowBuilder::new( Source::File( html_file ) );
 		bwb
 			.async_handler(|handle, cmd, args| async move {
@@ -84,9 +87,11 @@ fn main() {
 					}
 				}
 			})
-			.title("Terminal Example")
-			.opacity(32);
+			.dev_tools(false)
+			.title("Terminal Example");
 		let bw = bwb.build( app ).await;
+		bw.opacity().set( 224 );
+		bw.show();
 
 		// Initialize the script with our working directory.
 		// Make sure that it is initializes whether document has been loaded already or not.
@@ -96,6 +101,11 @@ fn main() {
 			Ok(_) => {}
 		};
 	} );
+
+	// Calling exit causes Rust to not drop all variables.
+	// In the case of Browser Window, we need to drop our Application instance because it has spawned another process which needs to be shutdown.
+	// If we don't drop our app, we leave the other process running.
+	application.finish();
 
 	// Return exit code
 	exit( exit_code );

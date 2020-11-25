@@ -11,6 +11,7 @@
 typedef struct {
 	HWND handle;
 	DWORD style;
+	BYTE opacity;
 } bw_WindowImpl;
 
 

@@ -38,7 +38,7 @@ fn main() {
 			.define("BW_WIN32", None)
 			.define("_CRT_SECURE_NO_WARNINGS", None);	// Disable sprintf_s warnings. sprintf_s tends to cause segfaults.
 	}
-	// Non-Windows platforms use GTK:
+	// Non-Windows platforms:
 	else {
 		match pkg_config::Config::new().atleast_version("3.0").arg("--cflags").probe("gtk+-3.0") {
 			Err(e) => panic!("Unable to find GTK 3 development files: {}", e),

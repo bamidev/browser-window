@@ -18,6 +18,7 @@ use std::{
 use unsafe_send_sync::UnsafeSend;
 
 
+
 /// The type of content to display in a browser window
 pub enum Source {
 	/// Displays the given HTML code in the browser.
@@ -181,9 +182,7 @@ impl BrowserWindowBuilder {
 				// Convert options to FFI structs
 				let window_options = bw_WindowOptions {
 					borders: window.borders,
-					closable: true,
 					minimizable: window.minimizable,
-					opacity: window.opacity,
 					resizable: window.resizable
 				};
 				let other_options = bw_BrowserWindowOptions {

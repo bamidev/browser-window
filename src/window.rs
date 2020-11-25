@@ -13,6 +13,7 @@ pub use builder::WindowBuilder;
 
 
 
+#[derive(Clone, Copy)]
 pub struct WindowHandle {
 	pub(in super) ffi_handle: *mut bw_Window
 }
@@ -25,14 +26,31 @@ pub trait OwnedWindow {
 
 impl WindowHandle {
 	impl_prop!{ pub content_dimensions: ContentDimensions }
+	impl_prop!{ pub opacity: Opacity }
 	impl_prop!{ pub position: Position }
 	impl_prop!{ pub title: Title }
 	impl_prop!{ pub window_dimensions: WindowDimensions }
+
+	/// Destroys the window.
+	pub fn close( self ) {
+		self.hide();
+		// The window will be dropped because ownership of `self` is taken.
+	}
+
+	/// Make the window invisible to the user.
+	pub fn hide( &self ) {
+		unsafe { bw_Window_hide( self.ffi_handle ) };
+	}
 
 	pub(in super) fn new( ffi_handle: *mut bw_Window ) -> Self {
 		Self {
 			ffi_handle
 		}
+	}
+
+	/// Make the window visible to the user.
+	pub fn show( &self ) {
+		unsafe { bw_Window_show( self.ffi_handle ) };
 	}
 }
 
@@ -42,6 +60,16 @@ prop! { /// Gets or sets the width and height of the content of the window.
 	ContentDimensions<Dims2D>( this: WindowHandle ) {
 		get => unsafe{ bw_Window_getContentDimensions( this.ffi_handle ) }.into(),
 		set(val) => unsafe { bw_Window_setContentDimensions( this.ffi_handle, val.into() ) }
+	}
+}
+
+prop! { /// Gets or sets the opacity of the window.
+        /// An opacity of 255 means the window is invisible.
+        /// An opacity of 0 means the window is completely visible.
+        /// Anything in between makes the window transparent.
+	Opacity<u8>( this: WindowHandle ) {
+		get => unsafe { bw_Window_getOpacity( this.ffi_handle ) }.into(),
+		set(val) => unsafe { bw_Window_setOpacity( this.ffi_handle, val.into() ) }
 	}
 }
 

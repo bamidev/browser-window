@@ -9,11 +9,6 @@ extern "C" {
 
 #include "assert.h"
 #include "debug.h"
-#if defined(BW_GTK)
-#include "posix.h"
-#elif defined(BW_WIN32)
-#include "win32.h"
-#endif
 
 #include <stdint.h>
 
