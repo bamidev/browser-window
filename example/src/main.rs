@@ -90,7 +90,7 @@ fn main() {
 			.dev_tools(false)
 			.title("Terminal Example");
 		let bw = bwb.build( app ).await;
-		bw.opacity().set( 128 );
+		bw.opacity().set( 224 );
 		bw.show();
 
 		// Initialize the script with our working directory.

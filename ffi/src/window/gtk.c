@@ -30,8 +30,16 @@ bw_WindowImpl bw_WindowImpl_new(
 	gtk_window_set_title( GTK_WINDOW(gtk_handle), title );
 	free( title );
 
-	// Width and height
-	gtk_window_resize( GTK_WINDOW(gtk_handle), width, height );
+	if ( width != -1 || height != -1 ) {
+		if ( width < 1 )
+			width = 800;
+		if ( height < 1 )
+			height = 600;
+
+		// Width and height
+		gtk_window_resize( GTK_WINDOW(gtk_handle), width, height );
+	}
+
 	gtk_window_set_resizable( GTK_WINDOW(gtk_handle), options->resizable );
 
 	// If both not minimizable and not resizable, make it a dialog

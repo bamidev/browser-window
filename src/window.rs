@@ -49,8 +49,8 @@ impl WindowHandle {
 	}
 
 	/// Make the window visible to the user.
-	pub fn show( &self ) { eprintln!("TEST SHOW");
-		unsafe { bw_Window_show( self.ffi_handle ) }; eprintln!("TEST SHOW");
+	pub fn show( &self ) {
+		unsafe { bw_Window_show( self.ffi_handle ) };
 	}
 }
 
