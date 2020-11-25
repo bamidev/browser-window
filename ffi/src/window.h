@@ -39,7 +39,6 @@ typedef struct bw_WindowCallbacks {
 typedef struct bw_WindowOptions {
 	bool borders;
 	bool minimizable;
-	uint8_t opacity;
 	bool resizable;
 } bw_WindowOptions;
 
@@ -60,6 +59,8 @@ struct bw_Window {
 
 
 
+/// Destroy the window, releasing all resources it holds.
+/// After this call, the handle is considered invalid.
 void bw_Window_destroy( bw_Window* window );
 
 /// Invalidates the window handle.
@@ -69,12 +70,13 @@ void bw_Window_drop( bw_Window* window );
 /// Gets the width and height of the usable area inside the window.
 bw_Dims2D bw_Window_getContentDimensions( bw_Window* window );
 
+/// Gets the opacity of the window as a value from 0 to 255.
 uint8_t bw_Window_getOpacity( bw_Window* window );
 
 /// Gets the X and Y coordinates of the window position relative to the desktop screen.
 bw_Pos2D bw_Window_getPosition( bw_Window* window );
 
-/// Copies as many bytes into `title` as fit there.
+/// Copies as many bytes into `title` that fit in there.
 /// Returns the number of characters the title actually has.
 size_t bw_Window_getTitle( bw_Window* window, bw_StrSlice title );
 

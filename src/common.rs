@@ -168,7 +168,7 @@ impl<'a,H,R> Future for DelegateFuture<'a,H,R> where
 
 				bw_Application_dispatch(
 					app_ffi_handle,
-					ffi_delegate_handler::<H,R>,
+					Some( ffi_delegate_handler::<H,R> ),
 					data_ptr as _
 				)
 			};
@@ -227,7 +227,7 @@ impl<'a,R> Future for DelegateFutureFuture<'a,R> where R: Send {
 
 				bw_Application_dispatch(
 					app_ffi_handle,
-					ffi_delegate_async_handler::<R>,
+					Some(ffi_delegate_async_handler::<R>),
 					data_ptr as _
 				)
 			};

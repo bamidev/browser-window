@@ -104,7 +104,7 @@ bw_ApplicationImpl bw_ApplicationImpl_initialize( bw_Application* _app, int argc
 }
 
 // There is no 'free' function for GtkApplication*
-void bw_ApplicationImpl_free( bw_ApplicationImpl* app ) {
+void bw_ApplicationImpl_finish( bw_ApplicationImpl* app ) {
 
 	pthread_mutex_destroy( &app->is_running_mtx );
 	g_object_unref( app->handle );

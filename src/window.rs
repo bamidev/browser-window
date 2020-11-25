@@ -87,8 +87,8 @@ prop!{ /// Gets or sets the title of the window.
 			let buf_len = unsafe { bw_Window_getTitle( this.ffi_handle, bw_StrSlice::empty() ) };
 
 			// Allocate buffer and copy string into it
-			let mut buf = vec![0u8; buf_len];
-			let slice = bw_StrSlice { len: buf_len, data: buf.as_mut_ptr() as _ };
+			let mut buf = vec![0u8; buf_len as _];
+			let slice = bw_StrSlice { len: buf_len as _, data: buf.as_mut_ptr() as _ };
 			unsafe { bw_Window_getTitle( this.ffi_handle, slice ) };
 
 			// Convert to String

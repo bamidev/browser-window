@@ -9,6 +9,16 @@ gboolean _bw_WindowGtk_stateHandler( GtkWidget *widget, GdkEventWindowState *eve
 
 
 
+uint8_t bw_Window_getOpacity( bw_Window* window ) {
+	double fraction = gtk_widget_get_opacity( window->impl.handle );
+
+	return (uint8_t)(fraction * 255);
+}
+
+void bw_Window_setOpacity( bw_Window* window, uint8_t opacity ) {
+	gtk_widget_set_opacity( window->impl.handle, (double)opacity / 255.0 );
+}
+
 bw_WindowImpl bw_WindowImpl_new(
 	const bw_Window* window,
 	bw_CStrSlice _title,
@@ -56,12 +66,16 @@ bw_WindowImpl bw_WindowImpl_new(
 	return impl;
 }
 
-void bw_WindowImpl_destroy( bw_Window* window ) {
-	gdk_window_destroy( GDK_WINDOW(window->impl.handle) );
+void bw_WindowImpl_destroy( bw_WindowImpl* window ) {
+	gdk_window_destroy( GDK_WINDOW(window->handle) );
 }
 
-void bw_WindowImpl_hide( bw_Window* window ) {
-	gdk_window_hide( GDK_WINDOW(window->impl.handle) );
+void bw_WindowImpl_hide( bw_WindowImpl* window ) {
+	gdk_window_hide( GDK_WINDOW(window->handle) );
+}
+
+void bw_WindowImpl_show( bw_WindowImpl* window ) {
+	gdk_window_show( GDK_WINDOW(window->handle) );
 }
 
 
@@ -88,6 +102,6 @@ gboolean _bw_WindowGtk_closeHandler( GtkWidget* handle, gpointer data ) {
 
 	bw_Window* window = (bw_Window*)data;
 
-	bw_WindowImpl_hide( window );
+	bw_WindowImpl_hide( &window->impl );
 	return FALSE;
 }

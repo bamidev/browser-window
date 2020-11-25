@@ -199,9 +199,9 @@ impl BrowserWindowBuilder {
 					window.height,
 					&window_options,
 					&other_options,
-					ffi_window_invoke_handler,
+					Some( ffi_window_invoke_handler ),
 					user_data as _,
-					ffi_browser_window_created_callback,
+					Some( ffi_browser_window_created_callback ),
 					callback_data as _
 				) };
 			}
@@ -249,34 +249,30 @@ fn args_to_vec( args: *const bw_CStrSlice, args_count: usize ) -> Vec<String> {
 }
 
 /// This external C function will be invoked by the underlying implementation browser-window when it is invoked in JavaScript
-extern "C" fn ffi_window_invoke_handler( inner_handle: *mut bw_BrowserWindow, _command: bw_CStrSlice, _args: *const bw_CStrSlice, args_count: usize ) {
+unsafe extern "C" fn ffi_window_invoke_handler( inner_handle: *mut bw_BrowserWindow, _command: bw_CStrSlice, _args: *mut bw_CStrSlice, args_count: u64 ) {
 
-	unsafe {
-		let data_ptr: *mut BrowserUserData = mem::transmute( bw_BrowserWindow_getUserData( inner_handle ) );
-		let data: &mut BrowserUserData = &mut *data_ptr;
+	let data_ptr: *mut BrowserUserData = mem::transmute( bw_BrowserWindow_getUserData( inner_handle ) );
+	let data: &mut BrowserUserData = &mut *data_ptr;
 
-		match data {
-			BrowserUserData{ handler } => {
-				let outer_handle = BrowserWindowHandle::new( inner_handle );
+	match data {
+		BrowserUserData{ handler } => {
+			let outer_handle = BrowserWindowHandle::new( inner_handle );
 
-				let args = args_to_vec( _args, args_count );
+			let args = args_to_vec( _args, args_count as _ );
 
-				let future = handler( outer_handle, _command.into(), args );
-				outer_handle.app().spawn( future );
-			}
+			let future = handler( outer_handle, _command.into(), args );
+			outer_handle.app().spawn( future );
 		}
 	}
 }
 
 // This external C function will be given as the callback to the bw_BrowserWindow_new function, to be invoked when the browser window has been created
-extern "C" fn ffi_browser_window_created_callback( inner_handle: *mut bw_BrowserWindow, data: *mut c_void ) {
+unsafe extern "C" fn ffi_browser_window_created_callback( inner_handle: *mut bw_BrowserWindow, data: *mut c_void ) {
 
-	unsafe {
-		let data_ptr: *mut Box<dyn FnOnce( BrowserWindowHandle )> = mem::transmute( data );
-		let data = Box::from_raw( data_ptr );
+	let data_ptr: *mut Box<dyn FnOnce( BrowserWindowHandle )> = mem::transmute( data );
+	let data = Box::from_raw( data_ptr );
 
-		let outer_handle = BrowserWindowHandle::new( inner_handle );
+	let outer_handle = BrowserWindowHandle::new( inner_handle );
 
-		data( outer_handle )
-	}
+	data( outer_handle )
 }

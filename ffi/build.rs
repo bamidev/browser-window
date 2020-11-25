@@ -1,22 +1,24 @@
+extern crate bindgen;
 extern crate cc;
 extern crate pkg_config;
 
 use std::env;
+use std::path::PathBuf;
 
 
 
 fn main() {
 
 	// If this is being build by docs.rs, don't do anything.
-	// docs.rs is not able to compile the C/C++ source files because it doesn't have the win32 and cef3 header files available.
+	// docs.rs is not able to compile the C/C++ source files because it doesn't have the win32 and cef3 header files available in their docker system in which they test-build.
 	if let Ok(_) = env::var("DOCS_RS") {
 		return
 	}
 
-	let mut build = cc::Build::new();
-
+	let out_path = PathBuf::from( env::var("OUT_DIR").expect("Unable to get output directory for FFI bindings") );
 	let target = env::var("TARGET").unwrap();
 
+	let mut build = cc::Build::new();
 	let std_flag =
 		if target.contains("windows") {
 			"/std:c++17"
@@ -26,9 +28,24 @@ fn main() {
 		};
 
 	/**************************************
+	 *	C header files for bindgen
+	 **************************************/
+	let mut bindgen_builder = bindgen::Builder::default()
+		.clang_arg("-DBW_CEF")
+		.header("src/application.h")
+		.header("src/browser_window.h")
+		.header("src/common.h")
+		.header("src/err.h")
+		.header("src/string.h")
+		.header("src/window.h")
+		.parse_callbacks(Box::new(bindgen::CargoCallbacks));
+
+	/**************************************
 	 *	The Platform source files
 	 **************************************/
 	if target.contains("windows") {
+
+		bindgen_builder = bindgen_builder.clang_arg("-DBW_WIN32");
 
 		// Win32 API
 		build
@@ -40,19 +57,24 @@ fn main() {
 	}
 	// Non-Windows platforms:
 	else {
+
+		bindgen_builder = bindgen_builder.clang_arg("-DBW_GTK");
+
+		// GTK source files
+		build
+			.file("src/application/gtk.c")
+			.file("src/window/gtk.c")
+			.define("BW_GTK", None);
+
 		match pkg_config::Config::new().atleast_version("3.0").arg("--cflags").probe("gtk+-3.0") {
 			Err(e) => panic!("Unable to find GTK 3 development files: {}", e),
 			Ok( lib ) => {
 
-				// Manually add GTK includes to compiler
+				// Manually add GTK includes to compiler and bindgen
 				for inc in &lib.include_paths {
 					build.include( inc );
+					bindgen_builder = bindgen_builder.clang_arg( format!("-I{}", inc.as_os_str().to_str().unwrap()) );
 				}
-
-				build
-					.file("src/application/gtk.c")
-					.file("src/window/gtk.c")
-					.define("BW_GTK", None);
 			}
 		}
 	}
@@ -60,7 +82,7 @@ fn main() {
 	/**************************************
 	 *	The Browser Engine (CEF3) source files
 	 **************************************/
-	// Make sure CEF_PATH is set
+	build.flag_if_supported("-Wno-unused-parameter");	// CEF's header files produce a lot of unused parameters warnings.
 	match env::var("CEF_PATH") {
 		Err(e) => {
 			match e {
@@ -82,7 +104,14 @@ fn main() {
 		}
 	}
 
-	// CEF source files
+	// Let bindgen generate the bindings
+	bindgen_builder
+		.generate().expect("Unable to generate FFI bindings!")
+		.write_to_file( out_path.join("c_bindings.rs") ).expect("Unable to write FFI bindings to file!");
+
+	/**************************************
+	 *	CEF source files
+	 **************************************/
 	build
 		.file("src/application/cef.cpp")
 		.file("src/browser_window/cef.cpp")

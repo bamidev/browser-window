@@ -183,6 +183,7 @@ protected:
 	}
 
 	void openDevTools( bw_BrowserWindow* bw, const CefRefPtr<CefBrowserHost>& host ) {
+#ifdef BW_WIN32
 
         CefRefPtr<CefClient> client;
         CefBrowserSettings settings;
@@ -192,6 +193,9 @@ protected:
 	    info.SetAsPopup( bw->window->impl.handle, "Dev Tools" );
 
 	    host->ShowDevTools( info, client, settings, point );
+#endif
+
+		// FIXME: Implement dev tools for non windows systems
 	}
 
 	IMPLEMENT_REFCOUNTING(ClientHandler);

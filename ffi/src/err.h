@@ -42,6 +42,8 @@ char* bw_Err_msg_string( bw_ErrCode, const void* );
 
 // Should always be called on a bw_Err.
 // Frees internal data from the heap.
+// TODO: Rename to bw_Err_destroy
+//       Now it sounds like its going to free the memory of bw_Err as well...
 void bw_Err_free( bw_Err* err );
 // Creates a new initialized bw_Err, with the given code and message.
 // The alloc_message pointer will return the same message as given here.

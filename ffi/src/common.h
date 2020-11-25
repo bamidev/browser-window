@@ -10,6 +10,10 @@ extern "C" {
 #include "assert.h"
 #include "debug.h"
 
+#ifdef BW_GTK
+#include "posix.h"
+#endif
+
 #include <stdint.h>
 
 

@@ -168,7 +168,7 @@ impl BrowserWindowHandle {
 		unsafe { bw_BrowserWindow_evalJs(
 			self.ffi_handle,
 			js.into(),
-			ffi_eval_js_callback::<H>,
+			Some( ffi_eval_js_callback::<H> ),
 			data_ptr as _
 		) };
 	}
@@ -271,7 +271,7 @@ impl BrowserWindowThreaded {
 
 impl Drop for BrowserWindowThreaded {
 	fn drop( &mut self ) {
-		unsafe { bw_Application_dispatch( self.app().handle.ffi_handle, ffi_free_browser_window, self.handle.ffi_handle as _ ); }
+		unsafe { bw_Application_dispatch( self.app().handle.ffi_handle, Some( ffi_free_browser_window ), self.handle.ffi_handle as _ ); }
 	}
 }
 
@@ -327,7 +327,7 @@ impl HasAppHandle for BrowserWindowHandle {
 impl JsEvaluationError {
 	pub(in super) unsafe fn new( err: *const bw_Err ) -> Self {
 
-		let msg_ptr = ((*err).alloc_message)( (*err).code, (*err).data );
+		let msg_ptr = ((*err).alloc_message.unwrap())( (*err).code, (*err).data );
 		let cstr = CStr::from_ptr( msg_ptr );
 		let message: String = cstr.to_string_lossy().into();
 

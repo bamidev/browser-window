@@ -3,13 +3,14 @@
 
 #include <gtk/gtk.h>
 #include <pthread.h>
+#include <stdbool.h>
 
 
 
 typedef struct {
 	GtkApplication* handle;
-    int argc;
-    char** argv;
+	int argc;
+	char** argv;
 	int exit_code;
 	bool is_running;
 	pthread_mutex_t is_running_mtx;

@@ -13,9 +13,8 @@ void bw_Window_destroy( bw_Window* window ) {
 	if ( window->callbacks.do_cleanup != 0 )
 		window->callbacks.do_cleanup( window );
 
-	// Actually destroy and free our window
+	// Actually destroy our window
 	bw_WindowImpl_destroy( &window->impl );
-	free( window );
 
 	// Decrease the window counter
 	bw_Application* app = window->app;
@@ -24,6 +23,9 @@ void bw_Window_destroy( bw_Window* window ) {
 	// Exit application if this was our last window
 	if ( app->windows_alive == 0 )
 		bw_Application_exit( app, 0 );
+
+	// Free the memory
+	free( window );
 }
 
 
@@ -92,7 +94,7 @@ void bw_Window_triggerClose( bw_Window* window ) {
 		bw_Window_destroy( window );
 	}
 	else {
-		bw_WindowImpl_hide( window );
+		bw_WindowImpl_hide( &window->impl );
     }
 
 	// TODO: Fire on_closed event

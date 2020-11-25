@@ -271,7 +271,7 @@ impl Runtime {
 		let ready_data = Box::into_raw( Box::new( on_ready ) );
 
 		unsafe {
-			let exit_code = bw_Application_run( self.handle.ffi_handle, ffi_ready_handler::<H>, ready_data as _ );
+			let exit_code = bw_Application_run( self.handle.ffi_handle, Some( ffi_ready_handler::<H> ), ready_data as _ );
 			return exit_code;
 		}
 	}
@@ -440,7 +440,7 @@ impl ApplicationHandleThreaded {
 		unsafe {
 			bw_Application_dispatch(
 				self.handle.ffi_handle,
-				ffi_dispatch_handler,
+				Some( ffi_dispatch_handler ),
 				data as _
 			)
 		}
@@ -537,7 +537,7 @@ unsafe fn waker_wake( data: *const () ) {
 
 	bw_Application_dispatch(
 		(*data_ptr).handle.ffi_handle,
-		ffi_wakeup,
+		Some( ffi_wakeup ),
 		data_ptr as _
 	);
 }

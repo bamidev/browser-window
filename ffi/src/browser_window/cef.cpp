@@ -14,9 +14,28 @@
 #include <include/cef_client.h>
 #include <include/cef_v8.h>
 
+#ifdef BW_GTK
+#include <gtk/gtk.h>
+#include <gdk/gdkx.h>
+
+// X11 headers
+#ifdef CEF_X11
+#include <X11/Xlib.h>
+#endif
+
+void bw_BrowserWindowCef_connectToGtkWindow( bw_BrowserWindow* bw, CefWindowInfo& info, int width, int height );
+#endif
+
+#ifdef BW_WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+
 // QUICKFIX: The win32 definition of GetMessage is getting through from somewhere...
 // TODO: Find out where
 #undef GetMessage
+
+void bw_BrowserWindowCef_connectToWin32Window( bw_BrowserWindow* bw, CefWindowInfo& info, int width, int height );
+#endif
 
 
 
@@ -65,6 +84,51 @@ void bw_BrowserWindow_evalJsThreaded( bw_BrowserWindow* bw, bw_CStrSlice js, bw_
 	bw_BrowserWindow_evalJs( bw, js, cb, user_data );
 }
 
+#ifdef BW_GTK
+void bw_BrowserWindowCef_connectToGtkWindow( bw_BrowserWindow* bw, CefWindowInfo& info, int width, int height ) {
+
+	CefRect rect( 0, 0, width, height );
+
+#ifdef CEF_X11
+	GtkWidget* vbox = gtk_box_new( GTK_ORIENTATION_VERTICAL, 0);
+	
+	GdkWindow* gdk_window = gtk_widget_get_window( bw->window->impl.handle );
+	
+	Window x_window = gdk_x11_window_get_xid( gdk_window );
+
+	info.SetAsChild( x_window, rect );
+
+	gtk_widget_show_all( bw->window->impl.handle );
+#else
+	// TODO: Figure out how CEF can be connected to a GTK window if CEF is actually build with flag use_gtk3=true
+#error BrowserWindow is set up to connect CEF with a GTK handle, but the glue for this is not yet implemented!
+	GtkWidget* vbox = gtk_box_new( GTK_ORIENTATION_VERTICAL, 0);
+
+	gtk_container_add( GTK_CONTAINER( bw->window->impl.handle ), vbox );
+#endif
+}
+#endif
+
+#ifdef BW_WIN32
+void bw_BrowserWindowCef_connectToWindow( bw_BrowserWindow* bw, CefWindowInfo& info, int width, int height ) {
+
+	RECT rect;
+	GetClientRect( bw->window->impl.handle, &rect );
+	info.SetAsChild( bw->window->impl.handle, rect );
+}
+#endif
+
+void bw_BrowserWindowCef_connectToWindow( bw_BrowserWindow* bw, CefWindowInfo& info, int width, int height ) {
+	
+#if defined(BW_WIN32)
+	bw_BrowserWindowCef_connectToWin32Window( bw, info, width, height );
+#elif defined(BW_GTK)
+	bw_BrowserWindowCef_connectToGtkWindow( bw, info, width, height );
+#else
+#error No supported windowing API implementation available
+#endif
+}
+
 void bw_BrowserWindowImpl_doCleanup( bw_Window* window ) {
 
 	auto bw_ptr = (bw_BrowserWindow*)window->user_data;
@@ -98,10 +162,6 @@ void bw_BrowserWindowImpl_new(
 	bw_BrowserWindowCreationCallbackFn callback,
 	void* callback_data
 ) {
-	// Unused parameters
-	UNUSED(width);
-	UNUSED(height);
-
 	CefWindowInfo info;
 	CefBrowserSettings settings;
 
@@ -117,19 +177,7 @@ void bw_BrowserWindowImpl_new(
 	}
 
 	// Update window size in CefWindowInfo
-#if defined(BW_WIN32)
-
-	RECT rect;
-	GetClientRect( browser->window->impl.handle, &rect );
-	info.SetAsChild( browser->window->impl.handle, rect );
-#elif defined(BW_GTK)
-
-	CefRect rect( 0, 0, width, height );
-	GtkWidget* vbox = gtk_box_new( GTK_ORIENTATION_VERTICAL, 0);
-	info.SetAsChild( (long unsigned int)vbox, rect );
-	gtk_container_add( GTK_CONTAINER( browser->window->impl.handle ), vbox );
-gtk_widget_show_all( GTK_WIDGET(browser->window->impl.handle) );
-#endif
+	bw_BrowserWindowCef_connectToWindow( browser, info, width, height );
 
 	// Create the browser window handle
 	bw_BrowserWindowImpl bw;
