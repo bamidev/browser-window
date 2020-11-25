@@ -17,12 +17,12 @@ path = "src/lib.rs"
 
 [dependencies]
 browser-window-ffi = { path = "./ffi", version = "0.4.1" }
-futures-channel = { version = "0.3" }
+futures-channel = { version = "^0.3" }
 lazy_static = "1"
 unsafe-send-sync = "0"
 
 [dev-dependencies]
-tokio = { version = "0.3", features = [ "rt-multi-thread" ] }
+tokio = { version = "^0.3", features = [ "rt-multi-thread" ] }
 
 [package.metadata.docs.rs]
 all-features = true
