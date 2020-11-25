@@ -11,3 +11,6 @@ GPUCache
 # Intelij IDEA project files
 .idea
 browser-window.iml
+
+# Visual Studio code project files
+.vscode
