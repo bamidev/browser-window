@@ -14,10 +14,11 @@ extern "C" {
 #elif defined(BW_GTK)
 #include "window/gtk.h"
 #else
-#error Unsupported GUI implementation
+#error Unsupported window API implementation
 #endif
 
 #include <stdbool.h>
+#include <stdint.h>
 
 
 
@@ -37,9 +38,8 @@ typedef struct bw_WindowCallbacks {
 
 typedef struct bw_WindowOptions {
 	bool borders;
-	bool closable;
 	bool minimizable;
-	unsigned char opacity;
+	uint8_t opacity;
 	bool resizable;
 } bw_WindowOptions;
 
@@ -60,6 +60,34 @@ struct bw_Window {
 
 
 
+void bw_Window_destroy( bw_Window* window );
+
+/// Invalidates the window handle.
+/// The window will get destroyed when it is deemed possible.
+void bw_Window_drop( bw_Window* window );
+
+/// Gets the width and height of the usable area inside the window.
+bw_Dims2D bw_Window_getContentDimensions( bw_Window* window );
+
+uint8_t bw_Window_getOpacity( bw_Window* window );
+
+/// Gets the X and Y coordinates of the window position relative to the desktop screen.
+bw_Pos2D bw_Window_getPosition( bw_Window* window );
+
+/// Copies as many bytes into `title` as fit there.
+/// Returns the number of characters the title actually has.
+size_t bw_Window_getTitle( bw_Window* window, bw_StrSlice title );
+
+/// Gets the width and height of the window including the title bar and borders.
+bw_Dims2D bw_Window_getWindowDimensions( bw_Window* window );
+
+// Makes the window invisible and inaccessible from the user.
+void bw_Window_hide( bw_Window* window );
+
+/// Returns whether or not the window is not hidden.
+/// `bw_Window_show` and `bw_Window_hide` change the visibility.
+bool bw_Window_isVisible( const bw_Window* window );
+
 /// Creates a new (empty) window
 /// The returned pointer is a handler for the window.
 /// bw_Window_drop needs to be called on it after it is done being used,
@@ -73,40 +101,22 @@ bw_Window* bw_Window_new(
 	void* user_data
 );
 
-/// Hides the window from the user
-void bw_Window_close( bw_Window* window );
-
-/// Invalidates the window handle.
-/// The window will get destroyed when it is deemed possible.
-void bw_Window_drop( bw_Window* window );
-
-/// Returns whether or not the window has been closed.
-bool bw_Window_isClosed( const bw_Window* window );
-
-/// Gets the width and height of the usable area inside the window.
-bw_Dims2D bw_Window_getContentDimensions( bw_Window* window );
-
-/// Gets the X and Y coordinates of the window position relative to the desktop screen.
-bw_Pos2D bw_Window_getPosition( bw_Window* window );
-
-/// Copies as many bytes into `title` as fit there.
-/// Returns the number of characters the title actually has.
-size_t bw_Window_getTitle( bw_Window* window, bw_StrSlice title );
-
-/// Gets the width and height of the window including the title bar and borders.
-bw_Dims2D bw_Window_getWindowDimensions( bw_Window* window );
-
-/// Shows the window if it was previously hidden
-void bw_Window_open( bw_Window* window );
-
 void bw_Window_setContentDimensions( bw_Window* window, bw_Dims2D dimensions );
+
+void bw_Window_setOpacity( bw_Window* window, uint8_t opacity );
 
 void bw_Window_setPosition( bw_Window* window, bw_Pos2D position );
 
 /// Applies the given title;
 void bw_Window_setTitle( bw_Window* window, bw_CStrSlice title );
 
-void bw_Window_setWindowDimensions( bw_Window* window );
+void bw_Window_setWindowDimensions( bw_Window* window, bw_Dims2D dimensions );
+
+/// Shows the window if it was previously hidden
+/// Is generally called after window creation.
+void bw_Window_show( bw_Window* window );
+
+void bw_Window_triggerClose( bw_Window* window );
 
 
 

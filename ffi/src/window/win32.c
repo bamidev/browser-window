@@ -26,60 +26,66 @@ void bw_WindowWin32_calculatePositionCentered( int width, int height, int* x, in
 
 
 bw_Dims2D bw_Window_getContentDimensions( bw_Window* window ) {
-    bw_Dims2D dims;
+	bw_Dims2D dims;
 
-    RECT rect;
-    GetClientRect( window->impl.handle, &rect );
+	RECT rect;
+	GetClientRect( window->impl.handle, &rect );
 
-    dims.width = (uint16_t)(rect.right - rect.left);
-    dims.height = (uint16_t)(rect.bottom - rect.top);
+	dims.width = (uint16_t)(rect.right - rect.left);
+	dims.height = (uint16_t)(rect.bottom - rect.top);
 
-    return dims;
+	return dims;
+}
+
+uint8_t bw_Window_getOpacity( bw_Window* window ) {
+	// For some reason the GetLayeredWindowAttributes function gives an "Invalid access to memory loaction [998]" error when trying to access the LWA_ALPHA property.
+	// This is a workaround.
+	return window->impl.opacity;
 }
 
 bw_Pos2D bw_Window_getPosition( bw_Window* window ) {
-    bw_Pos2D pos;
+	bw_Pos2D pos;
 
-    RECT rect;
-    GetWindowRect( window->impl.handle, &rect );
+	RECT rect;
+	GetWindowRect( window->impl.handle, &rect );
 
-    pos.x = (uint16_t)rect.left;
-    pos.y = (uint16_t)rect.top;
+	pos.x = (uint16_t)rect.left;
+	pos.y = (uint16_t)rect.top;
 
-    return pos;
+	return pos;
 }
 
 size_t bw_Window_getTitle( bw_Window* window, bw_StrSlice title ) {
 
-    // First get the length of the window title
-    int length = GetWindowTextLengthW( window->impl.handle );
-    BW_WIN32_ASSERT_SUCCESS;
+	// First get the length of the window title
+	int length = GetWindowTextLengthW( window->impl.handle );
+	BW_WIN32_ASSERT_SUCCESS;
 
-    if ( length > 0 && title.len > 0 ) {
-        WCHAR* buffer = (WCHAR*)malloc( sizeof(WCHAR) * (length + 1) );
+	if ( length > 0 && title.len > 0 ) {
+		WCHAR* buffer = (WCHAR*)malloc( sizeof(WCHAR) * (length + 1) );
 
-        // Copy string
-        int copied = GetWindowTextW( window->impl.handle, (LPWSTR)buffer, length + 1 );
-        if ( copied == 0 ) {
-            free( buffer );
-            BW_WIN32_PANIC_LAST_ERROR;
-        }
+		// Copy string
+		int copied = GetWindowTextW( window->impl.handle, (LPWSTR)buffer, length + 1 );
+		if ( copied == 0 ) {
+			free( buffer );
+			BW_WIN32_PANIC_LAST_ERROR;
+		}
 
-        // Copy into our slice
-        char* utf8_str;
-        bw_win32_copyAsNewUtf8Str( buffer, &utf8_str );
-        memcpy( title.data, utf8_str, length );
-        free( utf8_str );
-    }
+		// Copy into our slice
+		char* utf8_str;
+		bw_win32_copyAsNewUtf8Str( buffer, &utf8_str );
+		memcpy( title.data, utf8_str, length );
+		free( utf8_str );
+	}
 
-    return length;
+	return length;
 }
 
 bw_Dims2D bw_Window_getWindowDimensions( bw_Window* window ) {
-    bw_Dims2D dims;
+	bw_Dims2D dims;
 
-    RECT rect;
-    GetWindowRect( window->impl.handle, &rect );
+	RECT rect;
+	GetWindowRect( window->impl.handle, &rect );
 
    dims.width = (uint16_t)(rect.right - rect.left);
    dims.height = (uint16_t)(rect.bottom - rect.top);
@@ -88,71 +94,59 @@ bw_Dims2D bw_Window_getWindowDimensions( bw_Window* window ) {
 }
 
 void bw_Window_setContentDimensions( bw_Window* window, bw_Dims2D dimensions ) {
-    RECT rect;
-    rect.left = 0; rect.right = dimensions.width;
-    rect.top = 0;  rect.bottom = dimensions.height;
+	RECT rect;
+	rect.left = 0; rect.right = dimensions.width;
+	rect.top = 0;  rect.bottom = dimensions.height;
 
-    // Obtained the window size based on our client area size
-    if ( !AdjustWindowRect( &rect, window->impl.style, FALSE ) )
-        BW_WIN32_PANIC_LAST_ERROR
+	// Obtained the window size based on our client area size
+	if ( !AdjustWindowRect( &rect, window->impl.style, FALSE ) )
+		BW_WIN32_PANIC_LAST_ERROR
 
-    LONG actual_width = rect.right - rect.left;
-    LONG actual_height = rect.bottom - rect.top;
+	LONG actual_width = rect.right - rect.left;
+	LONG actual_height = rect.bottom - rect.top;
 
-    // Get our x and y coordinate
-    if ( !GetWindowRect( window->impl.handle, &rect ) )
-        BW_WIN32_PANIC_LAST_ERROR
+	// Apply the current position with the new width and height
+	if ( !SetWindowPos( window->impl.handle, 0, rect.left, rect.top, actual_width, actual_height, SWP_NOMOVE  ) )
+		BW_WIN32_PANIC_LAST_ERROR
+}
 
-    // Apply the current position with the new width and height
-    if ( !SetWindowPos( window->impl.handle, 0, rect.left, rect.top, actual_width, actual_height, 0  ) )
-        BW_WIN32_PANIC_LAST_ERROR
+void bw_Window_setOpacity( bw_Window* window, uint8_t opacity ) {
+	
+	if ( !SetLayeredWindowAttributes( window->impl.handle, 0, opacity, LWA_ALPHA ) )
+		BW_WIN32_PANIC_LAST_ERROR
+	window->impl.opacity = opacity;
 }
 
 void bw_Window_setPosition( bw_Window* window, bw_Pos2D position ) {
-    RECT rect;
 
-    if ( !GetWindowRect( window->impl.handle, &rect ) )
-        BW_WIN32_PANIC_LAST_ERROR
-
-    // Width and height
-    LONG width = rect.right - rect.left;
-    LONG height = rect.bottom - rect.top;
-
-    if ( !SetWindowPos( window->impl.handle, 0, position.x, position.y, width, height, 0 ) )
-        BW_WIN32_PANIC_LAST_ERROR
+	if ( !SetWindowPos( window->impl.handle, 0, position.x, position.y, 0, 0, SWP_NOSIZE ) )
+		BW_WIN32_PANIC_LAST_ERROR
 }
 
 void bw_Window_setTitle( bw_Window* window, bw_CStrSlice _title ) {
-    WCHAR* title = bw_win32_copyAsNewWstr( _title );
+	WCHAR* title = bw_win32_copyAsNewWstr( _title );
 
-    SetWindowTextW( window->impl.handle, title );
+	SetWindowTextW( window->impl.handle, title );
 
-    free( title );
+	free( title );
 }
 
 void bw_Window_setWindowDimensions( bw_Window* window, bw_Dims2D dimensions ) {
-    RECT rect;
 
-    if ( !GetWindowRect( window->impl.handle, &rect ) )
-        BW_WIN32_PANIC_LAST_ERROR
-
-    rect.right = rect.left + dimensions.width;
-    rect.bottom = rect.top + dimensions.height;
-
-    if ( !SetWindowPos( window->impl.handle, 0, rect.left, rect.top, dimensions.width, dimensions.height, 0 ) )
-        BW_WIN32_PANIC_LAST_ERROR
+	if ( !SetWindowPos( window->impl.handle, 0, 0, 0, dimensions.width, dimensions.height, SWP_NOMOVE ) )
+		BW_WIN32_PANIC_LAST_ERROR
 }
 
 
 
-void bw_WindowImpl_destroy( bw_Window* window ) {
-	DestroyWindow( window->impl.handle );
+void bw_WindowImpl_destroy( bw_WindowImpl* window ) {
+	DestroyWindow( window->handle );
 }
 
-void bw_WindowImpl_hide( bw_Window* window ) {
+void bw_WindowImpl_hide( bw_WindowImpl* window ) {
 
-	// Hide window and hide all its children, to emulate DestroyWindow without actually destroying it:
-	ShowWindow( window->impl.handle, SW_HIDE );
+	// // Hide window and hide all its children, to emulate DestroyWindow without actually destroying it:
+	ShowWindow( window->handle, SW_HIDE );
 }
 
 bw_WindowImpl bw_WindowImpl_new(
@@ -172,15 +166,14 @@ bw_WindowImpl bw_WindowImpl_new(
 	if ( !options->minimizable )
 		impl.style ^= WS_MINIMIZEBOX;
 
-	if ( width == -1 || height == -1 )
-	    width = CW_USEDEFAULT;
+	if ( width == -1 && height == -1 )
+		width = CW_USEDEFAULT;
 
 	wchar_t* title = bw_win32_copyAsNewWstr( _title );
 
 	// Create the window
-	DWORD ex_style = WS_EX_LAYERED;
 	impl.handle = CreateWindowExW(
-	    ex_style,
+		WS_EX_LAYERED,
 		L"bw-window",
 		title,
 		impl.style,
@@ -197,16 +190,10 @@ bw_WindowImpl bw_WindowImpl_new(
 	if ( impl.handle == NULL ) {
 		BW_WIN32_PANIC_LAST_ERROR;
 	}
-
+	
 	// Store a pointer to our window handle in win32's window handle
 	SetWindowLongPtrW( impl.handle, GWLP_USERDATA, (LONG_PTR)window );
-
-	// Set opacity
-	if ( options->opacity > 0 )
-	    SetLayeredWindowAttributes( impl.handle, 0, 255 - options->opacity, LWA_ALPHA );
-
-	// Show window
-	ShowWindow( impl.handle, SW_SHOW );
+	BW_WIN32_ASSERT_SUCCESS;
 
 	// Increase the application's window counter
 	window->app->windows_alive += 1;
@@ -233,18 +220,9 @@ LRESULT CALLBACK bw_Window_proc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 		}
 
 		break;
-	/*case WM_DPICHANGED: {
-		auto rect = reinterpret_cast<LPRECT>(lp);
-		auto x = rect->left;
-		auto y = rect->top;
-		auto w = rect->right - x;
-		auto h = rect->bottom - y;
-		SetWindowPos(hwnd, nullptr, x, y, w, h, SWP_NOZORDER | SWP_NOACTIVATE);
-		break;
-	}*/
 	// When closing the window, only destroy it when it is ready for it to be destroyed
 	case WM_CLOSE:
-		bw_Window_close( window );
+		bw_Window_triggerClose( window );
 		break;
 	default:
 		return DefWindowProcW(hwnd, msg, wp, lp);
@@ -253,20 +231,20 @@ LRESULT CALLBACK bw_Window_proc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 	return 0;
 }
 
-void bw_WindowImpl_show( bw_Window* window ) {
-	ShowWindow( window->impl.handle, SW_SHOW );
+void bw_WindowImpl_show( bw_WindowImpl* window ) {
+	ShowWindow( window->handle, SW_SHOW );
 }
 
 void bw_WindowWin32_calculatePositionCentered( int width, int height, int* x, int* y ) {
-    RECT rect;
+	RECT rect;
 
-    GetClientRect( GetDesktopWindow(), &rect );
+	GetClientRect( GetDesktopWindow(), &rect );
 
-    int desktop_width = rect.right - rect.left;
-    int desktop_height = rect.bottom - rect.top;
+	int desktop_width = rect.right - rect.left;
+	int desktop_height = rect.bottom - rect.top;
 
-    *x = ( desktop_width - width ) / 2;
-    *y = ( desktop_height - height ) / 2;
+	*x = ( desktop_width - width ) / 2;
+	*y = ( desktop_height - height ) / 2;
 }
 
 BOOL CALLBACK _bw_Window_closeChild( HWND handle, LPARAM _window ) {
@@ -288,7 +266,7 @@ BOOL CALLBACK _bw_Window_closeChild( HWND handle, LPARAM _window ) {
 
 			// If this is a child window, close it
 			if ( enum_window->parent == window ) {
-				bw_Window_close( enum_window );
+				bw_Window_triggerClose( enum_window );
 			}
 		}
 

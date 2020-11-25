@@ -9,7 +9,7 @@ pub struct WindowBuilder {
     pub(in crate) borders: bool,
     pub(in crate) height: i32,
     pub(in crate) minimizable: bool,
-    pub(in crate) opacity: u8,
+    //pub(in crate) opacity: u8,
     pub(in crate) parent: Option<UnsafeSend<WindowHandle>>,
     pub(in crate) resizable: bool,
     pub(in crate) title: Option<String>,
@@ -38,12 +38,12 @@ impl WindowBuilder {
         self.minimizable = value;	self
     }
 
-    /// Makes the window (partially) transparent.
-    /// A `value` of `255` indicates that the window should be fully transparent.
-    /// A `value` of `0` indicates the the window should not be transparent at all.
-    pub fn opacity( &mut self, value: u8 ) -> &mut Self {
-        self.opacity = value;	self
-    }
+    /// Sets the opacity of the window.
+    /// An opacity of 255 is the default and means the window is fully visible.
+    /// An lower opacity means the window will be transparent.
+    //pub fn opacity( &mut self, value: u8 ) -> &mut Self {
+     //   self.opacity = value;   self
+    //}
 
     /// Configure a parent window.
     /// When a parent window closes, this browser window will close as well.
@@ -60,7 +60,6 @@ impl WindowBuilder {
             borders: true,
             height: -1,
             minimizable: true,
-            opacity: 0,
             parent: None,
             resizable: true,
             title: None,

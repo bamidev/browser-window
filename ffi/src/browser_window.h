@@ -57,7 +57,7 @@ struct bw_BrowserWindow {
 
 
 
-void bw_BrowserWindow_close( bw_BrowserWindow* bw );
+void bw_BrowserWindow_destroy( bw_BrowserWindow* bw );
 
 /// Marks the browser window handle as not being used anymore.
 /// This makes it so that if and when the window gets closed, everything is freed and cleaned from memory.

@@ -139,6 +139,13 @@ impl Application {
 		( vec, vec_ptrs )
 	}
 
+	/// Shuts down other processes and performs any necessary clean-up code.
+	/// This is useful if you main function doesn't exit naturally.
+	/// If you call `std::process::exit`, the variables currently available don't get dropped.
+	/// This is problematic because Browser Window needs to shut down properly.
+	/// Call this if you are using `exit` or doing something else to kill the process.
+	pub fn finish( self ) {}
+
 	/// In order to use the Browser Window API, you need to initialize Browser Window at the very start of your application.
 	/// Preferably on the first line of your `main` function.
 	///
@@ -168,7 +175,9 @@ impl Application {
 
 impl Drop for Application {
 	fn drop( &mut self ) {
-		unsafe { bw_Application_free( self.handle.ffi_handle ) };
+		unsafe {
+			bw_Application_finish( self.handle.ffi_handle );
+		}
 	}
 }
 

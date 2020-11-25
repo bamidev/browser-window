@@ -1,4 +1,8 @@
 //! This module contains all browser related handles and stuff.
+//!
+//! Keep in mind that `BrowserWindow` exposes the same methods as `BrowserWindowHandle` and `WindowHandle` does.
+//! The methods of `BrowserWindowHandle` are displayed correctly at the page of `BrowserWindow`, but the methods of `WindowHandle` are not displayed.
+//! Be sure to check them out [here](../window/struct.WindowHandle.html).
 
 use browser_window_ffi::*;
 use futures_channel::oneshot;
@@ -17,7 +21,7 @@ use crate::application::*;
 use crate::common::*;
 use crate::window::*;
 
-pub mod builder;
+mod builder;
 
 pub use builder::{BrowserWindowBuilder, Source};
 
@@ -54,7 +58,8 @@ unsafe impl Sync for BrowserWindowThreaded {}
 /// This is a handle to an existing browser window.
 #[derive(Clone, Copy)]
 pub struct BrowserWindowHandle {
-	pub(in super) ffi_handle: *mut bw_BrowserWindow
+	pub(in super) ffi_handle: *mut bw_BrowserWindow,
+	window: WindowHandle
 }
 //unsafe impl Send for BrowserWindowHandle {}
 
@@ -128,12 +133,6 @@ impl BrowserWindowHandle {
 	/// Returns the application handle associated with this browser window.
 	pub fn app( &self ) -> ApplicationHandle {
 		ApplicationHandle::new( unsafe { bw_BrowserWindow_getApp( self.ffi_handle ) } )
-	}
-
-	/// Closes the browser.
-	// The browser will be freed from memory when the last handle to it gets dropped.
-	pub fn close( self ) {
-		unsafe { bw_BrowserWindow_close( self.ffi_handle ); }
 	}
 
 	/// Executes the given javascript code and returns the output as a string.
@@ -300,8 +299,17 @@ impl OwnedBrowserWindow for BrowserWindowThreaded {
 impl BrowserWindowHandle {
 	fn new( ffi_handle: *mut bw_BrowserWindow ) -> Self {
 		Self {
-			ffi_handle: ffi_handle
+			ffi_handle,
+			window: WindowHandle::new( unsafe { bw_BrowserWindow_getWindow( ffi_handle ) } )
 		}
+	}
+}
+
+impl Deref for BrowserWindowHandle {
+	type Target = WindowHandle;
+
+	fn deref( &self ) -> &Self::Target {
+		&self.window
 	}
 }
 
