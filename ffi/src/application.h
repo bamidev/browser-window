@@ -5,6 +5,8 @@
 extern "C" {
 #endif
 
+#include <stdbool.h>
+
 
 
 struct bw_Application;
@@ -12,6 +14,8 @@ typedef void (*bw_ApplicationDispatchFn)( struct bw_Application* app, void* data
 typedef bw_ApplicationDispatchFn bw_ApplicationReadyFn;
 
 
+
+#ifndef BW_BINDGEN
 
 // Import bw_ApplicationImpl and bw_ApplicationEngineImpl definitions
 #if defined(BW_WIN32)
@@ -27,6 +31,11 @@ typedef bw_ApplicationDispatchFn bw_ApplicationReadyFn;
 #include "application/edge.h"
 #else
 #error Unsupported engine
+#endif
+
+#else
+typedef struct {} bw_ApplicationImpl;
+typedef struct {} bw_ApplicationEngineImpl;
 #endif
 
 
