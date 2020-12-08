@@ -3,9 +3,35 @@ extern crate cc;
 extern crate pkg_config;
 
 use std::env;
+use std::fs;
 use std::path::PathBuf;
 
 
+
+fn rerun_if_directory_changed<P>( _path: P ) where P: Into<PathBuf> {
+	let path: PathBuf = _path.into();
+
+	let dir_iterator = match fs::read_dir( &path ) {
+		Err(e) => panic!( format!("Unable to read directory: {}", e) ),
+		Ok( iterator ) => iterator
+	};
+
+	for sub_path in dir_iterator {
+
+		match sub_path {
+			Err(e) => panic!( format!("Unable to read directory entry for dir {}: {}", path.as_os_str().to_str().unwrap(), e) ),
+			Ok( entry ) => {
+
+				if entry.path().is_dir() {
+					rerun_if_directory_changed( entry.path() );
+				}
+				else {
+					println!("cargo:rerun-if-changed={}", entry.path().as_os_str().to_str().unwrap() );
+				}
+			}
+		}
+	}
+}
 
 fn main() {
 
@@ -14,6 +40,9 @@ fn main() {
 	if let Ok(_) = env::var("DOCS_RS") {
 		return
 	}
+
+	println!("cargo:rerun-if-env-changed=CEF_PATH");
+	rerun_if_directory_changed("src");
 
 	let out_path = PathBuf::from( env::var("OUT_DIR").expect("Unable to get output directory for FFI bindings") );
 	let target = env::var("TARGET").unwrap();
@@ -32,13 +61,14 @@ fn main() {
 	 **************************************/
 	let mut bindgen_builder = bindgen::Builder::default()
 		.clang_arg("-DBW_CEF")
+		.clang_arg("-DBW_BINDGEN")
 		.header("src/application.h")
 		.header("src/browser_window.h")
 		.header("src/common.h")
 		.header("src/err.h")
 		.header("src/string.h")
-		.header("src/window.h")
-		.parse_callbacks(Box::new(bindgen::CargoCallbacks));
+		.header("src/window.h");
+		//.parse_callbacks(Box::new(bindgen::CargoCallbacks));
 
 	/**************************************
 	 *	The Platform source files
