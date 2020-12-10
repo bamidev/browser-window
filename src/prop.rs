@@ -51,9 +51,9 @@ pub trait Property<G,S> {
 
 #[macro_export]
 macro_rules! _prop_internal {
-    ( $(#[$meta:meta])*, $vis:tt, $name:ident, $tg:ty, $ts:ty, $this:ident, $stype:ty, $get:expr, $val:ident, $set:expr ) => {
+	( $(#[$meta:meta])*, $vis:tt, $name:ident, $tg:ty, $ts:ty, $this:ident, $stype:ty, $get:expr, $val:ident, $set:expr ) => {
 
-        // The struct is basically empty.
+		// The struct is basically empty.
 		$(#[$meta])*
 		$vis struct $name<'a> {
 			parent: &'a $stype
@@ -65,7 +65,7 @@ macro_rules! _prop_internal {
 
 			fn set( &self, $val: $ts ) { let $this = &self.parent; $set }
 		}
-    }
+	}
 }
 
 /// A macro to define a so called 'property'.
@@ -77,15 +77,15 @@ macro_rules! prop {
 	};
 	/*( $(#[$metas:meta])* pub $name:ident<$type:ty>( $this:ident: $stype:ty ) { get => $get:expr, set( $val:ident ) => $set:expr } ) => {
 		 _prop_internal!( $(#[metas])*, pub, $name, $type, $type, $this, $stype, $get, $val, $set  );
-	};*/
-	( $(#[$metas:meta])* $name:ident<$tg:ty, $ts:ty>($this:ident: $stype:ty) { get => $get:expr, set( $val:ident ) => $set:expr } ) => {
-        _prop_internal!( $(#[$metas])*, , $name, $tg, $ts, $this, $stype, $get, $val, $set  );
 	};
+	( $(#[$metas:meta])* $name:ident<$tg:ty, $ts:ty>($this:ident: $stype:ty) { get => $get:expr, set( $val:ident ) => $set:expr } ) => {
+		_prop_internal!( $(#[$metas])*, , $name, $tg, $ts, $this, $stype, $get, $val, $set  );
+	};*/
 	( $(#[$metas:meta])* pub $name:ident<$tg:ty, $ts:ty>($this:ident: $stype:ty) { get => $get:expr, set( $val:ident ) => $set:expr } ) => {
-        _prop_internal!( $(#[$metas])*, pub, $name, $tg, $ts, $this, $stype, $get, $val, $set  );
+		_prop_internal!( $(#[$metas])*, pub, $name, $tg, $ts, $this, $stype, $get, $val, $set  );
 	};
 	( $(#[$metas:meta])* pub($vis:tt) $name:ident<$tg:ty, $ts:ty>($this:ident: $stype:ty) { get => $get:expr, set( $val:ident ) => $set:expr } ) => {
-        _prop_internal!( $(#[$metas])*, pub($vis:tt), $name, $tg, $ts, $this, $stype, $get, $val, $set  );
+		_prop_internal!( $(#[$metas])*, pub($vis:tt), $name, $tg, $ts, $this, $stype, $get, $val, $set  );
 	};
 }
 

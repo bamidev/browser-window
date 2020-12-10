@@ -4,6 +4,7 @@ mod builder;
 
 use super::*;
 use super::common::{Dims2D, Pos2D};
+use super::event::Event;
 
 use browser_window_ffi::*;
 
@@ -13,9 +14,24 @@ pub use builder::WindowBuilder;
 
 
 
+pub type StandardWindowEvent = Event<'static, WindowHandle>;
+
+/// A handle that exposes all windowing functionality.
 #[derive(Clone, Copy)]
 pub struct WindowHandle {
 	pub(in super) ffi_handle: *mut bw_Window
+}
+
+#[derive(Default)]
+pub(in crate) struct WindowEvents {
+	pub on_close: StandardWindowEvent,
+	pub on_destroy: StandardWindowEvent,
+	pub on_resize: Event<'static, WindowResizeEventArgs>
+}
+
+pub struct WindowResizeEventArgs {
+	handle: WindowHandle,
+	new_size: Dims2D
 }
 
 pub trait OwnedWindow {

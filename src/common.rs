@@ -109,11 +109,13 @@ struct DelegateFutureInner<'a,R> where R: Send {
 //  care should be taken to make sure that the future is safe to send to other threads.
 unsafe impl<'a,R> Send for DelegateFutureInner<'a,R> where R: Send {}
 
+#[derive(Default)]
 pub struct Pos2D {
 	x: u16,
 	y: u16
 }
 
+#[derive(Default)]
 pub struct Dims2D {
 	width: u16,
 	height: u16
@@ -170,7 +172,7 @@ impl<'a,H,R> Future for DelegateFuture<'a,H,R> where
 					app_ffi_handle,
 					Some( ffi_delegate_handler::<H,R> ),
 					data_ptr as _
-				)
+				) != 0
 			};
 
 			// bw_Application_dispatch fails when there is now runtime that is running
@@ -229,7 +231,7 @@ impl<'a,R> Future for DelegateFutureFuture<'a,R> where R: Send {
 					app_ffi_handle,
 					Some(ffi_delegate_async_handler::<R>),
 					data_ptr as _
-				)
+				) != 0
 			};
 
 			// bw_Application_dispatch fails when there is now runtime that is running
