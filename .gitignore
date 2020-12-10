@@ -12,5 +12,8 @@ GPUCache
 .idea
 browser-window.iml
 
-# Visual Studio code project files
+# Visual Studio project files
+.vs
+
+# Visual Studio Code project files
 .vscode
