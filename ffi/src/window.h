@@ -57,11 +57,11 @@ typedef struct bw_WindowDispatchData bw_WindowDispatchData;
 struct bw_Window {
 	bw_Application* app;	// The application handle that this window belongs to.
 	const bw_Window* parent;	// An optional window that acts as the parent to this window. If the parent gets destroyed, children will get destroyed too.
-	bw_WindowImpl impl;	// The underlying handle to the window
 	bool closed;	// Whether or not the window has been closed already
 	bool dropped;	// Whether or not the window may be destroyed when it is actually closed
 	bw_WindowCallbacks callbacks;
 	void* user_data;
+	bw_WindowImpl impl;	// Data for the implementation of the window
 };
 
 

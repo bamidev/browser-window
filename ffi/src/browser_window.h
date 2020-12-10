@@ -50,9 +50,9 @@ typedef struct bw_BrowserWindowSource {
 
 struct bw_BrowserWindow {
 	bw_Window* window;
-	bw_BrowserWindowImpl impl;
 	bw_BrowserWindowHandlerFn external_handler;
 	void* user_data;
+	bw_BrowserWindowImpl impl;
 };
 
 

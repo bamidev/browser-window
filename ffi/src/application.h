@@ -40,9 +40,9 @@ typedef struct {} bw_ApplicationEngineImpl;
 
 
 struct bw_Application {
+	unsigned int windows_alive;
 	bw_ApplicationImpl impl;
 	bw_ApplicationEngineImpl engine_impl;	/// Can be set by the implementation of a browser engine
-	unsigned int windows_alive;
 };
 
 typedef struct bw_Application bw_Application;
