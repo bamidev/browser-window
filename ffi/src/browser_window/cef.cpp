@@ -22,8 +22,6 @@
 #ifdef CEF_X11
 #include <X11/Xlib.h>
 #endif
-
-void bw_BrowserWindowCef_connectToGtkWindow( bw_BrowserWindow* bw, CefWindowInfo& info, int width, int height );
 #endif
 
 #ifdef BW_WIN32
@@ -33,9 +31,12 @@ void bw_BrowserWindowCef_connectToGtkWindow( bw_BrowserWindow* bw, CefWindowInfo
 // QUICKFIX: The win32 definition of GetMessage is getting through from somewhere...
 // TODO: Find out where
 #undef GetMessage
-
-void bw_BrowserWindowCef_connectToWin32Window( bw_BrowserWindow* bw, CefWindowInfo& info, int width, int height );
 #endif
+
+
+
+void bw_BrowserWindowCef_connectToGtkWindow( bw_BrowserWindow* bw, CefWindowInfo& info, int width, int height );
+void bw_BrowserWindowCef_connectToWin32Window( bw_BrowserWindow* bw, CefWindowInfo& info, int width, int height );
 
 
 
@@ -110,7 +111,7 @@ void bw_BrowserWindowCef_connectToGtkWindow( bw_BrowserWindow* bw, CefWindowInfo
 #endif
 
 #ifdef BW_WIN32
-void bw_BrowserWindowCef_connectToWindow( bw_BrowserWindow* bw, CefWindowInfo& info, int width, int height ) {
+void bw_BrowserWindowCef_connectToWin32Window( bw_BrowserWindow* bw, CefWindowInfo& info, int width, int height ) {
 
 	RECT rect;
 	GetClientRect( bw->window->impl.handle, &rect );
