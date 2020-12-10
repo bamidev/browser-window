@@ -8,6 +8,7 @@ use std::path::PathBuf;
 
 
 
+/// Prints all compiler commands to rerun if any file has changed within the given directory or a subdictory thereof.
 fn rerun_if_directory_changed<P>( _path: P ) where P: Into<PathBuf> {
 	let path: PathBuf = _path.into();
 
@@ -125,7 +126,9 @@ fn main() {
 			println!("cargo:rustc-link-search={}/libcef_dll_wrapper", &cef_path);
 			println!("cargo:rustc-link-search={}/Release", &cef_path);
 			if target.contains("msvc") {
-				println!("cargo:rustc-link-lib=static={}", "libcef_dll_wrapper");
+				println!("cargo:rustc-link-search={}", &cef_path);
+				println!("cargo:rustc-link-search={}/libcef_dll_wrapper/Release", &cef_path);
+				println!("cargo:rustc-link-lib=static=libcef_dll_wrapper");
 				println!("cargo:rustc-link-lib=dylib={}", "libcef");
 			} else {
 				println!("cargo:rustc-link-lib=static={}", "cef_dll_wrapper");
