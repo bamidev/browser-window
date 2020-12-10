@@ -442,7 +442,7 @@ impl ApplicationHandleThreaded {
 				self.handle.ffi_handle,
 				Some( ffi_dispatch_handler ),
 				data as _
-			)
+			) != 0
 		}
 	}
 

@@ -29,7 +29,7 @@ void bw_Application_assertCorrectThread( const bw_Application* app ) {
 #endif
 }
 
-bool bw_ApplicationImpl_dispatch( bw_Application* app, bw_ApplicationDispatchData* dispatch_data ) {
+BOOL bw_ApplicationImpl_dispatch( bw_Application* app, bw_ApplicationDispatchData* dispatch_data ) {
 
 	// Check if the runtime is still running
 	AcquireSRWLockShared( &app->impl.is_running_mtx );
@@ -44,10 +44,10 @@ bool bw_ApplicationImpl_dispatch( bw_Application* app, bw_ApplicationDispatchDat
 }
 
 
-bool bw_Application_isRunning( const bw_Application* app ) {
+BOOL bw_Application_isRunning( const bw_Application* app ) {
 
 	AcquireSRWLockShared( (SRWLOCK*)&app->impl.is_running_mtx );
-	bool result = app->impl.is_running;
+	BOOL result = app->impl.is_running;
 	ReleaseSRWLockShared( (SRWLOCK*)&app->impl.is_running_mtx );
 
 	return result;

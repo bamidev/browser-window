@@ -61,7 +61,6 @@ pub struct BrowserWindowHandle {
 	pub(in super) ffi_handle: *mut bw_BrowserWindow,
 	window: WindowHandle
 }
-//unsafe impl Send for BrowserWindowHandle {}
 
 /// An error that may occur when evaluating or executing JavaScript code.
 #[derive(Debug)]

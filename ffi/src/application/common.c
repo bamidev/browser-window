@@ -40,7 +40,7 @@ bw_Application* bw_Application_initialize( int argc, char** argv ) {
     return app;
 }
 
-bool bw_Application_dispatch( bw_Application* app, bw_ApplicationDispatchFn func, void* data ) {
+BOOL bw_Application_dispatch( bw_Application* app, bw_ApplicationDispatchFn func, void* data ) {
 
     bw_ApplicationDispatchData* dispatch_data = (bw_ApplicationDispatchData*)malloc( sizeof(bw_ApplicationDispatchData) );
     dispatch_data->func = func;

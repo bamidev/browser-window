@@ -70,8 +70,8 @@ int bw_ApplicationImpl_run( bw_Application* app, bw_ApplicationImpl_ReadyHandler
 	return app->impl.exit_code;
 }
 
-bool bw_ApplicationImpl_dispatch( bw_Application* app, bw_ApplicationDispatchData* data ) {
-	bool is_running = true;
+BOOL bw_ApplicationImpl_dispatch( bw_Application* app, bw_ApplicationDispatchData* data ) {
+	BOOL is_running = true;
 	
 	pthread_mutex_lock( &app->impl.is_running_mtx );
 

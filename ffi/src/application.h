@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#include <stdbool.h>
+#include "bool.h"
 
 
 
@@ -70,7 +70,7 @@ void bw_Application_exitAsync(  bw_Application* app, int exit_code );
 /// # Returns
 /// An indication of whether or not the function was able to be dispatched.
 /// Dispatching a function fails when the application has already been terminated.
-bool bw_Application_dispatch( bw_Application* app, bw_ApplicationDispatchFn func, void* data );
+BOOL bw_Application_dispatch( bw_Application* app, bw_ApplicationDispatchFn func, void* data );
 
 /// Shuts down all application processes and performs necessary clean-up code.
 void bw_Application_finish( bw_Application* app );
@@ -85,7 +85,7 @@ void bw_Application_free( bw_Application* app );
 /// Returns an application handle.
 bw_Application* bw_Application_initialize( int argc, char** argv );
 
-bool bw_Application_isRunning( const bw_Application* app );
+BOOL bw_Application_isRunning( const bw_Application* app );
 
 /// Runs the event loop.
 /// Calls the `on_ready` callback when `app` can be used.
