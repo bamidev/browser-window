@@ -211,13 +211,10 @@ LRESULT CALLBACK bw_Window_proc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 		RECT rect;
 		GetClientRect( window->impl.handle, &rect );
 
-		if ( window->callbacks.on_resize != 0 ) {
-
 			unsigned int width = rect.right - rect.left;
 			unsigned int height = rect.bottom - rect.top;
 
-			window->callbacks.on_resize( window, width, height );
-		}
+			_bw_Window_onResize( window, width, height );
 
 		break;
 	// When closing the window, only destroy it when it is ready for it to be destroyed

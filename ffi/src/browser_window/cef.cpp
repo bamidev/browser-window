@@ -230,13 +230,15 @@ void bw_BrowserWindowCef_sendJsToRendererProcess(
 	cef_browser->GetMainFrame()->SendProcessMessage( PID_RENDERER, msg );
 }
 
-void bw_BrowserWindowImpl_onResize( const bw_Window* window, unsigned int width, unsigned int height ) {
+
+
+void _bw_Window_onResize( const bw_Window* window, unsigned int width, unsigned int height ) {
 	bw_BrowserWindow* bw = (bw_BrowserWindow*)window->user_data;
 
 	if ( bw != 0 ) {
 		CefRefPtr<CefBrowser> cef = *(CefRefPtr<CefBrowser>*)bw->impl.cef_ptr;
 
-#ifdef BW_WIN32
+#if defined(BW_WIN32)
 		SetWindowPos( cef->GetHost()->GetWindowHandle(), 0, 0, 0, width, height, SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOACTIVATE );
 #elif defined(BW_GTK)
 		gtk_window_resize( GTK_WINDOW(bw->window->impl.handle), width, height );

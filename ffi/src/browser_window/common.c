@@ -53,7 +53,6 @@ void bw_BrowserWindow_new(
 
 	browser->window = bw_Window_new( app, parent, title, width, height, window_options, browser );
 	browser->window->callbacks.do_cleanup = bw_BrowserWindowImpl_doCleanup;
-	browser->window->callbacks.on_resize = bw_BrowserWindowImpl_onResize;
 	browser->external_handler = handler;
 	browser->user_data = user_data;
 

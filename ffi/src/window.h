@@ -129,6 +129,10 @@ void bw_Window_triggerClose( bw_Window* window );
 
 
 
+void _bw_Window_onResize( const bw_Window* window, unsigned int width, unsigned int height );
+
+
+
 #ifdef __cplusplus
 }	// extern "C"
 #endif
