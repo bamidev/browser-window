@@ -12,4 +12,5 @@ typedef struct {
 
 
 
+
 #endif//BW_WINDOW_GTK_H

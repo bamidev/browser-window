@@ -134,6 +134,28 @@ fn main() {
 				println!("cargo:rustc-link-lib=static={}", "cef_dll_wrapper");
 				println!("cargo:rustc-link-lib=dylib={}", "cef");
 			}
+
+			// Add X flags to compiler
+			match pkg_config::Config::new().arg("--cflags").arg("--libs").probe("x11") {
+				Err(_) => {},	// CEF doesn't always use X...
+				Ok( result ) => {
+	
+					// Includes
+					for inc in &result.include_paths {
+						build.include( inc );
+					}
+
+					// Links
+					for lib in &result.libs {
+						build.flag( &format!("-l{}", lib) );
+					}
+
+					// Link search paths
+					for path in &result.link_paths {
+						build.flag( &format!("-L{}", path.to_str().unwrap()) );
+					}
+				}
+			}
 		}
 	}
 

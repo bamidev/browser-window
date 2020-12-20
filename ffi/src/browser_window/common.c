@@ -50,10 +50,8 @@ void bw_BrowserWindow_new(
 	bw_Application_assertCorrectThread( app );
 
 	bw_BrowserWindow* browser = (bw_BrowserWindow*)malloc( sizeof( bw_BrowserWindow ) );
-
 	browser->window = bw_Window_new( app, parent, title, width, height, window_options, browser );
 	browser->window->callbacks.do_cleanup = bw_BrowserWindowImpl_doCleanup;
-	browser->window->callbacks.on_resize = bw_BrowserWindowImpl_onResize;
 	browser->external_handler = handler;
 	browser->user_data = user_data;
 
@@ -67,4 +65,8 @@ void bw_BrowserWindow_new(
 		callback,
 		callback_data
 	);
+
+	// bw_BrowserWindowImpl_onResize depends on browser->impl being initialized already.
+	// Therefore we initialize this event after everything
+	browser->window->callbacks.on_resize = bw_BrowserWindowImpl_onResize;
 }

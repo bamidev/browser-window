@@ -34,6 +34,10 @@ public:
 		args->SetBinary( 2, extra_info->GetBinary( "callback-data" ) );
 		args->SetBool( 3, extra_info->GetBool( "dev-tools" ) );
 
+		auto test = extra_info->GetBinary( "handle" );
+		void* ptr = 0;
+		test->GetData( &ptr, sizeof( ptr ), 0 );
+
 		browser->GetMainFrame()->SendProcessMessage( PID_BROWSER, msg );
 	}
 

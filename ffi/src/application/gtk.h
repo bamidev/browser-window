@@ -17,6 +17,8 @@ typedef struct {
 	pthread_t thread_id;
 } bw_ApplicationImpl;
 
+
+
 struct bw_ApplicationDispatchData {
 	struct bw_Application* app;
 	bw_ApplicationDispatchFn func;
