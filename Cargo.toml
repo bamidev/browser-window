@@ -11,6 +11,9 @@ categories = ["asynchronous", "gui", "web-programming"]
 readme = "README.md"
 repository = "https://github.com/bamilab/browser-window"
 
+[features]
+cef = ["browser-window-ffi/cef"]
+
 [lib]
 name = "browser_window"
 path = "src/lib.rs"

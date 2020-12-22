@@ -82,7 +82,7 @@ void bw_ApplicationEngineImpl_finish( bw_ApplicationEngineImpl* app ) {
 
 int _bw_ApplicationCef_xErrorHandler( Display* display, XErrorEvent* event ) {
 
-	fprintf( stderr, "X Error: type %d, serial %d, error code %d, request code %d, mino	r code %d\n", event->type, event->serial, event->error_code, event->request_code, event->minor_code );
+	fprintf( stderr, "X Error: type %d, serial %lu, error code %d, request code %d, mino	r code %d\n", event->type, event->serial, event->error_code, event->request_code, event->minor_code );
 	return 0;
 }
 
