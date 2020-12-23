@@ -48,13 +48,22 @@ fn main() {
 	let out_path = PathBuf::from( env::var("OUT_DIR").expect("Unable to get output directory for C/C++ code base crate") );
 
 	let mut build = cc::Build::new();
-	let std_flag =
-		if target.contains("windows") {
+	let std_flag = if cfg!(feature = "cef") {
+		if target.contains("msvc") {
 			"/std:c++17"
 		}
 		else {
 			"-std=c++17"
-		};
+		}
+	}
+	else {
+		if target.contains("msvc") {
+			"/std:c11"
+		}
+		else {
+			"-std=c11"
+		}
+	};
 
 
 
@@ -106,17 +115,6 @@ fn main() {
 			},
 			Ok(cef_path) => {
 				build.include(&cef_path);
-				/*println!("cargo:rustc-link-search={}/libcef_dll_wrapper", &cef_path);
-				println!("cargo:rustc-link-search={}/Release", &cef_path);
-				if target.contains("msvc") {
-					println!("cargo:rustc-link-search={}", &cef_path);
-					println!("cargo:rustc-link-search={}/libcef_dll_wrapper/Release", &cef_path);
-					println!("cargo:rustc-link-lib=static=libcef_dll_wrapper");
-					println!("cargo:rustc-link-lib=dylib={}", "libcef");
-				} else {
-					println!("cargo:rustc-link-lib=static={}", "cef_dll_wrapper");
-					println!("cargo:rustc-link-lib=dylib={}", "cef");
-				}*/
 
 				// Add X flags to compiler
 				match pkg_config::Config::new().arg("--cflags").arg("--libs").probe("x11") {
@@ -127,16 +125,6 @@ fn main() {
 						for inc in &result.include_paths {
 							build.include( inc );
 						}
-
-						// Links
-						/*for lib in &result.libs {
-							println!("cargo:rustc-link-lib={}", lib);
-						}
-
-						// Link search paths
-						for path in &result.link_paths {
-							println!("cargo:rustc-link-search=native={}", path.to_str().unwrap());
-						}*/
 					}
 				}
 			}
