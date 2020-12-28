@@ -87,25 +87,18 @@ void bw_BrowserWindow_evalJsThreaded( bw_BrowserWindow* bw, bw_CStrSlice js, bw_
 
 #ifdef BW_GTK
 void bw_BrowserWindowCef_connectToGtkWindow( bw_BrowserWindow* bw, CefWindowInfo& info, int width, int height ) {
-
-	CefRect rect( 0, 0, width, height );
-
 #ifdef CEF_X11
-	GtkWidget* vbox = gtk_box_new( GTK_ORIENTATION_VERTICAL, 0);
-	
-	GdkWindow* gdk_window = gtk_widget_get_window( bw->window->impl.handle );
-	
-	Window x_window = gdk_x11_window_get_xid( gdk_window );
-
-	info.SetAsChild( x_window, rect );
 
 	gtk_widget_show_all( bw->window->impl.handle );
-#else
-	// TODO: Figure out how CEF can be connected to a GTK window if CEF is actually build with flag use_gtk3=true
-#error BrowserWindow is set up to connect CEF with a GTK handle, but the glue for this is not yet implemented!
-	GtkWidget* vbox = gtk_box_new( GTK_ORIENTATION_VERTICAL, 0);
 
-	gtk_container_add( GTK_CONTAINER( bw->window->impl.handle ), vbox );
+	GdkWindow* gdk_window = gtk_widget_get_window( bw->window->impl.handle );
+	Window x_window = GDK_WINDOW_XID( gdk_window );
+
+	CefRect rect( 0, 0, width, height );
+	
+	info.SetAsChild( x_window, rect );
+#else
+#error BrowserWindow is set up to connect CEF with a GTK handle, but the glue for this is not yet implemented!
 #endif
 }
 #endif
@@ -187,9 +180,9 @@ void bw_BrowserWindowImpl_new(
 
 	// Store the resource path if set
 	if ( browser_window_options->resource_path.len != 0 ) {
-	    bw.resource_path = new char[ browser_window_options->resource_path.len + 1 ];
-        memcpy( bw.resource_path, browser_window_options->resource_path.data, browser_window_options->resource_path.len );
-        bw.resource_path[ browser_window_options->resource_path.len ] = '\0';
+		bw.resource_path = new char[ browser_window_options->resource_path.len + 1 ];
+		memcpy( bw.resource_path, browser_window_options->resource_path.data, browser_window_options->resource_path.len );
+		bw.resource_path[ browser_window_options->resource_path.len ] = '\0';
 	}
 
 	// Create a CefDictionary containing the bw_BrowserWindow pointer to pass along CreateBrowser
@@ -235,13 +228,17 @@ void bw_BrowserWindowCef_sendJsToRendererProcess(
 void _bw_Window_onResize( const bw_Window* window, unsigned int width, unsigned int height ) {
 	bw_BrowserWindow* bw = (bw_BrowserWindow*)window->user_data;
 
-	if ( bw != 0 ) {
+
+	// Only do something when our browser window object and the underlying CEF implementation has been created.
+	if ( bw != 0 && bw->impl.cef_ptr != 0 ) {
+
 		CefRefPtr<CefBrowser> cef = *(CefRefPtr<CefBrowser>*)bw->impl.cef_ptr;
 
 #if defined(BW_WIN32)
 		SetWindowPos( cef->GetHost()->GetWindowHandle(), 0, 0, 0, width, height, SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOACTIVATE );
 #elif defined(BW_GTK)
-		gtk_window_resize( GTK_WINDOW(bw->window->impl.handle), width, height );
+		//Window x_handle = cef->GetHost()->GetWindowHandle();
+
 #endif
 	}
 }
