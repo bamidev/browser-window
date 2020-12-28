@@ -196,7 +196,6 @@ void bw_BrowserWindowImpl_new(
 	CefRefPtr<CefClient>* cef_client = (CefRefPtr<CefClient>*)browser->window->app->engine_impl.cef_client;
 	bool success = CefBrowserHost::CreateBrowser( info, *cef_client, source_string, settings, dict, NULL );
 	BW_ASSERT( success, "CefBrowserHost::CreateBrowser failed!\n" );
-
 	browser->impl = bw;
 }
 
@@ -225,7 +224,7 @@ void bw_BrowserWindowCef_sendJsToRendererProcess(
 
 
 
-void _bw_Window_onResize( const bw_Window* window, unsigned int width, unsigned int height ) {
+void bw_BrowserWindowImpl_onResize( const bw_Window* window, unsigned int width, unsigned int height ) {
 	bw_BrowserWindow* bw = (bw_BrowserWindow*)window->user_data;
 
 

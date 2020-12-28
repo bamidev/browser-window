@@ -187,7 +187,7 @@ impl BrowserWindowBuilder {
 					dev_tools,
 					resource_path: "".into()
 				};
-
+				
 				unsafe { bw_BrowserWindow_new(
 					app.ffi_handle,
 					parent_handle,

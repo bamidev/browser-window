@@ -9,5 +9,5 @@ publish = false
 cef = ["browser-window/cef"]
 
 [dependencies]
-browser-window = { path = ".." }
+browser-window = { path = "..", features = ["cef"] }
 serde_json = "1.0"

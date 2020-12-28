@@ -22,8 +22,11 @@
 
 // Causes the current process to exit with the given exit code.
 void _bw_Application_exitProcess( int exit_code );
+
+#ifdef CEF_X11
 int _bw_ApplicationCef_xErrorHandler( Display* display, XErrorEvent* event );
 int _bw_ApplicationCef_xIoErrorHandler( Display* display );
+#endif
 
 
 
@@ -60,7 +63,7 @@ bw_ApplicationEngineImpl bw_ApplicationEngineImpl_initialize( bw_Application* ap
 	//       This is usually less effecient than using the multithreaded loop though.
 	// TODO: If GTK will be used on macOS in the future, the if macro below needs to be corrected.
 #if defined(BW_WIN32) || defined(BW_GTK)
-	//app_settings.multi_threaded_message_loop = true;
+	app_settings.multi_threaded_message_loop = true;
 #endif
 
 	CefInitialize( main_args, app_settings, cef_app_handle.get(), 0 );
@@ -80,6 +83,7 @@ void bw_ApplicationEngineImpl_finish( bw_ApplicationEngineImpl* app ) {
 
 
 
+#ifdef CEF_X11
 int _bw_ApplicationCef_xErrorHandler( Display* display, XErrorEvent* event ) {
 
 	fprintf( stderr, "X Error: type %d, serial %lu, error code %d, request code %d, mino	r code %d\n", event->type, event->serial, event->error_code, event->request_code, event->minor_code );
@@ -89,3 +93,4 @@ int _bw_ApplicationCef_xErrorHandler( Display* display, XErrorEvent* event ) {
 int _bw_ApplicationCef_xIoErrorHandler( Display* display ) {
 	return 0;
 }
+#endif

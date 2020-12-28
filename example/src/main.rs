@@ -87,6 +87,7 @@ fn main() {
 			})
 			.size( 800, 600 )
 			.title("Terminal Example");
+		
 		let bw = bwb.build( app ).await;
 		bw.opacity().set(224);
 		bw.show();
