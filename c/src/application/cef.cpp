@@ -22,6 +22,7 @@
 
 // Causes the current process to exit with the given exit code.
 void _bw_Application_exitProcess( int exit_code );
+CefString to_string( bw_CStrSlice );
 
 #ifdef CEF_X11
 int _bw_ApplicationCef_xErrorHandler( Display* display, XErrorEvent* event );
@@ -30,7 +31,7 @@ int _bw_ApplicationCef_xIoErrorHandler( Display* display );
 
 
 
-bw_ApplicationEngineImpl bw_ApplicationEngineImpl_initialize( bw_Application* app, int argc, char** argv ) {
+bw_ApplicationEngineImpl bw_ApplicationEngineImpl_initialize( bw_Application* app, int argc, char** argv, const bw_ApplicationSettings* settings ) {
 	bw_ApplicationEngineImpl impl;
 
 	// For some reason the Windows implementation for CEF doesn't have the constructor for argc and argv.
@@ -65,6 +66,11 @@ bw_ApplicationEngineImpl bw_ApplicationEngineImpl_initialize( bw_Application* ap
 #if defined(BW_WIN32) || defined(BW_GTK)
 	app_settings.multi_threaded_message_loop = true;
 #endif
+	if ( settings->resource_dir.data != 0 ) {
+		char* path = bw_string_copyAsNewCstr( settings->resource_dir );
+		CefString( &app_settings.resources_dir_path ) = path;
+		bw_string_freeCstr(path);
+	}
 
 	CefInitialize( main_args, app_settings, cef_app_handle.get(), 0 );
 

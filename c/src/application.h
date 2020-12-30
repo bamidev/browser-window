@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 #include "bool.h"
+#include "string.h"
 
 
 
@@ -49,6 +50,10 @@ typedef struct bw_Application bw_Application;
 typedef struct bw_ApplicationEngineData bw_ApplicationEngineData;
 typedef struct bw_ApplicationDispatchData bw_ApplicationDispatchData;
 
+typedef struct {
+	bw_CStrSlice resource_dir;
+} bw_ApplicationSettings;
+
 
 
 /// Safety check that makes sure the given application handle is used on the correct thread.
@@ -83,7 +88,7 @@ void bw_Application_free( bw_Application* app );
 /// Initializes browser window.
 /// Starts up browser engine process(es).
 /// Returns an application handle.
-bw_Application* bw_Application_initialize( int argc, char** argv );
+bw_Application* bw_Application_initialize( int argc, char** argv, const bw_ApplicationSettings* settings );
 
 BOOL bw_Application_isRunning( const bw_Application* app );
 

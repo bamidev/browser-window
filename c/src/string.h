@@ -27,7 +27,10 @@ typedef struct bw_CStrSlice {
 
 
 
+/// Copies the string from the given `bw_CStrSlice` to a C compatible, nul-terminated string.
 char* bw_string_copyAsNewCstr( bw_CStrSlice str );
+
+/// Frees the string allocated with any of the functions of this module.
 void bw_string_freeCstr( char* str );
 
 

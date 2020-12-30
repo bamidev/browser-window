@@ -7,6 +7,7 @@ use crate::browser::*;
 use crate::window::WindowBuilder;
 
 use std::{
+	env,
 	ops::DerefMut,
 	mem,
 	path::PathBuf,
