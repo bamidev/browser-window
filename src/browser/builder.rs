@@ -2,12 +2,11 @@ use browser_window_ffi::*;
 
 use std::ffi::*;
 
-use crate::application::{ApplicationHandle, ApplicationHandleThreaded};
+use crate::application::{ApplicationHandle};
 use crate::browser::*;
 use crate::window::WindowBuilder;
 
 use std::{
-	env,
 	ops::DerefMut,
 	mem,
 	path::PathBuf,

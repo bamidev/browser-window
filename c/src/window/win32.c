@@ -195,6 +195,13 @@ bw_WindowImpl bw_WindowImpl_new(
 	SetWindowLongPtrW( impl.handle, GWLP_USERDATA, (LONG_PTR)window );
 	BW_WIN32_ASSERT_SUCCESS;
 
+	// We give the window an ex-style of WS_EX_LAYERED.
+	// This means however that we need to explicitly set the opacity to a value.
+	// We default to 255 for no transparency.
+	impl.opacity = 255;
+	if ( !SetLayeredWindowAttributes( impl.handle, 0, impl.opacity, LWA_ALPHA ) )
+		BW_WIN32_PANIC_LAST_ERROR
+
 	// Increase the application's window counter
 	window->app->windows_alive += 1;
 
