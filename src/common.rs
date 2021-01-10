@@ -155,7 +155,7 @@ impl<'a,H,R> Future for DelegateFuture<'a,H,R> where
 				waker: cx.waker().clone()
 			};
 
-			let succeeded = unsafe {
+			let succeeded = {
 				let data_ptr = Box::into_raw( Box::new( data ) );
 
 				app_inner.dispatch( delegate_handler::<H,R>, data_ptr as _ )

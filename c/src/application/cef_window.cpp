@@ -49,10 +49,11 @@ int bw_ApplicationImpl_run( bw_Application* app, bw_ApplicationImpl_ReadyHandler
 }
 
 // Doesn't need to be implemented because it is already done so in bw_ApplicationEngineImpl_initialize
-bw_ApplicationImpl bw_ApplicationImpl_initialize( bw_Application* app, int argc, char** argv ) {
+bw_ApplicationImpl bw_ApplicationImpl_initialize( bw_Application* app, int argc, char** argv, const bw_ApplicationSettings* settings ) {
 	UNUSED( app );
 	UNUSED( argc );
 	UNUSED( argv );
+	UNUSED( settings );
 
 	bw_ApplicationImpl impl;
 	impl.is_running = false;
