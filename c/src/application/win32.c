@@ -117,10 +117,11 @@ int bw_ApplicationImpl_run( bw_Application* app, bw_ApplicationImpl_ReadyHandler
 }
 
 
-bw_ApplicationImpl bw_ApplicationImpl_initialize( bw_Application* _app, int argc, char** argv ) {
+bw_ApplicationImpl bw_ApplicationImpl_initialize( bw_Application* _app, int argc, char** argv, const bw_ApplicationSettings* settings ) {
 	UNUSED(_app);
 	UNUSED(argc);
 	UNUSED(argv);
+	UNUSED(settings);
 
 	bw_ApplicationImpl app;
 	app.is_running = false;

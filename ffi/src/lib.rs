@@ -17,6 +17,7 @@ pub use bindings::{
 
 	// Appliation
 	bw_Application,
+	bw_ApplicationSettings,
 	bw_Application_assertCorrectThread,
 	bw_Application_dispatch,
 	bw_Application_exit,
@@ -89,6 +90,15 @@ pub use bindings::{
 impl bw_CStrSlice {
 	pub fn empty() -> Self {
 		Self { len: 0, data: ptr::null() }
+	}
+}
+
+impl Default for bw_CStrSlice {
+	fn default() -> Self {
+		Self {
+			data: ptr::null(),
+			len: 0
+		}
 	}
 }
 

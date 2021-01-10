@@ -206,7 +206,10 @@ fn main() {
 
 	// Copy our lib to a known location so that browser-window-ffi can link to it.
 	// Apparently, Rust is unwilling to link the this lib, probably since this crates' crate-type is set to "staticlib", which is a C static lib.
-	fs::copy( out_path.join("libbrowser_window_c.a"), "/tmp/libbrowser_window_c.a" ).expect("Unable to copy libbrowser_window_c.a");
+	let filename = match target.contains("windows") { true => "browser_window_c.lib", false => "libbrowser_window_c.a" };
+	let mut temp_path = env::temp_dir();
+	temp_path.push( filename );
+	fs::copy( out_path.join( filename ), temp_path ).expect( &format!("Unable to copy {}", filename ) );
 }
 
 

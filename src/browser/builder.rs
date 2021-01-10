@@ -4,7 +4,7 @@ use browser_window_core::window::*;
 
 use std::ffi::*;
 
-use crate::application::{ApplicationHandle, ApplicationHandleThreaded};
+use crate::application::{ApplicationHandle};
 use crate::browser::*;
 use crate::window::WindowBuilder;
 
@@ -36,7 +36,7 @@ pub enum Source {
 pub struct BrowserWindowBuilder {
 
 	dev_tools: bool,
-	handler: Option<Box<dyn FnMut(BrowserWindowHandle, String, Vec<String>) -> Pin<Box<dyn Future<Output=()>>> + Send>>,
+	handler: Option<Box<dyn FnMut(BrowserWindowHandle, String, Vec<String>) -> Pin<Box<dyn Future<Output=()>>>>>,
 	source: Source,
 	window: WindowBuilder
 }
@@ -49,7 +49,7 @@ impl BrowserWindowBuilder {
 	/// The closure's second parameter specifies a command name.
 	/// The closure's third parameter specifies an array of string arguments.
 	pub fn async_handler<H,F>( &mut self, mut handler: H ) -> &mut Self where
-		H: FnMut(BrowserWindowHandle, String, Vec<String>) -> F + Send + 'static,
+		H: FnMut(BrowserWindowHandle, String, Vec<String>) -> F + 'static,
 		F: Future<Output=()> + 'static
 	{
 		self.handler = Some( Box::new(

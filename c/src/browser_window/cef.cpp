@@ -207,12 +207,11 @@ void bw_BrowserWindowImpl_new(
 	dict->SetBinary( "callback", CefBinaryValue::Create( (const void*)&callback, sizeof(callback) ) );
 	dict->SetBinary( "callback-data", CefBinaryValue::Create( (const void*)&callback_data, sizeof(callback_data) ) );
 	dict->SetBool( "dev-tools", browser_window_options->dev_tools );
-	BW_DEBUG(" DSDFSDF %i", browser_window_options->dev_tools)
+	
 	// Create the browser
 	CefRefPtr<CefClient>* cef_client = (CefRefPtr<CefClient>*)browser->window->app->engine_impl.cef_client;
 	bool success = CefBrowserHost::CreateBrowser( info, *cef_client, source_string, settings, dict, NULL );
 	BW_ASSERT( success, "CefBrowserHost::CreateBrowser failed!\n" );
-
 	browser->impl = bw;
 }
 
@@ -238,6 +237,8 @@ void bw_BrowserWindowCef_sendJsToRendererProcess(
 
 	cef_browser->GetMainFrame()->SendProcessMessage( PID_RENDERER, msg );
 }
+
+
 
 void bw_BrowserWindowImpl_onResize( const bw_Window* window, unsigned int width, unsigned int height ) {
 	bw_BrowserWindow* bw = (bw_BrowserWindow*)window->user_data;

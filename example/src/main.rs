@@ -61,7 +61,7 @@ fn read_stream<R>( bw: BrowserWindowHandle, reader: &mut R, buffer: &mut [u8], j
 }
 
 fn main() {
-	let application = Application::initialize();
+	let application = Application::initialize( ApplicationSettings::default() );
 	let runtime = application.start();
 
 	let exit_code = runtime.run_async( |app| async move {
@@ -87,6 +87,7 @@ fn main() {
 			})
 			.size( 800, 600 )
 			.title("Terminal Example");
+		
 		let bw = bwb.build( app ).await;
 		
 		bw.opacity().set(224);

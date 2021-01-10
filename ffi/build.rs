@@ -21,7 +21,7 @@ fn main() {
 
 
 	println!("cargo:rustc-link-lib=browser_window_c");
-	println!("cargo:rustc-link-search=native=/tmp");
+	println!( "cargo:rustc-link-search=native={}", env::temp_dir().to_str().unwrap() );
 
 	/**************************************
 	 *	C header files for bindgen
@@ -107,5 +107,7 @@ fn main() {
 		.generate().expect("Unable to generate FFI bindings!")
 		.write_to_file( out_path.join("c_bindings.rs") ).expect("Unable to write FFI bindings to file!");
 
-	println!("cargo:rustc-link-lib=stdc++");
+	if !target.contains("windows") {
+		println!("cargo:rustc-link-lib=stdc++");
+	}
 }

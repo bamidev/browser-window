@@ -94,8 +94,9 @@ BOOL bw_ApplicationImpl_dispatch( bw_Application* app, bw_ApplicationDispatchDat
 	return is_running;
 }
 
-bw_ApplicationImpl bw_ApplicationImpl_initialize( bw_Application* _app, int argc, char** argv ) {
-	(void)(_app);
+bw_ApplicationImpl bw_ApplicationImpl_initialize( bw_Application* _app, int argc, char** argv, const bw_ApplicationSettings* settings ) {
+	UNUSED( _app );
+	UNUSED( settings );
 
 	bw_ApplicationImpl app;
 

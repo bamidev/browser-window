@@ -12,7 +12,7 @@
 //! use browser_window::application::*;
 //!
 //! fn main() {
-//! 	let application = Application::initialize();
+//! 	let application = Application::initialize( Settings::default() );
 //! 	let runtime = application.start();
 //!
 //!      runtime.run_async(|handle| async move {
@@ -34,7 +34,7 @@
 //! }
 //!
 //! fn main() {
-//! 	let application = Application::initialize();
+//! 	let application = Application::initialize( Settings::default() );
 //!
 //! 	let tokio_runtime = tokio::runtime::Runtime::new().unwrap();
 //!     let bw_runtime = application.start();
@@ -59,6 +59,8 @@ use std::ptr;
 use std::task::{Context, Poll, Waker, RawWaker, RawWakerVTable};
 
 use super::common::*;
+
+pub use browser_window_core::application::ApplicationSettings;
 
 
 /// Use this to initialize and start your application with.
@@ -154,13 +156,19 @@ impl Application {
 	/// This will open another process of your application.
 	/// Therefore, any code that will be placed before initialization will also be executed on all other processes.
 	/// This is generally unnecessary.
-	pub fn initialize() -> Application {
+	/// 
+	/// # Arguments
+	/// `settings` - Some settings that allow you to tweak some application behaviors.
+	///              Use `Settings::default()` for default settings that work for most people.
+	pub fn initialize( settings: ApplicationSettings ) -> Application {
 
 		let (args_vec, mut ptrs_vec) = Self::args_ptr_vec();
 		let argc: c_int = args_vec.len() as _;
 		let argv = ptrs_vec.as_mut_ptr();
 
-		let core_handle = ApplicationImpl::initialize( argc, argv as _ );
+		let settings = ApplicationSettings {};
+
+		let core_handle = ApplicationImpl::initialize( argc, argv as _, &settings );
 
 		Application::from_core_handle( core_handle )
 	}
@@ -186,7 +194,7 @@ impl Runtime {
 	unsafe fn poll_future( data: *mut WakerData ) {
 		debug_assert!( data != ptr::null_mut(), "WakerData pointer can't be zero!" );
 
-		// FIXME: Test if polling from the correct thread when in debug mode
+		// TODO: Test if polling from the right thread
 
 		let waker = Self::new_waker( data );
 		let mut ctx = Context::from_waker( &waker );
@@ -312,7 +320,7 @@ impl ApplicationHandle {
 
 	/// Spawns the given future, executing it on the GUI thread somewhere in the near future.
 	pub fn spawn<F>( &self, future: F ) where
-	    F: Future<Output=()> + 'static
+		F: Future<Output=()> + 'static
 	{
 		// Data for the waker.
 		let waker_data = Box::into_raw( Box::new(

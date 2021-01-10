@@ -1,7 +1,7 @@
 //! This module implements the `Application` trait with the corresponding function definitions found in the C code base of `browser-window-c`.
 //! All functions are basically wrapping the FFI provided by crate `browser-window-c`.
 
-use super::ApplicationExt;
+use super::{ApplicationExt, ApplicationSettings};
 
 use crate::prelude::*;
 
@@ -15,6 +15,10 @@ pub struct ApplicationImpl {
 }
 
 impl ApplicationExt for ApplicationImpl {
+
+	fn assert_correct_thread( &self ) {
+		unsafe { cbw_Application_assertCorrectThread( self.inner ) }
+	}
 
 	fn dispatch( &self, work: unsafe fn(ApplicationImpl, *mut ()), _data: *mut () ) -> bool {
 		let data = Box::new( DispatchData {
@@ -39,8 +43,13 @@ impl ApplicationExt for ApplicationImpl {
 		unsafe { cbw_Application_finish( self.inner ) }
 	}
 
-	fn initialize( argc: c_int, argv: *mut *mut c_char ) -> Self {
-		let c_handle = unsafe { cbw_Application_initialize( argc, argv ) };
+	fn initialize( argc: c_int, argv: *mut *mut c_char, settings: &ApplicationSettings ) -> Self {
+
+		let c_settings = cbw_ApplicationSettings {
+			resource_dir: "".into()
+		};
+
+		let c_handle = unsafe { cbw_Application_initialize( argc, argv, &c_settings ) };
 
 		Self {
 			inner: c_handle
