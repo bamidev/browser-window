@@ -98,8 +98,8 @@ fn main() {
 			.define("BW_WIN32", None)
 			.define("_CRT_SECURE_NO_WARNINGS", None);	// Disable sprintf_s warnings. sprintf_s tends to cause segfaults...
 	}
-	// Non-Windows platforms:
-	else {
+	// When opting for using GTK:
+	else if cfg!(feature = "gtk") {
 		bgbuilder = bgbuilder.clang_arg("-DBW_GTK");
 
 		// GTK source files
@@ -118,6 +118,14 @@ fn main() {
 				}
 			}
 		}
+	}
+	// Non-windows systems that opt for using CEF, use CEF's own internal windowing features
+	else if cfg!(feature = "cef") {
+		bgbuilder = bgbuilder.clang_arg("-DBW_CEF_WINDOW");
+		build
+			.file("src/application/cef_window.cpp")
+			.file("src/window/cef.cpp")
+			.define("BW_CEF_WINDOW", None);
 	}
 
 	/**************************************
@@ -172,6 +180,7 @@ fn main() {
 			.file("src/cef/bw_handle_map.cpp")
 			.file("src/cef/client_handler.cpp")
 			.file("src/cef/exception.cpp")
+			.file("src/cef/util.cpp")
 			.define("BW_CEF", None)
 			.cpp(true);
 	}

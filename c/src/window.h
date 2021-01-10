@@ -15,6 +15,8 @@ extern "C" {
 #include "win32/window.h"	// TODO: Make this "window/win32.h"
 #elif defined(BW_GTK)
 #include "window/gtk.h"
+#elif defined(BW_CEF_WINDOW)
+#include "window/cef.h"
 #else
 #error Unsupported window API implementation
 #endif

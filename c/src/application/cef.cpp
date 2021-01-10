@@ -17,7 +17,6 @@
 // Link with win32 libraries
 #if defined(BW_WIN32)
 #pragma comment(lib, "shell32.lib")
-#pragma comment(lib, "user32.lib")
 #endif
 
 // Causes the current process to exit with the given exit code.
@@ -55,12 +54,14 @@ bw_ApplicationEngineImpl bw_ApplicationEngineImpl_initialize( bw_Application* ap
 
 	CefSettings app_settings;
 	// Only works on Windows and Linux according to docs.
+	// Here it says it works on Windows only: https://bitbucket.org/chromiumembedded/cef/wiki/GeneralUsage.md#markdown-header-linux
+	// TODO: Check if the GTK implementation works when it is set to false, and with CefMessageDoWork() called repeatedly from somewhere else.
 	// TODO: Check if it works on BSD by any chance.
 	// TODO: For unsupported systems (like macOS), CefDoMessageLoopWork needs to be called repeatedly.
-	//       This is usually less effecient than using the multithreaded loop though.
-	// TODO: If GTK will be used on macOS in the future, the if macro below needs to be corrected.
+	//       This is usually less effecient than using the multithreaded message loop though.
+	// TODO: If GTK will be used on macOS in the future, the 'if' macro below needs to be corrected.
 #if defined(BW_WIN32) || defined(BW_GTK)
-	//app_settings.multi_threaded_message_loop = true;
+	app_settings.multi_threaded_message_loop = true;
 #endif
 
 	CefInitialize( main_args, app_settings, cef_app_handle.get(), 0 );

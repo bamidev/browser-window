@@ -22,9 +22,12 @@ typedef bw_ApplicationDispatchFn bw_ApplicationReadyFn;
 #include "application/win32.h"
 #elif defined(BW_GTK)
 #include "application/gtk.h"
+#elif defined(BW_CEF_WINDOW)
+#include "application/cef_window.h"
 #else
 #error Unsupported platform
 #endif
+
 #if defined(BW_CEF)
 #include "application/cef.h"
 #else
@@ -46,7 +49,11 @@ struct bw_Application {
 
 typedef struct bw_Application bw_Application;
 typedef struct bw_ApplicationEngineData bw_ApplicationEngineData;
-typedef struct bw_ApplicationDispatchData bw_ApplicationDispatchData;
+
+typedef struct {
+	bw_ApplicationDispatchFn func;
+	void* data;
+} bw_ApplicationDispatchData;
 
 
 

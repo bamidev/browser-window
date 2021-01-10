@@ -65,7 +65,7 @@ fn main() {
 	let runtime = application.start();
 
 	let exit_code = runtime.run_async( |app| async move {
-
+		
 		let working_dir = env::current_dir().unwrap();
 		let mut html_file = working_dir.clone();
 		html_file.push( "resources/terminal.html" );
@@ -88,6 +88,7 @@ fn main() {
 			.size( 800, 600 )
 			.title("Terminal Example");
 		let bw = bwb.build( app ).await;
+		
 		bw.opacity().set(224);
 		bw.show();
 

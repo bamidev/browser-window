@@ -27,11 +27,6 @@ typedef struct {
 	SRWLOCK is_running_mtx;
 } bw_ApplicationImpl;
 
-struct bw_ApplicationDispatchData {
-	bw_ApplicationDispatchFn func;
-	void* data;
-};
-
 
 
 #ifdef __cplusplus

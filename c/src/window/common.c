@@ -4,6 +4,7 @@
 #include "impl.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 
 
@@ -35,9 +36,9 @@ const bw_Application* bw_Window_getApp( bw_Window* window ) {
 }
 
 void bw_Window_hide( bw_Window* window ) {
-    window->closed = true;
+	window->closed = true;
 
-    bw_WindowImpl_hide( &window->impl );
+	bw_WindowImpl_hide( &window->impl );
 }
 
 bool bw_Window_isVisible( const bw_Window* window ) {
@@ -79,9 +80,9 @@ bw_Window* bw_Window_new(
 }
 
 void bw_Window_show( bw_Window* window ) {
-    window->closed = false;
+	window->closed = false;
 
-    bw_WindowImpl_show( &window->impl );
+	bw_WindowImpl_show( &window->impl );
 }
 
 // Closing a window hides the window,
@@ -95,7 +96,7 @@ void bw_Window_triggerClose( bw_Window* window ) {
 	}
 	else {
 		bw_WindowImpl_hide( &window->impl );
-    }
+	}
 
 	// TODO: Fire on_closed event
 }

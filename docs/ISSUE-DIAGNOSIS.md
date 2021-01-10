@@ -13,7 +13,7 @@ TODO: Paste console error here...
 
 This error means that the GTK development files are not available.
 
-#### Missing "stdlib.h"
+#### Missing "stdlib.h" or "stddef.h"
 
 ```rustc
 ./src/err.h:8:10: fatal error: 'stdlib.h' file not found

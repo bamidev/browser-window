@@ -12,6 +12,11 @@ typedef struct {
 	int exit_code;
 } bw_ApplicationGtkAsyncExitData;
 
+typedef struct {
+	bw_Application* app;
+	bw_ApplicationDispatchData* inner;
+} bw_ApplicationImplDispatchData;
+
 
 
 gboolean _bw_ApplicationImpl_dispatchHandler( gpointer _dispatch_data );
@@ -70,10 +75,14 @@ int bw_ApplicationImpl_run( bw_Application* app, bw_ApplicationImpl_ReadyHandler
 	return app->impl.exit_code;
 }
 
-BOOL bw_ApplicationImpl_dispatch( bw_Application* app, bw_ApplicationDispatchData* data ) {
+BOOL bw_ApplicationImpl_dispatch( bw_Application* app, bw_ApplicationDispatchData* _data ) {
 	BOOL is_running = true;
 	
 	pthread_mutex_lock( &app->impl.is_running_mtx );
+
+	bw_ApplicationImplDispatchData* data = (bw_ApplicationImplDispatchData*)malloc( sizeof( bw_ApplicationImplDispatchData ) );
+	data->app = app;
+	data->inner = _data;
 
 	if ( app->impl.is_running )
 		gdk_threads_add_idle( _bw_ApplicationImpl_dispatchHandler, (gpointer)data );
@@ -113,10 +122,11 @@ void bw_ApplicationImpl_finish( bw_ApplicationImpl* app ) {
 
 
 gboolean _bw_ApplicationImpl_dispatchHandler( gpointer _dispatch_data ) {
-	bw_ApplicationDispatchData* dispatch_data = (bw_ApplicationDispatchData*)(_dispatch_data);
+	bw_ApplicationImplDispatchData* dispatch_data = (bw_ApplicationImplDispatchData*)(_dispatch_data);
 
-	dispatch_data->func( dispatch_data->app, dispatch_data->data );
+	dispatch_data->inner->func( dispatch_data->app, dispatch_data->inner->data );
 
+	free( dispatch_data->inner );
 	free( dispatch_data );
 
 	return FALSE;

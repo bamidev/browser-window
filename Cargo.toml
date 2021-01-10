@@ -13,6 +13,7 @@ repository = "https://github.com/bamilab/browser-window"
 
 [features]
 cef = ["browser-window-c/cef"]
+gtk = ["browser-window-c/gtk"]
 
 [lib]
 name = "browser_window"

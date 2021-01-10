@@ -7,6 +7,7 @@ publish = false
 
 [features]
 cef = ["browser-window/cef"]
+gtk = ["browser-window/gtk"]
 
 [dependencies]
 browser-window = { path = ".." }

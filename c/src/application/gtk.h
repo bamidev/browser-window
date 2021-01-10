@@ -19,12 +19,4 @@ typedef struct {
 
 
 
-struct bw_ApplicationDispatchData {
-	struct bw_Application* app;
-	bw_ApplicationDispatchFn func;
-	void* data;
-};
-
-
-
 #endif//BW_APPLICATION_GTK_H
