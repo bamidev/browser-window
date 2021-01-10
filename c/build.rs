@@ -1,9 +1,15 @@
+extern crate bindgen;
 extern crate cc;
 extern crate pkg_config;
 
 use std::env;
 use std::fs;
 use std::path::PathBuf;
+
+
+
+#[derive(Debug)]
+struct BwBindgenCallbacks {}
 
 
 
@@ -65,12 +71,24 @@ fn main() {
 		}
 	};
 
-
+	/**************************************
+	 *	C header files for bindgen
+	 **************************************/
+	 let mut bgbuilder = bindgen::Builder::default()
+	 	.parse_callbacks( Box::new( BwBindgenCallbacks {} ) )
+		.clang_arg("-DBW_BINDGEN")
+		.header("../c/src/application.h")
+		.header("../c/src/browser_window.h")
+		.header("../c/src/common.h")
+		.header("../c/src/err.h")
+		.header("../c/src/string.h")
+		.header("../c/src/window.h");
 
 	/**************************************
 	 *	The Platform source files
 	 **************************************/
 	if target.contains("windows") {
+		bgbuilder = bgbuilder.clang_arg("-DBW_WIN32");
 
 		// Win32 API
 		build
@@ -82,6 +100,7 @@ fn main() {
 	}
 	// Non-Windows platforms:
 	else {
+		bgbuilder = bgbuilder.clang_arg("-DBW_GTK");
 
 		// GTK source files
 		build
@@ -105,6 +124,8 @@ fn main() {
 	 *	The Browser Engine (CEF3) source files
 	 **************************************/
 	if cfg!(feature = "cef") {
+		bgbuilder = bgbuilder.clang_arg("-DBW_CEF");
+
 		build.flag_if_supported("-Wno-unused-parameter");	// CEF's header files produce a lot of unused parameters warnings.
 		match env::var("CEF_PATH") {
 			Err(e) => {
@@ -115,6 +136,20 @@ fn main() {
 			},
 			Ok(cef_path) => {
 				build.include(&cef_path);
+
+				// Link with CEF
+				println!("cargo:rustc-link-search={}/libcef_dll_wrapper", &cef_path);
+				println!("cargo:rustc-link-search={}/Release", &cef_path);
+				if target.contains("msvc") {
+					println!("cargo:rustc-link-search={}", &cef_path);
+					println!("cargo:rustc-link-search={}/libcef_dll_wrapper/Release", &cef_path);
+					println!("cargo:rustc-link-lib=static=libcef_dll_wrapper");
+					println!("cargo:rustc-link-lib=dylib={}", "libcef");
+				} else {
+					// cef_dll_wrapper is a static lib, but for some reason it doesn't
+					println!("cargo:rustc-link-lib=static={}", "cef_dll_wrapper");
+					println!("cargo:rustc-link-lib=dylib={}", "cef");
+				}
 
 				// Add X flags to compiler
 				match pkg_config::Config::new().arg("--cflags").arg("--libs").probe("x11") {
@@ -129,7 +164,7 @@ fn main() {
 				}
 			}
 		}
-	
+		
 		// Source files
 		build
 			.file("src/application/cef.cpp")
@@ -155,7 +190,21 @@ fn main() {
 		.flag( std_flag )
 		.compile("browser_window_c");
 
+	// Let bindgen generate the bindings
+	bgbuilder
+		.generate().expect("Unable to generate FFI bindings!")
+		.write_to_file( out_path.join("c_bindings.rs") ).expect("Unable to write FFI bindings to file!");
+
 	// Copy our lib to a known location so that browser-window-ffi can link to it.
 	// Apparently, Rust is unwilling to link the this lib, probably since this crates' crate-type is set to "staticlib", which is a C static lib.
 	fs::copy( out_path.join("libbrowser_window_c.a"), "/tmp/libbrowser_window_c.a" ).expect("Unable to copy libbrowser_window_c.a");
+}
+
+
+
+impl bindgen::callbacks::ParseCallbacks for BwBindgenCallbacks {
+
+	fn item_name(&self, item_name: &str) -> Option<String> {
+		Some( "c".to_owned() + item_name )
+	}
 }

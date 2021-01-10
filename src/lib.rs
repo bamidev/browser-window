@@ -11,13 +11,16 @@
 //!
 //! For an rich example, see [this example code](https://github.com/bamilab/browser-window/blob/master/example/).
 
+
+#[macro_use]
+mod prop;
+
 pub mod application;
 pub mod browser;
 pub mod event;
 pub mod prelude;
 pub mod window;
 
-mod prop;
 #[cfg(test)]
 mod tests;
 
@@ -27,8 +30,6 @@ mod common;
 pub use common::{
 	DelegateError,
 	DelegateFuture,
-	DelegateFutureFuture,
-	Dims2D,
-	Pos2D
+	DelegateFutureFuture
 };
 pub use prop::Property;

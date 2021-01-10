@@ -27,7 +27,6 @@ fn main() {
 	 *	C header files for bindgen
 	 **************************************/
 	let mut bgbuilder = bindgen::Builder::default()
-		.clang_arg("-DBW_CEF")
 		.clang_arg("-DBW_BINDGEN")
 		.header("../c/src/application.h")
 		.header("../c/src/browser_window.h")
@@ -58,6 +57,8 @@ fn main() {
 	}
 
 	if cfg!(feature = "cef") {
+
+		bgbuilder = bgbuilder.clang_arg("-DBW_CEF");
 		
 		match env::var("CEF_PATH") {
 			Err(e) => {

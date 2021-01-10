@@ -9,7 +9,7 @@ If your issues isn't explained in here, please file the issue [here](https://git
 
 #### Missing gtk/gtk.h
 
-TODO: Parse console error here...
+TODO: Paste console error here...
 
 This error means that the GTK development files are not available.
 

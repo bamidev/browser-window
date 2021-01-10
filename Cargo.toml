@@ -12,14 +12,15 @@ readme = "README.md"
 repository = "https://github.com/bamilab/browser-window"
 
 [features]
-cef = ["browser-window-ffi/cef"]
+cef = ["browser-window-c/cef"]
 
 [lib]
 name = "browser_window"
 path = "src/lib.rs"
 
 [dependencies]
-browser-window-ffi = { path = "./ffi", version = "0.4.1" }
+browser-window-c = { path = "./c" }
+browser-window-core = { path = "./core" }
 futures-channel = { version = "^0.3" }
 lazy_static = "1"
 unsafe-send-sync = "0"

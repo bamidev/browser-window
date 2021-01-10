@@ -1,6 +1,7 @@
-use super::application::*;
-use super::window::*;
+use crate::application::*;
+use crate::window::*;
 
+use browser_window_core::prelude::*;
 use std::{
 	future::Future,
 	ptr
@@ -46,12 +47,12 @@ macro_rules! def_event {
 pub struct WindowBuilder {
 	pub(in crate) borders: bool,
 	pub(in crate) events: Box<WindowEvents>,
-	pub(in crate) height: i32,
+	pub(in crate) height: Option<u32>,
 	pub(in crate) minimizable: bool,
 	pub(in crate) parent: Option<UnsafeSend<WindowHandle>>,
 	pub(in crate) resizable: bool,
 	pub(in crate) title: Option<String>,
-	pub(in crate) width: i32
+	pub(in crate) width: Option<u32>
 }
 
 struct WindowUserData {
@@ -86,7 +87,7 @@ impl WindowBuilder {
 		};
 
 		// Convert options to the FFI struct
-		let window_options = bw_WindowOptions {
+		let window_options = cbw_WindowOptions {
 			borders: self.borders,
 			minimizable: self.minimizable,
 			resizable: self.resizable
@@ -98,25 +99,25 @@ impl WindowBuilder {
 		} );
 
 		// Unwrap the parent ffi handle
-		let parent_ffi_handle = match self.parent {
-			None => ptr::null(),
-			Some( parent ) => parent.ffi_handle
+		let parent_impl_handle = match self.parent {
+			None => WindowImpl::default(),
+			Some( parent ) => parent.inner
 		};
 
-		let _ffi_handle = unsafe { bw_Window_new(
-			app.ffi_handle,
-			parent_ffi_handle,
+		let _impl_handle = WindowImpl::new(
+			app.inner,
+			parent_impl_handle,
 			title.into(),
 			self.width as _,
 			self.height as _,
 			&window_options,
 			Box::into_raw( user_data ) as _
-		) };
+		);
 	}
 
 	/// Sets the height that the browser window will be created with initially
 	pub fn height( &mut self, height: u32 ) -> &mut Self {
-		self.height = height as i32;
+		self.height = Some( height );
 		self
 	}
 
@@ -146,20 +147,20 @@ impl WindowBuilder {
 	pub fn new() -> Self {
 		Self {
 			borders: true,
-			height: -1,
+			height: None,
 			minimizable: true,
 			parent: None,
 			resizable: true,
 			title: None,
-			width: -1,
+			width: None,
 			events: Box::new( WindowEvents::default() )
 		}
 	}
 
 	/// Sets the width and height of the browser window
 	pub fn size( &mut self, width: u32, height: u32 ) -> &mut Self {
-		self.width = width as i32;
-		self.height = height as i32;
+		self.width = Some( width );
+		self.height = Some( height );
 		self
 	}
 
@@ -172,7 +173,7 @@ impl WindowBuilder {
 
 	/// Sets the width that the browser window will be created with initially.
 	pub fn width( &mut self, width: u32 ) -> &mut Self {
-		self.width = width as i32;
+		self.width = Some( width );
 		self
 	}
 

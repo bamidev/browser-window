@@ -47,7 +47,8 @@
 //! }
 //! ```
 
-use browser_window_ffi::*;
+use browser_window_core::*;
+use browser_window_core::application::*;
 use lazy_static::lazy_static;
 use std::env;
 use std::ffi::{c_void, CString};
@@ -78,7 +79,7 @@ unsafe impl Sync for ApplicationHandleThreaded {}
 /// A thread-unsafe application handle.
 /// Often provided by for Browser Window.
 pub struct ApplicationHandle {
-	pub(in super) ffi_handle: *mut bw_Application
+	pub(in super) inner: ApplicationImpl
 }
 
 struct ApplicationDispatchData<'a> {
@@ -159,9 +160,9 @@ impl Application {
 		let argc: c_int = args_vec.len() as _;
 		let argv = ptrs_vec.as_mut_ptr();
 
-		let ffi_handle = unsafe { bw_Application_initialize( argc, argv as _ ) };
+		let core_handle = ApplicationImpl::initialize( argc, argv as _ );
 
-		Application::from_ffi_handle( ffi_handle )
+		Application::from_core_handle( core_handle )
 	}
 
 	/// Creates a `Runtime` from which you can run the application.
@@ -175,9 +176,7 @@ impl Application {
 
 impl Drop for Application {
 	fn drop( &mut self ) {
-		unsafe {
-			bw_Application_finish( self.handle.ffi_handle );
-		}
+		self.handle.inner.finish()
 	}
 }
 
@@ -186,9 +185,8 @@ impl Runtime {
 	/// Polls a future given a pointer to the waker data.
 	unsafe fn poll_future( data: *mut WakerData ) {
 		debug_assert!( data != ptr::null_mut(), "WakerData pointer can't be zero!" );
-		// Test if polling from the right thread
-		#[cfg(debug_assertions)]
-		bw_Application_assertCorrectThread( (*data).handle.ffi_handle );
+
+		// FIXME: Test if polling from the correct thread when in debug mode
 
 		let waker = Self::new_waker( data );
 		let mut ctx = Context::from_waker( &waker );
@@ -270,10 +268,7 @@ impl Runtime {
 	{
 		let ready_data = Box::into_raw( Box::new( on_ready ) );
 
-		unsafe {
-			let exit_code = bw_Application_run( self.handle.ffi_handle, Some( ffi_ready_handler::<H> ), ready_data as _ );
-			return exit_code;
-		}
+		self.handle.inner.run( ready_handler::<H>, ready_data as _ )
 	}
 }
 
@@ -282,9 +277,9 @@ impl Runtime {
 impl Application {
 
 	/// Constructs an `Application` from a ffi handle
-	pub(in super) fn from_ffi_handle( ffi_handle: *mut bw_Application ) -> Self {
+	pub(in super) fn from_core_handle( inner: ApplicationImpl ) -> Self {
 		Self {
-			handle: ApplicationHandle::new( ffi_handle )
+			handle: ApplicationHandle::new( inner )
 		}
 	}
 }
@@ -306,12 +301,12 @@ impl ApplicationHandle {
 	/// This will mean that not all tasks might complete.
 	/// If you were awaiting
 	pub fn exit( &self, exit_code: i32 ) {
-		unsafe { bw_Application_exit( self.ffi_handle, exit_code as _ ); }
+		self.inner.exit( exit_code as _ );
 	}
 
-	pub(in super) fn new( ffi_handle: *mut bw_Application ) -> Self {
+	pub(in super) fn new( inner: ApplicationImpl ) -> Self {
 		Self {
-			ffi_handle: ffi_handle
+			inner: inner
 		}
 	}
 
@@ -432,18 +427,12 @@ impl ApplicationHandleThreaded {
 	pub fn dispatch<'a,F>( &self, func: F ) -> bool where
 		F:  FnOnce( ApplicationHandle ) + Send + 'a
 	{
-		let data = Box::into_raw( Box::new( ApplicationDispatchData {
+		let data_ptr = Box::into_raw( Box::new( ApplicationDispatchData {
 			handle: self.handle,
 			func: Box::new( func )
 		} ) );
 
-		unsafe {
-			bw_Application_dispatch(
-				self.handle.ffi_handle,
-				Some( ffi_dispatch_handler ),
-				data as _
-			) != 0
-		}
+		self.handle.inner.dispatch( dispatch_handler, data_ptr as _ )
 	}
 
 	/// Queues the given async closure `func` to be executed on the GUI thread somewhere in the future.
@@ -465,13 +454,13 @@ impl ApplicationHandleThreaded {
 	/// This will cause `Runtime::run` to stop and return the provided exit code.
 	pub fn exit( &self, exit_code: i32 ) {
 		// The thread-safe version of bw_Application_exit:
-		unsafe { bw_Application_exitAsync( self.handle.ffi_handle, exit_code as _ ); }
+		self.handle.inner.exit_threadsafe( exit_code as _ );
 	}
 
 	/// Constructs an `ApplicationThreaded` handle from a ffi handle
-	pub(in super) fn from_ffi_handle( ffi_handle: *mut bw_Application ) -> Self {
+	pub(in super) fn from_core_handle( inner: ApplicationImpl ) -> Self {
 		Self {
-			handle: ApplicationHandle::new( ffi_handle )
+			handle: ApplicationHandle::new( inner )
 		}
 	}
 
@@ -502,7 +491,7 @@ impl HasAppHandle for ApplicationHandle {
 
 
 
-unsafe extern "C" fn ffi_dispatch_handler(_app: *mut bw_Application, _data: *mut c_void ) {
+unsafe fn dispatch_handler( _app: ApplicationImpl, _data: *mut () ) {
 
 	let data_ptr = _data as *mut ApplicationDispatchData<'static>;
 	let data = Box::from_raw( data_ptr );
@@ -511,17 +500,17 @@ unsafe extern "C" fn ffi_dispatch_handler(_app: *mut bw_Application, _data: *mut
 }
 
 /// The handler that is invoked when the runtime is deemed 'ready'.
-unsafe extern "C" fn ffi_ready_handler<H>( ffi_handle: *mut bw_Application, user_data: *mut c_void ) where
+unsafe fn ready_handler<H>( handle: ApplicationImpl, user_data: *mut () ) where
 	H: FnOnce( ApplicationHandle )
 {
-	let app = ApplicationHandle::new( ffi_handle );
+	let app = ApplicationHandle::new( handle );
 	let closure = Box::from_raw( user_data as *mut H );
 
 	closure( app );
 }
 
 /// A handler that is invoked by wakers.
-unsafe extern "C" fn ffi_wakeup( _ffi_handle: *mut bw_Application, user_data: *mut c_void ) {
+unsafe fn wakeup_handler( app: ApplicationImpl, user_data: *mut () ) {
 
 	let	data = user_data as *mut WakerData;
 
@@ -535,11 +524,7 @@ unsafe fn waker_clone( data: *const () ) -> RawWaker {
 unsafe fn waker_wake( data: *const () ) {
 	let data_ptr = data as *const WakerData;
 
-	bw_Application_dispatch(
-		(*data_ptr).handle.ffi_handle,
-		Some( ffi_wakeup ),
-		data_ptr as _
-	);
+	(*data_ptr).handle.inner.dispatch( wakeup_handler, data_ptr as _ );
 }
 
 unsafe fn waker_wake_by_ref( data: *const () ) {

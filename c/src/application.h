@@ -27,10 +27,9 @@ typedef bw_ApplicationDispatchFn bw_ApplicationReadyFn;
 #endif
 #if defined(BW_CEF)
 #include "application/cef.h"
-#elif defined(BW_EDGE)
-#include "application/edge.h"
 #else
-#error Unsupported engine
+typedef struct {} bw_ApplicationEngineImpl;
+//#error Unsupported engine
 #endif
 
 #else

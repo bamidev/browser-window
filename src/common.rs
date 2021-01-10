@@ -1,5 +1,5 @@
 use super::application::ApplicationHandle;
-use browser_window_ffi::*;
+use browser_window_c::*;
 use std::boxed::Box;
 use std::future::Future;
 use std::mem;
@@ -14,6 +14,8 @@ use std::task::{
 	Waker
 };
 use std::panic::{AssertUnwindSafe, catch_unwind};
+
+use browser_window_core::application::*;
 
 
 
@@ -109,18 +111,6 @@ struct DelegateFutureInner<'a,R> where R: Send {
 //  care should be taken to make sure that the future is safe to send to other threads.
 unsafe impl<'a,R> Send for DelegateFutureInner<'a,R> where R: Send {}
 
-#[derive(Default)]
-pub struct Pos2D {
-	x: u16,
-	y: u16
-}
-
-#[derive(Default)]
-pub struct Dims2D {
-	width: u16,
-	height: u16
-}
-
 
 
 impl<'a,H,R> DelegateFuture<'a,H,R> where R: Send {
@@ -148,7 +138,7 @@ impl<'a,H,R> Future for DelegateFuture<'a,H,R> where
 
 		if !self.started {
 			self.started = true;
-			let app_ffi_handle = self.handle.app_handle().ffi_handle;
+			let app_inner = self.handle.app_handle().inner;
 
 			// Move ownership from `DelegateFuture` to `DelegateData`
 			let mut func = None;
@@ -168,14 +158,10 @@ impl<'a,H,R> Future for DelegateFuture<'a,H,R> where
 			let succeeded = unsafe {
 				let data_ptr = Box::into_raw( Box::new( data ) );
 
-				bw_Application_dispatch(
-					app_ffi_handle,
-					Some( ffi_delegate_handler::<H,R> ),
-					data_ptr as _
-				) != 0
+				app_inner.dispatch( delegate_handler::<H,R>, data_ptr as _ )
 			};
 
-			// bw_Application_dispatch fails when there is now runtime that is running
+			// cbw_Application_dispatch fails when there is now runtime that is running
 			if !succeeded {
 				return Poll::Ready( Err( DelegateError::RuntimeNotAvailable ) );
 			}
@@ -218,7 +204,7 @@ impl<'a,R> Future for DelegateFutureFuture<'a,R> where R: Send {
 		// While the result is not yet set, we can keep polling
 		if !self.started {
 			self.started = true;
-			let app_ffi_handle = self.app_handle.ffi_handle;
+			let app_inner = self.app_handle.inner;
 
 			let succeeded = unsafe {
 
@@ -227,14 +213,10 @@ impl<'a,R> Future for DelegateFutureFuture<'a,R> where R: Send {
 					waker: ctx.waker().clone(),
 				}));
 
-				bw_Application_dispatch(
-					app_ffi_handle,
-					Some(ffi_delegate_async_handler::<R>),
-					data_ptr as _
-				) != 0
+				app_inner.dispatch( delegate_async_handler::<R>, data_ptr as _ )
 			};
 
-			// bw_Application_dispatch fails when there is now runtime that is running
+			// cbw_Application_dispatch fails when there is now runtime that is running
 			if !succeeded {
 				return Poll::Ready(Err(DelegateError::RuntimeNotAvailable));
 			}
@@ -284,67 +266,65 @@ impl<T> PointerEq for Arc<T> {
 
 
 
-extern "C" fn ffi_delegate_handler<H,R>( app: *mut bw_Application, _data: *mut c_void ) where
+unsafe fn delegate_handler<H,R>( app: ApplicationImpl, _data: *mut () ) where
 	H: Clone + 'static,
 	R: 'static
 {
 
-	unsafe {
-		let data_ptr: *mut DelegateData<'static,'static,H,R> = mem::transmute( _data );
-		let data = Box::from_raw( data_ptr );	// Take ownership of the data struct
+	let data_ptr = _data as *mut DelegateData<'static,'static,H,R>;
+	let data = Box::from_raw( data_ptr );	// Take ownership of the data struct
 
-		match *data {
-			DelegateData{ handle, func, result, waker } => {
+	match *data {
+		DelegateData{ handle, func, result, waker } => {
 
-				match catch_unwind(AssertUnwindSafe(|| {
-					*result = Some( Ok( func( handle ) ) );
-					waker.clone().wake();
-				})) {
-					Ok(()) => {},
-					Err( _ ) => {
-						*result = Some(Err(DelegateError::ClosurePanicked));
+			// Catch Rust panics during execution of delegated function
+			match catch_unwind(AssertUnwindSafe(|| {
+				*result = Some( Ok( func( handle ) ) );
+				waker.clone().wake();
+			})) {
+				Ok(()) => {},
+				Err( _ ) => {
+					*result = Some(Err(DelegateError::ClosurePanicked));
 
-						// Wake the future before exiting. This allows the calling thread to still receive the `DelegateError` before the application stops working.
-						waker.wake();
+					// Wake the future before exiting. This allows the calling thread to still receive the `DelegateError` before the application stops working.
+					waker.wake();
 
-						bw_Application_exit( app, -1 );
-					}
+					app.exit( -1 );
 				}
 			}
 		}
 	}
 }
 
-extern "C" fn ffi_delegate_async_handler<R>( app: *mut bw_Application, _data: *mut c_void ) where R: Send {
+unsafe fn delegate_async_handler<R>( app: ApplicationImpl, _data: *mut () ) where R: Send {
 
-	unsafe {
-		let data_ptr: *mut DelegateFutureData<R> = mem::transmute( _data );
-		let data = Box::from_raw( data_ptr );	// Take ownership of the data struct
+	let data_ptr = _data as *mut DelegateFutureData<R>;
+	let data = Box::from_raw( data_ptr );	// Take ownership of the data struct
 
-		match *data {
-			DelegateFutureData{ inner, waker } => {
+	match *data {
+		DelegateFutureData{ inner, waker } => {
 
-				match panic::catch_unwind(AssertUnwindSafe(|| {
+			// Catch Rust panics
+			match panic::catch_unwind(AssertUnwindSafe(|| {
 
-					let mut ctx  = Context::from_waker( &waker );
-					match inner.future.as_mut().poll( &mut ctx ) {
-						Poll::Pending => {},
-						Poll::Ready( result) => {
-							// Set the result and wake our future so it gets returned
-							inner.result = Some( Ok( result ) );
-							waker.clone().wake();
-						}
+				let mut ctx  = Context::from_waker( &waker );
+				match inner.future.as_mut().poll( &mut ctx ) {
+					Poll::Pending => {},
+					Poll::Ready( result) => {
+						// Set the result and wake our future so it gets returned
+						inner.result = Some( Ok( result ) );
+						waker.clone().wake();
 					}
-				})) {
-					Ok(()) => {},
-					Err( _ ) => {
-						inner.result = Some(Err(DelegateError::ClosurePanicked));
+				}
+			})) {
+				Ok(()) => {},
+				Err( _ ) => {
+					inner.result = Some(Err(DelegateError::ClosurePanicked));
 
-						// Wake the future before exiting. This allows the calling thread to still receive the `DelegateError` before the application stops working.
-						waker.wake();
+					// Wake the future before exiting. This allows the calling thread to still receive the `DelegateError` before the application stops working.
+					waker.wake();
 
-						bw_Application_exit( app, -1 );
-					}
+					app.exit( -1 );
 				}
 			}
 		}
@@ -353,7 +333,7 @@ extern "C" fn ffi_delegate_async_handler<R>( app: *mut bw_Application, _data: *m
 
 
 
-impl Dims2D {
+/*impl Dims2D {
 	pub fn new( width: u16, height: u16 ) -> Self {
 		Self {
 			width,
@@ -362,8 +342,8 @@ impl Dims2D {
 	}
 }
 
-impl From<bw_Dims2D> for Dims2D {
-	fn from( other: bw_Dims2D ) -> Self {
+impl From<cbw_Dims2D> for Dims2D {
+	fn from( other: cbw_Dims2D ) -> Self {
 		Self {
 			width: other.width,
 			height: other.height
@@ -371,9 +351,9 @@ impl From<bw_Dims2D> for Dims2D {
 	}
 }
 
-impl Into<bw_Dims2D> for Dims2D {
-	fn into( self: Self ) -> bw_Dims2D {
-		bw_Dims2D {
+impl Into<cbw_Dims2D> for Dims2D {
+	fn into( self: Self ) -> cbw_Dims2D {
+		cbw_Dims2D {
 			width: self.width,
 			height: self.height
 		}
@@ -389,8 +369,8 @@ impl Pos2D {
 	}
 }
 
-impl From<bw_Pos2D> for Pos2D {
-	fn from( other: bw_Pos2D ) -> Self {
+impl From<cbw_Pos2D> for Pos2D {
+	fn from( other: cbw_Pos2D ) -> Self {
 		Self {
 			x: other.x,
 			y: other.y
@@ -398,11 +378,11 @@ impl From<bw_Pos2D> for Pos2D {
 	}
 }
 
-impl Into<bw_Pos2D> for Pos2D {
-	fn into( self: Self ) -> bw_Pos2D {
-		bw_Pos2D {
+impl Into<cbw_Pos2D> for Pos2D {
+	fn into( self: Self ) -> cbw_Pos2D {
+		cbw_Pos2D {
 			x: self.x,
 			y: self.y
 		}
 	}
-}
+}*/

@@ -1,11 +1,10 @@
 #ifndef BW_BROWSER_WINDOW_H
 #define BW_BROWSER_WINDOW_H
 
-#ifdef BW_EDGE
-#include "browser_window/edge.h"
-#endif
 #ifdef BW_CEF
 #include "browser_window/cef.h"
+#else
+#error Unsupported engine
 #endif
 
 
