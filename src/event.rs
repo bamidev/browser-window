@@ -1,3 +1,7 @@
+//! This module contains all event related types.
+
+
+
 use std::{
 	boxed::Box,
 	future::Future,

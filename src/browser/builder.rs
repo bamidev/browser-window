@@ -32,6 +32,36 @@ type BrowserJsInvocationHandler = Box<dyn FnMut(BrowserWindowHandle, String, Vec
 type BrowserJsInvocationHandler = Box<dyn FnMut(BrowserWindowHandle, String, Vec<String>) -> Pin<Box<dyn Future<Output=()>>> + Send>;
 
 /// Used to create a `BrowserWindow` or `BrowserWindowThreaded` instance.
+/// 
+/// # Warning
+/// `BrowserWindowBuilder` dereferences to `WindowBuilder`, so that you can modify anything related to the window as well.
+/// This comes with a catch though.
+/// If you call any functions from `WindowBuilder`, they return a reference to `WindowBuilder`.
+/// So the following doesn't work:
+/// ```ignore
+/// let bwb = BrowserWindowBuilder::new( Source::Url("https://www.duckduckgo.com".into()) )
+/// 	.title("DuckDuckGo")
+/// 	.dev_tools(true);
+/// ```
+/// This is because the call to `title` returns a reference to `WindowBuilder`, which doesn't have a method `dev_tools`.
+/// 
+/// The following is also wrong:
+/// ```ignore
+/// let bw = BrowserWindowBuilder::new( Source::Url("https://www.duckduckgo.com".into()) )
+/// 	.dev_tools(true)
+/// 	.title("DuckDuckGo")
+/// 	.build();
+/// ```
+/// This is because _Browser Window_ currently does not support creating windows that don't have browsers in them.
+/// `build` is a method of `BrowserWindowBuilder`, yet `title` returns a reference to `WindowBuilder`, which has no `build` method.
+/// 
+/// The solution is to do this:
+/// ```
+/// let mut bwb = BrowserWindowBuilder::new( Source::Url("https://www.duckduckgo.com".into()) )
+/// 	.dev_tools(true);
+/// bwb.title("DuckDuckGo");
+/// let bw = bwb.build();
+/// ```
 pub struct BrowserWindowBuilder {
 
 	dev_tools: bool,

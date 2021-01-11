@@ -84,10 +84,12 @@ struct WindowUserData {
 impl WindowBuilder {
 
 	def_event!{ /// Invoked whenever the window closes, whether it was closed by the user or programmatically.
+		#[doc(hidden)]
 		on_close, on_close_async
 	}
 
 	def_event!{ /// Invoked whenever the window resizes
+		#[doc(hidden)]
 		WindowResizeEventArgs, on_resize, on_resize_async
 	}
 

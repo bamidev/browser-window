@@ -42,13 +42,17 @@
 //! my_struct.my_property().set( string );
 //! ```
 
+/// A property is something that has a setter and a getter.
+// The setters are immutable.
+// This is because they can not be changed from threads other than the GUI thread anyway.
 pub trait Property<G,S> {
-    fn get( &self ) -> G;
-    fn set( &self, value: S );
+	fn get( &self ) -> G;
+	fn set( &self, value: S );
 }
 
 
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! _prop_internal {
 	( $(#[$meta:meta])*, $vis:tt, $name:ident, $tg:ty, $ts:ty, $this:ident, $stype:ty, $get:expr, $val:ident, $set:expr ) => {
@@ -69,7 +73,7 @@ macro_rules! _prop_internal {
 }
 
 /// A macro to define a so called 'property'.
-/// The idea comes from C#.
+/// Kind of similar to how C# properties work.
 #[macro_export]
 macro_rules! prop {
 	( $(#[$metas:meta])* $name:ident<$type:ty>( $this:ident: $stype:ty ) { get => $get:expr, set( $val:ident ) => $set:expr } ) => {

@@ -1,10 +1,10 @@
 //! This module contains runtime and application related handles.
-//!
-//! Browser Window needs to be initialized, and also run its own runtime.
-//! Once that is set up and running, all windows can be constructed and played around with.
-//! To do this, you use `Application::initialize`.
-//! Then you have an `Application` instance, from which you can obtain a `Runtime` instance.
-//! Running it will grant you access to an application handle which you can manage the application with, and from which you can create all your windows with.
+//! 
+//! _Browser Window_ needs to be initialized, and also run its own runtime.
+//! Once that is set up and running, all windows can be constructed and be used.
+//! To do this, use `Application::initialize`.
+//! Then you will have an `Application` instance, from which you can derive a `Runtime` instance.
+//! Running the `Runtime` will grant you access to an `ApplicationHandle` which you use to manipulate your application with.
 //!
 //! # Example #1
 //! Here is an example to show how you can construct your application:
@@ -23,14 +23,15 @@
 //! ```
 //!
 //! # Example #2
-//! If you want to run another kind of runtime, like (tokio)[https://tokio.rs/] for example, its still possible to use Browser Window in conjunction with it.
+//! If you want to run another kind of runtime, like [tokio](https://tokio.rs/) for example, its still possible to use _Browser Window_ in conjunction with that.
+//! However, you will need to enable feature `threadsafe`, as it will enable all threadsafe handles.
 //! Here is an example:
 //! ```rust
 //! use browser_window::application::*;
 //! use tokio;
 //!
 //! async fn async_main( app: ApplicationHandleThreaded ) {
-//! 	// Do something...
+//! 	// Do something ...
 //! }
 //!
 //! fn main() {
@@ -40,7 +41,7 @@
 //!     let bw_runtime = application.start();
 //!
 //!     bw_runtime.run(|_handle| {
-//!         let handle: ApplicationHandleThreaded = _handle.into();
+//!         let handle = _handle.into_threaded();
 //!
 //! 		tokio_runtime.spawn( async_main( app ) );
 //! 	});
@@ -58,6 +59,9 @@ use std::ptr;
 use std::task::{Context, Poll, Waker, RawWaker, RawWakerVTable};
 
 pub use browser_window_core::application::ApplicationSettings;
+
+#[cfg(feature = "threadsafe")]
+use crate::delegate::*;
 
 
 /// Use this to initialize and start your application with.

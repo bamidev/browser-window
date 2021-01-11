@@ -14,6 +14,8 @@ use std::{
 };
 
 use crate::application::*;
+#[cfg(feature = "threadsafe")]
+use crate::delegate::*;
 use crate::window::*;
 
 use browser_window_core::browser_window::{BrowserWindowExt, BrowserWindowImpl, JsEvaluationError};
