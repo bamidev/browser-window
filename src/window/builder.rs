@@ -13,6 +13,7 @@ use unsafe_send_sync::UnsafeSend;
 macro_rules! _def_event {
 	( $(#[$metas:meta])*, $args_type:ty, $name:ident, $name_async:ident ) => {
 		$(#[$metas])*
+		#[cfg(not(feature = "threadsafe"))]
 		pub fn $name<H>( &mut self, handler: H ) -> &mut Self where
 			H: FnMut( &$args_type ) + 'static
 		{
@@ -21,8 +22,28 @@ macro_rules! _def_event {
 		}
 
 		$(#[$metas])*
+		#[cfg(feature = "threadsafe")]
+		pub fn $name<H>( &mut self, handler: H ) -> &mut Self where
+			H: FnMut( &$args_type ) + Send + 'static
+		{
+			self.events.$name.register( handler );
+			self
+		}
+
+		$(#[$metas])*
+		#[cfg(not(feature = "threadsafe"))]
 		pub fn $name_async<H,F>( &mut self, handler: H ) -> &mut Self where
 			H: FnMut( &$args_type ) -> F + 'static,
+			F: Future<Output=()> + 'static
+		{
+			self.events.$name.register_async( handler );
+			self
+		}
+
+		$(#[$metas])*
+		#[cfg(feature = "threadsafe")]
+		pub fn $name_async<H,F>( &mut self, handler: H ) -> &mut Self where
+			H: FnMut( &$args_type ) -> F + Send + 'static,
 			F: Future<Output=()> + 'static
 		{
 			self.events.$name.register_async( handler );

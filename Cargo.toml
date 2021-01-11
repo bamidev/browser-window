@@ -14,6 +14,7 @@ repository = "https://github.com/bamilab/browser-window"
 [features]
 cef = ["browser-window-c/cef"]
 gtk = ["browser-window-c/gtk"]
+threadsafe = []
 
 [lib]
 name = "browser_window"

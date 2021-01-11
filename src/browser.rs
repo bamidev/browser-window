@@ -182,11 +182,12 @@ impl BrowserWindowHandle {
 
 
 
-/*impl BrowserWindowThreaded {
+#[cfg(feature = "threadsafe")]
+impl BrowserWindowThreaded {
 
 	/// The thread-safe application handle associated with this browser window.
 	pub fn app( &self ) -> ApplicationHandleThreaded {
-		ApplicationHandleThreaded::from_ffi_handle( unsafe { bw_BrowserWindow_getApp( self.handle.ffi_handle ) } )
+		ApplicationHandleThreaded::from_core_handle( self.handle.inner.window().app() )
 	}
 
 	/// Closes the browser.
@@ -276,7 +277,7 @@ impl OwnedBrowserWindow for BrowserWindowThreaded {
 	fn browser_handle( &self ) -> BrowserWindowHandle {
 		self.handle.clone()
 	}
-}*/
+}
 
 
 

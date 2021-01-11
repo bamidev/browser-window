@@ -10,7 +10,7 @@ pub struct Settings {
 
 
 
-/*impl Settings {
+impl Settings {
 
 	pub fn default_resource_path() -> PathBuf {
 		let mut path = env::current_exe().unwrap();
@@ -23,7 +23,7 @@ pub struct Settings {
 
 		path
 	}
-}*/
+}
 
 impl Default for Settings {
 	fn default() -> Self {

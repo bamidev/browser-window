@@ -32,11 +32,16 @@ pub enum Source {
 	Url( String )
 }
 
+#[cfg(not(feature = "threadsafe"))]
+type BrowserJsInvocationHandler = Box<dyn FnMut(BrowserWindowHandle, String, Vec<String>) -> Pin<Box<dyn Future<Output=()>>>>;
+#[cfg(feature = "threadsafe")]
+type BrowserJsInvocationHandler = Box<dyn FnMut(BrowserWindowHandle, String, Vec<String>) -> Pin<Box<dyn Future<Output=()>>> + Send>;
+
 /// Used to create a `BrowserWindow` or `BrowserWindowThreaded` instance.
 pub struct BrowserWindowBuilder {
 
 	dev_tools: bool,
-	handler: Option<Box<dyn FnMut(BrowserWindowHandle, String, Vec<String>) -> Pin<Box<dyn Future<Output=()>>>>>,
+	handler: Option<BrowserJsInvocationHandler>,
 	source: Source,
 	window: WindowBuilder
 }
@@ -48,8 +53,23 @@ impl BrowserWindowBuilder {
 	/// Configure a closure that can be invoked from within JavaScript.
 	/// The closure's second parameter specifies a command name.
 	/// The closure's third parameter specifies an array of string arguments.
+	#[cfg(not(feature = "threadsafe"))]
 	pub fn async_handler<H,F>( &mut self, mut handler: H ) -> &mut Self where
 		H: FnMut(BrowserWindowHandle, String, Vec<String>) -> F + 'static,
+		F: Future<Output=()> + 'static
+	{
+		self.handler = Some( Box::new(
+			move |handle, cmd, args| Box::pin(handler( handle, cmd, args ) )
+		) );
+		self
+	}
+
+	/// Configure a closure that can be invoked from within JavaScript.
+	/// The closure's second parameter specifies a command name.
+	/// The closure's third parameter specifies an array of string arguments.
+	#[cfg(feature = "threadsafe")]
+	pub fn async_handler<H,F>( &mut self, mut handler: H ) -> &mut Self where
+		H: FnMut(BrowserWindowHandle, String, Vec<String>) -> F + Send + 'static,
 		F: Future<Output=()> + 'static
 	{
 		self.handler = Some( Box::new(
@@ -91,6 +111,7 @@ impl BrowserWindowBuilder {
 	///
 	/// # Arguments
 	/// * `app` - An application handle that this browser window can spawn into
+	#[cfg(not(feature = "threadsafe"))]
 	pub async fn build( self, app: ApplicationHandle ) -> BrowserWindow
 	{
 		let (tx, rx) = oneshot::channel::<BrowserWindowHandle>();
@@ -109,7 +130,8 @@ impl BrowserWindowBuilder {
 	///
 	/// # Arguments
 	/// * `app` - An thread-safe application handle.
-	/*pub async fn build_threaded( self, app: ApplicationHandleThreaded ) -> Result<BrowserWindowThreaded, DelegateError> {
+	#[cfg(feature = "threadsafe")]
+	pub async fn build( self, app: ApplicationHandleThreaded ) -> Result<BrowserWindowThreaded, DelegateError> {
 
 		let (tx, rx) = oneshot::channel::<UnsafeSend<BrowserWindowHandle>>();
 
@@ -125,7 +147,7 @@ impl BrowserWindowBuilder {
 		}).await?;
 
 		Ok( BrowserWindowThreaded::new( rx.await.unwrap().i ) )
-	}*/
+	}
 
 	fn _build<H>( self, app: ApplicationHandle, on_created: H ) where
 		H: FnOnce( BrowserWindowHandle )

@@ -26,5 +26,4 @@ pub trait ApplicationExt: Copy {
 
 #[derive(Default)]
 pub struct ApplicationSettings {
-
 }

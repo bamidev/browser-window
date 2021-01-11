@@ -166,8 +166,6 @@ impl Application {
 		let argc: c_int = args_vec.len() as _;
 		let argv = ptrs_vec.as_mut_ptr();
 
-		let settings = ApplicationSettings {};
-
 		let core_handle = ApplicationImpl::initialize( argc, argv as _, &settings );
 
 		Application::from_core_handle( core_handle )
@@ -219,11 +217,10 @@ impl Runtime {
 		)
 	}
 
-	/// Run the main loop.
-	/// This is useful if you want to manipulate the GUI from other threads.
+	/// Run the main loop and executes the given closure on it.
 	///
 	/// # Arguments
-	/// * `on_ready` - This closure will be called when the runtime has initialized, and will provide an application handle.
+	/// * `on_ready` - This closure will be called when the runtime has initialized, and will provide the caller with an application handle.
 	///
 	/// # Reserved Codes
 	/// -1 is used as the return code for when the main thread panicked during a delegated closure.
@@ -318,6 +315,11 @@ impl ApplicationHandle {
 		}
 	}
 
+	#[cfg(feature = "threadsafe")]
+	pub fn into_threaded( self ) -> ApplicationHandleThreaded {
+		self.into()
+	}
+
 	/// Spawns the given future, executing it on the GUI thread somewhere in the near future.
 	pub fn spawn<F>( &self, future: F ) where
 		F: Future<Output=()> + 'static
@@ -337,6 +339,7 @@ impl ApplicationHandle {
 
 
 
+#[cfg(feature = "threadsafe")]
 impl ApplicationHandleThreaded {
 
 	/// Executes the given closure `func` on the GUI thread, and gives back the result when done.
@@ -399,7 +402,7 @@ impl ApplicationHandleThreaded {
 	///
 	/// Except, async closures are not yet supported in stable Rust.
 	/// What we actually mean are closures of the form:
-	/// ```rust
+	/// ```no_run
 	/// |handle| async move { /* ... */ }
 	/// ```
 	///
@@ -480,6 +483,7 @@ impl ApplicationHandleThreaded {
 	}
 }
 
+#[cfg(feature = "threadsafe")]
 impl From<ApplicationHandle> for ApplicationHandleThreaded {
 	fn from( other: ApplicationHandle ) -> Self {
 		Self {

@@ -26,7 +26,7 @@
 //! The syntax was chosen to be somewhat Rust-like, but require as little as possible boilerplate.
 //!
 //! There is one last thing that needs to be done, and that is that the property needs to be added in the implementation of `MyStruct`:
-//! ```rust
+//! ```ignore
 //! impl MyStruct {
 //!     impl_prop!( pub my_property: MyProperty );
 //! }

@@ -6,8 +6,13 @@ use std::{
 
 
 
+#[cfg(not(feature = "threadsafe"))]
+type EventHandler<'a,A> = Box<dyn FnMut( &A ) -> Pin<Box<dyn Future<Output=()> + 'a>> + 'a>;
+#[cfg(feature = "threadsafe")]
+type EventHandler<'a,A> = Box<dyn FnMut( &A ) -> Pin<Box<dyn Future<Output=()> + 'a>> + Send + 'a>;
+
 pub struct Event<'a,A> {
-	handlers: Vec<Box<dyn FnMut( &A ) -> Pin<Box<dyn Future<Output=()> + 'a>> + 'a>>
+	handlers: Vec<EventHandler<'a,A>>
 }
 
 
@@ -23,6 +28,7 @@ impl<'a,A> Event<'a,A> {
 	}
 
 	/// Register a closure to be invoked for this event.
+	#[cfg(not(feature = "threadsafe"))]
 	pub fn register<H>( &mut self, mut handler: H ) where
 		H: FnMut( &A ) + 'a
 	{
@@ -32,7 +38,18 @@ impl<'a,A> Event<'a,A> {
 		}));
 	}
 
-	/// Register an 'async closre' to be invoked for this event.
+	/// Register a closure to be invoked for this event.
+	#[cfg(feature = "threadsafe")]
+	pub fn register<H>( &mut self, mut handler: H ) where
+		H: FnMut( &A ) + Send + 'a
+	{
+		self.handlers.push(Box::new(move |args| {
+			handler( args );
+			Box::pin(async {})
+		}));
+	}
+
+	/// Register an 'async closure' to be invoked for this event.
 	///
 	/// # Example
 	/// ```rust
@@ -40,8 +57,25 @@ impl<'a,A> Event<'a,A> {
 	///     // Do something ...
 	/// });
 	/// ```
+	#[cfg(not(feature = "threadsafe"))]
 	pub fn register_async<H,F>( &mut self, mut handler: H ) where
 		H: FnMut( &A ) -> F + 'a,
+		F: Future<Output=()> + 'a
+	{
+		self.handlers.push(Box::new(move |args| Box::pin( handler( args ) ) ) );
+	}
+
+	/// Register an 'async closure' to be invoked for this event.
+	///
+	/// # Example
+	/// ```rust
+	/// my_event.register_async(|args| async move {
+	///     // Do something ...
+	/// });
+	/// ```
+	#[cfg(feature = "threadsafe")]
+	pub fn register_async<H,F>( &mut self, mut handler: H ) where
+		H: FnMut( &A ) -> F + Send + 'a,
 		F: Future<Output=()> + 'a
 	{
 		self.handlers.push(Box::new(move |args| Box::pin( handler( args ) ) ) );
