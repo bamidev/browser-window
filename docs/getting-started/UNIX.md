@@ -4,8 +4,10 @@
 However, this guide is not tried and tested yet.
 
 There are basically two dependencies.
-_Browser Window_ depends on GTK 3 and CEF 3 for all non-Windows systems.
+_BrowserWindow_ depends on GTK 3 and CEF 3 for all non-Windows systems.
 Also, `pkg-config` and `cmake` are required.
+
+Furthermore, `clang` development files needs to be available on the system in order to build _BrowserWindow_.
 
 ## GTK
 
@@ -13,17 +15,17 @@ GTK 3 is generally easily available on most Linux distros.
 You could use the following commands (as root) to install the development files:
 
 ###### On Debian & Ubuntu
-`apt install pkg-config libgtk-3-dev`
+`apt install pkg-config libgtk-3-dev libclang-dev`
 
 ###### On Arch
-`pacman -S gtk3`
+`pacman -S gtk3 clang`
 
-In any case, just make sure that `pkg-config gtk+-3.0 --cflags` works.
+Make sure that `pkg-config gtk+-3.0 --cflags` works.
 
 ## CEF
 
 CEF takes a bit more effort to have it set up properly.
-First of all, to get CEF with GTK support, we need to build it manually.
+TODO: Complete this
 
 ## Building the source code
 

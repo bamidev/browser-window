@@ -1,10 +1,10 @@
 //! This module contains runtime and application related handles.
-//!
-//! Browser Window needs to be initialized, and also run its own runtime.
-//! Once that is set up and running, all windows can be constructed and played around with.
-//! To do this, you use `Application::initialize`.
-//! Then you have an `Application` instance, from which you can obtain a `Runtime` instance.
-//! Running it will grant you access to an application handle which you can manage the application with, and from which you can create all your windows with.
+//! 
+//! _Browser Window_ needs to be initialized, and also run its own runtime.
+//! Once that is set up and running, all windows can be constructed and be used.
+//! To do this, use `Application::initialize`.
+//! Then you will have an `Application` instance, from which you can derive a `Runtime` instance.
+//! Running the `Runtime` will grant you access to an `ApplicationHandle` which you use to manipulate your application with.
 //!
 //! # Example #1
 //! Here is an example to show how you can construct your application:
@@ -12,7 +12,7 @@
 //! use browser_window::application::*;
 //!
 //! fn main() {
-//! 	let application = Application::initialize();
+//! 	let application = Application::initialize( Settings::default() );
 //! 	let runtime = application.start();
 //!
 //!      runtime.run_async(|handle| async move {
@@ -23,41 +23,45 @@
 //! ```
 //!
 //! # Example #2
-//! If you want to run another kind of runtime, like (tokio)[https://tokio.rs/] for example, its still possible to use Browser Window in conjunction with it.
+//! If you want to run another kind of runtime, like [tokio](https://tokio.rs/) for example, its still possible to use _Browser Window_ in conjunction with that.
+//! However, you will need to enable feature `threadsafe`, as it will enable all threadsafe handles.
 //! Here is an example:
 //! ```rust
 //! use browser_window::application::*;
 //! use tokio;
 //!
 //! async fn async_main( app: ApplicationHandleThreaded ) {
-//! 	// Do something...
+//! 	// Do something ...
 //! }
 //!
 //! fn main() {
-//! 	let application = Application::initialize();
+//! 	let application = Application::initialize( Settings::default() );
 //!
 //! 	let tokio_runtime = tokio::runtime::Runtime::new().unwrap();
 //!     let bw_runtime = application.start();
 //!
 //!     bw_runtime.run(|_handle| {
-//!         let handle: ApplicationHandleThreaded = _handle.into();
+//!         let handle = _handle.into_threaded();
 //!
 //! 		tokio_runtime.spawn( async_main( app ) );
 //! 	});
 //! }
 //! ```
 
-use browser_window_ffi::*;
+use browser_window_core::application::*;
 use lazy_static::lazy_static;
 use std::env;
-use std::ffi::{c_void, CString};
+use std::ffi::{CString};
 use std::future::Future;
 use std::os::raw::{c_int};
 use std::pin::Pin;
 use std::ptr;
 use std::task::{Context, Poll, Waker, RawWaker, RawWakerVTable};
 
-use super::common::*;
+pub use browser_window_core::application::ApplicationSettings;
+
+#[cfg(feature = "threadsafe")]
+use crate::delegate::*;
 
 
 /// Use this to initialize and start your application with.
@@ -67,24 +71,34 @@ pub struct Application {
 
 /// A thread-safe application handle.
 /// This handle also allows you to dispatch code to be executed on the GUI thread from any other thread.
+#[cfg(feature = "threadsafe")]
 #[derive(Clone, Copy)]
 pub struct ApplicationHandleThreaded {
 	pub(in super) handle: ApplicationHandle
 }
+#[cfg(feature = "threadsafe")]
 unsafe impl Send for ApplicationHandleThreaded {}
+#[cfg(feature = "threadsafe")]
 unsafe impl Sync for ApplicationHandleThreaded {}
 
 #[derive(Clone, Copy)]
 /// A thread-unsafe application handle.
 /// Often provided by for Browser Window.
 pub struct ApplicationHandle {
-	pub(in super) ffi_handle: *mut bw_Application
+	pub(in super) inner: ApplicationImpl
 }
 
+#[cfg(feature = "threadsafe")]
 struct ApplicationDispatchData<'a> {
 
 	handle: ApplicationHandle,
 	func: Box<dyn FnOnce(ApplicationHandle) + Send + 'a>
+}
+
+// The trait to be implemented by all (user-level) handles that are able to return an ApplicationHandle.
+// Like: Application, ApplicationAsync, BrowserWindow, BrowserWindowAsync
+pub trait HasAppHandle {
+	fn app_handle( &self ) -> ApplicationHandle;
 }
 
 /// The runtime to run the application with.
@@ -101,6 +115,7 @@ struct WakerData<'a> {
 
 
 /// The future that dispatches a closure onto the GUI thread
+#[cfg(feature = "threadsafe")]
 pub type ApplicationDelegateFuture<'a,R> = DelegateFuture<'a, ApplicationHandle, R>;
 
 
@@ -153,15 +168,19 @@ impl Application {
 	/// This will open another process of your application.
 	/// Therefore, any code that will be placed before initialization will also be executed on all other processes.
 	/// This is generally unnecessary.
-	pub fn initialize() -> Application {
+	/// 
+	/// # Arguments
+	/// `settings` - Some settings that allow you to tweak some application behaviors.
+	///              Use `Settings::default()` for default settings that work for most people.
+	pub fn initialize( settings: ApplicationSettings ) -> Application {
 
 		let (args_vec, mut ptrs_vec) = Self::args_ptr_vec();
 		let argc: c_int = args_vec.len() as _;
 		let argv = ptrs_vec.as_mut_ptr();
 
-		let ffi_handle = unsafe { bw_Application_initialize( argc, argv as _ ) };
+		let core_handle = ApplicationImpl::initialize( argc, argv as _, &settings );
 
-		Application::from_ffi_handle( ffi_handle )
+		Application::from_core_handle( core_handle )
 	}
 
 	/// Creates a `Runtime` from which you can run the application.
@@ -175,9 +194,7 @@ impl Application {
 
 impl Drop for Application {
 	fn drop( &mut self ) {
-		unsafe {
-			bw_Application_finish( self.handle.ffi_handle );
-		}
+		self.handle.inner.finish()
 	}
 }
 
@@ -186,9 +203,8 @@ impl Runtime {
 	/// Polls a future given a pointer to the waker data.
 	unsafe fn poll_future( data: *mut WakerData ) {
 		debug_assert!( data != ptr::null_mut(), "WakerData pointer can't be zero!" );
-		// Test if polling from the right thread
-		#[cfg(debug_assertions)]
-		bw_Application_assertCorrectThread( (*data).handle.ffi_handle );
+
+		// TODO: Test if polling from the right thread
 
 		let waker = Self::new_waker( data );
 		let mut ctx = Context::from_waker( &waker );
@@ -213,11 +229,10 @@ impl Runtime {
 		)
 	}
 
-	/// Run the main loop.
-	/// This is useful if you want to manipulate the GUI from other threads.
+	/// Run the main loop and executes the given closure on it.
 	///
 	/// # Arguments
-	/// * `on_ready` - This closure will be called when the runtime has initialized, and will provide an application handle.
+	/// * `on_ready` - This closure will be called when the runtime has initialized, and will provide the caller with an application handle.
 	///
 	/// # Reserved Codes
 	/// -1 is used as the return code for when the main thread panicked during a delegated closure.
@@ -270,10 +285,7 @@ impl Runtime {
 	{
 		let ready_data = Box::into_raw( Box::new( on_ready ) );
 
-		unsafe {
-			let exit_code = bw_Application_run( self.handle.ffi_handle, Some( ffi_ready_handler::<H> ), ready_data as _ );
-			return exit_code;
-		}
+		self.handle.inner.run( ready_handler::<H>, ready_data as _ )
 	}
 }
 
@@ -282,9 +294,9 @@ impl Runtime {
 impl Application {
 
 	/// Constructs an `Application` from a ffi handle
-	pub(in super) fn from_ffi_handle( ffi_handle: *mut bw_Application ) -> Self {
+	pub(in super) fn from_core_handle( inner: ApplicationImpl ) -> Self {
 		Self {
-			handle: ApplicationHandle::new( ffi_handle )
+			handle: ApplicationHandle::new( inner )
 		}
 	}
 }
@@ -306,18 +318,23 @@ impl ApplicationHandle {
 	/// This will mean that not all tasks might complete.
 	/// If you were awaiting
 	pub fn exit( &self, exit_code: i32 ) {
-		unsafe { bw_Application_exit( self.ffi_handle, exit_code as _ ); }
+		self.inner.exit( exit_code as _ );
 	}
 
-	pub(in super) fn new( ffi_handle: *mut bw_Application ) -> Self {
+	pub(in super) fn new( inner: ApplicationImpl ) -> Self {
 		Self {
-			ffi_handle: ffi_handle
+			inner: inner
 		}
+	}
+
+	#[cfg(feature = "threadsafe")]
+	pub fn into_threaded( self ) -> ApplicationHandleThreaded {
+		self.into()
 	}
 
 	/// Spawns the given future, executing it on the GUI thread somewhere in the near future.
 	pub fn spawn<F>( &self, future: F ) where
-	    F: Future<Output=()> + 'static
+		F: Future<Output=()> + 'static
 	{
 		// Data for the waker.
 		let waker_data = Box::into_raw( Box::new(
@@ -334,6 +351,7 @@ impl ApplicationHandle {
 
 
 
+#[cfg(feature = "threadsafe")]
 impl ApplicationHandleThreaded {
 
 	/// Executes the given closure `func` on the GUI thread, and gives back the result when done.
@@ -396,7 +414,7 @@ impl ApplicationHandleThreaded {
 	///
 	/// Except, async closures are not yet supported in stable Rust.
 	/// What we actually mean are closures of the form:
-	/// ```rust
+	/// ```no_run
 	/// |handle| async move { /* ... */ }
 	/// ```
 	///
@@ -432,18 +450,12 @@ impl ApplicationHandleThreaded {
 	pub fn dispatch<'a,F>( &self, func: F ) -> bool where
 		F:  FnOnce( ApplicationHandle ) + Send + 'a
 	{
-		let data = Box::into_raw( Box::new( ApplicationDispatchData {
+		let data_ptr = Box::into_raw( Box::new( ApplicationDispatchData {
 			handle: self.handle,
 			func: Box::new( func )
 		} ) );
 
-		unsafe {
-			bw_Application_dispatch(
-				self.handle.ffi_handle,
-				Some( ffi_dispatch_handler ),
-				data as _
-			) != 0
-		}
+		self.handle.inner.dispatch( dispatch_handler, data_ptr as _ )
 	}
 
 	/// Queues the given async closure `func` to be executed on the GUI thread somewhere in the future.
@@ -465,13 +477,13 @@ impl ApplicationHandleThreaded {
 	/// This will cause `Runtime::run` to stop and return the provided exit code.
 	pub fn exit( &self, exit_code: i32 ) {
 		// The thread-safe version of bw_Application_exit:
-		unsafe { bw_Application_exitAsync( self.handle.ffi_handle, exit_code as _ ); }
+		self.handle.inner.exit_threadsafe( exit_code as _ );
 	}
 
 	/// Constructs an `ApplicationThreaded` handle from a ffi handle
-	pub(in super) fn from_ffi_handle( ffi_handle: *mut bw_Application ) -> Self {
+	pub(in super) fn from_core_handle( inner: ApplicationImpl ) -> Self {
 		Self {
-			handle: ApplicationHandle::new( ffi_handle )
+			handle: ApplicationHandle::new( inner )
 		}
 	}
 
@@ -483,6 +495,7 @@ impl ApplicationHandleThreaded {
 	}
 }
 
+#[cfg(feature = "threadsafe")]
 impl From<ApplicationHandle> for ApplicationHandleThreaded {
 	fn from( other: ApplicationHandle ) -> Self {
 		Self {
@@ -502,7 +515,8 @@ impl HasAppHandle for ApplicationHandle {
 
 
 
-unsafe extern "C" fn ffi_dispatch_handler(_app: *mut bw_Application, _data: *mut c_void ) {
+#[cfg(feature = "threadsafe")]
+unsafe fn dispatch_handler( _app: ApplicationImpl, _data: *mut () ) {
 
 	let data_ptr = _data as *mut ApplicationDispatchData<'static>;
 	let data = Box::from_raw( data_ptr );
@@ -511,17 +525,17 @@ unsafe extern "C" fn ffi_dispatch_handler(_app: *mut bw_Application, _data: *mut
 }
 
 /// The handler that is invoked when the runtime is deemed 'ready'.
-unsafe extern "C" fn ffi_ready_handler<H>( ffi_handle: *mut bw_Application, user_data: *mut c_void ) where
+unsafe fn ready_handler<H>( handle: ApplicationImpl, user_data: *mut () ) where
 	H: FnOnce( ApplicationHandle )
 {
-	let app = ApplicationHandle::new( ffi_handle );
+	let app = ApplicationHandle::new( handle );
 	let closure = Box::from_raw( user_data as *mut H );
 
 	closure( app );
 }
 
 /// A handler that is invoked by wakers.
-unsafe extern "C" fn ffi_wakeup( _ffi_handle: *mut bw_Application, user_data: *mut c_void ) {
+unsafe fn wakeup_handler( _app: ApplicationImpl, user_data: *mut () ) {
 
 	let	data = user_data as *mut WakerData;
 
@@ -535,11 +549,7 @@ unsafe fn waker_clone( data: *const () ) -> RawWaker {
 unsafe fn waker_wake( data: *const () ) {
 	let data_ptr = data as *const WakerData;
 
-	bw_Application_dispatch(
-		(*data_ptr).handle.ffi_handle,
-		Some( ffi_wakeup ),
-		data_ptr as _
-	);
+	(*data_ptr).handle.inner.dispatch( wakeup_handler, data_ptr as _ );
 }
 
 unsafe fn waker_wake_by_ref( data: *const () ) {

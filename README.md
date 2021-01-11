@@ -41,5 +41,5 @@ These are the features that are awaiting implementation:
 * Linux support (through GTK+) [underway]
 * MacOS support (through Cocoa)
 * Cookie support (including HttpOnly cookies)
-* Events
+* Events [underway]
 * Servo engine support
