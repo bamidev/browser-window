@@ -29,6 +29,7 @@ struct EvalJsCallbackData {
 	data: *mut ()
 }
 
+#[allow(dead_code)]
 struct UserData {
 	func: *const HandlerFn,
 	data: *mut ()

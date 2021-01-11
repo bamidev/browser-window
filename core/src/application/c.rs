@@ -43,7 +43,7 @@ impl ApplicationExt for ApplicationImpl {
 		unsafe { cbw_Application_finish( self.inner ) }
 	}
 
-	fn initialize( argc: c_int, argv: *mut *mut c_char, settings: &ApplicationSettings ) -> Self {
+	fn initialize( argc: c_int, argv: *mut *mut c_char, _settings: &ApplicationSettings ) -> Self {
 
 		let c_settings = cbw_ApplicationSettings {
 			resource_dir: "".into()

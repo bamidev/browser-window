@@ -3,8 +3,7 @@ use crate::window::*;
 
 use browser_window_core::prelude::*;
 use std::{
-	future::Future,
-	ptr
+	future::Future
 };
 use unsafe_send_sync::UnsafeSend;
 

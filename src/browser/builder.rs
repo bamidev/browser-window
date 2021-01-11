@@ -2,8 +2,6 @@ use browser_window_core::*;
 use browser_window_core::browser_window::BrowserWindowExt;
 use browser_window_core::window::*;
 
-use std::ffi::*;
-
 use crate::application::{ApplicationHandle};
 use crate::browser::*;
 use crate::window::WindowBuilder;
@@ -13,12 +11,8 @@ use std::{
 	mem,
 	path::PathBuf,
 	pin::Pin,
-	ptr,
 	vec::Vec
 };
-
-use browser_window_c::*;
-use unsafe_send_sync::UnsafeSend;
 
 
 
@@ -260,7 +254,7 @@ struct BrowserUserData {
 
 
 /// Takes the arguments received from the C FFI handler callback, and converts it to a vector of strings
-fn args_to_vec( args: *const cbw_CStrSlice, args_count: usize ) -> Vec<String> {
+/*fn args_to_vec( args: *const cbw_CStrSlice, args_count: usize ) -> Vec<String> {
 
 	let mut vec = Vec::with_capacity( args_count );
 
@@ -271,7 +265,7 @@ fn args_to_vec( args: *const cbw_CStrSlice, args_count: usize ) -> Vec<String> {
 	}
 
 	vec
-}
+}*/
 
 /// This external C function will be invoked by the underlying implementation browser-window when it is invoked in JavaScript
 /*unsafe extern "C" fn ffi_window_invoke_handler( inner_handle: *mut bw_BrowserWindow, _command: bw_CStrSlice, _args: *mut bw_CStrSlice, args_count: u64 ) {

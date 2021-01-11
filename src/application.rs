@@ -47,18 +47,15 @@
 //! }
 //! ```
 
-use browser_window_core::*;
 use browser_window_core::application::*;
 use lazy_static::lazy_static;
 use std::env;
-use std::ffi::{c_void, CString};
+use std::ffi::{CString};
 use std::future::Future;
 use std::os::raw::{c_int};
 use std::pin::Pin;
 use std::ptr;
 use std::task::{Context, Poll, Waker, RawWaker, RawWakerVTable};
-
-use super::*;
 
 pub use browser_window_core::application::ApplicationSettings;
 
@@ -70,11 +67,14 @@ pub struct Application {
 
 /// A thread-safe application handle.
 /// This handle also allows you to dispatch code to be executed on the GUI thread from any other thread.
+#[cfg(feature = "threadsafe")]
 #[derive(Clone, Copy)]
 pub struct ApplicationHandleThreaded {
 	pub(in super) handle: ApplicationHandle
 }
+#[cfg(feature = "threadsafe")]
 unsafe impl Send for ApplicationHandleThreaded {}
+#[cfg(feature = "threadsafe")]
 unsafe impl Sync for ApplicationHandleThreaded {}
 
 #[derive(Clone, Copy)]
@@ -84,6 +84,7 @@ pub struct ApplicationHandle {
 	pub(in super) inner: ApplicationImpl
 }
 
+#[cfg(feature = "threadsafe")]
 struct ApplicationDispatchData<'a> {
 
 	handle: ApplicationHandle,
@@ -510,6 +511,7 @@ impl HasAppHandle for ApplicationHandle {
 
 
 
+#[cfg(feature = "threadsafe")]
 unsafe fn dispatch_handler( _app: ApplicationImpl, _data: *mut () ) {
 
 	let data_ptr = _data as *mut ApplicationDispatchData<'static>;
@@ -529,7 +531,7 @@ unsafe fn ready_handler<H>( handle: ApplicationImpl, user_data: *mut () ) where
 }
 
 /// A handler that is invoked by wakers.
-unsafe fn wakeup_handler( app: ApplicationImpl, user_data: *mut () ) {
+unsafe fn wakeup_handler( _app: ApplicationImpl, user_data: *mut () ) {
 
 	let	data = user_data as *mut WakerData;
 

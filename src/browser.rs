@@ -7,18 +7,13 @@
 use browser_window_c::*;
 use futures_channel::oneshot;
 use std::{
-	error::Error,
-	ffi::CStr,
-	fmt,
 	future::Future,
 	marker::PhantomData,
 	ops::Deref,
-	os::raw::*,
 	rc::Rc
 };
 
 use crate::application::*;
-use crate::*;
 use crate::window::*;
 
 use browser_window_core::browser_window::{BrowserWindowExt, BrowserWindowImpl, JsEvaluationError};
@@ -27,8 +22,6 @@ use browser_window_core::window::WindowExt;
 mod builder;
 
 pub use builder::{BrowserWindowBuilder, Source};
-
-use unsafe_send_sync::UnsafeSend;
 
 
 //type BrowserJsCallbackData<'a> = Box<dyn FnOnce(Browser, Result<String, JsEvaluationError>) + 'a>;
