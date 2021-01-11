@@ -18,7 +18,7 @@ use std::{
 };
 
 use crate::application::*;
-use crate::common::*;
+use crate::*;
 use crate::window::*;
 
 use browser_window_core::browser_window::{BrowserWindowExt, BrowserWindowImpl, JsEvaluationError};
@@ -35,6 +35,7 @@ use unsafe_send_sync::UnsafeSend;
 //type BrowserJsThreadedCallbackData<'a> = SendBoxFnOnce<'a,(BrowserHandle, Result<String, JsEvaluationError>),()>;
 
 /// The future that dispatches a closure on the GUI thread.
+#[cfg(feature = "threadsafe")]
 pub type BrowserDelegateFuture<'a,R> = DelegateFuture<'a, BrowserWindowHandle, R>;
 
 

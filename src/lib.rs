@@ -26,8 +26,10 @@ mod tests;
 
 
 
-mod common;
-pub use common::{
+#[cfg(feature = "threadsafe")]
+mod delegate;
+#[cfg(feature = "threadsafe")]
+pub use delegate::{
 	DelegateError,
 	DelegateFuture,
 	DelegateFutureFuture

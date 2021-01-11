@@ -58,7 +58,7 @@ use std::pin::Pin;
 use std::ptr;
 use std::task::{Context, Poll, Waker, RawWaker, RawWakerVTable};
 
-use super::common::*;
+use super::*;
 
 pub use browser_window_core::application::ApplicationSettings;
 
@@ -90,6 +90,12 @@ struct ApplicationDispatchData<'a> {
 	func: Box<dyn FnOnce(ApplicationHandle) + Send + 'a>
 }
 
+// The trait to be implemented by all (user-level) handles that are able to return an ApplicationHandle.
+// Like: Application, ApplicationAsync, BrowserWindow, BrowserWindowAsync
+pub trait HasAppHandle {
+	fn app_handle( &self ) -> ApplicationHandle;
+}
+
 /// The runtime to run the application with.
 pub struct Runtime {
 	pub(in super) handle: ApplicationHandle
@@ -104,6 +110,7 @@ struct WakerData<'a> {
 
 
 /// The future that dispatches a closure onto the GUI thread
+#[cfg(feature = "threadsafe")]
 pub type ApplicationDelegateFuture<'a,R> = DelegateFuture<'a, ApplicationHandle, R>;
 
 

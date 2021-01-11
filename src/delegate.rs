@@ -1,9 +1,8 @@
-use super::application::ApplicationHandle;
+use super::application::{ApplicationHandle, HasAppHandle};
 use browser_window_c::*;
 use std::boxed::Box;
 use std::future::Future;
 use std::mem;
-use std::os::raw::*;
 use std::panic;
 use std::pin::Pin;
 use std::rc::Rc;
@@ -19,14 +18,6 @@ use browser_window_core::application::*;
 
 
 
-/// The data that is sent to the GUI thread for `DelegateAsyncFuture`.
-/*struct DelegateAsyncData<'a,'b,H,F,R> {
-	handle: H,
-	result: &'a mut Option<Result<R, DelegateError>>,
-	func: Option<Box<dyn FnOnce( H ) -> F + Send + 'b>>,
-	waker: Waker
-}*/
-
 /// The data that is sent to the GUI thread for `DelegateFuture`.
 struct DelegateData<'a,'b,H,R> {
 	handle: H,
@@ -37,7 +28,7 @@ struct DelegateData<'a,'b,H,R> {
 //unsafe impl<'a,H,R> Send for DelegateData<'a,H,R> {}
 
 /// The data that is sent to the GUI thread for `DelegateFutureFuture`.
-struct DelegateFutureData<'a,'b,R> where R: Send{
+struct DelegateFutureData<'a,'b,R> where R: Send {
 	inner: &'b mut DelegateFutureInner<'a,R>,
 	waker: Waker
 }
@@ -128,6 +119,7 @@ impl<'a,H,R> DelegateFuture<'a,H,R> where R: Send {
 	}
 }
 
+#[cfg(feature = "threadsafe")]
 impl<'a,H,R> Future for DelegateFuture<'a,H,R> where
 	H: HasAppHandle + Clone + 'static,
 	R: Send + 'static
@@ -182,6 +174,7 @@ impl<'a,H,R> Future for DelegateFuture<'a,H,R> where
 	}
 }
 
+#[cfg(feature = "threadsafe")]
 impl<'a,R> DelegateFutureFuture<'a,R> where R: Send {
 
 	pub(in super) fn new( app_handle: ApplicationHandle, future: impl Future<Output=R> + 'a ) -> Self {
@@ -196,6 +189,7 @@ impl<'a,R> DelegateFutureFuture<'a,R> where R: Send {
 	}
 }
 
+#[cfg(feature = "threadsafe")]
 impl<'a,R> Future for DelegateFutureFuture<'a,R> where R: Send {
 	type Output = Result<R, DelegateError>;
 
@@ -235,36 +229,6 @@ impl<'a,R> Future for DelegateFutureFuture<'a,R> where R: Send {
 
 
 
-// The trait to be implemented by all (user-level) handles that are able to return an ApplicationHandle.
-// Like: Application, ApplicationAsync, BrowserWindow, BrowserWindowAsync
-pub trait HasAppHandle {
-	fn app_handle( &self ) -> ApplicationHandle;
-}
-
-
-
-/// A trait that is able to tell whether or not the pointer-like type that implements it,
-///  points to the same location as another instance of the pointer.
-pub trait PointerEq {
-	fn ptr_eq( &self, other: &Self ) -> bool;
-}
-
-
-
-impl<T> PointerEq for Rc<T> {
-	fn ptr_eq( &self, other: &Self  ) -> bool {
-		Rc::ptr_eq( self, other )
-	}
-}
-
-impl<T> PointerEq for Arc<T> {
-	fn ptr_eq( &self, other: &Self  ) -> bool {
-		Arc::ptr_eq( self, other )
-	}
-}
-
-
-
 
 unsafe fn delegate_handler<H,R>( app: ApplicationImpl, _data: *mut () ) where
 	H: Clone + 'static,
@@ -296,6 +260,7 @@ unsafe fn delegate_handler<H,R>( app: ApplicationImpl, _data: *mut () ) where
 	}
 }
 
+#[cfg(feature = "threadsafe")]
 unsafe fn delegate_async_handler<R>( app: ApplicationImpl, _data: *mut () ) where R: Send {
 
 	let data_ptr = _data as *mut DelegateFutureData<R>;
@@ -330,59 +295,3 @@ unsafe fn delegate_async_handler<R>( app: ApplicationImpl, _data: *mut () ) wher
 		}
 	}
 }
-
-
-
-/*impl Dims2D {
-	pub fn new( width: u16, height: u16 ) -> Self {
-		Self {
-			width,
-			height
-		}
-	}
-}
-
-impl From<cbw_Dims2D> for Dims2D {
-	fn from( other: cbw_Dims2D ) -> Self {
-		Self {
-			width: other.width,
-			height: other.height
-		}
-	}
-}
-
-impl Into<cbw_Dims2D> for Dims2D {
-	fn into( self: Self ) -> cbw_Dims2D {
-		cbw_Dims2D {
-			width: self.width,
-			height: self.height
-		}
-	}
-}
-
-impl Pos2D {
-	pub fn new( x: u16, y: u16 ) -> Self {
-		Self {
-			x,
-			y
-		}
-	}
-}
-
-impl From<cbw_Pos2D> for Pos2D {
-	fn from( other: cbw_Pos2D ) -> Self {
-		Self {
-			x: other.x,
-			y: other.y
-		}
-	}
-}
-
-impl Into<cbw_Pos2D> for Pos2D {
-	fn into( self: Self ) -> cbw_Pos2D {
-		cbw_Pos2D {
-			x: self.x,
-			y: self.y
-		}
-	}
-}*/
