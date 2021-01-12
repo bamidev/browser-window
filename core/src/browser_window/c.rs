@@ -4,7 +4,6 @@ use std::{
 	error::Error,
 	ffi::CStr,
 	fmt,
-	mem,
 	os::raw::*
 };
 

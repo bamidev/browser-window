@@ -8,7 +8,6 @@ use crate::window::WindowBuilder;
 
 use std::{
 	ops::DerefMut,
-	mem,
 	path::PathBuf,
 	pin::Pin,
 	vec::Vec
