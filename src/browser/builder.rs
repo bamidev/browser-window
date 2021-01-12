@@ -31,6 +31,11 @@ type BrowserJsInvocationHandler = Box<dyn FnMut(BrowserWindowHandle, String, Vec
 #[cfg(feature = "threadsafe")]
 type BrowserJsInvocationHandler = Box<dyn FnMut(BrowserWindowHandle, String, Vec<String>) -> Pin<Box<dyn Future<Output=()>>> + Send>;
 
+/// The data that is passed to the C FFI handler function
+struct BrowserUserData {
+	handler: BrowserJsInvocationHandler
+}
+
 /// Used to create a `BrowserWindow` or `BrowserWindowThreaded` instance.
 /// 
 /// # Warning
@@ -248,7 +253,7 @@ impl BrowserWindowBuilder {
 					window.height,
 					&window_options,
 					&other_options,
-					unsafe { mem::transmute( &browser_window_invoke_handler ) },
+					browser_window_invoke_handler,
 					user_data as _,
 					browser_window_created_callback,
 					callback_data as _
@@ -271,11 +276,6 @@ impl DerefMut for BrowserWindowBuilder {
 	fn deref_mut( &mut self ) -> &mut Self::Target {
 		&mut self.window
 	}
-}
-
-/// The data that is passed to the C FFI handler function
-struct BrowserUserData {
-	handler: Box<dyn FnMut( BrowserWindowHandle, String, Vec<String>) -> Pin<Box<dyn Future<Output=()>>>>
 }
 
 /// The data that is passed to the creation callback function

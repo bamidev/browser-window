@@ -29,18 +29,30 @@ struct EvalJsCallbackData {
 	data: *mut ()
 }
 
-#[allow(dead_code)]
-struct UserData {
-	func: *const HandlerFn,
-	data: *mut ()
-}
-
 /// An error that may occur when evaluating or executing JavaScript code.
 #[derive(Debug)]
 pub struct JsEvaluationError {
 	message: String
 	// TODO: Add line and column number files, and perhaps even more info about the JS error
 }
+
+struct UserData {
+	func: ExternalInvocationHandlerFn,
+	data: *mut ()
+}
+
+/// For some reason, Rust doesn't allow converting function signatures with differing argument types, even when we are sure the bit representation of both types are exactly the same.
+/// In this case, `arg_count` of `ffi_handler` is of type `usize`.
+/// However, bindgen translates C's `size_t` type into `u64` or `u32` depending on your architecture.
+/// Using `usize` would make sense since it is always the same as what `size_t` translates into bitwise.
+/// However, due to Rust's type system constraints, we can't really use `usize`.
+/// Therefore, we use this as a workaround.
+#[cfg(target_pointer_width = "16")]
+type UsizeFix = u16;
+#[cfg(target_pointer_width = "32")]
+type UsizeFix = u32;
+#[cfg(target_pointer_width = "64")]
+type UsizeFix = u64;
 
 
 
@@ -81,7 +93,7 @@ impl BrowserWindowExt for BrowserWindowImpl {
 		height: Option<u32>,
 		window_options: &WindowOptions,
 		browser_window_options: &BrowserWindowOptions,
-		handler: &HandlerFn,
+		handler: ExternalInvocationHandlerFn,
 		_user_data: *mut (),
 		creation_callback: CreationCallbackFn,
 		_callback_data: *mut ()
@@ -115,10 +127,7 @@ impl BrowserWindowExt for BrowserWindowImpl {
 			w, h,
 			window_options as _,
 			browser_window_options as _,
-			// Apparently C's size_t doesn't translate to usize.
-			// However, if I'd use a u64 as the functions arg type, we'd run into problems on 32-bit systems.
-			// So I basically force the cast right here.
-			Some( mem::transmute( &ffi_handler ) ),
+			Some( ffi_handler ),
 			Box::into_raw( user_data ) as _,
 			Some( ffi_creation_callback_handler ),
 			Box::into_raw( callback_data ) as _
@@ -126,7 +135,10 @@ impl BrowserWindowExt for BrowserWindowImpl {
 	}
 
 	fn user_data( &self ) -> *mut () {
-		unsafe { (*self.inner).user_data as _ }
+		let c_user_data_ptr: *mut UserData = unsafe { (*self.inner).user_data as _ };
+
+		// The actual user data pointer is stored within the `UserData` struct that is stored within the C handle
+		unsafe { (*c_user_data_ptr).data }
 	}
 
 	fn window( &self ) -> WindowImpl {
@@ -189,21 +201,21 @@ unsafe extern "C" fn ffi_eval_js_callback_handler( bw: *mut cbw_BrowserWindow, _
 	(data.callback)( handle, data.data, result );
 }
 
-unsafe extern "C" fn ffi_handler( bw: *mut cbw_BrowserWindow, cmd: cbw_CStrSlice, args: *mut cbw_CStrSlice, arg_count: usize ) {
+unsafe extern "C" fn ffi_handler( bw: *mut cbw_BrowserWindow, cmd: cbw_CStrSlice, args: *mut cbw_CStrSlice, arg_count: UsizeFix ) {
 
 	let handle = BrowserWindowImpl { inner: bw };
 
 	let data_ptr = (*bw).user_data as *mut UserData;
-	let data = Box::from_raw( data_ptr );
+	let data = &mut *data_ptr;
 
 	// Convert the command and args to a String and `Vec<&str>`
 	let cmd_string: &str = cmd.into();
-	let mut args_vec = Vec::with_capacity( arg_count );
+	let mut args_vec: Vec<String> = Vec::with_capacity( arg_count as usize );
 	for i in 0..arg_count {
-		args_vec.push( (*args.add( i )).into() );
+		args_vec.push( (*args.add( i as usize )).into() );
 	}
-
-	(*data.func)( handle, cmd_string, args_vec );
+	
+	(data.func)( handle, cmd_string, args_vec );
 }
 
 /// Processes the result received from the C function, and returns it in a Rust Result.

@@ -161,7 +161,7 @@ protected:
 		CefString cmd = msg_args->GetString( 0 );
 		std::string cmd_str = cmd.ToString();
 
-        // All next message arguments are the arguments of the command
+		// All next message arguments are the arguments of the command
 		std::vector<std::string> params; params.reserve( msg_args->GetSize() - 1 );
 		for ( size_t i = 1; i < msg_args->GetSize(); i++ ) {
 			std::string param = msg_args->GetString( i ).ToString();
@@ -169,17 +169,17 @@ protected:
 			params.push_back( param );
 		}
 
-        // Dispatch the invocation of the external handler to the thread from which the BrowserWindow main loop runs.
-        auto dispatch_data = new ExternalInvocationHandlerData {
-            our_handle,
-            cmd_str,
-            params
-        };
-        bw_Application_dispatch(
-            our_handle->window->app,
-            externalInvocationHandlerFunc,
-            (void*)dispatch_data
-        );
+		// Dispatch the invocation of the external handler to the thread from which the BrowserWindow main loop runs.
+		auto dispatch_data = new ExternalInvocationHandlerData {
+			our_handle,
+			cmd_str,
+			params
+		};
+		bw_Application_dispatch(
+			our_handle->window->app,
+			externalInvocationHandlerFunc,
+			(void*)dispatch_data
+		);
 	}
 
 	void openDevTools( bw_BrowserWindow* bw, const CefRefPtr<CefBrowserHost>& host ) {

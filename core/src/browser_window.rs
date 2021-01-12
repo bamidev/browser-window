@@ -17,7 +17,7 @@ pub type Source = cbw_BrowserWindowSource;
 
 pub type CreationCallbackFn = unsafe fn( bw: BrowserWindowImpl, data: *mut () );
 pub type EvalJsCallbackFn = unsafe fn( bw: BrowserWindowImpl, data: *mut (), result: Result<String, JsEvaluationError> ); 
-pub type HandlerFn = unsafe fn( bw: BrowserWindowImpl, cmd: &str, args: Vec<String> );
+pub type ExternalInvocationHandlerFn = unsafe fn( bw: BrowserWindowImpl, cmd: &str, args: Vec<String> );
 
 pub trait BrowserWindowExt: Copy {
 
@@ -56,7 +56,7 @@ pub trait BrowserWindowExt: Copy {
 		height: Option<u32>,
 		window_options: &WindowOptions,
 		browser_window_options: &BrowserWindowOptions,
-		handler: &HandlerFn,
+		handler: ExternalInvocationHandlerFn,
 		user_data: *mut (),
 		creation_callback: CreationCallbackFn,
 		callback_data: *mut ()
