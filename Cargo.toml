@@ -1,6 +1,6 @@
 [package]
 name = "browser-window"
-version = "0.4.1"
+version = "0.5.0"
 description = "A simple async/await aware browser (GUI) toolkit."
 edition = "2018"
 authors = ["Danny de Jong"]
@@ -21,11 +21,11 @@ name = "browser_window"
 path = "src/lib.rs"
 
 [dependencies]
-browser-window-c = { path = "./c" }
-browser-window-core = { path = "./core" }
+browser-window-c = { path = "./c", version = "0.0.0" }
+browser-window-core = { path = "./core", version = "0.0.0" }
 futures-channel = { version = "^0.3" }
 lazy_static = "1"
-unsafe-send-sync = "0"
+unsafe-send-sync = "^0.1"
 
 [dev-dependencies]
 tokio = { version = "^0.3", features = [ "rt-multi-thread" ] }
