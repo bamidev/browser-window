@@ -2,11 +2,10 @@
 
 mod builder;
 
-use super::*;
-use super::common::{Dims2D, Pos2D};
+use super::prelude::*;
 use super::event::Event;
 
-use browser_window_ffi::*;
+use browser_window_core::prelude::*;
 
 
 
@@ -19,7 +18,7 @@ pub type StandardWindowEvent = Event<'static, WindowHandle>;
 /// A handle that exposes all windowing functionality.
 #[derive(Clone, Copy)]
 pub struct WindowHandle {
-	pub(in super) ffi_handle: *mut bw_Window
+	pub(in super) inner: WindowImpl
 }
 
 #[derive(Default)]
@@ -55,18 +54,18 @@ impl WindowHandle {
 
 	/// Make the window invisible to the user.
 	pub fn hide( &self ) {
-		unsafe { bw_Window_hide( self.ffi_handle ) };
+		self.inner.hide()
 	}
 
-	pub(in super) fn new( ffi_handle: *mut bw_Window ) -> Self {
+	pub(in super) fn new( inner: WindowImpl ) -> Self {
 		Self {
-			ffi_handle
+			inner
 		}
 	}
 
 	/// Make the window visible to the user.
 	pub fn show( &self ) {
-		unsafe { bw_Window_show( self.ffi_handle ) };
+		self.inner.show()
 	}
 }
 
@@ -74,8 +73,8 @@ impl WindowHandle {
 
 prop! { /// Gets or sets the width and height of the content of the window.
 	ContentDimensions<Dims2D>( this: WindowHandle ) {
-		get => unsafe{ bw_Window_getContentDimensions( this.ffi_handle ) }.into(),
-		set(val) => unsafe { bw_Window_setContentDimensions( this.ffi_handle, val.into() ) }
+		get => this.inner.get_content_dimensions().into(),
+		set(val) => this.inner.set_content_dimensions( val.into() )
 	}
 }
 
@@ -84,42 +83,28 @@ prop! { /// Gets or sets the opacity of the window.
         /// An opacity of 0 means the window is completely visible.
         /// Anything in between makes the window transparent.
 	Opacity<u8>( this: WindowHandle ) {
-		get => unsafe { bw_Window_getOpacity( this.ffi_handle ) }.into(),
-		set(val) => unsafe { bw_Window_setOpacity( this.ffi_handle, val.into() ) }
+		get => this.inner.get_opacity(),
+		set(val) => this.inner.set_opacity( val )
 	}
 }
 
 prop! { /// Gets or sets the current position of the window.
 	Position<Pos2D>( this: WindowHandle ) {
-		get => unsafe { bw_Window_getPosition( this.ffi_handle ) }.into(),
-		set(val) => unsafe { bw_Window_setPosition( this.ffi_handle, val.into() ) }
+		get => this.inner.get_position(),
+		set(val) => this.inner.set_position( val )
 	}
 }
 
 prop!{ /// Gets or sets the title of the window.
 	pub Title<String, &str>( this: WindowHandle ) {
-		get => {
-			// First obtain string size
-			let buf_len = unsafe { bw_Window_getTitle( this.ffi_handle, bw_StrSlice::empty() ) };
-
-			// Allocate buffer and copy string into it
-			let mut buf = vec![0u8; buf_len as _];
-			let slice = bw_StrSlice { len: buf_len as _, data: buf.as_mut_ptr() as _ };
-			unsafe { bw_Window_getTitle( this.ffi_handle, slice ) };
-
-			// Convert to String
-			slice.into()
-		},
-		set(val) => {
-			let slice: bw_CStrSlice = val.into();
-			unsafe { bw_Window_setTitle( this.ffi_handle, slice ) };
-		}
+		get => this.inner.get_title(),
+		set(val) => this.inner.set_title( val ).into()
 	}
 }
 
 prop! { /// Gets or sets the current window size including its border and titlebar.
 	WindowDimensions<Dims2D>( this: WindowHandle ) {
-		get => unsafe{ bw_Window_getWindowDimensions( this.ffi_handle ) }.into(),
-		set(val) => unsafe { bw_Window_setWindowDimensions( this.ffi_handle, val.into() ) }
+		get => this.inner.get_window_dimensions().into(),
+		set(val) => this.inner.set_window_dimensions( val.into() )
 	}
 }

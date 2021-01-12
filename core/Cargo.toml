@@ -1,0 +1,22 @@
+[package]
+name = "browser-window-core"
+version = "0.4.1"
+description = "The non-user friendly inner functionality of crate browser-window, providing an cross-platform and browser engine independent interface."
+edition = "2018"
+authors = ["Danny de Jong"]
+license = "MIT"
+publish = true
+categories = ["api-bindings"]
+repository = "https://github.com/bamilab/browser-window/tree/master/core"
+
+[features]
+cef = ["browser-window-c/cef"]
+
+[lib]
+name = "browser_window_core"
+path = "src/lib.rs"
+crate-type = ["rlib"]
+
+[dependencies]
+browser-window-c = { path = "../c" }
+
