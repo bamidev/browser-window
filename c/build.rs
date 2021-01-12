@@ -77,12 +77,12 @@ fn main() {
 	 let mut bgbuilder = bindgen::Builder::default()
 	 	.parse_callbacks( Box::new( BwBindgenCallbacks {} ) )
 		.clang_arg("-DBW_BINDGEN")
-		.header("../c/src/application.h")
-		.header("../c/src/browser_window.h")
-		.header("../c/src/common.h")
-		.header("../c/src/err.h")
-		.header("../c/src/string.h")
-		.header("../c/src/window.h");
+		.header("src/application.h")
+		.header("src/browser_window.h")
+		.header("src/common.h")
+		.header("src/err.h")
+		.header("src/string.h")
+		.header("src/window.h");
 
 	/**************************************
 	 *	The Platform source files
