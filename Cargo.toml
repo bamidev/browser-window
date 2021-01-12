@@ -21,8 +21,8 @@ name = "browser_window"
 path = "src/lib.rs"
 
 [dependencies]
-browser-window-c = { path = "./c", version = "0.0.0" }
-browser-window-core = { path = "./core", version = "0.0.0" }
+browser-window-c = { path = "./c", version = "0.0.1" }
+browser-window-core = { path = "./core", version = "0.0.1" }
 futures-channel = { version = "^0.3" }
 lazy_static = "1"
 unsafe-send-sync = "^0.1"

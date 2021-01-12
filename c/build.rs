@@ -41,9 +41,16 @@ fn rerun_if_directory_changed<P>( _path: P ) where P: Into<PathBuf> {
 
 fn main() {
 
+	let out_path = PathBuf::from( env::var("OUT_DIR").expect("Unable to get output directory for C/C++ code base crate") );
+
 	// If this is being build by docs.rs, don't do anything.
 	// docs.rs is not able to compile the C/C++ source files because it doesn't have the win32 and cef header files available in their docker system in which they test-build.
+	// Also, because this prevents bindgen from running, no c_bindings.rs file in the output directory will be created.
+	// That would cause docs.rs to fail compiling if the file would exist, so we create it as well.
 	if let Ok(_) = env::var("DOCS_RS") {
+
+		fs::File::create( out_path.join("c_bindings.rs") ).expect("Unable to create empty bindings file.");
+
 		return
 	}
 
@@ -51,7 +58,6 @@ fn main() {
 	rerun_if_directory_changed("src");
 
 	let target = env::var("TARGET").unwrap();
-	let out_path = PathBuf::from( env::var("OUT_DIR").expect("Unable to get output directory for C/C++ code base crate") );
 
 	let mut build = cc::Build::new();
 	let std_flag = if cfg!(feature = "cef") {
