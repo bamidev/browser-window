@@ -17,7 +17,7 @@ You can get the latest prebuilt binaries [here](http://opensource.spotify.com/ce
 The minimal version will be fine.
 You can also get the 32-bit binaries if you really want.
 
-Once downloaded, you will need to extract it somewhere
+Once downloaded, you will need to extract it somewhere.
 These .tar.bz files are not readable by Windows itself.
 Good-old [WinRAR](https://www.rarlab.com/download.htm) should do the trick.
 
@@ -52,9 +52,10 @@ Copy all .dll and .bin files to the working directory as well.
 You could also just add the Release folder to your `%PATH%` environment variable for the .dll files.
 
 That's it!
-A call to `cargo run` will do it.
+Running `cargo run` should now work.
 
 If you encounter any issues, take a look at the [issue diagnosis page](https://github.com/bamilab/browser-window/blob/master/docs/ISSUE-DIAGNOSIS.md).
+If that doesn't help, you can submit an issue to the repository.
 
 ## Building From Source
 

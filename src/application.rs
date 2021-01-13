@@ -8,45 +8,57 @@
 //!
 //! # Example #1
 //! Here is an example to show how you can construct your application:
-//! ```rust
+//! ```
 //! use browser_window::application::*;
 //!
 //! fn main() {
-//! 	let application = Application::initialize( Settings::default() );
+//! 	let application = Application::initialize( ApplicationSettings::default() );
 //! 	let runtime = application.start();
 //!
-//!      runtime.run_async(|handle| async move {
+//! 	runtime.run_async(|handle| async move {
 //!
-//!         // Do something ...
-//!     });
-//! }
-//! ```
-//!
-//! # Example #2
-//! If you want to run another kind of runtime, like [tokio](https://tokio.rs/) for example, its still possible to use _Browser Window_ in conjunction with that.
-//! However, you will need to enable feature `threadsafe`, as it will enable all threadsafe handles.
-//! Here is an example:
-//! ```rust
-//! use browser_window::application::*;
-//! use tokio;
-//!
-//! async fn async_main( app: ApplicationHandleThreaded ) {
-//! 	// Do something ...
-//! }
-//!
-//! fn main() {
-//! 	let application = Application::initialize( Settings::default() );
-//!
-//! 	let tokio_runtime = tokio::runtime::Runtime::new().unwrap();
-//!     let bw_runtime = application.start();
-//!
-//!     bw_runtime.run(|_handle| {
-//!         let handle = _handle.into_threaded();
-//!
-//! 		tokio_runtime.spawn( async_main( app ) );
+//! 		// Do something ...
 //! 	});
 //! }
 //! ```
+//!
+#![cfg_attr(not(feature = "threadsafe"), doc = r#"
+_Browser Window_ also supports manipulating the GUI from other threads with thread-safe handles.
+To use these, enable the `threadsafe` feature.
+"#)]
+#![cfg_attr(feature = "threadsafe", doc = r#"
+# Example #2
+
+If you want to run another kind of runtime, like [tokio](https://tokio.rs/) for example, its still possible to use _Browser Window_ in conjunction with that.
+However, you will need to enable feature `threadsafe`, as it will enable all threadsafe handles.
+Here is an example:
+
+```rust
+use browser_window::application::*;
+use tokio;
+
+async fn async_main( app: ApplicationHandleThreaded ) {
+	// Do something ...
+}
+
+fn main() {
+	let application = Application::initialize( ApplicationSettings::default() );
+	let bw_runtime = application.start();
+
+	let tokio_runtime = tokio::runtime::Runtime::new().unwrap();
+
+	// First run our own runtime on the main thread
+	bw_runtime.run(|_app| {
+		let app = _app.into_threaded();
+
+		// Spawn the main logic into the tokio runtime
+		tokio_runtime.spawn( async_main( app ) );
+	});
+
+	tokio_runtime.shutdown_on_idle();
+}
+```"#)]
+
 
 use browser_window_core::application::*;
 use lazy_static::lazy_static;
@@ -69,6 +81,8 @@ pub struct Application {
 	pub(in super) handle: ApplicationHandle
 }
 
+/// *Note:* Only available with feature `threadsafe` enabled.
+///
 /// A thread-safe application handle.
 /// This handle also allows you to dispatch code to be executed on the GUI thread from any other thread.
 #[cfg(feature = "threadsafe")]
@@ -264,7 +278,7 @@ impl Runtime {
 		})
 	}
 
-	/// Spawns the given future, executing it on the GUI thread somewhere in the near future.
+	/// Use `run_async` instead.
 	pub fn spawn<'a,F>( &'a self, future: F ) where
 		F: Future<Output=()> + 'a
 	{
@@ -314,7 +328,7 @@ impl From<ApplicationHandle> for Application {
 impl ApplicationHandle {
 
 	/// Causes the `Runtime` to terminate.
-	/// The `Runtime`'s run or spawn command will return the exit code provided.
+	/// The `Runtime`'s [`Runtime::run`] or spawn command will return the exit code provided.
 	/// This will mean that not all tasks might complete.
 	/// If you were awaiting
 	pub fn exit( &self, exit_code: i32 ) {
@@ -327,6 +341,9 @@ impl ApplicationHandle {
 		}
 	}
 
+	/// **Note:** Only available with feature `threadsafe` enabled.
+	///
+	/// Transforms this application handle into a thread-safe version of it.
 	#[cfg(feature = "threadsafe")]
 	pub fn into_threaded( self ) -> ApplicationHandleThreaded {
 		self.into()

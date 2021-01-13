@@ -38,7 +38,7 @@ struct BrowserUserData {
 	handler: BrowserJsInvocationHandler
 }
 
-/// Used to create a `BrowserWindow` or `BrowserWindowThreaded` instance.
+/// Used to create a [`BrowserWindow`] or [`BrowserWindowThreaded`] instance, depending on whether or not you have feature `threadsafe` enabled.
 /// 
 /// # Warning
 /// `BrowserWindowBuilder` dereferences to `WindowBuilder`, so that you can modify anything related to the window as well.
@@ -57,17 +57,17 @@ struct BrowserUserData {
 /// let bw = BrowserWindowBuilder::new( Source::Url("https://www.duckduckgo.com".into()) )
 /// 	.dev_tools(true)
 /// 	.title("DuckDuckGo")
-/// 	.build();
+/// 	.build( app );
 /// ```
 /// This is because _Browser Window_ currently does not support creating windows that don't have browsers in them.
 /// `build` is a method of `BrowserWindowBuilder`, yet `title` returns a reference to `WindowBuilder`, which has no `build` method.
 /// 
 /// The solution is to do this:
-/// ```
+/// ```ignore
 /// let mut bwb = BrowserWindowBuilder::new( Source::Url("https://www.duckduckgo.com".into()) )
 /// 	.dev_tools(true);
 /// bwb.title("DuckDuckGo");
-/// let bw = bwb.build();
+/// let bw = bwb.build( app );
 /// ```
 pub struct BrowserWindowBuilder {
 
@@ -157,10 +157,16 @@ impl BrowserWindowBuilder {
 		BrowserWindow::new( rx.await.unwrap() )
 	}
 
-	/// Same as build, but gives back a browser handle that is thread-safe.
+	/// Creates the browser window.
+	///
+	/// Keep in mind that the description of this function is for when feature `threadsafe` is enabled.
+	/// When it is not enabled, it looks like this:
+	/// ```
+	/// pub async fn build( self, app: ApplicationHandle ) -> BrowserWindow { /* ... */ }
+	/// ```
 	///
 	/// # Arguments
-	/// * `app` - An thread-safe application handle.
+	/// * `app` - An (thread-safe) application handle.
 	#[cfg(feature = "threadsafe")]
 	pub async fn build( self, app: ApplicationHandleThreaded ) -> Result<BrowserWindowThreaded, DelegateError> {
 

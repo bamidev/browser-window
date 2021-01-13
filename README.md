@@ -25,6 +25,11 @@ Also, _Browser Window_ relies on the [Chromium Embedding Framework](https://bitb
 
 Click [here](./docs/getting-started) for a manual on how to set up everything that's needed to use Browser Window.
 
+### Documentation issues on docs.rs
+
+At the moment, _Browser Window_ is experiencing issues with the docs.rs site to get its documentation to show up properly.
+Therefore, if you want to start using _Browser Window_, you can clone the git repository and run `cargo doc --open --all-features` to get the documentation you need.
+
 ## License
 
 This software is available as open source software under a MIT license, for maximum freedom.

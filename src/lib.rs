@@ -16,7 +16,7 @@
 //! # Getting Started
 //! To start building apps with Browser Window, take a quick look at the [`application`](application/index.html) module.
 //!
-//! For an rich example, see [this example code](https://github.com/bamilab/browser-window/blob/master/example/).
+//! For a rich example, see [this example code](https://github.com/bamilab/browser-window/blob/master/example/).
 
 
 #[macro_use]
