@@ -28,9 +28,6 @@ pub mod event;
 pub mod prelude;
 pub mod window;
 
-#[cfg(test)]
-mod tests;
-
 
 
 #[cfg(feature = "threadsafe")]
