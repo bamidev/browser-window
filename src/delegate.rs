@@ -1,5 +1,4 @@
 use super::application::{ApplicationHandle, HasAppHandle};
-use browser_window_c::*;
 use std::boxed::Box;
 use std::future::Future;
 use std::mem;

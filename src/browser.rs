@@ -20,6 +20,11 @@ use crate::window::*;
 use browser_window_core::browser_window::{BrowserWindowExt, BrowserWindowImpl, JsEvaluationError};
 use browser_window_core::window::WindowExt;
 
+#[cfg(feature = "threadsafe")]
+use unsafe_send_sync::UnsafeSend;
+
+
+
 mod builder;
 
 pub use builder::{BrowserWindowBuilder, Source};

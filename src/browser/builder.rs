@@ -13,6 +13,9 @@ use std::{
 	vec::Vec
 };
 
+#[cfg(feature = "threadsafe")]
+use unsafe_send_sync::UnsafeSend;
+
 
 
 /// The type of content to display in a browser window
