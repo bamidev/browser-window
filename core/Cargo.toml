@@ -10,7 +10,9 @@ categories = ["api-bindings"]
 repository = "https://github.com/bamilab/browser-window/tree/master/core"
 
 [features]
+default = ["cef"]
 cef = ["browser-window-c/cef"]
+gtk = ["browser-window-c/gtk"]
 
 [lib]
 name = "browser_window_core"
@@ -18,5 +20,5 @@ path = "src/lib.rs"
 crate-type = ["rlib"]
 
 [dependencies]
-browser-window-c = { path = "../c", version = "0.0.1" }
+browser-window-c = { path = "../c", version = "0.0.3" }
 

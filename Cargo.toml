@@ -1,6 +1,6 @@
 [package]
 name = "browser-window"
-version = "0.5.0"
+version = "0.5.1"
 description = "A simple async/await aware browser (GUI) toolkit."
 edition = "2018"
 authors = ["Danny de Jong"]
@@ -12,8 +12,9 @@ readme = "README.md"
 repository = "https://github.com/bamilab/browser-window"
 
 [features]
-cef = ["browser-window-c/cef"]
-gtk = ["browser-window-c/gtk"]
+default = ["cef"]
+cef = ["browser-window-core/cef"]
+gtk = ["browser-window-core/gtk"]
 threadsafe = []
 
 [lib]
@@ -21,8 +22,7 @@ name = "browser_window"
 path = "src/lib.rs"
 
 [dependencies]
-browser-window-c = { path = "./c", version = "0.0.1" }
-browser-window-core = { path = "./core", version = "0.0.1" }
+browser-window-core = { path = "./core", version = "0.0.1", features = [ "cef" ] }
 futures-channel = { version = "^0.3" }
 lazy_static = "1"
 unsafe-send-sync = "^0.1"

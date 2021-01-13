@@ -4,7 +4,6 @@
 //! The methods of `BrowserWindowHandle` are displayed correctly at the page of `BrowserWindow`, but the methods of `WindowHandle` are not displayed.
 //! Be sure to check them out [here](../window/struct.WindowHandle.html).
 
-use browser_window_c::*;
 use futures_channel::oneshot;
 use std::{
 	future::Future,

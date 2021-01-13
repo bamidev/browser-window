@@ -1,5 +1,5 @@
 use browser_window_core::*;
-use browser_window_core::browser_window::BrowserWindowExt;
+use browser_window_core::browser_window::*;
 use browser_window_core::window::*;
 
 use crate::application::{ApplicationHandle};
@@ -233,12 +233,12 @@ impl BrowserWindowBuilder {
 				let callback_data: *mut Box<dyn FnOnce( BrowserWindowHandle )> = Box::into_raw( Box::new( Box::new(on_created ) ) );
 
 				// Convert options to FFI structs
-				let window_options = cbw_WindowOptions {
+				let window_options = WindowOptions {
 					borders: window.borders,
 					minimizable: window.minimizable,
 					resizable: window.resizable
 				};
-				let other_options = cbw_BrowserWindowOptions {
+				let other_options = BrowserWindowOptions {
 					dev_tools,
 					resource_path: "".into()
 				};

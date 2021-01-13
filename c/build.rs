@@ -41,23 +41,11 @@ fn rerun_if_directory_changed<P>( _path: P ) where P: Into<PathBuf> {
 
 fn main() {
 
-	let out_path = PathBuf::from( env::var("OUT_DIR").expect("Unable to get output directory for C/C++ code base crate") );
-
-	// If this is being build by docs.rs, don't do anything.
-	// docs.rs is not able to compile the C/C++ source files because it doesn't have the win32 and cef header files available in their docker system in which they test-build.
-	// Also, because this prevents bindgen from running, no c_bindings.rs file in the output directory will be created.
-	// That would cause docs.rs to fail compiling if the file would exist, so we create it as well.
-	if let Ok(_) = env::var("DOCS_RS") {
-
-		fs::File::create( out_path.join("c_bindings.rs") ).expect("Unable to create empty bindings file.");
-
-		return
-	}
-
 	println!("cargo:rerun-if-env-changed=CEF_PATH");
 	rerun_if_directory_changed("src");
 
 	let target = env::var("TARGET").unwrap();
+	let out_path = PathBuf::from( env::var("OUT_DIR").expect("Unable to get output directory for C/C++ code base crate") );
 
 	let mut build = cc::Build::new();
 	let std_flag = if cfg!(feature = "cef") {
@@ -144,7 +132,13 @@ fn main() {
 		match env::var("CEF_PATH") {
 			Err(e) => {
 				match e {
-					env::VarError::NotPresent => panic!("Environment variable CEF_PATH is not set! This is needed by Browser Window to find CEF's development files. See https://github.com/bamilab/browser-window/tree/master/docs/getting-started for more information."),
+					env::VarError::NotPresent => {
+
+						// Disable checking CEF_PATH for the docs.rs compiler, it is not on their system anyway.
+						if let Err(_) = env::var("DOCS_RS") {
+							panic!("Environment variable CEF_PATH is not set! This is needed by Browser Window to find CEF's development files. See https://github.com/bamilab/browser-window/tree/master/docs/getting-started for more information.")
+						}
+					},
 					other => panic!("Unable to use CEF_PATH: {}", other)
 				}
 			},
@@ -196,14 +190,18 @@ fn main() {
 	/**************************************
 	 *	All other source files
 	 **************************************/
-	build
-		.file("src/application/common.c")
-		.file("src/browser_window/common.c")
-		.file("src/err.c")
-		.file("src/string.c")
-		.file("src/window/common.c")
-		.flag( std_flag )
-		.compile("browser_window_c");
+	// If this is being build by docs.rs, don't do anything.
+	// docs.rs is not able to compile the C/C++ source files because it doesn't have the win32 and cef header files available in their docker system in which they test-build.
+	if let Err(_) = env::var("DOCS_RS") {
+		build
+			.file("src/application/common.c")
+			.file("src/browser_window/common.c")
+			.file("src/err.c")
+			.file("src/string.c")
+			.file("src/window/common.c")
+			.flag( std_flag )
+			.compile("browser_window_c");
+	}
 
 	// Let bindgen generate the bindings
 	bgbuilder
@@ -212,10 +210,10 @@ fn main() {
 
 	// Copy our lib to a known location so that browser-window-ffi can link to it.
 	// Apparently, Rust is unwilling to link the this lib, probably since this crates' crate-type is set to "staticlib", which is a C static lib.
-	let filename = match target.contains("windows") { true => "browser_window_c.lib", false => "libbrowser_window_c.a" };
-	let mut temp_path = env::temp_dir();
-	temp_path.push( filename );
-	fs::copy( out_path.join( filename ), temp_path ).expect( &format!("Unable to copy {}", filename ) );
+	//let filename = match target.contains("windows") { true => "browser_window_c.lib", false => "libbrowser_window_c.a" };
+	//let mut temp_path = env::temp_dir();
+	//temp_path.push( filename );
+	//s::copy( out_path.join( filename ), temp_path ).expect( &format!("Unable to copy {}", filename ) );
 }
 
 

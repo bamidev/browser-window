@@ -1,6 +1,6 @@
 [package]
 name = "browser-window-c"
-version = "0.0.1"
+version = "0.0.3"
 description = "FFI bindings for the browser-window crate."
 edition = "2018"
 authors = ["Danny de Jong"]
@@ -10,6 +10,7 @@ categories = []
 repository = "https://github.com/bamilab/browser-window/tree/master/c"
 
 [features]
+default = ["cef"]
 cef = []
 gtk = []
 
