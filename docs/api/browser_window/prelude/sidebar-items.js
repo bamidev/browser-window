@@ -1,0 +1,1 @@
+initSidebarItems({"trait":[["Property","A property is something that has a setter and a getter."]]});

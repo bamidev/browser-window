@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["browser_window_c"] = [{"text":"impl&lt;'a&gt; Into&lt;&amp;'a str&gt; for cbw_CStrSlice","synthetic":false,"types":[]},{"text":"impl Into&lt;String&gt; for cbw_CStrSlice","synthetic":false,"types":[]},{"text":"impl&lt;'a&gt; Into&lt;&amp;'a str&gt; for cbw_StrSlice","synthetic":false,"types":[]},{"text":"impl Into&lt;String&gt; for cbw_StrSlice","synthetic":false,"types":[]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

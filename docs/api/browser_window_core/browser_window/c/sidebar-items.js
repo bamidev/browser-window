@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["BrowserWindowImpl",""],["JsEvaluationError","An error that may occur when evaluating or executing JavaScript code."]]});

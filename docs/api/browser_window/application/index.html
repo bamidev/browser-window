@@ -1,0 +1,63 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `application` mod in crate `browser_window`."><meta name="keywords" content="rust, rustlang, rust-lang, application"><title>browser_window::application - Rust</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../browser_window/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a><p class='location'>Module application</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#structs">Structs</a></li><li><a href="#traits">Traits</a></li><li><a href="#types">Type Definitions</a></li></ul></div><p class='location'><a href='../index.html'>browser_window</a></p><script>window.sidebarCurrent = {name: 'application', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../../src/browser_window/application.rs.html#1-576' title='goto source code'>[src]</a></span><span class='in-band'>Module <a href='../index.html'>browser_window</a>::<wbr><a class="mod" href=''>application</a></span></h1><div class='docblock'><p>This module contains runtime and application related handles.</p>
+<p><em>Browser Window</em> needs to be initialized, and also run its own runtime.
+Once that is set up and running, all windows can be constructed and be used.
+To do this, use <code>Application::initialize</code>.
+Then you will have an <code>Application</code> instance, from which you can derive a <code>Runtime</code> instance.
+Running the <code>Runtime</code> will grant you access to an <code>ApplicationHandle</code> which you use to manipulate your application with.</p>
+<h1 id="example-1" class="section-header"><a href="#example-1">Example #1</a></h1>
+<p>Here is an example to show how you can construct your application:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered">
+<span class="kw">use</span> <span class="ident">browser_window</span>::<span class="ident">application</span>::<span class="kw-2">*</span>;
+
+<span class="kw">fn</span> <span class="ident">main</span>() {
+	<span class="kw">let</span> <span class="ident">application</span> <span class="op">=</span> <span class="ident">Application</span>::<span class="ident">initialize</span>( <span class="ident">ApplicationSettings</span>::<span class="ident">default</span>() );
+	<span class="kw">let</span> <span class="ident">runtime</span> <span class="op">=</span> <span class="ident">application</span>.<span class="ident">start</span>();
+
+	<span class="ident">runtime</span>.<span class="ident">run_async</span>(<span class="op">|</span><span class="ident">handle</span><span class="op">|</span> <span class="ident">async</span> <span class="kw">move</span> {
+
+		<span class="comment">// Do something ...</span>
+	});
+}</pre></div>
+<h1 id="example-2" class="section-header"><a href="#example-2">Example #2</a></h1>
+<p>If you want to run another kind of runtime, like <a href="https://tokio.rs/">tokio</a> for example, its still possible to use <em>Browser Window</em> in conjunction with that.
+However, you will need to enable feature <code>threadsafe</code>, as it will enable all threadsafe handles.
+Here is an example:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered">
+<span class="kw">use</span> <span class="ident">browser_window</span>::<span class="ident">application</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">tokio</span>;
+
+<span class="ident">async</span> <span class="kw">fn</span> <span class="ident">async_main</span>( <span class="ident">app</span>: <span class="ident">ApplicationHandleThreaded</span> ) {
+	<span class="comment">// Do something ...</span>
+}
+
+<span class="kw">fn</span> <span class="ident">main</span>() {
+	<span class="kw">let</span> <span class="ident">application</span> <span class="op">=</span> <span class="ident">Application</span>::<span class="ident">initialize</span>( <span class="ident">ApplicationSettings</span>::<span class="ident">default</span>() );
+	<span class="kw">let</span> <span class="ident">bw_runtime</span> <span class="op">=</span> <span class="ident">application</span>.<span class="ident">start</span>();
+
+	<span class="kw">let</span> <span class="ident">tokio_runtime</span> <span class="op">=</span> <span class="ident">tokio</span>::<span class="ident">runtime</span>::<span class="ident">Runtime</span>::<span class="ident">new</span>().<span class="ident">unwrap</span>();
+
+	<span class="comment">// First run our own runtime on the main thread</span>
+	<span class="ident">bw_runtime</span>.<span class="ident">run</span>(<span class="op">|</span><span class="ident">_app</span><span class="op">|</span> {
+		<span class="kw">let</span> <span class="ident">app</span> <span class="op">=</span> <span class="ident">_app</span>.<span class="ident">into_threaded</span>();
+
+		<span class="comment">// Spawn the main logic into the tokio runtime</span>
+		<span class="ident">tokio_runtime</span>.<span class="ident">spawn</span>( <span class="ident">async_main</span>( <span class="ident">app</span> ) );
+	});
+
+	<span class="ident">tokio_runtime</span>.<span class="ident">shutdown_on_idle</span>();
+}</pre></div>
+</div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+<table><tr class='module-item'><td><a class="struct" href="struct.Application.html" title='browser_window::application::Application struct'>Application</a></td><td class='docblock-short'><p>Use this to initialize and start your application with.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.ApplicationHandle.html" title='browser_window::application::ApplicationHandle struct'>ApplicationHandle</a></td><td class='docblock-short'><p>A thread-unsafe application handle.
+Often provided by for Browser Window.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.ApplicationHandleThreaded.html" title='browser_window::application::ApplicationHandleThreaded struct'>ApplicationHandleThreaded</a></td><td class='docblock-short'><p><em>Note:</em> Only available with feature <code>threadsafe</code> enabled.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.ApplicationSettings.html" title='browser_window::application::ApplicationSettings struct'>ApplicationSettings</a></td><td class='docblock-short'></td></tr><tr class='module-item'><td><a class="struct" href="struct.Runtime.html" title='browser_window::application::Runtime struct'>Runtime</a></td><td class='docblock-short'><p>The runtime to run the application with.</p>
+</td></tr></table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
+<table><tr class='module-item'><td><a class="trait" href="trait.HasAppHandle.html" title='browser_window::application::HasAppHandle trait'>HasAppHandle</a></td><td class='docblock-short'></td></tr></table><h2 id='types' class='section-header'><a href="#types">Type Definitions</a></h2>
+<table><tr class='module-item'><td><a class="type" href="type.ApplicationDelegateFuture.html" title='browser_window::application::ApplicationDelegateFuture type'>ApplicationDelegateFuture</a></td><td class='docblock-short'><p>The future that dispatches a closure onto the GUI thread</p>
+</td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "browser_window";</script><script src="../../main.js"></script><script defer src="../../search-index.js"></script></body></html>
