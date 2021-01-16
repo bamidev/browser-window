@@ -10,6 +10,7 @@ keywords = ["browser", "chromium", "electron", "gui", "webview"]
 categories = ["asynchronous", "gui", "web-programming"]
 readme = "README.md"
 repository = "https://github.com/bamilab/browser-window"
+documentation = "https://bamilab.github.io/browser-window/browser_window/"
 
 [features]
 default = ["cef"]
