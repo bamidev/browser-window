@@ -4,6 +4,10 @@ _Browser Window_ is a simple Rust crate for utilizing a browser engine to create
 Just like [Electron](https://www.electronjs.org/), you can build your GUI with HTML/CSS/JS, or simply have some browser functionality.
 _Browser Window_ was born from the lack of a good and simple Electron alternative for Rust.
 
+## Documentation
+
+At the moment, _Browser Window_ is experiencing issues on the docs.rs site to get its documentation to display properly. For the time being, you can get the documentation here: https://bamilab.github.io/browser-window/browser_window/
+
 ## Goals
 
 Browser Window aims to be cross-platform, very simple, and straight forward.
@@ -24,11 +28,6 @@ Also, _Browser Window_ relies on the [Chromium Embedding Framework](https://bitb
 ## Getting Started
 
 Click [here](./docs/getting-started) for a manual on how to set up everything that's needed to use Browser Window.
-
-### Documentation issues on docs.rs
-
-At the moment, _Browser Window_ is experiencing issues with the docs.rs site to get its documentation to show up properly.
-Therefore, if you want to start using _Browser Window_, you can clone the git repository and run `cargo doc --open --all-features` to get the documentation you need.
 
 ## License
 
