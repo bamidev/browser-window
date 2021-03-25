@@ -18,7 +18,7 @@ fn rerun_if_directory_changed<P>( _path: P ) where P: Into<PathBuf> {
 	let path: PathBuf = _path.into();
 
 	let dir_iterator = match fs::read_dir( &path ) {
-		Err(e) => panic!( format!("Unable to read directory: {}", e) ),
+		Err(e) => panic!( "Unable to read directory: {}", e ),
 		Ok( iterator ) => iterator
 	};
 

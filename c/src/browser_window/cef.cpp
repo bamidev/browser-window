@@ -93,7 +93,6 @@ void bw_BrowserWindowCef_connectToCefWindow( bw_BrowserWindow* bw, CefWindowInfo
 	CefRefPtr<CefWindow> window = *(CefRefPtr<CefWindow>*)bw->window->impl.handle_ptr;
 
 	CefRect rect( 0, 0, width, height );
-	BW_DEBUG("W %i H %i", width, height)
 
 	info.SetAsChild( window->GetWindowHandle(), rect );
 }
