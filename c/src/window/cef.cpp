@@ -8,11 +8,11 @@
 
 
 
-class BwCefWindowOptions : public CefWindowDelegate {
+class MyWindowDelegate : public CefWindowDelegate {
 	bw_WindowOptions options;
 
 public:
-	BwCefWindowOptions( const bw_WindowOptions& options ) : options(options) {}
+	MyWindowDelegate( const bw_WindowOptions& options ) : options(options) {}
 
 	bool CanClose( CefRefPtr<CefWindow> window ) override {
 		UNUSED( window );
@@ -66,7 +66,7 @@ public:
 	}
 
 protected:
-	IMPLEMENT_REFCOUNTING(BwCefWindowOptions);
+	IMPLEMENT_REFCOUNTING(MyWindowDelegate);
 };
 
 
@@ -89,7 +89,7 @@ bw_WindowImpl bw_WindowImpl_new(
 ) {
 	UNUSED( _window );
 
-	CefRefPtr<CefWindowDelegate> cef_window_options( new BwCefWindowOptions( *options ) );
+	CefRefPtr<CefWindowDelegate> cef_window_options( new MyWindowDelegate( *options ) );
 	CefRefPtr<CefWindow> window = CefWindow::CreateTopLevelWindow( cef_window_options );
 
 	window->SetTitle( bw_cef_copyToString( _title ) );

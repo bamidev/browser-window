@@ -46,6 +46,13 @@ fn main() {
 
 	let target = env::var("TARGET").unwrap();
 	let out_path = PathBuf::from( env::var("OUT_DIR").expect("Unable to get output directory for C/C++ code base crate") );
+	let backup_file = PathBuf::from( env::var("CARGO_MANIFEST_DIR").unwrap() + "/bindgen_backup.rs" );
+
+	// Workaround for docs.rs
+	// Docs.rs is not able to compile the C/C++ source files because it doesn't have the win32 and cef header files available in their docker system in which they test-build.
+	if let Ok(_) = env::var("DOCS_RS") {
+		fs::copy( &backup_file, out_path.join("c_bindings.rs") ).expect("Unable to copy backup c bindings");
+	}
 
 	let mut build = cc::Build::new();
 	let std_flag = if cfg!(feature = "cef") {
@@ -190,30 +197,24 @@ fn main() {
 	/**************************************
 	 *	All other source files
 	 **************************************/
-	// If this is being build by docs.rs, don't do anything.
-	// docs.rs is not able to compile the C/C++ source files because it doesn't have the win32 and cef header files available in their docker system in which they test-build.
-	if let Err(_) = env::var("DOCS_RS") {
-		build
-			.file("src/application/common.c")
-			.file("src/browser_window/common.c")
-			.file("src/err.c")
-			.file("src/string.c")
-			.file("src/window/common.c")
-			.flag( std_flag )
-			.compile("browser_window_c");
-	}
+	build
+		.file("src/application/common.c")
+		.file("src/browser_window/common.c")
+		.file("src/err.c")
+		.file("src/string.c")
+		.file("src/window/common.c")
+		.flag( std_flag )
+		.compile("browser_window_c");
 
 	// Let bindgen generate the bindings
 	bgbuilder
 		.generate().expect("Unable to generate FFI bindings!")
 		.write_to_file( out_path.join("c_bindings.rs") ).expect("Unable to write FFI bindings to file!");
 
-	// Copy our lib to a known location so that browser-window-ffi can link to it.
-	// Apparently, Rust is unwilling to link the this lib, probably since this crates' crate-type is set to "staticlib", which is a C static lib.
-	//let filename = match target.contains("windows") { true => "browser_window_c.lib", false => "libbrowser_window_c.a" };
-	//let mut temp_path = env::temp_dir();
-	//temp_path.push( filename );
-	//s::copy( out_path.join( filename ), temp_path ).expect( &format!("Unable to copy {}", filename ) );
+	// Update bindgen backup
+	if let Ok(_) = env::var("UPDATE_BINDGEN_BACKUP") {
+		fs::copy( out_path.join("c_bindings.rs"), backup_file ).expect("Unable to copy backup file");
+	}
 }
 
 

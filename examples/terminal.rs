@@ -85,6 +85,7 @@ fn main() {
 					}
 				}
 			})
+			.dev_tools(false)
 			.size( 800, 600 )
 			.title("Terminal Example");
 		

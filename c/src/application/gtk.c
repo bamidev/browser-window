@@ -94,6 +94,10 @@ BOOL bw_ApplicationImpl_dispatch( bw_Application* app, bw_ApplicationDispatchDat
 	return is_running;
 }
 
+void bw_ApplicationImpl_dispatchHandler( bw_Application* app, bw_ApplicationDispatchData* data ) {
+	data->func( app, data->data );
+}
+
 bw_ApplicationImpl bw_ApplicationImpl_initialize( bw_Application* _app, int argc, char** argv, const bw_ApplicationSettings* settings ) {
 	UNUSED( _app );
 	UNUSED( settings );
