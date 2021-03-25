@@ -52,6 +52,7 @@ fn main() {
 	// Docs.rs is not able to compile the C/C++ source files because it doesn't have the win32 and cef header files available in their docker system in which they test-build.
 	if let Ok(_) = env::var("DOCS_RS") {
 		fs::copy( &backup_file, out_path.join("c_bindings.rs") ).expect("Unable to copy backup c bindings");
+		return
 	}
 
 	let mut build = cc::Build::new();
