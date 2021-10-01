@@ -68,7 +68,7 @@ fn main() {
 		
 		let working_dir = env::current_dir().unwrap();
 		let mut html_file = working_dir.clone();
-		html_file.push( "resources/terminal.html" );
+		html_file.push( "examples/resources/terminal.html" );
 
 		let mut bwb = BrowserWindowBuilder::new( Source::File( html_file ) );
 		bwb
