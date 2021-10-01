@@ -1,6 +1,6 @@
 [package]
 name = "browser-window-core"
-version = "0.0.4"
+version = "0.0.5"
 description = "The non-user friendly inner functionality of crate browser-window, providing an cross-platform and browser engine independent interface."
 edition = "2018"
 authors = ["Danny de Jong"]
