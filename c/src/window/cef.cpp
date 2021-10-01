@@ -113,3 +113,59 @@ void bw_WindowImpl_hide( bw_WindowImpl* window ) {
 void bw_WindowImpl_show( bw_WindowImpl* window ) {
 	(*(CefRefPtr<CefWindow>*)window->handle_ptr)->Show();
 }
+
+
+
+bw_Dims2D bw_Window_getContentDimensions( bw_Window* window ) { printf("bw_Window_getContentDimensions\n");
+	CefRect rect = (*(CefRefPtr<CefWindow>*)window->impl.handle_ptr)->GetClientAreaBoundsInScreen();
+
+	bw_Dims2D dims;
+	dims.width = rect.width;
+	dims.height = rect.height;
+
+	return dims;
+}
+
+bw_Pos2D bw_Window_getPosition( bw_Window* window ) { printf("bw_Window_getPosition\n");
+	CefRect rect = (*(CefRefPtr<CefWindow>*)window->impl.handle_ptr)->GetClientAreaBoundsInScreen();
+
+	bw_Pos2D pos;
+	pos.x = rect.x;
+	pos.y = rect.y;
+
+	return pos;
+}
+
+size_t bw_Window_getTitle( bw_Window* window, char** title ) { printf("bw_Window_getTitle\n");
+
+	CefString cef_title = (*(CefRefPtr<CefWindow>*)window->impl.handle_ptr)->GetTitle();
+
+	return bw_cef_copyToCstr( cef_title, title );
+}
+
+bw_Dims2D bw_Window_getWindowDimensions( bw_Window* window ) {
+	bw_Dims2D dims = { 0, 0 };
+	return dims;
+}
+
+void bw_Window_setContentDimensions( bw_Window* window, bw_Dims2D dimensions ) {
+	// Not supported...
+	UNUSED(window)
+	UNUSED(dimensions)
+}
+
+void bw_Window_setPosition( bw_Window* window, bw_Pos2D position ) { printf("bw_Window_setPosition\n");
+	UNUSED(window)
+	UNUSED(position)
+}
+
+void bw_Window_setTitle( bw_Window* window, bw_CStrSlice _title ) { printf("bw_Window_setTitle\n");
+	CefString title = bw_cef_copyToString( _title );
+
+	(*(CefRefPtr<CefWindow>*)window->impl.handle_ptr)->SetTitle(title);
+}
+
+void bw_Window_setWindowDimensions( bw_Window* window, bw_Dims2D dimensions ) { printf("bw_Window_setWindowDimensions\n");
+	UNUSED(window)
+	UNUSED(dimensions)
+}

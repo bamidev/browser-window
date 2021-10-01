@@ -11,7 +11,10 @@ use crate::{
 	prelude::*
 };
 
-use std::ptr;
+use std::{
+	os::raw::c_char,
+	ptr
+};
 
 
 
@@ -87,12 +90,13 @@ impl WindowExt for WindowImpl {
 
 	fn get_title( &self ) -> String {
 		// First obtain string size
-		let buf_len = unsafe { cbw_Window_getTitle( self.inner, cbw_StrSlice::empty() ) };
+		println!("get_title");
+		let mut buf: *mut c_char = ptr::null_mut();
+		let buf_len = unsafe { cbw_Window_getTitle( self.inner, &mut buf) };
 
-		// Allocate buffer and copy string into it
-		let mut buf = vec![0u8; buf_len as _];
-		let slice = cbw_StrSlice { len: buf_len as _, data: buf.as_mut_ptr() as _ };
-		unsafe { cbw_Window_getTitle( self.inner, slice ) };
+		let slice = cbw_StrSlice { data: buf, len: buf_len };
+
+		unsafe { cbw_string_freeCstr(buf) };
 
 		// Convert to String
 		slice.into()

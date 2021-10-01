@@ -8,6 +8,7 @@
 
 
 CefString bw_cef_copyToString( bw_CStrSlice slice );
+size_t bw_cef_copyToCstr( const CefString& cef_string, char** cstr );
 
 
 
