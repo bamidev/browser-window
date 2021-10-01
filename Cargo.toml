@@ -1,6 +1,6 @@
 [package]
 name = "browser-window"
-version = "0.5.8"
+version = "0.5.9"
 description = "A simple async/await aware browser (GUI) toolkit."
 edition = "2018"
 authors = ["Danny de Jong"]
@@ -27,7 +27,7 @@ name = "terminal"
 path = "examples/terminal.rs"
 
 [dependencies]
-browser-window-core = { path = "./core", version = "0.0.5", features = [ "cef" ] }
+browser-window-core = { path = "./core", version = "0.0.6", features = [ "cef" ] }
 futures-channel = { version = "^0.3" }
 lazy_static = "1"
 unsafe-send-sync = "^0.1"
