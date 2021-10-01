@@ -72,6 +72,8 @@ impl WindowHandle {
 
 
 prop! { /// Gets or sets the width and height of the content of the window.
+        /// Setting this property only works on Windows.
+        /// This will be fixed once CEF works with GTK3 correctly.
 	ContentDimensions<Dims2D>( this: WindowHandle ) {
 		get => this.inner.get_content_dimensions().into(),
 		set(val) => this.inner.set_content_dimensions( val.into() )
@@ -82,6 +84,8 @@ prop! { /// Gets or sets the opacity of the window.
         /// An opacity of 255 means the window is invisible.
         /// An opacity of 0 means the window is completely visible.
         /// Anything in between makes the window transparent.
+        /// 
+        /// This feature only works on Windows since CEF currently does not work with GTK3 correctly.
 	Opacity<u8>( this: WindowHandle ) {
 		get => this.inner.get_opacity(),
 		set(val) => this.inner.set_opacity( val )
@@ -89,6 +93,9 @@ prop! { /// Gets or sets the opacity of the window.
 }
 
 prop! { /// Gets or sets the current position of the window.
+        /// 
+        /// This feature only works on Windows since CEF currently does not work with GTK3 correctly.
+        /// On non-Windows platforms the getting the position still works, but relates to the position of the browser inside the window, instead of the window itself.
 	Position<Pos2D>( this: WindowHandle ) {
 		get => this.inner.get_position(),
 		set(val) => this.inner.set_position( val )
@@ -103,6 +110,8 @@ prop!{ /// Gets or sets the title of the window.
 }
 
 prop! { /// Gets or sets the current window size including its border and titlebar.
+        /// 
+        /// This feature only works on Windows since CEF currently does not work with GTK3 correctly.
 	WindowDimensions<Dims2D>( this: WindowHandle ) {
 		get => this.inner.get_window_dimensions().into(),
 		set(val) => this.inner.set_window_dimensions( val.into() )
