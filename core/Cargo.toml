@@ -20,5 +20,5 @@ path = "src/lib.rs"
 crate-type = ["rlib"]
 
 [dependencies]
-browser-window-c = { path = "../c", version = "0.0.6" }
+browser-window-c = { path = "../c", version = "0.0.7" }
 
