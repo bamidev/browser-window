@@ -1,11 +1,12 @@
-# Getting Started on Windows
+# Getting Started
 
 _Browser Window_ currently relies on [CEF3](https://bitbucket.org/chromiumembedded/cef/wiki/Home).
-You will also need [cmake](https://cmake.org/), which you can download [here](https://cmake.org/download/).
-And you will need _Visual Studio_. You can download the free _Community_ version [here](https://visualstudio.microsoft.com/vs/).
+You will also need [cmake](https://cmake.org/).
+And on Windows, you will also need _Visual Studio_.
+You can download the free _Community_ version [here](https://visualstudio.microsoft.com/vs/).
 
 If you want to set up CEF by building it from source, take a look at [this](https://bitbucket.org/chromiumembedded/cef/wiki/MasterBuildQuickStart.md).
-However, it will take a lot of time, memory and disk space.
+However, it will take a lot of effort and time, memory & disk space for the compilation process.
 
 ## Using the binary distribution
 
@@ -13,13 +14,9 @@ However, it will take a lot of time, memory and disk space.
 
 The easiest and quickest way to set up CEF is to get the binary distribution.
 Building the source code is very, very time and resource consuming.
-You can get the latest prebuilt binaries [here](http://opensource.spotify.com/cefbuilds/index.html#windows64).
+You can get the latest prebuilt binaries [here](http://opensource.spotify.com/cefbuilds/index.html).
 The minimal version will be fine.
-You can also get the 32-bit binaries if you really want.
-
 Once downloaded, you will need to extract it somewhere.
-These .tar.bz files are not readable by Windows itself.
-Good-old [WinRAR](https://www.rarlab.com/download.htm) should do the trick.
 
 ### Compilation
 
@@ -28,6 +25,13 @@ To do this, first run _cmake_ by running this on the command line from within th
 ```
 cmake .
 ```
+
+### Unix-like Operating Systems
+
+After you have run `cmake`, you can just simply run `make`.
+This will build CEF.
+
+### Windows
 
 A newly generated Visual Studio solution has been generated in the folder.
 You should build this solution's Release target.
@@ -44,12 +48,14 @@ Now you can build the solution.
 
 Once you have extracted and compiled everything, we need to let _Browser Window_ know where it can find the header and library files to link to.
 If you set environment variable `CEF_PATH` to the directory that you have extracted, Browser Window is able to find them.
+Otherwise, `cargo` will fail to build `browser-window`.
 
-You also need to copy all resource files, found in the Resource directory, to the executables working directory.
+You also need to copy resource and library files (`.so`/`.dll` and `.bin`), so that they are available to the executable.
+Running `setup-cef-files.sh` or `setup-cef-files.bat` does all this for you.
+It will also change some permissions that CEF requires you to do.
+`setup-cef-files.sh` will use `sudo`, so if you don't have `sudo`, inspect the file and execute the commands yourself.
 
-To last thing that needs to be done is that the library files need to be made available to the executable.
-Copy all .dll and .bin files to the working directory as well.
-You could also just add the Release folder to your `%PATH%` environment variable for the .dll files.
+For the library files, you could also just add the `Release` folder to your `PATH` environment variable for the `.so`/`.dll` files.
 
 That's it!
 Running `cargo run` should now work.
@@ -57,7 +63,7 @@ Running `cargo run` should now work.
 If you encounter any issues, take a look at the [issue diagnosis page](https://github.com/bamilab/browser-window/blob/master/docs/ISSUE-DIAGNOSIS.md).
 If that doesn't help, you can submit an issue to the repository.
 
-## Building From Source
+## Building CEF From Source
 
 If you really want to build CEF from source, take a look at [this](https://bitbucket.org/chromiumembedded/cef/wiki/BranchesAndBuilding.md#markdown-header-automated-method).
 You still need to set up the environment variables and copy the files into the working directory afterwards.
