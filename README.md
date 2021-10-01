@@ -27,7 +27,7 @@ So window manipulation itself is currently only mostly supported on Windows.
 
 ## Getting Started
 
-Click [here](./docs/getting-started) for a manual on how to set up everything to use Browser Window.
+Click [here](./docs/GETTING-STARTED.md) for a manual on how to set up everything to be able to use Browser Window.
 
 ## License
 
