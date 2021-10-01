@@ -11,15 +11,29 @@ use std::process::{Command, exit, Stdio};
 async fn execute_command( bw: BrowserWindowHandle, line: &str ) {
 	let working_dir = bw.eval_js("working_dir").await.expect("Unable to obtain working dir from JavaScript!");
 
-	let cmd = Command::new("cmd")
-		.arg("/C")
-		.arg( line )
-		.current_dir( working_dir )
-		.stdout( Stdio::piped() )
-		.stderr( Stdio::piped() )
-		//.kill_on_drop(true)
-		.spawn()
-		.expect("Command failed to run!");
+	let cmd =
+		if env::consts::OS == "windows" {
+			Command::new("cmd")
+				.arg("/C")
+				.arg( line )
+				.current_dir( working_dir )
+				.stdout( Stdio::piped() )
+				.stderr( Stdio::piped() )
+				//.kill_on_drop(true)
+				.spawn()
+				.expect("Command failed to run!")
+		}
+		else {
+			Command::new("sh")
+				.arg("-c")
+				.arg( line )
+				.current_dir( working_dir )
+				.stdout( Stdio::piped() )
+				.stderr( Stdio::piped() )
+				//.kill_on_drop(true)
+				.spawn()
+				.expect("Command failed to run!")
+		};
 
 	// Read the output
 	let mut stdout = cmd.stdout.unwrap();
