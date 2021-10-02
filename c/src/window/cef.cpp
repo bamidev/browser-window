@@ -143,9 +143,9 @@ size_t bw_Window_getTitle( bw_Window* window, char** title ) {
 }
 
 bw_Dims2D bw_Window_getWindowDimensions( bw_Window* window ) {
-	CefRefPtr<CefView> browser_view = (*(CefRefPtr<CefWindow>*)window->impl.handle_ptr)->GetChildViewAt(0);
+	// FIXME: This is the same as getContentDimensions...
+	CefRect rect = (*(CefRefPtr<CefWindow>*)window->impl.handle_ptr)->GetBounds();
 	
-	CefRect rect = browser_view->GetBounds();
 	bw_Dims2D dims;
 	dims.width = rect.width;
 	dims.height = rect.height;
@@ -153,10 +153,13 @@ bw_Dims2D bw_Window_getWindowDimensions( bw_Window* window ) {
 	return dims;
 }
 
-void bw_Window_setContentDimensions( bw_Window* window, bw_Dims2D dimensions ) {
-	// Not supported...
-	UNUSED(window)
-	UNUSED(dimensions)
+void bw_Window_setContentDimensions( bw_Window* window, bw_Dims2D dims ) {
+	// FIXME: This doesn't work quite yet...
+	CefRefPtr<CefView> browser_view = (*(CefRefPtr<CefWindow>*)window->impl.handle_ptr)->GetChildViewAt(0);
+	
+	CefRect rect(0, 0, dims.width, dims.height);
+	browser_view->SetBounds(rect);
+	(*(CefRefPtr<CefWindow>*)window->impl.handle_ptr)->Layout();
 }
 
 void bw_Window_setPosition( bw_Window* window, bw_Pos2D position ) {
