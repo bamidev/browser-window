@@ -25,7 +25,7 @@ fn rerun_if_directory_changed<P>( _path: P ) where P: Into<PathBuf> {
 	for sub_path in dir_iterator {
 
 		match sub_path {
-			Err(e) => panic!( format!("Unable to read directory entry for dir {}: {}", path.as_os_str().to_str().unwrap(), e) ),
+			Err(e) => panic!( "Unable to read directory entry for dir {}: {}", path.as_os_str().to_str().unwrap(), e ),
 			Ok( entry ) => {
 
 				if entry.path().is_dir() {
