@@ -77,7 +77,7 @@ impl WindowExt for WindowImpl {
 	}
 
 	fn get_content_dimensions( &self ) -> Dims2D {
-		unsafe { cbw_Window_getContentDimensions( self.inner ) }
+		unsafe { Dims2D(cbw_Window_getContentDimensions( self.inner )) }
 	}
 
 	fn get_opacity( &self ) -> u8 {
@@ -85,7 +85,7 @@ impl WindowExt for WindowImpl {
 	}
 
 	fn get_position( &self ) -> Pos2D {
-		unsafe { cbw_Window_getPosition( self.inner ) }
+		unsafe { Pos2D(cbw_Window_getPosition( self.inner )) }
 	}
 
 	fn get_title( &self ) -> String {
@@ -103,7 +103,7 @@ impl WindowExt for WindowImpl {
 	}
 
 	fn get_window_dimensions( &self ) -> Dims2D {
-		unsafe { cbw_Window_getWindowDimensions( self.inner ) }
+		unsafe { Dims2D(cbw_Window_getWindowDimensions( self.inner )) }
 	}
 
 	fn hide( &self ) {
@@ -111,7 +111,7 @@ impl WindowExt for WindowImpl {
 	}
 
 	fn set_content_dimensions( &self, dimensions: Dims2D ) {
-		unsafe { cbw_Window_setContentDimensions( self.inner, dimensions ) }
+		unsafe { cbw_Window_setContentDimensions( self.inner, dimensions.0 ) }
 	}
 
 	fn set_opacity( &self, opacity: u8 ) {
@@ -119,7 +119,7 @@ impl WindowExt for WindowImpl {
 	}
 
 	fn set_position( &self, position: Pos2D ) {
-		unsafe { cbw_Window_setPosition( self.inner, position ) }
+		unsafe { cbw_Window_setPosition( self.inner, position.0 ) }
 	}
 
 	fn set_title( &self, title: &str ) {
@@ -128,7 +128,7 @@ impl WindowExt for WindowImpl {
 	}
 
 	fn set_window_dimensions( &self, dimensions: Dims2D ) {
-		unsafe { cbw_Window_setWindowDimensions( self.inner, dimensions ) }
+		unsafe { cbw_Window_setWindowDimensions( self.inner, dimensions.0 ) }
 	}
 
 	fn show( &self ) {
