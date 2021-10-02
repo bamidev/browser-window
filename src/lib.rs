@@ -8,10 +8,10 @@
 //!
 //! Moreover, the only supported browser engine right now is Chromium's Blink.
 //! Therefore, the Chromium Embedding Framework (CEF) is used as a dependency.
-//! To get CEF set up properly, enable feature `cef`, and take a look [here](https://github.com/bamilab/browser-window/tree/master/docs/GETTING-STARTED.md).
+//! To get CEF set up properly, take a look [here](https://github.com/bamilab/browser-window/tree/master/docs/GETTING-STARTED.md).
 //! 
 //! # Warning
-//! Due to insufficient support of GTK by the browser embedding API, some windowing features are only available on Windows.
+//! Due to insufficient support of GTK for CEF, some windowing features are only available on Windows.
 //! 
 //! # Getting Started
 //! To start building apps with Browser Window, take a quick look at the [`application`](application/index.html) module.
