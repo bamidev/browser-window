@@ -13,9 +13,9 @@ However, it will take a lot of effort and time, memory & disk space for the comp
 ### Download & Extract
 
 The easiest and quickest way to set up CEF is to get the binary distribution.
-Building the source code is very, very time and resource consuming.
 You can get the latest prebuilt binaries [here](http://opensource.spotify.com/cefbuilds/index.html).
 The minimal version will be fine.
+Version `87.1` is the lastest version known to work.
 Once downloaded, you will need to extract it somewhere.
 
 ### Compilation

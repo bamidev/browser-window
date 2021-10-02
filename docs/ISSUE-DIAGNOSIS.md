@@ -12,6 +12,7 @@ If your issues isn't explained in here, please file the issue [here](https://git
 TODO: Paste console error here...
 
 This error means that the GTK development files are not available.
+You should install them.
 
 #### Missing "stdlib.h" or "stddef.h"
 
@@ -57,6 +58,13 @@ LINK : warning LNK4098: defaultlib 'LIBCMT' conflicts with use of other libs; us
 This happends when you didn't follow the getting started guide properly.
 You need to built CEF with the `/MD` flag.
 
+### Other C++ Errors
+
+Sometimes, you may run into C++ compilation errors. Generally speaking, this should not happen for versions of _Browser Window_ that where published.
+However, _Browser Window_ still depends on one external C++ API, _CEF_.
+So, new versions of _CEF_ may break compatability with _Browser Window_.
+To fix this, simply look at the _latest version known to work_ specified in the [getting started guide](./GETTING-STARTED.md).
 
 ## Runtime Errors
 
+TODO
