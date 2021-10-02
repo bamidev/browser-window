@@ -38,7 +38,7 @@ public:
 		UNUSED( window );
 		UNUSED( is_menu );
 		UNUSED( can_activate_menu );
-		return NULL;
+		return nullptr;
 	}
 
 	bool IsFrameless( CefRefPtr<CefWindow> window ) override {
@@ -116,7 +116,7 @@ void bw_WindowImpl_show( bw_WindowImpl* window ) {
 
 
 
-bw_Dims2D bw_Window_getContentDimensions( bw_Window* window ) { printf("bw_Window_getContentDimensions\n");
+bw_Dims2D bw_Window_getContentDimensions( bw_Window* window ) {
 	CefRect rect = (*(CefRefPtr<CefWindow>*)window->impl.handle_ptr)->GetClientAreaBoundsInScreen();
 
 	bw_Dims2D dims;
@@ -126,46 +126,56 @@ bw_Dims2D bw_Window_getContentDimensions( bw_Window* window ) { printf("bw_Windo
 	return dims;
 }
 
-bw_Pos2D bw_Window_getPosition( bw_Window* window ) { printf("bw_Window_getPosition\n");
-	CefRect rect = (*(CefRefPtr<CefWindow>*)window->impl.handle_ptr)->GetClientAreaBoundsInScreen();
+bw_Pos2D bw_Window_getPosition( bw_Window* window ) {
+	CefPoint p = (*(CefRefPtr<CefWindow>*)window->impl.handle_ptr)->GetPosition();
 
 	bw_Pos2D pos;
-	pos.x = rect.x;
-	pos.y = rect.y;
+	pos.x = p.x;
+	pos.y = p.y;
 
 	return pos;
 }
 
-size_t bw_Window_getTitle( bw_Window* window, char** title ) { printf("bw_Window_getTitle\n");
-
+size_t bw_Window_getTitle( bw_Window* window, char** title ) {
 	CefString cef_title = (*(CefRefPtr<CefWindow>*)window->impl.handle_ptr)->GetTitle();
 
 	return bw_cef_copyToCstr( cef_title, title );
 }
 
 bw_Dims2D bw_Window_getWindowDimensions( bw_Window* window ) {
-	bw_Dims2D dims = { 0, 0 };
+	// FIXME: This is the same as getContentDimensions...
+	CefRect rect = (*(CefRefPtr<CefWindow>*)window->impl.handle_ptr)->GetBounds();
+	
+	bw_Dims2D dims;
+	dims.width = rect.width;
+	dims.height = rect.height;
+
 	return dims;
 }
 
-void bw_Window_setContentDimensions( bw_Window* window, bw_Dims2D dimensions ) {
-	// Not supported...
-	UNUSED(window)
-	UNUSED(dimensions)
+void bw_Window_setContentDimensions( bw_Window* window, bw_Dims2D dims ) {
+	// FIXME: This doesn't work quite yet...
+	CefRefPtr<CefView> browser_view = (*(CefRefPtr<CefWindow>*)window->impl.handle_ptr)->GetChildViewAt(0);
+	
+	CefRect rect(0, 0, dims.width, dims.height);
+	browser_view->SetBounds(rect);
+	(*(CefRefPtr<CefWindow>*)window->impl.handle_ptr)->Layout();
 }
 
-void bw_Window_setPosition( bw_Window* window, bw_Pos2D position ) { printf("bw_Window_setPosition\n");
-	UNUSED(window)
-	UNUSED(position)
+void bw_Window_setPosition( bw_Window* window, bw_Pos2D position ) {
+	CefPoint point(position.x, position.y);
+
+	(*(CefRefPtr<CefWindow>*)window->impl.handle_ptr)->SetPosition(point);
 }
 
-void bw_Window_setTitle( bw_Window* window, bw_CStrSlice _title ) { printf("bw_Window_setTitle\n");
+void bw_Window_setTitle( bw_Window* window, bw_CStrSlice _title ) {
 	CefString title = bw_cef_copyToString( _title );
 
 	(*(CefRefPtr<CefWindow>*)window->impl.handle_ptr)->SetTitle(title);
 }
 
-void bw_Window_setWindowDimensions( bw_Window* window, bw_Dims2D dimensions ) { printf("bw_Window_setWindowDimensions\n");
-	UNUSED(window)
-	UNUSED(dimensions)
+void bw_Window_setWindowDimensions( bw_Window* window, bw_Dims2D dims ) {
+	CefRect bounds( 0, 0, dims.width, dims.height );
+
+	(*(CefRefPtr<CefWindow>*)window->impl.handle_ptr)->SetBounds( bounds );
 }

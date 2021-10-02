@@ -1,17 +1,12 @@
 //! Browser Window is a Rust crate that allows you to utilize a browser engine to build graphical interfaces.
-//! The idea is similar to Electron.
+//! The idea is similar to Electron.js.
+//! You create the interface with HTML, CSS and JavaScript.
+//! Then, you can communicate information from JavaScript back to Rust, and from the other way around.
 //!
-//! # Warning
-//! _Browser Window_ is still in alpha stage of development.
-//! The API is bound to have breaking changes every minor version increment.
-//! Once version 1.0.0 is released, minor version increments will be backwards-compatible.
-//!
-//! Moreover, the only supported browser engine right now is Chromium's Blink.
+//! The only supported browser engine right now is Chromium's Blink.
 //! Therefore, the Chromium Embedding Framework (CEF) is used as a dependency.
-//! To get CEF set up properly, enable feature `cef`, and take a look [here](https://github.com/bamilab/browser-window/tree/master/docs/GETTING-STARTED.md).
-//! 
-//! # Warning
-//! Due to insufficient support of GTK by the browser embedding API, some windowing features are only available on Windows.
+//! To get CEF set up properly, take a look [here](https://github.com/bamilab/browser-window/tree/master/docs/GETTING-STARTED.md).
+//! Moreover, because getting CEF to work properly is not always straightforward, [here](https://github.com/bamilab/browser-window/tree/master/docs/ISSUE-DIAGNOSIS.md) is a list of common issues you may run in to, and their solutions.
 //! 
 //! # Getting Started
 //! To start building apps with Browser Window, take a quick look at the [`application`](application/index.html) module.

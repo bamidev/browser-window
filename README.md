@@ -1,8 +1,23 @@
 # Browser Window
 
 _Browser Window_ is a simple Rust crate for utilizing a browser engine to create a graphical user interface.
-Just like [Electron](https://www.electronjs.org/), you can build your GUI with HTML/CSS/JS, or simply have some browser functionality.
+Just like [Electron.js](https://www.electronjs.org/), you can build your GUI with HTML, CSS & JS, or simply have some browser functionality at your disposal.
+
 _Browser Window_ was born from the lack of a good and simple Electron alternative for Rust.
+There are other crates out there doing a similar thing, but they lack a few important key features.
+
+For example, other alternatives tend to depend on the target platform's native browser engine, initially intended to have something that works _out-of-the-box_.
+However, this poses a few problems.
+For one, Linux distributions don't have a _native_ browser engine, so Linux users still need to install libraries.
+Moreover, the browser engine that is shipped with Windows nowadays is now old and deprecated.
+So therefor, the end-user is still required to install an extra component to get your application to work on their system.
+So only MacOS just works supposedly.
+
+But you still have the issue of having to deal with the fact that not every browser engine behaves the same.
+This is the same issue web developers face, although it isn't as bad anymore as it used to.
+Nevertheless, when using one browser engine for all platforms, you don't have to worry about all that anyway.
+If you don't use platform dependent JavaScript or Rust, and it works, it works everywhere.
+End of story.
 
 ## Goals
 
@@ -20,10 +35,7 @@ You can view an [example](https://github.com/bamilab/browser-window/tree/master/
 
 _Browser Window_ relies on the [Chromium Embedding Framework](https://bitbucket.org/chromiumembedded/cef/wiki/Home), or CEF.
 Browser Window works on any platform that is also supported by CEF.
-Currently that is Linux, macOS and Windows, but macOS has not been tested yet.
-
-However, due to issues that CEF has with its GTK support, the Linux and macOS implementations use CEF's own windowing API, which is unfortunately is pretty limited.
-So window manipulation itself is currently only mostly supported on Windows.
+Currently those are Linux, macOS and Windows, but macOS has not been tested so far.
 
 ## Getting Started
 
