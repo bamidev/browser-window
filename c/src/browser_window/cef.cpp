@@ -200,11 +200,11 @@ void bw_BrowserWindowImpl_new(
 	// Create the browser
 	CefRefPtr<CefClient>* cef_client = (CefRefPtr<CefClient>*)browser->window->app->engine_impl.cef_client;
 #ifndef BW_CEF_WINDOW
-	bool success = CefBrowserHost::CreateBrowser( info, *cef_client, source_string, settings, dict, NULL );
+	bool success = CefBrowserHost::CreateBrowser( info, *cef_client, source_string, settings, dict, nullptr );
 	BW_ASSERT( success, "CefBrowserHost::CreateBrowser failed!\n" );
 #else
 	// CefBrowserHoset::CreateBrowser doesn't work well with Cefwindow, so we use the CefBrowserView
-	CefRefPtr<CefBrowserView> browser_view = CefBrowserView::CreateBrowserView( *cef_client, source_string, settings, dict, NULL, NULL );
+	CefRefPtr<CefBrowserView> browser_view = CefBrowserView::CreateBrowserView( *cef_client, source_string, settings, dict, nullptr, nullptr );
 	CefRefPtr<CefWindow>* window = (CefRefPtr<CefWindow>*)browser->window->impl.handle_ptr;
 	(*window)->AddChildView(browser_view);
 #endif

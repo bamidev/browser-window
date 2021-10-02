@@ -2,18 +2,20 @@
 #define BW_APPLICATION_CEF_WINDOW_H
 
 #if !defined(BW_CEF)
-#error "BW_CEF needs to be defined in order to used BW_CEF_WINDOW!"
+#error "BW_CEF needs to be defined in order to use BW_CEF_WINDOW!"
 #endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+#include "../bool.h"
+
 
 
 typedef struct {
 	int exit_code;
-	bool is_running;
+	BOOL is_running;
 } bw_ApplicationImpl;
 
 
