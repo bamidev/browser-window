@@ -60,3 +60,9 @@ You need to built CEF with the `/MD` flag.
 
 ## Runtime Errors
 
+### Nothing Happens
+
+So your program compiles, starts, but does nothing?
+This may be because the library and resource files were not copied to your executable directory.
+If this is not done, your program will not get past `Application::initialize`.
+Execute `setup-cef-files.sh` or `setup-cef-files.bat`.
