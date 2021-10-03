@@ -1,17 +1,18 @@
 #ifndef BW_CEF_APP_HANDLER_H
 #define BW_CEF_APP_HANDLER_H
 
+#include "../assert.h"
+#include "../application.h"
+#include "../browser_window.h"
+
+#include "external_invocation_handler.hpp"
+#include "v8_to_string.hpp"
+#include "../cef/bw_handle_map.hpp"
+
 #include <include/cef_app.h>
 #include <include/cef_client.h>
 #include <include/cef_life_span_handler.h>
 #include <include/cef_v8.h>
-
-#include "external_invocation_handler.hpp"
-#include "v8_to_string.hpp"
-#include "../assert.h"
-#include "../application.h"
-#include "../browser_window.h"
-#include "../cef/bw_handle_map.hpp"
 
 
 
