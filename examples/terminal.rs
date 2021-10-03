@@ -75,10 +75,8 @@ fn read_stream<R>( bw: BrowserWindowHandle, reader: &mut R, buffer: &mut [u8], j
 }
 
 fn main() {
-	let mut s = ApplicationSettings::default();
-	s.engine_seperate_executable_path = Some("/home/bamilab/projects/browser-window/target/debug/browser-window-se".into());
-
-	let application = match Application::initialize( &s ) {
+	let mut settings = ApplicationSettings::default();
+	let application = match Application::initialize( &settings ) {
 		Err(e) => panic!("Unable to initialize application: {}", e),
 		Ok(app) => app
 	};
