@@ -8,11 +8,11 @@
 //!
 //! # Example #1
 //! Here is an example to show how you can construct your application:
-//! ```
+//! ```ignore
 //! use browser_window::application::*;
 //!
 //! fn main() {
-//! 	let application = Application::initialize( ApplicationSettings::default() );
+//! 	let application = Application::initialize( &ApplicationSettings::default() ).unwrap();
 //! 	let runtime = application.start();
 //!
 //! 	runtime.run_async(|handle| async move {
@@ -42,7 +42,7 @@ async fn async_main( app: ApplicationHandleThreaded ) {
 }
 
 fn main() {
-	let application = Application::initialize( ApplicationSettings::default() );
+	let application = Application::initialize( &ApplicationSettings::default() ).unwrap();
 	let bw_runtime = application.start();
 
 	let tokio_runtime = tokio::runtime::Runtime::new().unwrap();
