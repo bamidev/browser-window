@@ -5,7 +5,10 @@ pub use c::ApplicationImpl;
 
 use crate::error::CbwResult;
 
-use std::os::raw::{c_char, c_int};
+use std::{
+	path::PathBuf,
+	os::raw::{c_char, c_int}
+};
 
 
 
@@ -27,7 +30,7 @@ pub trait ApplicationExt: Copy {
 }
 
 pub struct ApplicationSettings {
-	pub engine_seperate_executable_path: Option<String>,
+	pub engine_seperate_executable_path: Option<PathBuf>,
 	pub resource_dir: Option<String>
 }
 

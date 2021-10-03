@@ -187,13 +187,13 @@ impl Application {
 	/// # Arguments
 	/// `settings` - Some settings that allow you to tweak some application behaviors.
 	///              Use `Settings::default()` for default settings that work for most people.
-	pub fn initialize( settings: ApplicationSettings ) -> error::Result<Application> {
+	pub fn initialize( settings: &ApplicationSettings ) -> error::Result<Application> {
 
 		let (args_vec, mut ptrs_vec) = Self::args_ptr_vec();
 		let argc: c_int = args_vec.len() as _;
 		let argv = ptrs_vec.as_mut_ptr();
 
-		let core_handle = ApplicationImpl::initialize( argc, argv as _, &settings )?;
+		let core_handle = ApplicationImpl::initialize( argc, argv as _, settings )?;
 
 		Ok(Application::from_core_handle( core_handle ))
 	}

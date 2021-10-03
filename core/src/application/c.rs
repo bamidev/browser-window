@@ -51,8 +51,13 @@ impl ApplicationExt for ApplicationImpl {
 
 	fn initialize( argc: c_int, argv: *mut *mut c_char, _settings: &ApplicationSettings ) -> CbwResult<Self> {
 
+		let exec_path: &str = match _settings.engine_seperate_executable_path.as_ref() {
+			None => "",
+			Some(path) => path.to_str().unwrap()
+		};
+
 		let c_settings = cbw_ApplicationSettings {
-			engine_seperate_executable_path: _settings.engine_seperate_executable_path.as_ref().unwrap_or(&"".to_owned()).as_str().into(),
+			engine_seperate_executable_path: exec_path.into(),
 			resource_dir: _settings.resource_dir.as_ref().unwrap_or(&"".to_owned()).as_str().into()
 		};
 
