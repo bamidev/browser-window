@@ -9,10 +9,11 @@
 
 
 class MyWindowDelegate : public CefWindowDelegate {
+	bw_Application* app;
 	bw_WindowOptions options;
 
 public:
-	MyWindowDelegate( const bw_WindowOptions& options ) : options(options) {}
+	MyWindowDelegate( bw_Application* app, const bw_WindowOptions& options ) : app(app), options(options) {}
 
 	bool CanClose( CefRefPtr<CefWindow> window ) override {
 		UNUSED( window );
@@ -59,10 +60,17 @@ public:
 
 	void OnWindowCreated( CefRefPtr<CefWindow> window ) override {
 		UNUSED( window );
+
+		this->app->windows_alive += 1;
 	}
 
 	void OnWindowDestroyed( CefRefPtr<CefWindow> window ) override {
 		UNUSED( window );
+
+		this->app->windows_alive -= 1;
+
+		if (this->app->windows_alive == 0)
+			bw_Application_exit(this->app, 0);
 	}
 
 protected:
@@ -89,7 +97,7 @@ bw_WindowImpl bw_WindowImpl_new(
 ) {
 	UNUSED( _window );
 
-	CefRefPtr<CefWindowDelegate> cef_window_options( new MyWindowDelegate( *options ) );
+	CefRefPtr<CefWindowDelegate> cef_window_options( new MyWindowDelegate( _window->app, *options ) );
 	CefRefPtr<CefWindow> window = CefWindow::CreateTopLevelWindow( cef_window_options );
 
 	window->SetTitle( bw_cef_copyToString( _title ) );
