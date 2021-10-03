@@ -244,7 +244,7 @@ impl BrowserWindowThreaded {
 	/// Executes the given future on the GUI thread, and gives back the result when done.
 	/// Also see `ApplicationThreaded::delegate_future`.
 	pub fn delegate_future<'a,F,R>( &self, fut: F ) -> DelegateFutureFuture<'a,R> where
-		F: Future<Output=R> + Send,
+		F: Future<Output=R> + Send + 'a,
 		R: Send + 'static
 	{
 		let handle = self.handle.clone();
