@@ -16,6 +16,8 @@
 
 #[macro_use]
 mod prop;
+#[cfg(test)]
+mod tests;
 
 pub mod application;
 pub mod browser;
