@@ -5,8 +5,6 @@ mod builder;
 use super::prelude::*;
 use super::event::Event;
 
-use browser_window_core::prelude::*;
-
 
 
 pub use builder::WindowBuilder;

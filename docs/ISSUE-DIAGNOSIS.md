@@ -68,9 +68,12 @@ If that doesn't work, please [submit an issue](https://github.com/bamilab/browse
 
 ## Runtime Errors
 
-### Nothing Happens
+### Unable to initialize application
 
-So your program compiles, starts, but does nothing?
+```
+thread 'main' panicked at 'Unable to initialize application: c(bw) error: [1] unable to execute CEF process (are all required files located near the executable?)', ...
+```
+
 This may be because the library and resource files were not copied to your executable directory.
 If this is not done, your program will not get past `Application::initialize`.
 Execute `setup-cef-files.sh` or `setup-cef-files.bat`.

@@ -75,10 +75,13 @@ fn read_stream<R>( bw: BrowserWindowHandle, reader: &mut R, buffer: &mut [u8], j
 }
 
 fn main() {
-	let application = Application::initialize( ApplicationSettings::default() );
+	let application = match Application::initialize( ApplicationSettings::default() ) {
+		Err(e) => panic!("Unable to initialize application: {}", e),
+		Ok(app) => app
+	};
 	let runtime = application.start();
 
-	let exit_code = runtime.run_async( |app| async move {
+	let exit_code = runtime.run_async(|app| async move {
 		
 		let working_dir = env::current_dir().unwrap();
 		let mut html_file = working_dir.clone();

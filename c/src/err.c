@@ -6,6 +6,10 @@
 
 BW_ERR_MSG_DEF( bw_Err_msg_success, "success" )
 
+char* bw_Err_message(const bw_Err* error) {
+	return error->alloc_message(error->code, error->data);
+}
+
 char* bw_Err_msg_string( bw_ErrCode code, const void* message ) {
 	(void)(code);
 

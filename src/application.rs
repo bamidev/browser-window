@@ -74,6 +74,7 @@ pub use browser_window_core::application::ApplicationSettings;
 
 #[cfg(feature = "threadsafe")]
 use crate::delegate::*;
+use crate::error;
 
 
 /// Use this to initialize and start your application with.
@@ -186,15 +187,15 @@ impl Application {
 	/// # Arguments
 	/// `settings` - Some settings that allow you to tweak some application behaviors.
 	///              Use `Settings::default()` for default settings that work for most people.
-	pub fn initialize( settings: ApplicationSettings ) -> Application {
+	pub fn initialize( settings: ApplicationSettings ) -> error::Result<Application> {
 
 		let (args_vec, mut ptrs_vec) = Self::args_ptr_vec();
 		let argc: c_int = args_vec.len() as _;
 		let argv = ptrs_vec.as_mut_ptr();
 
-		let core_handle = ApplicationImpl::initialize( argc, argv as _, &settings );
+		let core_handle = ApplicationImpl::initialize( argc, argv as _, &settings )?;
 
-		Application::from_core_handle( core_handle )
+		Ok(Application::from_core_handle( core_handle ))
 	}
 
 	/// Creates a `Runtime` from which you can run the application.

@@ -3,9 +3,15 @@
 
 use super::{ApplicationExt, ApplicationSettings};
 
-use crate::prelude::*;
+use crate::{
+	error::*,
+	prelude::*
+};
 
-use std::os::raw::{c_char, c_int, c_void};
+use std::{
+	os::raw::{c_char, c_int, c_void},
+	ptr
+};
 
 
 
@@ -43,17 +49,21 @@ impl ApplicationExt for ApplicationImpl {
 		unsafe { cbw_Application_finish( self.inner ) }
 	}
 
-	fn initialize( argc: c_int, argv: *mut *mut c_char, _settings: &ApplicationSettings ) -> Self {
+	fn initialize( argc: c_int, argv: *mut *mut c_char, _settings: &ApplicationSettings ) -> CbwResult<Self> {
 
 		let c_settings = cbw_ApplicationSettings {
 			resource_dir: "".into()
 		};
 
-		let c_handle = unsafe { cbw_Application_initialize( argc, argv, &c_settings ) };
-
-		Self {
-			inner: c_handle
+		let mut c_handle: *mut cbw_Application = ptr::null_mut();
+		let c_err = unsafe { cbw_Application_initialize( &mut c_handle, argc, argv, &c_settings ) };
+		if c_err.code != 0 {
+			return Err( c_err.into() )
 		}
+
+		Ok(Self {
+			inner: c_handle
+		})
 	}
 
 	fn run( &self, on_ready: unsafe fn( ApplicationImpl, *mut () ), _data: *mut () ) -> i32 {

@@ -21,7 +21,7 @@ int bw_ApplicationImpl_run( bw_Application* app, bw_ApplicationImpl_ReadyHandler
 bw_ApplicationImpl bw_ApplicationImpl_initialize( bw_Application* app, int argc, char** argv, const bw_ApplicationSettings* settings );
 
 void bw_ApplicationEngineImpl_finish( bw_ApplicationEngineImpl* );
-bw_ApplicationEngineImpl bw_ApplicationEngineImpl_initialize( bw_Application* app, int argc, char** argv, const bw_ApplicationSettings* settings );
+bw_Err bw_ApplicationEngineImpl_initialize( bw_ApplicationEngineImpl* impl, bw_Application* app, int argc, char** argv, const bw_ApplicationSettings* settings );
 
 
 

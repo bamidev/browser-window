@@ -30,8 +30,7 @@ int _bw_ApplicationCef_xIoErrorHandler( Display* display );
 
 
 
-bw_ApplicationEngineImpl bw_ApplicationEngineImpl_initialize( bw_Application* app, int argc, char** argv, const bw_ApplicationSettings* settings ) {
-	bw_ApplicationEngineImpl impl;
+bw_Err bw_ApplicationEngineImpl_initialize( bw_ApplicationEngineImpl* impl, bw_Application* app, int argc, char** argv, const bw_ApplicationSettings* settings ) {
 
 	// For some reason the Windows implementation for CEF doesn't have the constructor for argc and argv.
 #ifdef BW_WIN32
@@ -44,10 +43,9 @@ bw_ApplicationEngineImpl bw_ApplicationEngineImpl_initialize( bw_Application* ap
 
 	int exit_code = CefExecuteProcess( main_args, cef_app_handle.get(), 0 );
 
-	// If the current process returns a non-negative number, it is not the main process on which we run user code.
+	// If the current process returns a non-negative number, something went wrong...
 	if ( exit_code >= 0 ) {
-		exit( exit_code );
-		return impl;
+		return bw_Err_new_with_msg(exit_code + 1, "unable to execute CEF process (are all required files located near the executable?)");
 	}
 
 	// If working with X, set error handlers that spit out errors instead of shutting down the application
@@ -77,10 +75,10 @@ bw_ApplicationEngineImpl bw_ApplicationEngineImpl_initialize( bw_Application* ap
 
 	CefRefPtr<CefClient>* client = new CefRefPtr<CefClient>(new ClientHandler( app ));
 
-	impl.exit_code = 0;
-	impl.cef_client = (void*)client;
+	impl->exit_code = 0;
+	impl->cef_client = (void*)client;
 
-	return impl;
+	BW_ERR_RETURN_SUCCESS;
 }
 
 void bw_ApplicationEngineImpl_finish( bw_ApplicationEngineImpl* app ) {

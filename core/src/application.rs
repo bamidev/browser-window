@@ -3,6 +3,8 @@ pub mod c;
 
 pub use c::ApplicationImpl;
 
+use crate::error::CbwResult;
+
 use std::os::raw::{c_char, c_int};
 
 
@@ -18,7 +20,7 @@ pub trait ApplicationExt: Copy {
 	fn exit_threadsafe( self: &Self, exit_code: i32 );
 	/// Shuts down all application processes and performs necessary clean-up code.
 	fn finish( &self ) {}
-	fn initialize( argc: c_int, argv: *mut *mut c_char, settings: &ApplicationSettings ) -> ApplicationImpl;
+	fn initialize( argc: c_int, argv: *mut *mut c_char, settings: &ApplicationSettings ) -> CbwResult<ApplicationImpl>;
 	/// Runs the main loop.
 	/// This blocks until the application is exitting.
 	fn run( &self, on_ready: unsafe fn(ApplicationImpl, *mut ()), data: *mut () ) -> i32;
