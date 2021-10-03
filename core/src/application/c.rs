@@ -52,7 +52,8 @@ impl ApplicationExt for ApplicationImpl {
 	fn initialize( argc: c_int, argv: *mut *mut c_char, _settings: &ApplicationSettings ) -> CbwResult<Self> {
 
 		let c_settings = cbw_ApplicationSettings {
-			resource_dir: "".into()
+			engine_seperate_executable_path: _settings.engine_seperate_executable_path.as_ref().unwrap_or(&"".to_owned()).as_str().into(),
+			resource_dir: _settings.resource_dir.as_ref().unwrap_or(&"".to_owned()).as_str().into()
 		};
 
 		let mut c_handle: *mut cbw_Application = ptr::null_mut();

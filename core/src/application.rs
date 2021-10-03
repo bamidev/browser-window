@@ -26,6 +26,18 @@ pub trait ApplicationExt: Copy {
 	fn run( &self, on_ready: unsafe fn(ApplicationImpl, *mut ()), data: *mut () ) -> i32;
 }
 
-#[derive(Default)]
 pub struct ApplicationSettings {
+	pub engine_seperate_executable_path: Option<String>,
+	pub resource_dir: Option<String>
+}
+
+
+
+impl Default for ApplicationSettings {
+	fn default() -> Self {
+		Self {
+			engine_seperate_executable_path: None,
+			resource_dir: None
+		}
+	}
 }

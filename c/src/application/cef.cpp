@@ -7,6 +7,9 @@
 
 #include <include/cef_app.h>
 #include <include/cef_base.h>
+#ifdef BW_MACOS
+#include <include/wrapper/cef_library_loader.h>
+#endif
 #include <stdlib.h>
 
 // X11 headers, when used by CEF
@@ -32,6 +35,19 @@ int _bw_ApplicationCef_xIoErrorHandler( Display* display );
 
 bw_Err bw_ApplicationEngineImpl_initialize( bw_ApplicationEngineImpl* impl, bw_Application* app, int argc, char** argv, const bw_ApplicationSettings* settings ) {
 
+	// If working with X, set error handlers that spit out errors instead of shutting down the application
+#if defined(CEF_X11)
+	XSetErrorHandler( _bw_ApplicationCef_xErrorHandler );
+	XSetIOErrorHandler( _bw_ApplicationCef_xIoErrorHandler );
+#endif
+
+	// Load CEF libraries at runtime, as required by the MacOS sandbox
+#ifdef BW_MACOS
+	CefScopedLibraryLoader library_loader;
+	if (!library_loader.LoadInMain())
+		return bw_Err_new_with_msg(1, "unable to load CEF libraries");
+#endif
+
 	// For some reason the Windows implementation for CEF doesn't have the constructor for argc and argv.
 #ifdef BW_WIN32
 	CefMainArgs main_args( GetModuleHandle(NULL) );
@@ -39,22 +55,22 @@ bw_Err bw_ApplicationEngineImpl_initialize( bw_ApplicationEngineImpl* impl, bw_A
 	CefMainArgs main_args( argc, argv );
 #endif
 
+	CefSettings app_settings;
 	CefRefPtr<CefApp> cef_app_handle( new AppHandler( app ) );
 
-	int exit_code = CefExecuteProcess( main_args, cef_app_handle.get(), 0 );
-
-	// If the current process returns a non-negative number, something went wrong...
-	if ( exit_code >= 0 ) {
-		return bw_Err_new_with_msg(exit_code + 1, "unable to execute CEF process (are all required files located near the executable?)");
+	if (settings->engine_seperate_executable_path.len == 0) {
+		int exit_code = CefExecuteProcess( main_args, cef_app_handle.get(), 0 );
+		// If the current process returns a non-negative number, something went wrong...
+		if ( exit_code >= 0 ) {
+			return bw_Err_new_with_msg(exit_code + 2, "unable to execute CEF process (are all required files located near the executable?)");
+		}
+	}
+	else {
+		char* path = bw_string_copyAsNewCstr(settings->engine_seperate_executable_path);
+		CefString( &app_settings.browser_subprocess_path ) = path;
+		bw_string_freeCstr(path);
 	}
 
-	// If working with X, set error handlers that spit out errors instead of shutting down the application
-#if defined(CEF_X11)
-	XSetErrorHandler( _bw_ApplicationCef_xErrorHandler );
-	XSetIOErrorHandler( _bw_ApplicationCef_xIoErrorHandler );
-#endif
-
-	CefSettings app_settings;
 	// Only works on Windows and Linux according to docs.
 	// Here it says it works on Windows only: https://bitbucket.org/chromiumembedded/cef/wiki/GeneralUsage.md#markdown-header-linux
 	// TODO: Check if the GTK implementation works when it is set to false, and with CefMessageDoWork() called repeatedly from somewhere else.

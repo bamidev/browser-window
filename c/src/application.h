@@ -59,6 +59,7 @@ typedef struct {
 } bw_ApplicationDispatchData;
 
 typedef struct {
+	bw_CStrSlice engine_seperate_executable_path;
 	bw_CStrSlice resource_dir;
 } bw_ApplicationSettings;
 
