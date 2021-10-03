@@ -9,12 +9,12 @@ There are other crates out there doing a similar thing, but they lack a few impo
 For example, other alternatives tend to depend on the target platform's native browser engine, initially intended to have something that works _out-of-the-box_.
 However, this poses a few problems.
 For one, Linux distributions don't have a _native_ browser engine, so Linux users still need to install libraries.
-Moreover, the browser engine that is shipped with Windows nowadays is now old and deprecated.
+Moreover, the browser engine that is shipped with Windows nowadays is old and deprecated.
 So therefor, the end-user is still required to install an extra component to get your application to work on their system.
-So only MacOS just works supposedly.
+So only MacOS 'just works', supposedly.
 
 But you still have the issue of having to deal with the fact that not every browser engine behaves the same.
-This is the same issue web developers face, although it isn't as bad anymore as it used to.
+This is the same issue front-end web developers deal with, although it isn't as bad anymore as it used to be.
 Nevertheless, when using one browser engine for all platforms, you don't have to worry about all that anyway.
 If you don't use platform dependent JavaScript or Rust, and it works, it works everywhere.
 End of story.
@@ -29,7 +29,7 @@ This also makes it possible to communicate smoothly with JavaScript on the clien
 Moreover, if you want to use it in a multi-threaded environment, you can.
 There are thread-safe handles available for easy exchange of data and work between the GUI thread and others.
 
-You can view an [example](https://github.com/bamilab/browser-window/tree/master/example) of a terminal emulator, to see how easily a GUI made with Browser Window can be done.
+You can view an [example](https://github.com/bamilab/browser-window/tree/master/examples) of a terminal emulator, to see how easily a GUI made with Browser Window can be done.
 
 ## Requirements
 
