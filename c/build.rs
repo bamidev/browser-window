@@ -70,7 +70,7 @@ fn to_executable_compiler_command( tool: cc::Tool, library_args: &[OsString], so
 			"-lcef_dll_wrapper".into(),
 			"-lcef".into()
 		];
-		cmd.args(extra_args);
+		cmd.args(&extra_args);
 	}
 	else {
 		panic!("MSVC compiler not yet implemented for seperate executable");
