@@ -31,13 +31,13 @@ typedef void (*bw_BrowserWindowJsCallbackFn)( bw_BrowserWindow* window, void* us
 
 
 typedef struct bw_BrowserWindowOptions {
-	bool dev_tools;
+	BOOL dev_tools;
 	bw_CStrSlice resource_path;
 } bw_BrowserWindowOptions;
 
 typedef struct bw_BrowserWindowSource {
 	bw_CStrSlice data;
-	bool is_html;
+	BOOL is_html;
 } bw_BrowserWindowSource;
 
 
