@@ -51,7 +51,6 @@ fn to_executable_args<'a>( args: &'a [OsString] ) -> Vec<&'a OsStr> {
 	for arg in args {
 		if !(ignore_args.contains(arg)) {
 			new_args.push(arg.as_os_str());
-			eprintln!("ARG: {:?}", arg);
 		}
 	}
 
