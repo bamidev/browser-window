@@ -131,7 +131,7 @@ impl BrowserWindowBuilder {
 	/// * `source` - The content that will be displayed in the browser window.
 	pub fn new( source: Source ) -> Self {
 		Self {
-			dev_tools: cfg!(debug_assertions),
+			dev_tools: false,
 			source,
 			handler: None,
 			window: WindowBuilder::new()
