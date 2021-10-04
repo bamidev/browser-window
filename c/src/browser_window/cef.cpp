@@ -166,7 +166,7 @@ void bw_BrowserWindowImpl_new(
 	// Set up a CefString with the source
 	CefString source_string;
 	if ( !source.is_html ) {
-		std::string url = "file:///" + std::string( source.data.data, source.data.len );
+		std::string url = std::string( source.data.data, source.data.len );
 		source_string = CefString( url );
 	}
 	else {
