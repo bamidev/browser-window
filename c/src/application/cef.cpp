@@ -62,7 +62,7 @@ bw_Err bw_ApplicationEngineImpl_initialize( bw_ApplicationEngineImpl* impl, bw_A
 		int exit_code = CefExecuteProcess( main_args, cef_app_handle.get(), 0 );
 		// If the current process returns a non-negative number, something went wrong...
 		if ( exit_code >= 0 ) {
-			return bw_Err_new_with_msg(exit_code + 2, "unable to execute CEF process (are all required files located near the executable?)");
+			exit(exit_code);
 		}
 	}
 	else {
