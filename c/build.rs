@@ -50,7 +50,8 @@ fn to_executable_args<'a>( args: &'a [OsString] ) -> Vec<&'a OsStr> {
 
 	for arg in args {
 		if !(ignore_args.contains(arg)) {
-			new_args.push(arg.as_os_str())
+			new_args.push(arg.as_os_str());
+			eprintln!("ARG: {:?}", arg);
 		}
 	}
 
@@ -72,8 +73,18 @@ fn to_executable_compiler_command( tool: cc::Tool, library_args: &[OsString], so
 		];
 		cmd.args(&extra_args);
 	}
+	else if tool.is_like_msvc() {
+		let extra_args: [OsString; 5] = [
+			format!("/Fe:{}", out_file.to_str().unwrap()).into(),
+			source_file.into(),
+			"/link".into(),
+			"libcef_dll_wrapper.lib".into(),
+			"libcef.lib".into()
+		];
+		cmd.args(&extra_args);
+	}
 	else {
-		panic!("MSVC compiler not yet implemented for seperate executable");
+		panic!("Compiler type not recognized for seperate executable.")
 	}
 
 	cmd.args(library_args);
@@ -183,7 +194,7 @@ fn main() {
 		}
 	}
 	// Non-windows systems that opt for using CEF, use CEF's own internal windowing features
-	else if cfg!(feature = "cef") {
+	else if cfg!(feature = "cef") && !target.contains("windows") {
 		bgbuilder = bgbuilder.clang_arg("-DBW_CEF_WINDOW");
 		build
 			.file("src/application/cef_window.cpp")
@@ -274,13 +285,22 @@ fn main() {
 			.flag(std_flag);
 		let se_comp = build_se.get_compiler();
 
-		let se_file = out_path.join("browser-window-se");
+		for var in se_comp.env() {
+			env::set_var(&var.0, &var.1);
+		}
+
+		let se_file = if !target.contains("windows") { out_path.join("browser-window-se") } else { out_path.join("browser-window-se.exe") };
 		let mut se_cmd = to_executable_compiler_command(se_comp, &*build_se_lib_args, "src/cef/seperate_executable.cpp", &se_file);
 
 		let status = se_cmd.status().expect("unable to get status of seperate executable compiler");
 		assert!(status.code().unwrap() == 0, "Seperate executable compiler failed with error code {}.", status.code().unwrap());
 
-		fs::copy( se_file, target_dir.join("browser-window-se") ).expect("unable to copy seperate executable");
+		if !target.contains("windows") {
+			fs::copy( se_file, target_dir.join("browser-window-se") ).expect("unable to copy seperate executable");
+		}
+		else {
+			fs::copy( se_file, target_dir.join("browser-window-se.exe") ).expect("unable to copy seperate executable");
+		}
 	}
 
 
