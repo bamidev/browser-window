@@ -61,7 +61,7 @@ size_t bw_Window_getTitle( bw_Window* window, char** title ) {
 	int length = GetWindowTextLengthW( window->impl.handle );
 	BW_WIN32_ASSERT_SUCCESS;
 
-	if ( length > 0 && title.len > 0 ) {
+	if ( length > 0 ) {
 		WCHAR* buffer = (WCHAR*)malloc( sizeof(WCHAR) * (length + 1) );
 
 		// Copy string
