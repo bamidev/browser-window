@@ -9,8 +9,8 @@ publish = true
 keywords = ["browser", "chromium", "electron", "gui", "webview"]
 categories = ["asynchronous", "gui", "web-programming"]
 readme = "README.md"
-repository = "https://docs.rs/browser-window/"
-documentation = "https://bamilab.github.io/browser-window/browser_window/"
+documentation = "https://docs.rs/browser-window/"
+repository = "https://github.com/bamilab/browser-window/"
 
 [features]
 default = ["cef"]
