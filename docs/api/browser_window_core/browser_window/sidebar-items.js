@@ -1,1 +1,0 @@
-initSidebarItems({"mod":[["c",""]],"trait":[["BrowserWindowExt",""]],"type":[["BrowserWindowOptions",""],["CreationCallbackFn",""],["EvalJsCallbackFn",""],["ExternalInvocationHandlerFn",""],["Source",""]]});

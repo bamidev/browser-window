@@ -1,5 +1,0 @@
-(function() {var implementors = {};
-implementors["browser_window"] = [{"text":"impl&lt;'a, A&gt; Default for Event&lt;'a, A&gt;","synthetic":false,"types":[]}];
-implementors["browser_window_core"] = [{"text":"impl Default for ApplicationSettings","synthetic":false,"types":[]},{"text":"impl Default for WindowImpl","synthetic":false,"types":[]}];
-implementors["unsafe_send_sync"] = [{"text":"impl&lt;T&gt; Default for UnsafeSend&lt;T&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;T: Default,&nbsp;</span>","synthetic":false,"types":[]},{"text":"impl&lt;T&gt; Default for UnsafeSync&lt;T&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;T: Default,&nbsp;</span>","synthetic":false,"types":[]},{"text":"impl&lt;T&gt; Default for UnsafeSendSync&lt;T&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;T: Default,&nbsp;</span>","synthetic":false,"types":[]}];
-if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

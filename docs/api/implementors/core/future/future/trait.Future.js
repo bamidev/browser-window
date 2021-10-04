@@ -1,4 +1,0 @@
-(function() {var implementors = {};
-implementors["browser_window"] = [{"text":"impl&lt;'a, H, R&gt; Future for DelegateFuture&lt;'a, H, R&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;H: HasAppHandle + Clone + 'static,<br>&nbsp;&nbsp;&nbsp;&nbsp;R: Send + 'static,&nbsp;</span>","synthetic":false,"types":[]},{"text":"impl&lt;'a, R&gt; Future for DelegateFutureFuture&lt;'a, R&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;R: Send,&nbsp;</span>","synthetic":false,"types":[]}];
-implementors["futures_channel"] = [{"text":"impl&lt;T, '_&gt; Future for Cancellation&lt;'_, T&gt;","synthetic":false,"types":[]},{"text":"impl&lt;T&gt; Future for Receiver&lt;T&gt;","synthetic":false,"types":[]}];
-if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["UnsafeSend","A wrapper type that is always `Send`."],["UnsafeSendSync","A wrapper type that is always `Send` and `Sync`."],["UnsafeSync","A wrapper type that is always `Sync`."]]});
