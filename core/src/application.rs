@@ -3,7 +3,12 @@ pub mod c;
 
 pub use c::ApplicationImpl;
 
-use std::os::raw::{c_char, c_int};
+use crate::error::CbwResult;
+
+use std::{
+	path::PathBuf,
+	os::raw::{c_char, c_int}
+};
 
 
 
@@ -18,12 +23,24 @@ pub trait ApplicationExt: Copy {
 	fn exit_threadsafe( self: &Self, exit_code: i32 );
 	/// Shuts down all application processes and performs necessary clean-up code.
 	fn finish( &self ) {}
-	fn initialize( argc: c_int, argv: *mut *mut c_char, settings: &ApplicationSettings ) -> ApplicationImpl;
+	fn initialize( argc: c_int, argv: *mut *mut c_char, settings: &ApplicationSettings ) -> CbwResult<ApplicationImpl>;
 	/// Runs the main loop.
 	/// This blocks until the application is exitting.
 	fn run( &self, on_ready: unsafe fn(ApplicationImpl, *mut ()), data: *mut () ) -> i32;
 }
 
-#[derive(Default)]
 pub struct ApplicationSettings {
+	pub engine_seperate_executable_path: Option<PathBuf>,
+	pub resource_dir: Option<String>
+}
+
+
+
+impl Default for ApplicationSettings {
+	fn default() -> Self {
+		Self {
+			engine_seperate_executable_path: None,
+			resource_dir: None
+		}
+	}
 }

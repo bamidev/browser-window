@@ -3,8 +3,10 @@ extern crate cc;
 extern crate pkg_config;
 
 use std::env;
+use std::ffi::{OsStr, OsString};
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
+use std::process::Command;
 
 
 
@@ -18,14 +20,14 @@ fn rerun_if_directory_changed<P>( _path: P ) where P: Into<PathBuf> {
 	let path: PathBuf = _path.into();
 
 	let dir_iterator = match fs::read_dir( &path ) {
-		Err(e) => panic!( format!("Unable to read directory: {}", e) ),
+		Err(e) => panic!( "Unable to read directory: {}", e ),
 		Ok( iterator ) => iterator
 	};
 
 	for sub_path in dir_iterator {
 
 		match sub_path {
-			Err(e) => panic!( format!("Unable to read directory entry for dir {}: {}", path.as_os_str().to_str().unwrap(), e) ),
+			Err(e) => panic!( "Unable to read directory entry for dir {}: {}", path.as_os_str().to_str().unwrap(), e ),
 			Ok( entry ) => {
 
 				if entry.path().is_dir() {
@@ -39,6 +41,59 @@ fn rerun_if_directory_changed<P>( _path: P ) where P: Into<PathBuf> {
 	}
 }
 
+fn to_executable_args<'a>( args: &'a [OsString] ) -> Vec<&'a OsStr> {
+	let ignore_args: [OsString; 1] = [
+		"-fPIC".into()
+	];
+
+	let mut new_args = Vec::with_capacity(args.len());
+
+	for arg in args {
+		if !(ignore_args.contains(arg)) {
+			new_args.push(arg.as_os_str());
+			eprintln!("ARG: {:?}", arg);
+		}
+	}
+
+	new_args
+}
+
+fn to_executable_compiler_command( tool: cc::Tool, library_args: &[OsString], source_file: &str, out_file: &Path ) -> Command {
+
+	let mut cmd = Command::new(tool.path());
+	cmd.args(to_executable_args(tool.args()));
+	
+	if tool.is_like_gnu() || tool.is_like_clang() {
+		let extra_args: [OsString; 5] = [
+			"-o".into(),
+			out_file.as_os_str().into(),
+			source_file.into(),
+			"-lcef_dll_wrapper".into(),
+			"-lcef".into()
+		];
+		cmd.args(&extra_args);
+	}
+	else if tool.is_like_msvc() {
+		let extra_args: [OsString; 5] = [
+			format!("/Fe:{}", out_file.to_str().unwrap()).into(),
+			source_file.into(),
+			"/link".into(),
+			"libcef_dll_wrapper.lib".into(),
+			"libcef.lib".into()
+		];
+		cmd.args(&extra_args);
+	}
+	else {
+		panic!("Compiler type not recognized for seperate executable.")
+	}
+
+	cmd.args(library_args);
+
+	return cmd;
+}
+
+
+
 fn main() {
 
 	println!("cargo:rerun-if-env-changed=CEF_PATH");
@@ -46,8 +101,18 @@ fn main() {
 
 	let target = env::var("TARGET").unwrap();
 	let out_path = PathBuf::from( env::var("OUT_DIR").expect("Unable to get output directory for C/C++ code base crate") );
+	let target_dir = out_path.parent().unwrap().parent().unwrap().parent().unwrap();
+	let backup_file = PathBuf::from( env::var("CARGO_MANIFEST_DIR").unwrap() + "/bindgen_backup.rs" );
+
+	// Workaround for docs.rs
+	// Docs.rs is not able to compile the C/C++ source files because it doesn't have the win32 and cef header files available in their docker system in which they test-build.
+	if let Ok(_) = env::var("DOCS_RS") {
+		fs::copy( &backup_file, out_path.join("c_bindings.rs") ).expect("Unable to copy backup c bindings");
+		return
+	}
 
 	let mut build = cc::Build::new();
+	let mut build_se = cc::Build::new();	// For seperate executable
 	let std_flag = if cfg!(feature = "cef") {
 		if target.contains("msvc") {
 			"/std:c++17"
@@ -90,16 +155,31 @@ fn main() {
 			.file("src/application/win32.c")
 			.file("src/window/win32.c")
 			.define("BW_WIN32", None)
-			.define("_CRT_SECURE_NO_WARNINGS", None);	// Disable sprintf_s warnings. sprintf_s tends to cause segfaults...
+			.define("_CRT_SECURE_NO_WARNINGS", None);	// Disable sprintf_s warnings. sprintf_s tends to cause segfaults anyway...
+
+		build_se
+			.define("BW_WIN32", None)
+			.define("_CRT_SECURE_NO_WARNINGS", None);
 	}
+	else if target.contains("macos") {
+		bgbuilder = bgbuilder.clang_arg("-DBW_MACOS");
+
+		build
+			.define("BW_MACOS", None);
+		build_se
+			.define("BW_MACOS", None);
+	}
+
 	// When opting for using GTK:
-	else if cfg!(feature = "gtk") {
+	if cfg!(feature = "gtk") {
 		bgbuilder = bgbuilder.clang_arg("-DBW_GTK");
 
 		// GTK source files
 		build
 			.file("src/application/gtk.c")
 			.file("src/window/gtk.c")
+			.define("BW_GTK", None);
+		build_se
 			.define("BW_GTK", None);
 
 		match pkg_config::Config::new().atleast_version("3.0").arg("--cflags").probe("gtk+-3.0") {
@@ -114,11 +194,13 @@ fn main() {
 		}
 	}
 	// Non-windows systems that opt for using CEF, use CEF's own internal windowing features
-	else if cfg!(feature = "cef") {
+	else if cfg!(feature = "cef") && !target.contains("windows") {
 		bgbuilder = bgbuilder.clang_arg("-DBW_CEF_WINDOW");
 		build
 			.file("src/application/cef_window.cpp")
 			.file("src/window/cef.cpp")
+			.define("BW_CEF_WINDOW", None);
+		build_se
 			.define("BW_CEF_WINDOW", None);
 	}
 
@@ -129,6 +211,9 @@ fn main() {
 		bgbuilder = bgbuilder.clang_arg("-DBW_CEF");
 
 		build.flag_if_supported("-Wno-unused-parameter");	// CEF's header files produce a lot of unused parameters warnings.
+		build_se.flag_if_supported("-Wno-unused-parameter");
+		let mut build_se_lib_args = Vec::<OsString>::new();
+
 		match env::var("CEF_PATH") {
 			Err(e) => {
 				match e {
@@ -144,6 +229,7 @@ fn main() {
 			},
 			Ok(cef_path) => {
 				build.include(&cef_path);
+				build_se.include(&cef_path);
 
 				// Link with CEF
 				println!("cargo:rustc-link-search={}/libcef_dll_wrapper", &cef_path);
@@ -153,10 +239,17 @@ fn main() {
 					println!("cargo:rustc-link-search={}/libcef_dll_wrapper/Release", &cef_path);
 					println!("cargo:rustc-link-lib=static=libcef_dll_wrapper");
 					println!("cargo:rustc-link-lib=dylib={}", "libcef");
+
+					build_se_lib_args.push(format!("/LIBPATH:{}", &cef_path).into());
+					build_se_lib_args.push(format!("/LIBPATH:{}/libcef_dll_wrapper", &cef_path).into());
+					build_se_lib_args.push(format!("/LIBPATH:{}/libcef_dll_wrapper/Release", &cef_path).into());
+					build_se_lib_args.push(format!("/LIBPATH:{}/Release", &cef_path).into());
 				} else {
-					// cef_dll_wrapper is a static lib, but for some reason it doesn't
 					println!("cargo:rustc-link-lib=static={}", "cef_dll_wrapper");
 					println!("cargo:rustc-link-lib=dylib={}", "cef");
+
+					build_se_lib_args.push(format!("-L{}/libcef_dll_wrapper", &cef_path).into());
+					build_se_lib_args.push(format!("-L{}/Release", &cef_path).into());
 				}
 
 				// Add X flags to compiler
@@ -166,7 +259,8 @@ fn main() {
 		
 						// Includes
 						for inc in &result.include_paths {
-							build.include( inc );
+							build.include(inc);
+							build_se.include(inc);
 						}
 					}
 				}
@@ -183,6 +277,30 @@ fn main() {
 			.file("src/cef/util.cpp")
 			.define("BW_CEF", None)
 			.cpp(true);
+
+		// Build the seperate executable and copy it to target/debug (or target/release)
+		build_se
+			.define("BW_CEF", None)
+			.cpp(true)
+			.flag(std_flag);
+		let se_comp = build_se.get_compiler();
+
+		for var in se_comp.env() {
+			env::set_var(&var.0, &var.1);
+		}
+
+		let se_file = if !target.contains("windows") { out_path.join("browser-window-se") } else { out_path.join("browser-window-se.exe") };
+		let mut se_cmd = to_executable_compiler_command(se_comp, &*build_se_lib_args, "src/cef/seperate_executable.cpp", &se_file);
+
+		let status = se_cmd.status().expect("unable to get status of seperate executable compiler");
+		assert!(status.code().unwrap() == 0, "Seperate executable compiler failed with error code {}.", status.code().unwrap());
+
+		if !target.contains("windows") {
+			fs::copy( se_file, target_dir.join("browser-window-se") ).expect("unable to copy seperate executable");
+		}
+		else {
+			fs::copy( se_file, target_dir.join("browser-window-se.exe") ).expect("unable to copy seperate executable");
+		}
 	}
 
 
@@ -190,30 +308,24 @@ fn main() {
 	/**************************************
 	 *	All other source files
 	 **************************************/
-	// If this is being build by docs.rs, don't do anything.
-	// docs.rs is not able to compile the C/C++ source files because it doesn't have the win32 and cef header files available in their docker system in which they test-build.
-	if let Err(_) = env::var("DOCS_RS") {
-		build
-			.file("src/application/common.c")
-			.file("src/browser_window/common.c")
-			.file("src/err.c")
-			.file("src/string.c")
-			.file("src/window/common.c")
-			.flag( std_flag )
-			.compile("browser_window_c");
-	}
+	build
+		.file("src/application/common.c")
+		.file("src/browser_window/common.c")
+		.file("src/err.c")
+		.file("src/string.c")
+		.file("src/window/common.c")
+		.flag( std_flag )
+		.compile("browser-window-c");
 
 	// Let bindgen generate the bindings
 	bgbuilder
 		.generate().expect("Unable to generate FFI bindings!")
 		.write_to_file( out_path.join("c_bindings.rs") ).expect("Unable to write FFI bindings to file!");
 
-	// Copy our lib to a known location so that browser-window-ffi can link to it.
-	// Apparently, Rust is unwilling to link the this lib, probably since this crates' crate-type is set to "staticlib", which is a C static lib.
-	//let filename = match target.contains("windows") { true => "browser_window_c.lib", false => "libbrowser_window_c.a" };
-	//let mut temp_path = env::temp_dir();
-	//temp_path.push( filename );
-	//s::copy( out_path.join( filename ), temp_path ).expect( &format!("Unable to copy {}", filename ) );
+	// Update bindgen backup
+	if let Ok(_) = env::var("UPDATE_BINDGEN_BACKUP") {
+		fs::copy( out_path.join("c_bindings.rs"), backup_file ).expect("Unable to copy backup file");
+	}
 }
 
 

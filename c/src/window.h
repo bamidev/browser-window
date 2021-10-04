@@ -87,7 +87,7 @@ bw_Pos2D bw_Window_getPosition( bw_Window* window );
 
 /// Copies as many bytes into `title` that fit in there.
 /// Returns the number of characters the title actually has.
-size_t bw_Window_getTitle( bw_Window* window, bw_StrSlice title );
+size_t bw_Window_getTitle( bw_Window* window, char** title );
 
 /// Gets the width and height of the window including the title bar and borders.
 bw_Dims2D bw_Window_getWindowDimensions( bw_Window* window );

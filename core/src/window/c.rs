@@ -11,7 +11,10 @@ use crate::{
 	prelude::*
 };
 
-use std::ptr;
+use std::{
+	os::raw::c_char,
+	ptr
+};
 
 
 
@@ -74,7 +77,7 @@ impl WindowExt for WindowImpl {
 	}
 
 	fn get_content_dimensions( &self ) -> Dims2D {
-		unsafe { cbw_Window_getContentDimensions( self.inner ) }
+		unsafe { Dims2D(cbw_Window_getContentDimensions( self.inner )) }
 	}
 
 	fn get_opacity( &self ) -> u8 {
@@ -82,24 +85,25 @@ impl WindowExt for WindowImpl {
 	}
 
 	fn get_position( &self ) -> Pos2D {
-		unsafe { cbw_Window_getPosition( self.inner ) }
+		unsafe { Pos2D(cbw_Window_getPosition( self.inner )) }
 	}
 
 	fn get_title( &self ) -> String {
 		// First obtain string size
-		let buf_len = unsafe { cbw_Window_getTitle( self.inner, cbw_StrSlice::empty() ) };
+		println!("get_title");
+		let mut buf: *mut c_char = ptr::null_mut();
+		let buf_len = unsafe { cbw_Window_getTitle( self.inner, &mut buf) };
 
-		// Allocate buffer and copy string into it
-		let mut buf = vec![0u8; buf_len as _];
-		let slice = cbw_StrSlice { len: buf_len as _, data: buf.as_mut_ptr() as _ };
-		unsafe { cbw_Window_getTitle( self.inner, slice ) };
+		let slice = cbw_StrSlice { data: buf, len: buf_len };
+
+		unsafe { cbw_string_freeCstr(buf) };
 
 		// Convert to String
 		slice.into()
 	}
 
 	fn get_window_dimensions( &self ) -> Dims2D {
-		unsafe { cbw_Window_getWindowDimensions( self.inner ) }
+		unsafe { Dims2D(cbw_Window_getWindowDimensions( self.inner )) }
 	}
 
 	fn hide( &self ) {
@@ -107,7 +111,7 @@ impl WindowExt for WindowImpl {
 	}
 
 	fn set_content_dimensions( &self, dimensions: Dims2D ) {
-		unsafe { cbw_Window_setContentDimensions( self.inner, dimensions ) }
+		unsafe { cbw_Window_setContentDimensions( self.inner, dimensions.0 ) }
 	}
 
 	fn set_opacity( &self, opacity: u8 ) {
@@ -115,7 +119,7 @@ impl WindowExt for WindowImpl {
 	}
 
 	fn set_position( &self, position: Pos2D ) {
-		unsafe { cbw_Window_setPosition( self.inner, position ) }
+		unsafe { cbw_Window_setPosition( self.inner, position.0 ) }
 	}
 
 	fn set_title( &self, title: &str ) {
@@ -124,7 +128,7 @@ impl WindowExt for WindowImpl {
 	}
 
 	fn set_window_dimensions( &self, dimensions: Dims2D ) {
-		unsafe { cbw_Window_setWindowDimensions( self.inner, dimensions ) }
+		unsafe { cbw_Window_setWindowDimensions( self.inner, dimensions.0 ) }
 	}
 
 	fn show( &self ) {

@@ -29,15 +29,16 @@ void bw_Application_finish( bw_Application* app ) {
 	bw_ApplicationImpl_finish( &app->impl );
 }
 
-bw_Application* bw_Application_initialize( int argc, char** argv, const bw_ApplicationSettings* settings ) {
+bw_Err bw_Application_initialize( bw_Application** app, int argc, char** argv, const bw_ApplicationSettings* settings ) {
 
-	bw_Application* app = (bw_Application*)malloc( sizeof( bw_Application ) );
-	app->windows_alive = 0;
+	*app = (bw_Application*)malloc( sizeof( bw_Application ) );
+	(*app)->windows_alive = 0;
 
-	app->engine_impl = bw_ApplicationEngineImpl_initialize( app, argc, argv, settings );
-	app->impl = bw_ApplicationImpl_initialize( app, argc, argv, settings );
+	bw_Err error = bw_ApplicationEngineImpl_initialize( &(*app)->engine_impl, (*app), argc, argv, settings );
+	if (BW_ERR_IS_FAIL(error))	return error;
+	(*app)->impl = bw_ApplicationImpl_initialize( (*app), argc, argv, settings );
 
-	return app;
+	BW_ERR_RETURN_SUCCESS;
 }
 
 BOOL bw_Application_dispatch( bw_Application* app, bw_ApplicationDispatchFn func, void* data ) {

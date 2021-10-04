@@ -14,10 +14,16 @@ void bw_Application_assertCorrectThread( const bw_Application* app ) {
 }
 
 void bw_Application_exit( bw_Application* app, int exit_code ) {
+	bw_Application_assertCorrectThread( app );
+
 	app->impl.exit_code = exit_code;
 	app->impl.is_running = false;
 
 	CefQuitMessageLoop();
+}
+
+void bw_Application_exitAsync( bw_Application* app, int exit_code ) {
+	CefPostTask( TID_UI, base::Bind( &bw_Application_exit, app, exit_code ));
 }
 
 void bw_ApplicationImpl_dispatchHandler( bw_Application* app, bw_ApplicationDispatchData* data ) {
@@ -38,6 +44,8 @@ void bw_ApplicationImpl_finish( bw_ApplicationImpl* app ) {
 }
 
 int bw_ApplicationImpl_run( bw_Application* app, bw_ApplicationImpl_ReadyHandlerData* ready_handler_data ) {
+	bw_Application_assertCorrectThread( app );
+
 	app->impl.exit_code = 0;
 	app->impl.is_running = true;
 

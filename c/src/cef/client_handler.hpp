@@ -14,9 +14,9 @@
 
 
 struct ExternalInvocationHandlerData {
-    bw_BrowserWindow* bw;
-    std::string cmd;
-    std::vector<std::string> params;
+	bw_BrowserWindow* bw;
+	std::string cmd;
+	std::vector<std::string> params;
 };
 
 class ClientHandler : public CefClient, public CefLifeSpanHandler {
@@ -86,9 +86,9 @@ protected:
 		// Store a link with the cef browser handle and our handle in a global map
 		bw::bw_handle_map.store( *cef_ptr, bw_handle );
 
-        // Open dev-tools window
-        if ( dev_tools_enabled )
-            this->openDevTools( bw_handle, browser->GetHost() );
+		// Open dev-tools window
+		if ( dev_tools_enabled )
+			this->openDevTools( bw_handle, browser->GetHost() );
 
 		// Invoke the completion callback
 		callback( bw_handle, callback_data );
@@ -185,14 +185,14 @@ protected:
 	void openDevTools( bw_BrowserWindow* bw, const CefRefPtr<CefBrowserHost>& host ) {
 #ifdef BW_WIN32
 
-        CefRefPtr<CefClient> client;
-        CefBrowserSettings settings;
-        CefPoint point;
+		CefRefPtr<CefClient> client;
+		CefBrowserSettings settings;
+		CefPoint point;
 
-	    CefWindowInfo info;
-	    info.SetAsPopup( bw->window->impl.handle, "Dev Tools" );
+		CefWindowInfo info;
+		info.SetAsPopup( bw->window->impl.handle, "Dev Tools" );
 
-	    host->ShowDevTools( info, client, settings, point );
+		host->ShowDevTools( info, client, settings, point );
 #endif
 
 		// FIXME: Implement dev tools for non windows systems

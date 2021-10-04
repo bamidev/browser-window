@@ -29,7 +29,7 @@ void bw_win32_print_error( DWORD code ) {
 		NULL
 	);
 
-	fwprintf(stderr, L"win32 assertion [%i]: %s\n", code, msg);
+	fwprintf(stderr, L"win32 error [%i]: %s\n", code, msg);
 
 	// TODO: Print stack trace
 }

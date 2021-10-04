@@ -1,6 +1,6 @@
 [package]
 name = "browser-window"
-version = "0.5.1"
+version = "0.6.0"
 description = "A simple async/await aware browser (GUI) toolkit."
 edition = "2018"
 authors = ["Danny de Jong"]
@@ -9,7 +9,8 @@ publish = true
 keywords = ["browser", "chromium", "electron", "gui", "webview"]
 categories = ["asynchronous", "gui", "web-programming"]
 readme = "README.md"
-repository = "https://github.com/bamilab/browser-window"
+repository = "https://docs.rs/browser-window/"
+documentation = "https://bamilab.github.io/browser-window/browser_window/"
 
 [features]
 default = ["cef"]
@@ -21,18 +22,22 @@ threadsafe = []
 name = "browser_window"
 path = "src/lib.rs"
 
+[[example]]
+name = "terminal"
+path = "examples/terminal.rs"
+
 [dependencies]
-browser-window-core = { path = "./core", version = "0.0.1", features = [ "cef" ] }
+browser-window-core = { path = "./core", version = "0.1.0", features = [ "cef" ] }
 futures-channel = { version = "^0.3" }
 lazy_static = "1"
 unsafe-send-sync = "^0.1"
 
 [dev-dependencies]
-tokio = { version = "^0.3", features = [ "rt-multi-thread" ] }
+serde_json = "^1.0"
+tokio = { version = "^1.0", features = ["rt", "rt-multi-thread"] }
 
 [package.metadata.docs.rs]
 all-features = true
-default-target = "x86_64-pc-windows-msvc"
 
 [workspace]
-members = ["c", "core", "example"]
+members = ["c", "core"]

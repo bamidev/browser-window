@@ -1,25 +1,20 @@
 #ifndef BW_BROWSER_WINDOW_H
 #define BW_BROWSER_WINDOW_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef BW_CEF
 #include "browser_window/cef.h"
 #else
 #error Unsupported engine
 #endif
 
-
-
-
 #include "application.h"
 #include "err.h"
 #include "string.h"
 #include "window.h"
-
-
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include <stdint.h>
 

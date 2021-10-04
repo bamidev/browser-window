@@ -20,13 +20,16 @@ use crate::window::*;
 use browser_window_core::browser_window::{BrowserWindowExt, BrowserWindowImpl, JsEvaluationError};
 use browser_window_core::window::WindowExt;
 
+#[cfg(feature = "threadsafe")]
+use unsafe_send_sync::UnsafeSend;
+
+
+
 mod builder;
 
 pub use builder::{BrowserWindowBuilder, Source};
 
 
-//type BrowserJsCallbackData<'a> = Box<dyn FnOnce(Browser, Result<String, JsEvaluationError>) + 'a>;
-//type BrowserJsThreadedCallbackData<'a> = SendBoxFnOnce<'a,(BrowserHandle, Result<String, JsEvaluationError>),()>;
 
 /// The future that dispatches a closure on the GUI thread.
 #[cfg(feature = "threadsafe")]
@@ -44,13 +47,37 @@ pub struct BrowserWindow {
 	_not_send: PhantomData<Rc<()>>
 }
 
+/// **Note:** Only available with feature `threadsafe` enabled.
+///
 /// A thread-safe handle to a browser window.
-/// It allows you to dispatch code to the GUI thread.
-// It provides the same functionality as `BrowserWindow`.
-// However, each function is async: it runs on the GUI thread, and returns when it is done.
+/// It allows you to dispatch code to the GUI thread and obtain manipulate the browser window from any thread.
+/// To do this, you will need to use the functions `dispatch`, `dispatch_async`, `delegate` and `delegate_async`.
+///
+/// # Example
+///
+/// This example fetches a value from within JavaScript:
+/// ```
+/// use browser_window::application::*;
+/// use browser_window::browser::*;
+///
+/// async fn get_cookies( app: ApplicationHandleThreaded ) -> String {
+///
+///     let bw: BrowserWindowThreaded = builder.build( app );
+/// 
+///     // Waits for `eval_js` to give back its result from the GUI thread
+///     let result = bw.delegate_async( |handle| async move {
+///         // Execute `eval_js` on the GUI thread
+///         handle.eval_js("document.cookies").await
+///     } ).await.expect("Unable to delegate code!");
+///
+///     result.expect("Unable to evaluate JavaScript!")
+/// }
+/// ```
+#[cfg(feature = "threadsafe")]
 pub struct BrowserWindowThreaded {
 	pub(in super) handle: BrowserWindowHandle
 }
+#[cfg(feature = "threadsafe")]
 unsafe impl Sync for BrowserWindowThreaded {}
 
 /// This is a handle to an existing browser window.
@@ -67,13 +94,6 @@ pub trait OwnedBrowserWindow: OwnedWindow {
 
 
 impl BrowserWindow {
-
-	/*fn from_ffi_handle( ptr: *mut bw_BrowserWindow ) -> Self {
-		Self {
-			handle: BrowserWindowHandle::new( ptr ),
-			_not_send: PhantomData
-		}
-	}*/
 
 	fn new( handle: BrowserWindowHandle ) -> Self {
 		Self {
@@ -196,10 +216,10 @@ impl BrowserWindowThreaded {
 	/// Also see `ApplicationThreaded::delegate`.
 	///
 	/// The function signature is practically the same as:
-	/// ```rust
+	/// ```ignore
 	/// pub async fn delegate<'a,F,R>( &self, func: F ) -> Result<R, DelegateError> where
 	/// 	F: FnOnce( BrowserWindowHandle ) -> R + Send + 'a,
-	/// 	R: Send { //...
+	/// 	R: Send { /*...*/ }
 	/// ```
 	pub fn delegate<'a,F,R>( &self, func: F ) -> BrowserDelegateFuture<'a,R> where
 		F: FnOnce( BrowserWindowHandle ) -> R + Send + 'a,
@@ -221,6 +241,16 @@ impl BrowserWindowThreaded {
 		})
 	}
 
+	/// Executes the given future on the GUI thread, and gives back the result when done.
+	/// Also see `ApplicationThreaded::delegate_future`.
+	pub fn delegate_future<'a,F,R>( &self, fut: F ) -> DelegateFutureFuture<'a,R> where
+		F: Future<Output=R> + Send + 'a,
+		R: Send + 'static
+	{
+		let handle = self.handle.clone();
+		DelegateFutureFuture::new( self.app().handle.clone(), fut )
+	}
+
 	/// Executes the given close on the GUI thread.
 	/// See also `Application::dispatch`.
 	pub fn dispatch<'a,F>( &self, func: F ) -> bool where
@@ -228,25 +258,24 @@ impl BrowserWindowThreaded {
 	{
 		let handle = UnsafeSend::new( self.handle );
 
-		self.app().dispatch(move |_| {
+		// FIXME: It is more efficient to reimplement this for the browser window
+		self.app().dispatch(move |_| { eprintln!("HOIH");
 			func( handle.i );
 		})
 	}
 
-	/*fn _eval_js<'a,H>( &self, js: &str, on_complete: H ) where
-		H: FnOnce( BrowserWindowHandle, Result<String, JsEvaluationError> ) + Send + 'a
+	/// Executes the given closure on the GUI thread.
+	/// See also `Application::dispatch`.
+	pub fn dispatch_async<'a,C,F>( &self, func: C ) -> bool where
+		C:  FnOnce( BrowserWindowHandle ) -> F + Send + 'a,
+		F: Future<Output=()> + 'static
 	{
-		let data_ptr: *mut H = Box::into_raw(
-			Box::new( on_complete )
-		);
+		let handle = UnsafeSend::new( self.handle );
 
-		unsafe { bw_BrowserWindow_evalJsThreaded(
-			self.handle.ffi_handle,
-			js.into(),
-			ffi_eval_js_threaded_callback::<H>,
-			data_ptr as _
-		) };
-	}*/
+		self.app().dispatch(move |a| {
+			a.spawn( func( handle.i ) );
+		})
+	}
 
 	fn new( handle: BrowserWindowHandle ) -> Self {
 		Self {
@@ -255,6 +284,7 @@ impl BrowserWindowThreaded {
 	}
 }
 
+#[cfg(feature = "threadsafe")]
 impl HasAppHandle for BrowserWindowThreaded {
 
 	fn app_handle( &self ) -> ApplicationHandle {
@@ -262,12 +292,14 @@ impl HasAppHandle for BrowserWindowThreaded {
 	}
 }
 
+#[cfg(feature = "threadsafe")]
 impl OwnedWindow for BrowserWindowThreaded {
 	fn window_handle( &self ) -> WindowHandle {
 		self.handle.window()
 	}
 }
 
+#[cfg(feature = "threadsafe")]
 impl OwnedBrowserWindow for BrowserWindowThreaded {
 	fn browser_handle( &self ) -> BrowserWindowHandle {
 		self.handle.clone()
@@ -304,23 +336,6 @@ impl HasAppHandle for BrowserWindowHandle {
 
 
 
-/// Callback for dropping a browser window.
-/// This gets dispatch to the GUI thread when a `BrowserWindowThreaded` handle gets dropped.
-/*unsafe extern "C" fn ffi_free_browser_window( _app: *mut bw_Application, data: *mut c_void ) {
-	bw_BrowserWindow_drop( data as *mut bw_BrowserWindow );
-}*/
-
-/*unsafe extern "C" fn ffi_eval_js_callback<H>( bw: *mut bw_BrowserWindow, cb_data: *mut c_void, _result: *const c_char, error: *const bw_Err ) where
-	H: FnOnce(BrowserWindowHandle, Result<String, JsEvaluationError>)
-{
-	let data_ptr = cb_data as *mut H;
-	let data = Box::from_raw( data_ptr );
-
-	let (handle, result) = eval_js_callback_result( bw, _result, error );
-
-	(*data)( handle, result );
-}*/
-
 unsafe fn eval_js_callback<H>( _handle: BrowserWindowImpl, cb_data: *mut (), result: Result<String, JsEvaluationError> ) where
 	H: FnOnce(BrowserWindowHandle, Result<String, JsEvaluationError>)
 {
@@ -331,40 +346,3 @@ unsafe fn eval_js_callback<H>( _handle: BrowserWindowImpl, cb_data: *mut (), res
 
 	(*data)( handle, result );
 }
-
-/*unsafe fn ffi_eval_js_callback_result(
-	bw: *mut bw_BrowserWindow,
-	result: *const c_char,
-	error: *const bw_Err
-) -> ( BrowserWindowHandle, Result<String, JsEvaluationError> ) {
-
-
-	// Construct a result value depending on whether the result or error parameters are set
-	let result_val: Result<String, JsEvaluationError> = if error.is_null() {
-		let result_str = CStr::from_ptr( result ).to_string_lossy().to_owned().to_string();
-		Ok( result_str )
-	}
-	else {
-		Err( JsEvaluationError::new( error ) )
-	};
-
-	let handle = BrowserWindowHandle::new( bw );
-
-	// return
-	( handle, result_val )
-}*/
-
-// Callback for catching JavaScript results.
-//
-// # Warning
-// This may get invoked from another thread than the GUI thread, depending on the implementation of the browser engine.
-/*unsafe extern "C" fn ffi_eval_js_threaded_callback<H>( bw: *mut bw_BrowserWindow, cb_data: *mut c_void, _result: *const c_char, error: *const bw_Err ) where
-	H: FnOnce(BrowserHandle, Result<String, JsEvaluationError>) + Send
-{
-	let data_ptr = cb_data as *mut H;
-	let data = Box::from_raw( data_ptr );
-
-	let (handle, result) = ffi_eval_js_callback_result( bw, _result, error );
-
-	(*data)( handle, result );
-}*/

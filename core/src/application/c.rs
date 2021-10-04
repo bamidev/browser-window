@@ -3,9 +3,15 @@
 
 use super::{ApplicationExt, ApplicationSettings};
 
-use crate::prelude::*;
+use crate::{
+	error::*,
+	prelude::*
+};
 
-use std::os::raw::{c_char, c_int, c_void};
+use std::{
+	os::raw::{c_char, c_int, c_void},
+	ptr
+};
 
 
 
@@ -43,17 +49,27 @@ impl ApplicationExt for ApplicationImpl {
 		unsafe { cbw_Application_finish( self.inner ) }
 	}
 
-	fn initialize( argc: c_int, argv: *mut *mut c_char, _settings: &ApplicationSettings ) -> Self {
+	fn initialize( argc: c_int, argv: *mut *mut c_char, _settings: &ApplicationSettings ) -> CbwResult<Self> {
 
-		let c_settings = cbw_ApplicationSettings {
-			resource_dir: "".into()
+		let exec_path: &str = match _settings.engine_seperate_executable_path.as_ref() {
+			None => "",
+			Some(path) => path.to_str().unwrap()
 		};
 
-		let c_handle = unsafe { cbw_Application_initialize( argc, argv, &c_settings ) };
+		let c_settings = cbw_ApplicationSettings {
+			engine_seperate_executable_path: exec_path.into(),
+			resource_dir: _settings.resource_dir.as_ref().unwrap_or(&"".to_owned()).as_str().into()
+		};
 
-		Self {
-			inner: c_handle
+		let mut c_handle: *mut cbw_Application = ptr::null_mut();
+		let c_err = unsafe { cbw_Application_initialize( &mut c_handle, argc, argv, &c_settings ) };
+		if c_err.code != 0 {
+			return Err( c_err.into() )
 		}
+
+		Ok(Self {
+			inner: c_handle
+		})
 	}
 
 	fn run( &self, on_ready: unsafe fn( ApplicationImpl, *mut () ), _data: *mut () ) -> i32 {

@@ -55,13 +55,13 @@ bw_Pos2D bw_Window_getPosition( bw_Window* window ) {
 	return pos;
 }
 
-size_t bw_Window_getTitle( bw_Window* window, bw_StrSlice title ) {
+size_t bw_Window_getTitle( bw_Window* window, char** title ) {
 
 	// First get the length of the window title
 	int length = GetWindowTextLengthW( window->impl.handle );
 	BW_WIN32_ASSERT_SUCCESS;
 
-	if ( length > 0 && title.len > 0 ) {
+	if ( length > 0 ) {
 		WCHAR* buffer = (WCHAR*)malloc( sizeof(WCHAR) * (length + 1) );
 
 		// Copy string
@@ -71,11 +71,8 @@ size_t bw_Window_getTitle( bw_Window* window, bw_StrSlice title ) {
 			BW_WIN32_PANIC_LAST_ERROR;
 		}
 
-		// Copy into our slice
-		char* utf8_str;
-		bw_win32_copyAsNewUtf8Str( buffer, &utf8_str );
-		memcpy( title.data, utf8_str, length );
-		free( utf8_str );
+		size_t l = bw_win32_copyAsNewUtf8Str( buffer, title );
+		BW_ASSERT(length == l, "UTF-8 string length is invalid")
 	}
 
 	return length;

@@ -33,13 +33,15 @@ typedef bw_ApplicationDispatchFn bw_ApplicationReadyFn;
 #include "application/cef.h"
 #else
 typedef struct {} bw_ApplicationEngineImpl;
-//#error Unsupported engine
 #endif
 
 #else
 typedef struct {} bw_ApplicationImpl;
 typedef struct {} bw_ApplicationEngineImpl;
 #endif
+
+#include "err.h"
+
 
 
 struct bw_Application {
@@ -57,6 +59,7 @@ typedef struct {
 } bw_ApplicationDispatchData;
 
 typedef struct {
+	bw_CStrSlice engine_seperate_executable_path;
 	bw_CStrSlice resource_dir;
 } bw_ApplicationSettings;
 
@@ -94,7 +97,7 @@ void bw_Application_free( bw_Application* app );
 /// Initializes browser window.
 /// Starts up browser engine process(es).
 /// Returns an application handle.
-bw_Application* bw_Application_initialize( int argc, char** argv, const bw_ApplicationSettings* settings );
+bw_Err bw_Application_initialize( bw_Application** application, int argc, char** argv, const bw_ApplicationSettings* settings );
 
 BOOL bw_Application_isRunning( const bw_Application* app );
 

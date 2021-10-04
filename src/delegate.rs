@@ -1,5 +1,4 @@
 use super::application::{ApplicationHandle, HasAppHandle};
-use browser_window_c::*;
 use std::boxed::Box;
 use std::future::Future;
 use std::mem;
@@ -42,15 +41,6 @@ pub enum DelegateError {
 	/// The delegated closure has panicked.
 	ClosurePanicked
 }
-
-/// This future executes a async closure on the GUI thread and returns the result.
-/*pub struct DelegateAsyncFuture<'a,H,F,R> {
-	handle: H,
-	func: Option<Box<dyn FnOnce( H ) -> F + Send + 'a>>,
-	fut: Option<Pin<Box<dyn Future<Output=R>>>>,
-	result: Option<Result<R, DelegateError>>
-}
-impl<'a,H,G,R> Unpin for DelegateAsyncFuture<'a,H,G,R> {}*/
 
 /// This future executes a closure on the GUI thread and returns the result.
 pub struct DelegateFuture<'a,H,R> where

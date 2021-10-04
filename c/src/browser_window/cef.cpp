@@ -13,6 +13,7 @@
 #include <include/cef_browser.h>
 #include <include/cef_client.h>
 #include <include/cef_v8.h>
+#include <include/views/cef_browser_view.h>
 #include <include/views/cef_window.h>
 
 #ifdef BW_GTK
@@ -36,7 +37,6 @@
 
 
 
-void bw_BrowserWindowCef_connectToCefWindow( bw_BrowserWindow* bw, CefWindowInfo& info, int width, int height );
 void bw_BrowserWindowCef_connectToGtkWindow( bw_BrowserWindow* bw, CefWindowInfo& info, int width, int height );
 void bw_BrowserWindowCef_connectToWin32Window( bw_BrowserWindow* bw, CefWindowInfo& info, int width, int height );
 
@@ -87,18 +87,6 @@ void bw_BrowserWindow_evalJsThreaded( bw_BrowserWindow* bw, bw_CStrSlice js, bw_
 	bw_BrowserWindow_evalJs( bw, js, cb, user_data );
 }
 
-#ifdef BW_CEF_WINDOW
-void bw_BrowserWindowCef_connectToCefWindow( bw_BrowserWindow* bw, CefWindowInfo& info, int width, int height ) {
-
-	CefRefPtr<CefWindow> window = *(CefRefPtr<CefWindow>*)bw->window->impl.handle_ptr;
-
-	CefRect rect( 0, 0, width, height );
-	BW_DEBUG("W %i H %i", width, height)
-
-	info.SetAsChild( window->GetWindowHandle(), rect );
-}
-#endif
-
 #ifdef BW_GTK
 void bw_BrowserWindowCef_connectToGtkWindow( bw_BrowserWindow* bw, CefWindowInfo& info, int width, int height ) {
 #ifdef CEF_X11
@@ -133,7 +121,7 @@ void bw_BrowserWindowCef_connectToWindow( bw_BrowserWindow* bw, CefWindowInfo& i
 #elif defined(BW_GTK)
 	bw_BrowserWindowCef_connectToGtkWindow( bw, info, width, height );
 #elif defined(BW_CEF_WINDOW)
-	bw_BrowserWindowCef_connectToCefWindow( bw, info, width, height );
+	// Nothing to do here...
 #else
 #error No supported windowing API implementation available
 #endif
@@ -178,7 +166,8 @@ void bw_BrowserWindowImpl_new(
 	// Set up a CefString with the source
 	CefString source_string;
 	if ( !source.is_html ) {
-		source_string = CefString( std::string( source.data.data, source.data.len ) );
+		std::string url = "file:///" + std::string( source.data.data, source.data.len );
+		source_string = CefString( url );
 	}
 	else {
 		std::string data = "data:text/html,";
@@ -210,8 +199,16 @@ void bw_BrowserWindowImpl_new(
 	
 	// Create the browser
 	CefRefPtr<CefClient>* cef_client = (CefRefPtr<CefClient>*)browser->window->app->engine_impl.cef_client;
-	bool success = CefBrowserHost::CreateBrowser( info, *cef_client, source_string, settings, dict, NULL );
+#ifndef BW_CEF_WINDOW
+	bool success = CefBrowserHost::CreateBrowser( info, *cef_client, source_string, settings, dict, nullptr );
 	BW_ASSERT( success, "CefBrowserHost::CreateBrowser failed!\n" );
+#else
+	// CefBrowserHoset::CreateBrowser doesn't work well with Cefwindow, so we use the CefBrowserView
+	CefRefPtr<CefBrowserView> browser_view = CefBrowserView::CreateBrowserView( *cef_client, source_string, settings, dict, nullptr, nullptr );
+	CefRefPtr<CefWindow>* window = (CefRefPtr<CefWindow>*)browser->window->impl.handle_ptr;
+	(*window)->AddChildView(browser_view);
+#endif
+
 	browser->impl = bw;
 }
 

@@ -5,8 +5,6 @@ mod builder;
 use super::prelude::*;
 use super::event::Event;
 
-use browser_window_core::prelude::*;
-
 
 
 pub use builder::WindowBuilder;
@@ -82,6 +80,8 @@ prop! { /// Gets or sets the opacity of the window.
         /// An opacity of 255 means the window is invisible.
         /// An opacity of 0 means the window is completely visible.
         /// Anything in between makes the window transparent.
+        /// 
+        /// This feature only works on Windows.
 	Opacity<u8>( this: WindowHandle ) {
 		get => this.inner.get_opacity(),
 		set(val) => this.inner.set_opacity( val )

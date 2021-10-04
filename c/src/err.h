@@ -20,6 +20,11 @@ typedef struct bw_Err {
 
 #define BW_ERR_CODE_SUCCESS 0
 
+#define BW_ERR_IS_FAIL(ERROR) \
+	(ERROR).code != BW_ERR_CODE_SUCCESS
+#define BW_ERR_IS_OK(ERROR) \
+	(ERROR).code == BW_ERR_CODE_SUCCESS
+
 #define BW_ERR_RETURN( CODE, DATA_PTR, MESSAGE_FUNC ) \
 	{ bw_Err r; r.code = CODE; r.data = (const void*)DATA_PTR; r.alloc_message = MESSAGE_FUNC; return r; }
 
@@ -49,6 +54,7 @@ void bw_Err_free( bw_Err* err );
 // The alloc_message pointer will return the same message as given here.
 bw_Err bw_Err_new_with_msg( bw_ErrCode code, const char* msg );
 
+char* bw_Err_message(const bw_Err* error);
 
 
 

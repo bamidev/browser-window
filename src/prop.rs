@@ -5,7 +5,7 @@
 //! There is no memory unsafety caused by any of this.
 //!
 //! # Usage
-//! ```rust
+//! ```ignore
 //! use std::cell::Cell;
 //! use std::ffi::OsString;
 //!
@@ -35,7 +35,7 @@
 //!
 //! Then we have it.
 //! The property now can be accessed like this:
-//! ```rust
+//! ```ignore
 //! let my_struct = MyStruct { Cell::new( OsString::new() ) };
 //! let string = my_struct.my_property().get();
 //! string.push_str("something");
@@ -74,6 +74,7 @@ macro_rules! _prop_internal {
 
 /// A macro to define a so called 'property'.
 /// Kind of similar to how C# properties work.
+#[doc(hidden)]
 #[macro_export]
 macro_rules! prop {
 	( $(#[$metas:meta])* $name:ident<$type:ty>( $this:ident: $stype:ty ) { get => $get:expr, set( $val:ident ) => $set:expr } ) => {
@@ -95,6 +96,7 @@ macro_rules! prop {
 
 /// A macro to implement the property for a struct.
 #[macro_export]
+#[doc(hidden)]
 macro_rules! impl_prop {
 	( $name:ident: $property:ident ) => {
 		fn $name<'a>( &'a self ) -> $property { $property { parent: self } }
