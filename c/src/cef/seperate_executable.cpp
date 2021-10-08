@@ -21,7 +21,11 @@ int main(int argc, char* argv[]) {
 
 	// Structure for passing command-line arguments.
 	// The definition of this structure is platform-specific.
+#ifndef BW_WIN32
 	CefMainArgs main_args(argc, argv);
+#else
+	CefMainArgs main_args(GetModuleHandle(NULL));
+#endif
 
 	// Optional implementation of the CefApp interface.
 	CefRefPtr<CefApp> app( new AppHandler( 0 ) );
