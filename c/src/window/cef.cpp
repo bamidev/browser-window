@@ -100,7 +100,7 @@ bw_WindowImpl bw_WindowImpl_new(
 	CefRefPtr<CefWindowDelegate> cef_window_options( new MyWindowDelegate( _window->app, *options ) );
 	CefRefPtr<CefWindow> window = CefWindow::CreateTopLevelWindow( cef_window_options );
 
-	window->SetTitle( bw_cef_copyToString( _title ) );
+	window->SetTitle( bw_cef_copyFromStrSlice( _title ) );
 
 	CefSize size( width, height );
 	window->SetSize( size );
@@ -177,7 +177,7 @@ void bw_Window_setPosition( bw_Window* window, bw_Pos2D position ) {
 }
 
 void bw_Window_setTitle( bw_Window* window, bw_CStrSlice _title ) {
-	CefString title = bw_cef_copyToString( _title );
+	CefString title = bw_cef_copyFromStrSlice( _title );
 
 	(*(CefRefPtr<CefWindow>*)window->impl.handle_ptr)->SetTitle(title);
 }

@@ -5,6 +5,7 @@ pub use c::JsEvaluationError;
 
 use super::{
 	application::ApplicationImpl,
+	cookie::CookieJarImpl,
 	window::{WindowImpl, WindowOptions}
 };
 
@@ -20,6 +21,8 @@ pub type EvalJsCallbackFn = unsafe fn( bw: BrowserWindowImpl, data: *mut (), res
 pub type ExternalInvocationHandlerFn = unsafe fn( bw: BrowserWindowImpl, cmd: &str, args: Vec<String> );
 
 pub trait BrowserWindowExt: Copy {
+
+	fn cookie_jar(&self) -> CookieJarImpl;
 
 	/// Executes the given JavaScript string.
 	/// The result will be provided by invoking the callback function.

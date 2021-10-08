@@ -21,6 +21,7 @@ mod tests;
 
 pub mod application;
 pub mod browser;
+pub mod cookie;
 pub mod error;
 pub mod event;
 pub mod prelude;

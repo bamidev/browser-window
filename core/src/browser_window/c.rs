@@ -57,6 +57,14 @@ type UsizeFix = u64;
 
 impl BrowserWindowExt for BrowserWindowImpl {
 
+	fn cookie_jar(&self) -> CookieJarImpl {
+		let inner = unsafe { cbw_CookieJar_newGlobal() };
+
+		CookieJarImpl {
+			inner
+		}
+	}
+
 	fn eval_js( &self, js: &str, callback: EvalJsCallbackFn, callback_data: *mut () ) {
 		let data = Box::new( EvalJsCallbackData {
 			callback,
