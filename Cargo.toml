@@ -26,6 +26,10 @@ path = "src/lib.rs"
 name = "terminal"
 path = "examples/terminal.rs"
 
+[[example]]
+name = "authentication"
+path = "examples/authentication.rs"
+
 [dependencies]
 browser-window-core = { path = "./core", version = "0.1.0", features = [ "cef" ] }
 futures-channel = { version = "^0.3" }
