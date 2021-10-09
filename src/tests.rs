@@ -1,7 +1,12 @@
 use crate::application::*;
 use crate::browser::*;
+use crate::cookie::*;
+use crate::prelude::*;
 
-use std::env;
+use std::{
+	env,
+	time::SystemTime
+};
 
 #[cfg(feature = "threadsafe")]
 use tokio;
@@ -61,6 +66,36 @@ fn basic_async_example(application: &Application) {
 		
 		bw.close();
 	});
+}
+
+#[test]
+fn cookies() {
+
+		let now = SystemTime::now();
+
+		let mut jar = CookieJar::global();
+		let mut cookie = Cookie::new("name", "value");
+
+		assert!(cookie.name() == "name");
+		assert!(cookie.value() == "value");
+		assert!(cookie.domain() == "");
+		assert!(cookie.path() == "/");
+		assert!(cookie.expires() == None);
+
+		cookie
+			.make_secure()
+			.make_http_only()
+			.set_path("/")
+			.set_domain("localhost")
+			.set_expires(&now)
+			.set_creation_time(&now);
+
+		assert!(cookie.domain() == "localhost");
+		assert!(cookie.path() == "/");
+		assert!(cookie.expires() == Some(now));
+		assert!(cookie.creation_time() == now);
+
+		jar.store(&cookie);
 }
 
 /// Closes a parent window before closing its child window, to see if the child window handle still is valid and doesn't cause any memory issues.

@@ -33,19 +33,99 @@ void bw_Cookie_free(bw_Cookie* cookie) {
 	free(cookie);
 }
 
-bw_StrSlice bw_Cookie_getName(const bw_Cookie* cookie) {
-	CefString string(&((CefCookie*)cookie->impl.handle_ptr)->name);
-	return bw_cef_copyToStrSlice(string);
+bw_Cookie* bw_Cookie_new(bw_CStrSlice name, bw_CStrSlice value) {
+	CefRefPtr<CefCookie>* cef_cookie = new CefRefPtr<CefCookie>();
+
+	CefString(&(*cef_cookie)->name).FromString(std::string(name.data, name.len));
+	CefString(&(*cef_cookie)->value).FromString(std::string(value.data, value.len));
+
+	bw_Cookie* cookie = (bw_Cookie*)malloc(sizeof(bw_Cookie));
+	cookie->impl.handle_ptr = (void*)cef_cookie;
+	return cookie;
 }
 
-bw_StrSlice bw_Cookie_getValue(const bw_Cookie* cookie) {
-	CefString string(&((CefCookie*)cookie->impl.handle_ptr)->value);
-	return bw_cef_copyToStrSlice(string);
+unsigned long bw_Cookie_getCreationTime(const bw_Cookie* cookie) {
+	CefTime time(((CefCookie*)cookie->impl.handle_ptr)->creation);
+	return time.GetDoubleT() * 1000;
+}
+
+void bw_Cookie_setCreationTime(bw_Cookie* cookie, unsigned long time) {
+	CefTime cef_time(((CefCookie*)cookie->impl.handle_ptr)->creation);
+	cef_time.SetDoubleT((double)time / 1000);
+}
+
+BOOL bw_Cookie_getDomain(const bw_Cookie* cookie, bw_StrSlice* domain) {
+	CefString string(&((CefCookie*)cookie->impl.handle_ptr)->domain);
+	*domain = bw_cef_copyToStrSlice(string);
+	return TRUE;
+}
+
+void bw_Cookie_setDomain(bw_Cookie* cookie, bw_CStrSlice domain) {
+	CefString string(&((CefCookie*)cookie->impl.handle_ptr)->domain);
+	string.FromString(std::string(domain.data, domain.len));
+}
+
+unsigned long bw_Cookie_getExpires(const bw_Cookie* cookie) {
+	CefCookie* cef_cookie = (CefCookie*)cookie->impl.handle_ptr;
+
+	if (cef_cookie->has_expires)
+		return 0;
+
+	CefTime time(cef_cookie->expires);
+	return time.GetDoubleT() * 1000;
+}
+
+void bw_Cookie_setExpires(bw_Cookie* cookie, unsigned long time) {
+	CefCookie* cef_cookie = (CefCookie*)cookie->impl.handle_ptr;
+
+	cef_cookie->has_expires = 1;
+	CefTime(cef_cookie->expires).SetDoubleT((double)time / 1000);
+}
+
+void bw_Cookie_setName(bw_Cookie* cookie, bw_CStrSlice name) {
+	CefString string(&((CefCookie*)cookie->impl.handle_ptr)->name);
+	string.FromString(std::string(name.data, name.len));
+}
+
+BOOL bw_Cookie_getPath(const bw_Cookie* cookie, bw_StrSlice* path) {
+	CefString string(&((CefCookie*)cookie->impl.handle_ptr)->path);
+	*path = bw_cef_copyToStrSlice(string);
+	return TRUE;
+}
+
+void bw_Cookie_setPath(bw_Cookie* cookie, bw_CStrSlice path) {
+	CefString string(&((CefCookie*)cookie->impl.handle_ptr)->path);
+	string.FromString(std::string(path.data, path.len));
 }
 
 void bw_Cookie_setValue(bw_Cookie* cookie, bw_CStrSlice value) {
-	std::string temp(value.data, value.len);
-	CefString(&((CefCookie*)cookie->impl.handle_ptr)->value).FromString(temp);
+	CefString string(&((CefCookie*)cookie->impl.handle_ptr)->value);
+	string.FromString(std::string(value.data, value.len));
+}
+
+BOOL bw_Cookie_isHttpOnly(const bw_Cookie* cookie) {
+	return ((CefCookie*)cookie->impl.handle_ptr)->httponly;
+}
+void bw_Cookie_makeHttpOnly(bw_Cookie* cookie) {
+	((CefCookie*)cookie->impl.handle_ptr)->httponly = 1;
+}
+BOOL bw_Cookie_isSecure(const bw_Cookie* cookie) {
+	return ((CefCookie*)cookie->impl.handle_ptr)->secure;
+}
+void bw_Cookie_makeSecure(bw_Cookie* cookie) {
+	((CefCookie*)cookie->impl.handle_ptr)->secure = 1;
+}
+
+BOOL bw_Cookie_getName(const bw_Cookie* cookie, bw_StrSlice* name) {
+	CefString string(&((CefCookie*)cookie->impl.handle_ptr)->name);
+	*name = bw_cef_copyToStrSlice(string);
+	return TRUE;
+}
+
+BOOL bw_Cookie_getValue(const bw_Cookie* cookie, bw_StrSlice* value) {
+	CefString string(&((CefCookie*)cookie->impl.handle_ptr)->name);
+	*value = bw_cef_copyToStrSlice(string);
+	return TRUE;
 }
 
 void bw_CookieJar_free(bw_CookieJar* jar) {
@@ -73,6 +153,18 @@ bw_CookieJar* bw_CookieJar_newGlobal() {
 	cj->impl.handle_ptr = mgr;
 
 	return cj;
+}
+
+void bw_CookieJar_store(bw_CookieJar* jar, const bw_Cookie* cookie) {
+	CefRefPtr<CefCookieManager> mgr = *(CefRefPtr<CefCookieManager>*)jar->impl.handle_ptr;
+	CefCookie cef_cookie = *(CefCookie*)cookie->impl.handle_ptr;
+
+	std::string url = CefString(&cef_cookie.domain).ToString();
+	url += CefString(&cef_cookie.path).ToString();
+	CefString cef_url;
+	cef_url.FromString(url);
+
+	mgr->SetCookie(cef_url, cef_cookie, nullptr);
 }
 
 void bw_CookieIterator_free(bw_CookieIterator* iterator) {

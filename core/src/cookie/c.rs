@@ -1,10 +1,12 @@
-use super::{CookieExt, CookieJarExt, CookieIteratorExt};
+use super::*;
 
 use std::{
 	borrow::Cow,
+	ops::Add,
 	marker::PhantomData,
 	mem::MaybeUninit,
-	ptr
+	ptr,
+	time::{Duration, SystemTime}
 };
 
 use browser_window_c::*;
@@ -14,6 +16,8 @@ use browser_window_c::*;
 pub struct CookieImpl {
 	pub(in crate) inner: *mut cbw_Cookie
 }
+
+pub struct CookieMutImpl (CookieImpl);
 
 pub struct CookieJarImpl {
 	pub(in crate) inner: *mut cbw_CookieJar
@@ -27,18 +31,129 @@ pub struct CookieIteratorImpl<'a> {
 
 
 impl CookieExt for CookieImpl {
-	fn name<'a>(&'a self) -> Cow<'a, str> {
-		let slice = unsafe { cbw_Cookie_getName(self.inner) };
 
-		let string: String = slice.into();
-		return string.into()
+	fn creation_time(&self) -> SystemTime {
+		let timestamp = unsafe { cbw_Cookie_getCreationTime(self.inner) };
+
+		SystemTime::UNIX_EPOCH.add(Duration::from_millis(timestamp))
+	}
+
+	fn expires(&self) -> Option<SystemTime> {
+		let timestamp = unsafe { cbw_Cookie_getExpires(self.inner) };
+
+		if timestamp != 0 {
+			Some( SystemTime::UNIX_EPOCH.add(Duration::from_millis(timestamp)) )
+		}
+		else {
+			None
+		}
+	}
+
+	fn domain<'a>(&'a self) -> Cow<'a, str> {
+		let mut slice: cbw_StrSlice = unsafe { MaybeUninit::uninit().assume_init() };
+		let owned = unsafe { cbw_Cookie_getDomain(self.inner, &mut slice) };
+
+		if owned > 0 {
+			let string: String = slice.into();
+			unsafe { cbw_string_free(slice) };
+			string.into()
+		}
+		else {
+			let string: &str = slice.into();
+			string.into()
+		}
+	}
+
+	fn is_http_only(&self) -> bool {
+		(unsafe { cbw_Cookie_isHttpOnly(self.inner) }) > 0
+	}
+
+	fn is_secure(&self) -> bool {
+		(unsafe { cbw_Cookie_isSecure(self.inner) }) > 0
+	}
+
+	fn name<'a>(&'a self) -> Cow<'a, str> {
+		let mut slice: cbw_StrSlice = unsafe { MaybeUninit::uninit().assume_init() };
+		let owned = unsafe { cbw_Cookie_getName(self.inner, &mut slice) };
+
+		if owned > 0 {
+			let string: String = slice.into();
+			unsafe { cbw_string_free(slice) };
+			string.into()
+		}
+		else {
+			let string: &str = slice.into();
+			string.into()
+		}
+	}
+
+	fn new(name: &str, value: &str) -> Self {
+		let inner = unsafe { cbw_Cookie_new(name.into(), value.into()) };
+
+		Self { inner }
+	}
+
+	fn path<'a>(&'a self) -> Cow<'a, str> {
+		let mut slice: cbw_StrSlice = unsafe { MaybeUninit::uninit().assume_init() };
+		let owned = unsafe { cbw_Cookie_getPath(self.inner, &mut slice) };
+
+		if owned > 0 {
+			let string: String = slice.into();
+			unsafe { cbw_string_free(slice) };
+			string.into()
+		}
+		else {
+			let string: &str = slice.into();
+			string.into()
+		}
 	}
 
 	fn value<'a>(&'a self) -> Cow<'a, str> {
-		let slice = unsafe { cbw_Cookie_getValue(self.inner) };
+		let mut slice: cbw_StrSlice = unsafe { MaybeUninit::uninit().assume_init() };
+		let owned = unsafe { cbw_Cookie_getValue(self.inner, &mut slice) };
 
-		let string: String = slice.into();
-		return string.into()
+		if owned > 0 {
+			let string: String = slice.into();
+			unsafe { cbw_string_free(slice) };
+			string.into()
+		}
+		else {
+			let string: &str = slice.into();
+			string.into()
+		}
+	}
+	
+	fn make_http_only(&mut self) -> &mut Self {
+		unsafe { cbw_Cookie_makeHttpOnly(self.inner) };	self
+	}
+
+	fn make_secure(&mut self) -> &mut Self {
+		unsafe { cbw_Cookie_makeSecure(self.inner) };	self
+	}
+
+	fn set_creation_time(&mut self, time: &SystemTime) -> &mut Self {
+		unsafe { cbw_Cookie_setCreationTime(self.inner, time.duration_since(SystemTime::UNIX_EPOCH).unwrap().as_millis() as _) };	self
+	}
+
+	fn set_expires(&mut self, time: &SystemTime) -> &mut Self {
+		unsafe { cbw_Cookie_setExpires(self.inner, time.duration_since(SystemTime::UNIX_EPOCH).unwrap().as_millis() as _) };	self
+	}
+
+	fn set_domain(&mut self, domain: &str) -> &mut Self {
+		unsafe { cbw_Cookie_setDomain(self.inner, domain.into()) };	self
+	}
+
+	fn set_name(&mut self, name: &str) -> &mut Self {
+		unsafe { cbw_Cookie_setName(self.inner, name.into()) };	self
+	}
+
+
+	fn set_path(&mut self, path: &str) -> &mut Self {
+		unsafe { cbw_Cookie_setPath(self.inner, path.into()) };	self
+	}
+
+	fn set_value(&mut self, value: &str) -> &mut Self{
+		unsafe { cbw_Cookie_setValue(self.inner, value.into()) };	self
 	}
 }
 
@@ -63,6 +178,10 @@ impl CookieJarExt for CookieJarImpl {
 		unsafe { cbw_CookieJar_iterator(self.inner, &mut iterator.inner, if include_http_only {1} else {0}, url.into()) };
 		
 		return iterator;
+	}
+
+	fn store(&self, cookie: &CookieImpl) {
+		unsafe { cbw_CookieJar_store(self.inner, cookie.inner) };
 	}
 }
 
