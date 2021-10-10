@@ -142,7 +142,6 @@ impl BrowserWindowBuilder {
 	///
 	/// # Arguments
 	/// * `app` - An application handle that this browser window can spawn into
-	#[cfg(not(feature = "threadsafe"))]
 	pub async fn build( self, app: ApplicationHandle ) -> BrowserWindow
 	{
 		let (tx, rx) = oneshot::channel::<BrowserWindowHandle>();
@@ -168,7 +167,7 @@ impl BrowserWindowBuilder {
 	/// # Arguments
 	/// * `app` - An (thread-safe) application handle.
 	#[cfg(feature = "threadsafe")]
-	pub async fn build( self, app: ApplicationHandleThreaded ) -> Result<BrowserWindowThreaded, DelegateError> {
+	pub async fn build_threaded( self, app: ApplicationHandleThreaded ) -> Result<BrowserWindowThreaded, DelegateError> {
 
 		let (tx, rx) = oneshot::channel::<UnsafeSend<BrowserWindowHandle>>();
 

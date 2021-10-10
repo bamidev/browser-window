@@ -74,7 +74,6 @@ fn read_stream<R>( bw: BrowserWindowHandle, reader: &mut R, buffer: &mut [u8], j
 }
 
 // This example does not work with feature `threadsafe` enabled
-#[cfg(not(feature = "threadsafe"))]
 fn main() {
 	let settings = ApplicationSettings::default();
 	let application = match Application::initialize( &settings ) {
@@ -125,6 +124,3 @@ fn main() {
 	// Return exit code
 	exit( exit_code );
 }
-
-#[cfg(feature = "threadsafe")]
-fn main() {}
