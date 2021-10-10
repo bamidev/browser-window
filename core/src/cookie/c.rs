@@ -2,6 +2,7 @@ use super::*;
 
 use std::{
 	borrow::Cow,
+	ffi::c_void,
 	ops::Add,
 	marker::PhantomData,
 	mem::MaybeUninit,
@@ -26,6 +27,11 @@ pub struct CookieJarImpl {
 pub struct CookieIteratorImpl<'a> {
 	pub(in crate) inner: *mut cbw_CookieIterator,
 	_phantom: PhantomData<&'a u8>
+}
+
+struct CookieStorageCallbackData {
+	callback: CookieStorageCallbackFn,
+	data: *mut ()
 }
 
 
@@ -77,8 +83,8 @@ impl CookieExt for CookieImpl {
 		let owned = unsafe { cbw_Cookie_getName(self.inner, &mut slice) };
 
 		if owned > 0 {
-			let string: String = slice.into();
-			unsafe { cbw_string_free(slice) };
+			let string: String = slice.into();println!("name:{}",string);
+			unsafe { cbw_string_free(slice) };println!("owned:{}",owned);
 			string.into()
 		}
 		else {
@@ -110,8 +116,9 @@ impl CookieExt for CookieImpl {
 
 	fn value<'a>(&'a self) -> Cow<'a, str> {
 		let mut slice: cbw_StrSlice = unsafe { MaybeUninit::uninit().assume_init() };
-		let owned = unsafe { cbw_Cookie_getValue(self.inner, &mut slice) };
 
+		let owned = unsafe { cbw_Cookie_getValue(self.inner, &mut slice) };
+		
 		if owned > 0 {
 			let string: String = slice.into();
 			unsafe { cbw_string_free(slice) };
@@ -180,8 +187,24 @@ impl CookieJarExt for CookieJarImpl {
 		return iterator;
 	}
 
-	fn store(&self, cookie: &CookieImpl) {
-		unsafe { cbw_CookieJar_store(self.inner, cookie.inner) };
+	fn store(&self, url: &str, cookie: &CookieImpl, success_cb: Option<CookieStorageCallbackFn>, cb_data: *mut ()) {
+		let data = if !success_cb.is_none() {
+			Box::into_raw( Box::new( CookieStorageCallbackData {
+				callback: success_cb.unwrap(),
+				data: cb_data
+			}))
+		}
+		else {
+			ptr::null_mut()
+		};
+
+		unsafe { cbw_CookieJar_store(
+			self.inner,
+			url.into(),
+			cookie.inner,
+			success_cb.map(|_| ffi_cookie_storage_callback_handler as _),
+			data as _
+		) };
 	}
 }
 
@@ -209,4 +232,22 @@ impl<'a> Drop for CookieIteratorImpl<'a> {
 	fn drop(&mut self) {
 		unsafe { cbw_CookieIterator_free(self.inner) }
 	}
+}
+
+
+
+unsafe extern "C" fn ffi_cookie_storage_callback_handler(cookie_jar: *mut cbw_CookieJar, _data: *mut c_void, error: cbw_Err) {
+
+	let data_ptr = _data as *mut CookieStorageCallbackData;
+	let data: Box<CookieStorageCallbackData> = Box::from_raw( data_ptr );
+
+	let handle = CookieJarImpl {inner: cookie_jar};
+	let result = if error.code == 0 {
+		Ok(())
+	}
+	else {
+		Err(CookieStorageError::Unknown)
+	};
+
+	(data.callback)( handle, data.data, result );
 }

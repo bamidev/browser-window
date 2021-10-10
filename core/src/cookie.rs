@@ -10,6 +10,8 @@ pub use c::*;
 
 
 
+pub type CookieStorageCallbackFn = unsafe fn( cj: CookieJarImpl, data: *mut (), Result<(), CookieStorageError> );
+
 pub trait CookieExt {
 	fn new(name: &str, value: &str) -> CookieImpl;
 
@@ -35,9 +37,14 @@ pub trait CookieExt {
 pub trait CookieJarExt {
 	fn global() -> CookieJarImpl;
 	fn iterator<'a>(&'a self, url: &str, include_http_only: bool) -> CookieIteratorImpl<'a>;
-	fn store(&self, cookie: &CookieImpl);
+	fn store(&self, url: &str, cookie: &CookieImpl, success_cb: Option<CookieStorageCallbackFn>, cb_data: *mut ());
 }
 
 pub trait CookieIteratorExt {
 	fn next(&mut self) -> Option<CookieImpl>;
+}
+
+#[derive(Debug)]
+pub enum CookieStorageError {
+	Unknown
 }

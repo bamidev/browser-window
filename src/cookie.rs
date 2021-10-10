@@ -1,8 +1,9 @@
 use browser_window_core::cookie::*;
+use futures_channel::oneshot;
 
 use std::{
-	borrow::Cow,
-	ops::*
+	ops::*,
+	ptr
 };
 
 
@@ -115,7 +116,36 @@ impl CookieJar {
 		CookieIteratorMut (inner)
 	}*/
 
-	pub fn store(&mut self, cookie: &Cookie) {
-		self.inner.store(&cookie.inner)
+	fn _store<'a,H>(&mut self, url: &str, cookie: &Cookie, on_complete: H) where
+		H: FnOnce(Result<(), CookieStorageError>) + 'a
+	{
+		let data = Box::into_raw(Box::new(on_complete));
+
+		self.inner.store(url.into(), &cookie.inner, Some(cookie_store_callback::<'a,H>), data as _);
 	}
+
+	pub async fn store(&mut self, url: &str, cookie: &Cookie) -> Result<(), CookieStorageError> {
+		let (tx, rx) = oneshot::channel::<Result<(), CookieStorageError>>();
+
+		self._store(url, cookie, |result| {
+			tx.send(result).expect("unable to retrieve cookie storage error");
+		});
+
+		rx.await.unwrap()
+	}
+
+	pub fn store_start(&mut self, url: &str, cookie: &Cookie) {
+		self.inner.store(url.into(), &cookie.inner, None, ptr::null_mut());
+	}
+}
+
+
+
+unsafe fn cookie_store_callback<'a, H>( _handle: CookieJarImpl, cb_data: *mut (), result: Result<(), CookieStorageError> ) where
+	H: FnOnce(Result<(), CookieStorageError>) + 'a
+{
+	let data_ptr = cb_data as *mut H;
+	let data: Box<H> = Box::from_raw( data_ptr );
+
+	(*data)( result );
 }

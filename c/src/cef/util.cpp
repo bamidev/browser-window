@@ -37,8 +37,10 @@ bw_StrSlice bw_cef_copyToStrSlice(const CefString& string) {
 
 	std::string temp = string.ToString();
 
-	char* data = (char*)malloc(temp.length());
+	size_t len = temp.length();
+	char* data = (char*)malloc(len);
+	memcpy(data, temp.c_str(), len);
 	slice.data = data;
-	slice.len = temp.length();
+	slice.len = len;
 	return slice;
 }

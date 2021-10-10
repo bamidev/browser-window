@@ -259,7 +259,7 @@ impl BrowserWindowThreaded {
 		let handle = UnsafeSend::new( self.handle );
 
 		// FIXME: It is more efficient to reimplement this for the browser window
-		self.app().dispatch(move |_| { eprintln!("HOIH");
+		self.app().dispatch(move |_| {
 			func( handle.i );
 		})
 	}

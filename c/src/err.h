@@ -25,11 +25,17 @@ typedef struct bw_Err {
 #define BW_ERR_IS_OK(ERROR) \
 	(ERROR).code == BW_ERR_CODE_SUCCESS
 
-#define BW_ERR_RETURN( CODE, DATA_PTR, MESSAGE_FUNC ) \
-	{ bw_Err r; r.code = CODE; r.data = (const void*)DATA_PTR; r.alloc_message = MESSAGE_FUNC; return r; }
+#define BW_ERR_RETURN( CODE, DATA_PTR, MSG_FUNC ) \
+	{ bw_Err r; r.code = CODE; r.data = (const void*)DATA_PTR; r.alloc_message = MSG_FUNC; return r; }
+
+#define BW_ERR_DECLARE(VAR_NAME, CODE, DATA_PTR, MSG_FUNC) \
+	bw_Err VAR_NAME = { .code = CODE, .data = DATA_PTR, .alloc_message = MSG_FUNC };
 
 #define BW_ERR_RETURN_SUCCESS \
 	BW_ERR_RETURN( BW_ERR_CODE_SUCCESS, 0, bw_Err_msg_success )
+
+#define BW_ERR_DECLARE_SUCCESS(VAR_NAME) \
+	BW_ERR_DECLARE(VAR_NAME, BW_ERR_CODE_SUCCESS, 0, bw_Err_msg_success)
 
 #define BW_ERR_MSG_DEF( FUNC, MSG ) \
 	char* FUNC( bw_ErrCode code, const void* data ) { \

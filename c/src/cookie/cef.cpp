@@ -26,6 +26,33 @@ protected:
 	IMPLEMENT_REFCOUNTING(BwCookieVisitor);
 };
 
+class BwSetCookieCallback : public CefSetCookieCallback {
+public:
+	bw_CookieJar* cookie_jar;
+	bw_CookieJarStorageCallbackFn cb;
+	void* cb_data;
+
+	BwSetCookieCallback(bw_CookieJar* cookie_jar, bw_CookieJarStorageCallbackFn cb, void* cb_data) :
+		cookie_jar(cookie_jar), cb(cb), cb_data(cb_data)
+	{}
+
+	void OnComplete(bool success) override {
+		if (cb != 0) {
+			if (success) {
+				BW_ERR_DECLARE_SUCCESS(success);
+				this->cb(this->cookie_jar, this->cb_data, success);
+			}
+			else {
+				bw_Err error = bw_Err_new_with_msg(1, "unable to set cookie");
+				this->cb(this->cookie_jar, this->cb_data, error);
+			}
+		}
+	}
+
+protected:
+	IMPLEMENT_REFCOUNTING(BwSetCookieCallback);
+};
+
 
 
 void bw_Cookie_free(bw_Cookie* cookie) {
@@ -34,24 +61,26 @@ void bw_Cookie_free(bw_Cookie* cookie) {
 }
 
 bw_Cookie* bw_Cookie_new(bw_CStrSlice name, bw_CStrSlice value) {
-	CefRefPtr<CefCookie>* cef_cookie = new CefRefPtr<CefCookie>();
-
-	CefString(&(*cef_cookie)->name).FromString(std::string(name.data, name.len));
-	CefString(&(*cef_cookie)->value).FromString(std::string(value.data, value.len));
+	CefCookie* cef_cookie = new CefCookie();
+	cef_cookie->has_expires = 0;
+	
+	CefString(&cef_cookie->name).FromString(std::string(name.data, name.len));
+	CefString(&cef_cookie->value).FromString(std::string(value.data, value.len));
 
 	bw_Cookie* cookie = (bw_Cookie*)malloc(sizeof(bw_Cookie));
 	cookie->impl.handle_ptr = (void*)cef_cookie;
 	return cookie;
 }
 
-unsigned long bw_Cookie_getCreationTime(const bw_Cookie* cookie) {
+uint64_t bw_Cookie_getCreationTime(const bw_Cookie* cookie) {
 	CefTime time(((CefCookie*)cookie->impl.handle_ptr)->creation);
 	return time.GetDoubleT() * 1000;
 }
 
-void bw_Cookie_setCreationTime(bw_Cookie* cookie, unsigned long time) {
-	CefTime cef_time(((CefCookie*)cookie->impl.handle_ptr)->creation);
+void bw_Cookie_setCreationTime(bw_Cookie* cookie, uint64_t time) {
+	CefTime cef_time;
 	cef_time.SetDoubleT((double)time / 1000);
+	((CefCookie*)cookie->impl.handle_ptr)->creation = cef_time;
 }
 
 BOOL bw_Cookie_getDomain(const bw_Cookie* cookie, bw_StrSlice* domain) {
@@ -65,21 +94,22 @@ void bw_Cookie_setDomain(bw_Cookie* cookie, bw_CStrSlice domain) {
 	string.FromString(std::string(domain.data, domain.len));
 }
 
-unsigned long bw_Cookie_getExpires(const bw_Cookie* cookie) {
+uint64_t bw_Cookie_getExpires(const bw_Cookie* cookie) {
 	CefCookie* cef_cookie = (CefCookie*)cookie->impl.handle_ptr;
 
-	if (cef_cookie->has_expires)
+	if (!cef_cookie->has_expires)
 		return 0;
-
+		
 	CefTime time(cef_cookie->expires);
 	return time.GetDoubleT() * 1000;
 }
 
-void bw_Cookie_setExpires(bw_Cookie* cookie, unsigned long time) {
+void bw_Cookie_setExpires(bw_Cookie* cookie, uint64_t time) {
 	CefCookie* cef_cookie = (CefCookie*)cookie->impl.handle_ptr;
 
 	cef_cookie->has_expires = 1;
-	CefTime(cef_cookie->expires).SetDoubleT((double)time / 1000);
+	CefTime temp;	temp.SetDoubleT((double)time / 1000);
+	cef_cookie->expires = temp;
 }
 
 void bw_Cookie_setName(bw_Cookie* cookie, bw_CStrSlice name) {
@@ -123,7 +153,7 @@ BOOL bw_Cookie_getName(const bw_Cookie* cookie, bw_StrSlice* name) {
 }
 
 BOOL bw_Cookie_getValue(const bw_Cookie* cookie, bw_StrSlice* value) {
-	CefString string(&((CefCookie*)cookie->impl.handle_ptr)->name);
+	CefString string(&((CefCookie*)cookie->impl.handle_ptr)->value);
 	*value = bw_cef_copyToStrSlice(string);
 	return TRUE;
 }
@@ -155,16 +185,18 @@ bw_CookieJar* bw_CookieJar_newGlobal() {
 	return cj;
 }
 
-void bw_CookieJar_store(bw_CookieJar* jar, const bw_Cookie* cookie) {
+bw_Err bw_CookieJar_store(bw_CookieJar* jar, bw_CStrSlice url, const bw_Cookie* cookie, bw_CookieJarStorageCallbackFn cb, void* cb_data) {
 	CefRefPtr<CefCookieManager> mgr = *(CefRefPtr<CefCookieManager>*)jar->impl.handle_ptr;
 	CefCookie cef_cookie = *(CefCookie*)cookie->impl.handle_ptr;
 
-	std::string url = CefString(&cef_cookie.domain).ToString();
-	url += CefString(&cef_cookie.path).ToString();
-	CefString cef_url;
-	cef_url.FromString(url);
+	CefString cef_url = bw_cef_copyFromStrSlice(url);
 
-	mgr->SetCookie(cef_url, cef_cookie, nullptr);
+	CefRefPtr<CefSetCookieCallback> cef_cb(new BwSetCookieCallback(jar, cb, cb_data));
+
+	if (!mgr->SetCookie(cef_url, cef_cookie, cef_cb))
+		return bw_Err_new_with_msg(1, "invalid characters in cookie or invalid url");
+
+	BW_ERR_RETURN_SUCCESS;
 }
 
 void bw_CookieIterator_free(bw_CookieIterator* iterator) {
