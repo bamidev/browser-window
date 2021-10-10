@@ -49,8 +49,7 @@ int bw_ApplicationImpl_run( bw_Application* app, bw_ApplicationImpl_ReadyHandler
 	app->impl.exit_code = 0;
 	app->impl.is_running = true;
 
-	ready_handler_data->func( app, ready_handler_data->data );
-
+	CefPostTask(TID_UI, base::Bind(ready_handler_data->func, app, ready_handler_data->data ));
 	CefRunMessageLoop();
 
 	return app->impl.exit_code;
