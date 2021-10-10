@@ -1,3 +1,5 @@
+//! Module for dealing with cookies.
+
 use browser_window_core::cookie::*;
 use futures_channel::oneshot;
 
