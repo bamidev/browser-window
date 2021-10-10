@@ -61,8 +61,11 @@ pub struct BrowserWindow {
 /// use browser_window::browser::*;
 ///
 /// async fn get_cookies( app: ApplicationHandleThreaded ) -> String {
+/// 
+///     let mut builder = BrowserWindowBuilder::new(Source::Url("https://www.duckduckgo.com/".into()));
+///     builder.title("test");
 ///
-///     let bw: BrowserWindowThreaded = builder.build( app );
+///     let bw: BrowserWindowThreaded = builder.build_threaded( app ).await.unwrap();
 /// 
 ///     // Waits for `eval_js` to give back its result from the GUI thread
 ///     let result = bw.delegate_async( |handle| async move {

@@ -160,8 +160,8 @@ impl BrowserWindowBuilder {
 	///
 	/// Keep in mind that the description of this function is for when feature `threadsafe` is enabled.
 	/// When it is not enabled, it looks like this:
-	/// ```
-	/// pub async fn build( self, app: ApplicationHandle ) -> BrowserWindow { /* ... */ }
+	/// ```ignore
+	/// pub async fn build( self, app: ApplicationHandle ) -> Result<BrowserWindowThreaded, DelegateError> { /* ... */ }
 	/// ```
 	///
 	/// # Arguments
