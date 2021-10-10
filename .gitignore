@@ -4,14 +4,6 @@ target
 # CEF generated files
 GPUCache
 
-# Eclipse project files
-.project
-.settings
-
-# Intelij IDEA project files
-.idea
-browser-window.iml
-
 # Visual Studio project files
 .vs
 
@@ -20,7 +12,7 @@ browser-window.iml
 
 # CEF's bin and resource files
 chrome-sandbox
-.bin
-.dat
-.pak
-.so
+*.bin
+*.dat
+*.pak
+*.so
