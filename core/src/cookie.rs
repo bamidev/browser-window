@@ -3,6 +3,8 @@ pub mod c;
 
 use std::{
 	borrow::Cow,
+	error::Error,
+	fmt,
 	time::SystemTime
 };
 
@@ -47,4 +49,16 @@ pub trait CookieIteratorExt {
 #[derive(Debug)]
 pub enum CookieStorageError {
 	Unknown
+}
+
+
+
+impl fmt::Display for CookieStorageError {
+	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+		write!(f, "unable to set cookie")
+	}
+}
+
+impl Error for CookieStorageError {
+	fn source(&self) -> Option<&(dyn Error + 'static)> { None }
 }
