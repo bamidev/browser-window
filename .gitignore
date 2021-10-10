@@ -17,3 +17,10 @@ browser-window.iml
 
 # Visual Studio Code project files
 .vscode
+
+# CEF's bin and resource files
+chrome-sandbox
+.bin
+.dat
+.pak
+.so

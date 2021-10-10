@@ -8,17 +8,23 @@
 //!
 //! # Example #1
 //! Here is an example to show how you can construct your application:
-//! ```ignore
+//! ```
+//! use std::process;
 //! use browser_window::application::*;
 //!
 //! fn main() {
 //! 	let application = Application::initialize( &ApplicationSettings::default() ).unwrap();
 //! 	let runtime = application.start();
 //!
-//! 	runtime.run_async(|handle| async move {
+//! 	let exit_code = runtime.run_async(|handle| async move {
 //!
 //! 		// Do something ...
+//! 
+//! 		// Not normally needed:
+//! 		handle.exit(0);
 //! 	});
+//! 
+//! 	process::exit(exit_code);
 //! }
 //! ```
 //!
@@ -34,6 +40,7 @@ However, you will need to enable feature `threadsafe`, as it will enable all thr
 Here is an example:
 
 ```rust
+use std::process;
 use browser_window::application::*;
 use tokio;
 
@@ -50,12 +57,14 @@ fn main() {
 	let tokio_runtime = tokio::runtime::Runtime::new().unwrap();
 
 	// First run our own runtime on the main thread
-	bw_runtime.run(|_app| {
+	let exit_code = bw_runtime.run(|_app| {
 		let app = _app.into_threaded();
 
 		// Spawn the main logic into the tokio runtime
 		tokio_runtime.spawn( async_main( app ) );
 	});
+
+	process::exit(exit_code);
 }
 ```"#)]
 
