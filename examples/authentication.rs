@@ -7,6 +7,8 @@ use browser_window::prelude::*;
 
 
 
+// This example does not work with feature `threadsafe` enabled
+#[cfg(not(feature = "threadsafe"))]
 fn main() {
 	let application = Application::initialize(&ApplicationSettings::default()).expect("unable to initialize");
 	let runtime = application.start();
@@ -27,3 +29,6 @@ fn main() {
 		}
 	});
 }
+
+#[cfg(feature = "threadsafe")]
+fn main() {}
