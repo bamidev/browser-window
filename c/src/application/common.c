@@ -11,6 +11,17 @@ void bw_Application_free( bw_Application* app ) {
 	free( app );
 }
 
+void bw_Application_runOnReady(bw_Application* app, void* user_data) {
+	bw_ApplicationImpl_ReadyHandlerData* ready_handler_data = (bw_ApplicationImpl_ReadyHandlerData*)user_data;
+
+	ready_handler_data->func(app, ready_handler_data->data);
+
+	// If there are no windows left when the on-ready-handler has finished, we can exit.
+	app->finished = TRUE;
+	if (app->windows_alive == 0)
+		bw_Application_exit(app, 0);
+}
+
 int bw_Application_run( bw_Application* app, bw_ApplicationReadyFn on_ready, void* user_data ) {
 	bw_Application_assertCorrectThread( app );
 
@@ -20,7 +31,13 @@ int bw_Application_run( bw_Application* app, bw_ApplicationReadyFn on_ready, voi
 		user_data
 	};
 
-	return bw_ApplicationImpl_run( app, &ready_handler_data );
+	bw_ApplicationImpl_ReadyHandlerData handler_data_wrapper = {
+		app,
+		bw_Application_runOnReady,
+		(void*)&ready_handler_data
+	};
+
+	return bw_ApplicationImpl_run( app, &handler_data_wrapper );
 }
 
 void bw_Application_finish( bw_Application* app ) {
@@ -33,6 +50,7 @@ bw_Err bw_Application_initialize( bw_Application** app, int argc, char** argv, c
 
 	*app = (bw_Application*)malloc( sizeof( bw_Application ) );
 	(*app)->windows_alive = 0;
+	(*app)->finished = FALSE;
 
 	bw_Err error = bw_ApplicationEngineImpl_initialize( &(*app)->engine_impl, (*app), argc, argv, settings );
 	if (BW_ERR_IS_FAIL(error))	return error;

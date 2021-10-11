@@ -46,6 +46,7 @@ typedef struct {} bw_ApplicationEngineImpl;
 
 struct bw_Application {
 	unsigned int windows_alive;
+	BOOL finished;
 	bw_ApplicationImpl impl;
 	bw_ApplicationEngineImpl engine_impl;	/// Can be set by the implementation of a browser engine
 };

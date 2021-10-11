@@ -4,7 +4,7 @@
 
 
 bw_WindowImpl bw_WindowImpl_new(
-	const bw_Window* window,
+	bw_Window* window,
 	bw_CStrSlice _title,
 	int width, int height,
 	const bw_WindowOptions* options
