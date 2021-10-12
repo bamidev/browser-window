@@ -1,4 +1,4 @@
-//! Browser Window is a Rust crate that allows you to utilize a browser engine to build graphical interfaces.
+//! _Browser Window_ is a Rust crate that allows you to utilize a browser engine to build graphical interfaces.
 //! The idea is similar to Electron.js.
 //! You create the interface with HTML, CSS and JavaScript.
 //! Then, you can communicate information from JavaScript back to Rust, and from the other way around.
@@ -12,6 +12,9 @@
 //! To start building apps with Browser Window, take a quick look at the [`application`](application/index.html) module.
 //! 
 //! For a rich example, see [this example code](https://github.com/bamilab/browser-window/tree/master/examples).
+//! 
+//! # Thread safety
+//! To use the threadsafe version of _Browser Window_, enable feature `threadsafe`.
 
 
 #[macro_use]

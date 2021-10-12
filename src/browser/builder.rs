@@ -147,7 +147,6 @@ impl BrowserWindowBuilder {
 		let (tx, rx) = oneshot::channel::<BrowserWindowHandle>();
 
 		self._build( app, move |handle| {
-
 			if let Err(_) = tx.send( handle ) {
 				panic!("Unable to send browser handle back")
 			}
