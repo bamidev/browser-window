@@ -28,6 +28,7 @@ typedef struct {
 } bw_CookieIterator;
 
 typedef void (*bw_CookieJarStorageCallbackFn)( bw_CookieJar* cj, void* data, bw_Err error );
+typedef void (*bw_CookieIteratorNextCallbackFn)(bw_CookieIterator* ci, void* data, bw_Cookie* cookie);
 
 
 
@@ -52,11 +53,12 @@ void bw_Cookie_makeSecure(bw_Cookie* cookie);
 
 void bw_CookieJar_free(bw_CookieJar* jar);
 void bw_CookieJar_iterator(bw_CookieJar* jar, bw_CookieIterator** iterator, BOOL include_http_only, bw_CStrSlice url);
+void bw_CookieJar_iteratorAll(bw_CookieJar* jar, bw_CookieIterator** iterator);
 bw_CookieJar* bw_CookieJar_newGlobal();
 bw_Err bw_CookieJar_store(bw_CookieJar* jar, bw_CStrSlice url, const bw_Cookie* cookie, bw_CookieJarStorageCallbackFn cb, void* cb_data);
 
 void bw_CookieIterator_free(bw_CookieIterator* iterator);
-BOOL bw_CookieIterator_next(bw_CookieIterator* iterator, bw_Cookie** cookie);
+BOOL bw_CookieIterator_next(bw_CookieIterator* iterator, bw_CookieIteratorNextCallbackFn on_next, void* cb_data);
 
 
 

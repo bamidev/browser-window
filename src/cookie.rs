@@ -4,9 +4,12 @@ use browser_window_core::cookie::*;
 use futures_channel::oneshot;
 
 use std::{
+	marker::PhantomData,
 	ops::*,
 	ptr
 };
+
+use super::application::ApplicationHandle;
 
 
 
@@ -21,7 +24,8 @@ pub struct CookieJar {
 }
 
 pub struct CookieIterator<'a> {
-	inner: CookieIteratorImpl<'a>
+	inner: CookieIteratorImpl,
+	_phantom: PhantomData<&'a u8>
 }
 
 //pub struct CookieIteratorMut<'a> (CookieIterator<'a>);
@@ -47,39 +51,58 @@ impl DerefMut for Cookie {
 	}
 }
 
-/*impl CookieMut {
-	pub fn set_value(&mut self, value: &str) {
-		self.0.inner.set_value(value)
+impl Drop for Cookie {
+	fn drop(&mut self) {
+		self.inner.free();
 	}
 }
 
-impl Deref for CookieMut {
-	type Target = Cookie;
+impl<'a> CookieIterator<'a> {
+	pub async fn next(&mut self) -> Option<Cookie> {
+		let (tx, rx) = oneshot::channel::<Option<Cookie>>();
 
-	fn deref(&self) -> &Self::Target {
-		&self.0
+		let more = self._next(|result| {
+			if let Err(_) = tx.send(result) {
+				panic!("unable to send cookie iterator next result back");
+			}
+		});
+
+		if !more {
+			return None;
+		}
+
+		rx.await.unwrap()
 	}
-}*/
 
-impl<'a> Iterator for CookieIterator<'a> {
-	type Item = Cookie;
+	fn _next<H>(&mut self, on_next: H) -> bool where
+		H: FnOnce(Option<Cookie>)
+	{
+		let data = Box::into_raw(Box::new(
+			on_next
+		));
 
-	fn next(&mut self) -> Option<Cookie> {
-		self.inner.next().map(|inner| Cookie { inner })
+		let called_closure = self.inner.next(cookie_iterator_next_handler::<H>, data as _);
+
+		if !called_closure {
+			unsafe { Box::from_raw(data) };
+		}
+
+		called_closure
 	}
 }
 
-/*impl<'a> Iterator for CookieIteratorMut<'a> {
-	type Item = CookieMut;
-
-	fn next(&mut self) -> Option<CookieMut> {
-		self.0.next().map(|inner| CookieMut(inner))
+impl<'a> Drop for CookieIterator<'a> {
+	fn drop(&mut self) {
+		self.inner.free();
 	}
-}*/
+}
 
 impl CookieJar {
-	pub fn find(&self, name: &str, path: &str, include_http_only: bool) -> Option<Cookie> {
-		for cookie in self.iter(path, include_http_only) {
+
+	pub async fn find(&self, name: &str, url: &str, include_http_only: bool) -> Option<Cookie> {
+		let mut iter = self.iter(url, include_http_only);
+
+		while let Some(cookie) = iter.next().await {
 			if cookie.name() == name {
 				return Some(cookie)
 			}
@@ -88,17 +111,19 @@ impl CookieJar {
 		None
 	}
 
-	/*pub fn find_mut(&mut self, name: &str, path: &str, include_http_only: bool) -> Option<CookieMut> {
-		for cookie in self.iter_mut(path, include_http_only) {
+	pub async fn find_from_all(&self, name: &str) -> Option<Cookie> {
+		let mut iter = self.iter_all();
+
+		while let Some(cookie) = iter.next().await {
 			if cookie.name() == name {
 				return Some(cookie)
 			}
 		}
 
 		None
-	}*/
+	}
 
-	pub fn global() -> Self {
+	pub fn global(_app: &ApplicationHandle) -> Self {
 		Self {
 			inner: CookieJarImpl::global()
 		}
@@ -108,15 +133,19 @@ impl CookieJar {
 		let inner = self.inner.iterator(url, include_http_only);
 
 		CookieIterator {
-			inner
+			inner,
+			_phantom: PhantomData
 		}
 	}
 
-	/*pub fn iter_mut<'a>(&'a mut self, url: &str, include_http_only: bool) -> CookieIteratorMut<'a> {
-		let inner = self.iter(url, include_http_only);
+	pub fn iter_all<'a>(&'a self) -> CookieIterator<'a> {
+		let inner = self.inner.iterator_all();
 
-		CookieIteratorMut (inner)
-	}*/
+		CookieIterator {
+			inner,
+			_phantom: PhantomData
+		}
+	}
 
 	fn _store<'a,H>(&mut self, url: &str, cookie: &Cookie, on_complete: H) where
 		H: FnOnce(Result<(), CookieStorageError>) + 'a
@@ -141,6 +170,12 @@ impl CookieJar {
 	}
 }
 
+impl Drop for CookieJar {
+	fn drop(&mut self) {
+		self.inner.free();
+	}
+}
+
 
 
 unsafe fn cookie_store_callback<'a, H>( _handle: CookieJarImpl, cb_data: *mut (), result: Result<(), CookieStorageError> ) where
@@ -150,4 +185,13 @@ unsafe fn cookie_store_callback<'a, H>( _handle: CookieJarImpl, cb_data: *mut ()
 	let data: Box<H> = Box::from_raw( data_ptr );
 
 	(*data)( result );
+}
+
+unsafe fn cookie_iterator_next_handler<H>(_handle: CookieIteratorImpl, cb_data: *mut (), cookie: Option<CookieImpl>) where
+	H: FnOnce(Option<Cookie>)
+{
+	let data_ptr = cb_data as *mut H;
+	let data: Box<H> = Box::from_raw(data_ptr);
+
+	(*data)(cookie.map(|c| Cookie {inner: c}));
 }

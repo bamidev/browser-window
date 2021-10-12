@@ -7,7 +7,6 @@ use browser_window::prelude::*;
 
 
 
-// This example does not work with feature `threadsafe` enabled
 fn main() {
 	let application = Application::initialize(&ApplicationSettings::default()).expect("unable to initialize");
 	let runtime = application.start();
@@ -22,8 +21,9 @@ fn main() {
 
 		bw.show();
 
-		let cookie_jar = CookieJar::global();
-		for cookie in cookie_jar.iter("/", true) {
+		let cookie_jar = CookieJar::global(&app);
+		let mut iter = cookie_jar.iter("https://github.com/", true);
+		while let Some(cookie) = iter.next().await {
 			println!("Cookie {}: {}", cookie.name(), cookie.value());
 		}
 	});

@@ -74,6 +74,7 @@ use lazy_static::lazy_static;
 use std::env;
 use std::ffi::{CString};
 use std::future::Future;
+use std::ops::Deref;
 use std::os::raw::{c_int};
 use std::pin::Pin;
 use std::ptr;
@@ -528,6 +529,15 @@ impl From<ApplicationHandle> for ApplicationHandleThreaded {
 		Self {
 			handle: other.clone()
 		}
+	}
+}
+
+#[cfg(feature = "threadsafe")]
+impl Deref for ApplicationHandleThreaded {
+	type Target = ApplicationHandle;
+
+	fn deref(&self) -> &Self::Target {
+		&self.handle
 	}
 }
 

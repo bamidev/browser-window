@@ -27,7 +27,6 @@ fn tests() {
 	// Instead of marking each test with #[test], there is one actual test that runs all different 'test' functions.
 	// This is because the Browser Window application can only be initialized once.
 	// Also, because `Application` is not `Send`, we can not use it acros multiple tests because they are ran in parallel.
-	#[cfg(not(feature = "threadsafe"))]
 	async_tests(&app);
 	#[cfg(feature = "threadsafe")]
 	threaded_tests(&app);
@@ -45,8 +44,8 @@ fn threaded_tests(application: &Application) {
 
 		// Spawn the main logic into the tokio runtime
 		tokio_runtime.spawn(async move{
+
 			// TODO: run tests here...
-			println!("TEST");
 
 			app.exit(0);
 		});
@@ -54,25 +53,52 @@ fn threaded_tests(application: &Application) {
 }
 
 
-#[cfg(not(feature = "threadsafe"))]
 fn async_tests(application: &Application) {
 	let runtime = application.start();
 	
-	runtime.run_async(|app| async move {
+	let exit_code = runtime.run_async(|app| async move {
+		let bw = async_basic(app).await;
+		async_cookies(app).await;
+		//async_correct_parent_cleanup(app).await;
 
-		async_basic(app).await;
-		async_correct_parent_cleanup(app).await;
+		bw.close();
 	});
+
+	assert!(exit_code == 0);
 }
 
-#[cfg(not(feature = "threadsafe"))]
-async fn async_basic(app: ApplicationHandle) {
+async fn async_basic(app: ApplicationHandle) -> BrowserWindow {
 	let mut bwb = BrowserWindowBuilder::new( Source::Url("https://www.duckduckgo.com/".into()) );
 	bwb.title("Basic Async Test");
-	let bw = bwb.build( app ).await;
-	
-	bw.close();
+	return bwb.build( app ).await;
 }
+
+async fn async_cookies(app: ApplicationHandle) {
+	let mut jar = CookieJar::global(&app);
+
+	let cookie = Cookie::new("name", "value");
+
+	// Store cookies
+	jar.store("/", &cookie).await.unwrap_err();	// Should give error
+	jar.store_start("http://localhost/test", &cookie);
+	jar.store("http://localhost/", &cookie).await.unwrap();
+
+	// Using a wrong url
+	let mut iter = jar.iter("/", true);
+	assert!(iter.next().await.is_none());
+	
+	// Finding our set cookie back
+	let cookie = jar.find("name", "http://localhost/", true).await.unwrap();
+	assert!(cookie.name() == "name");
+	assert!(cookie.value() == "value");
+
+	// Finding our set cookie back in another way
+	let cookie = jar.find_from_all("name").await.unwrap();
+	assert!(cookie.name() == "name");
+	assert!(cookie.value() == "value");
+}
+
+
 
 #[test]
 /// Checking if all cookie methods work correctly.
@@ -98,15 +124,13 @@ fn cookie() {
 
 		assert!(cookie.domain() == "127.0.0.1");
 		assert!(cookie.path() == "/");
-		println!("Expires: {:?} {:?}", &now, cookie.expires().unwrap());
 		assert!((now.duration_since(UNIX_EPOCH).unwrap() - cookie.expires().unwrap().duration_since(UNIX_EPOCH).unwrap()) < Duration::from_millis(1));
 		assert!((now.duration_since(UNIX_EPOCH).unwrap() - cookie.creation_time().duration_since(UNIX_EPOCH).unwrap()) < Duration::from_millis(1));
 }
 
 /// Closes a parent window before closing its child window, to see if the child window handle still is valid and doesn't cause any memory issues.
-#[cfg(not(feature = "threadsafe"))]
 async fn async_correct_parent_cleanup(app: ApplicationHandle) {
-		
+
 	// First create the parent
 	let mut bwb_parent = BrowserWindowBuilder::new(Source::Url("https://www.duckduckgo.com/".into()));
 	bwb_parent.title("Parent Window");
@@ -117,10 +141,10 @@ async fn async_correct_parent_cleanup(app: ApplicationHandle) {
 	bwb_child.title("Child Window");
 	bwb_child.parent(&bw_parent);
 	let bw_child = bwb_child.build(app).await;
-
+	
 	// Destroy the parent handle, while a handle of the child still exists
 	bw_parent.close();
-
+	
 	// Then close the child handle.
 	// This should cleanup the parent as well.
 	bw_child.close();

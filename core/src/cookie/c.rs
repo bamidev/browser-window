@@ -24,13 +24,17 @@ pub struct CookieJarImpl {
 	pub(in crate) inner: *mut cbw_CookieJar
 }
 
-pub struct CookieIteratorImpl<'a> {
-	pub(in crate) inner: *mut cbw_CookieIterator,
-	_phantom: PhantomData<&'a u8>
+pub struct CookieIteratorImpl {
+	pub(in crate) inner: *mut cbw_CookieIterator
 }
 
 struct CookieStorageCallbackData {
 	callback: CookieStorageCallbackFn,
+	data: *mut ()
+}
+
+struct CookieIteratorNextCallbackData {
+	callback: CookieIteratorNextCallbackFn,
 	data: *mut ()
 }
 
@@ -70,6 +74,10 @@ impl CookieExt for CookieImpl {
 		}
 	}
 
+	fn free(&mut self) {
+		unsafe { cbw_Cookie_free(self.inner) };
+	}
+
 	fn is_http_only(&self) -> bool {
 		(unsafe { cbw_Cookie_isHttpOnly(self.inner) }) > 0
 	}
@@ -83,8 +91,8 @@ impl CookieExt for CookieImpl {
 		let owned = unsafe { cbw_Cookie_getName(self.inner, &mut slice) };
 
 		if owned > 0 {
-			let string: String = slice.into();println!("name:{}",string);
-			unsafe { cbw_string_free(slice) };println!("owned:{}",owned);
+			let string: String = slice.into();
+			unsafe { cbw_string_free(slice) };
 			string.into()
 		}
 		else {
@@ -164,13 +172,11 @@ impl CookieExt for CookieImpl {
 	}
 }
 
-impl Drop for CookieImpl {
-	fn drop(&mut self) {
-		unsafe { cbw_Cookie_free(self.inner) };
-	}
-}
-
 impl CookieJarExt for CookieJarImpl {
+
+	fn free(&mut self) {
+		unsafe { cbw_CookieJar_free(self.inner) };
+	}
 
 	fn global() -> CookieJarImpl {
 		let inner = unsafe { cbw_CookieJar_newGlobal() };
@@ -180,17 +186,24 @@ impl CookieJarExt for CookieJarImpl {
 		}
 	}
 
-	fn iterator<'a>(&'a self, url: &str, include_http_only: bool) -> CookieIteratorImpl<'a> {
-		let mut iterator: CookieIteratorImpl<'a> = unsafe { MaybeUninit::uninit().assume_init() };
+	fn iterator<'a>(&'a self, url: &str, include_http_only: bool) -> CookieIteratorImpl {
+		let mut iterator: CookieIteratorImpl = unsafe { MaybeUninit::uninit().assume_init() };
 		unsafe { cbw_CookieJar_iterator(self.inner, &mut iterator.inner, if include_http_only {1} else {0}, url.into()) };
 		
 		return iterator;
 	}
 
-	fn store(&self, url: &str, cookie: &CookieImpl, success_cb: Option<CookieStorageCallbackFn>, cb_data: *mut ()) {
-		let data = if !success_cb.is_none() {
+	fn iterator_all<'a>(&'a self) -> CookieIteratorImpl {
+		let mut iterator: CookieIteratorImpl = unsafe { MaybeUninit::uninit().assume_init() };
+		unsafe { cbw_CookieJar_iteratorAll(self.inner, &mut iterator.inner) };
+		
+		return iterator;
+	}
+
+	fn store(&self, url: &str, cookie: &CookieImpl, complete_cb: Option<CookieStorageCallbackFn>, cb_data: *mut ()) {
+		let data = if !complete_cb.is_none() {
 			Box::into_raw( Box::new( CookieStorageCallbackData {
-				callback: success_cb.unwrap(),
+				callback: complete_cb.unwrap(),
 				data: cb_data
 			}))
 		}
@@ -198,41 +211,41 @@ impl CookieJarExt for CookieJarImpl {
 			ptr::null_mut()
 		};
 
-		unsafe { cbw_CookieJar_store(
-			self.inner,
-			url.into(),
-			cookie.inner,
-			success_cb.map(|_| ffi_cookie_storage_callback_handler as _),
-			data as _
-		) };
-	}
-}
+		unsafe {
+			let mut error = cbw_CookieJar_store(
+				self.inner,
+				url.into(),
+				cookie.inner,
+				complete_cb.map(|_| ffi_cookie_storage_callback_handler as _),
+				data as _
+			);
 
-impl Drop for CookieJarImpl {
-	fn drop(&mut self) {
-		unsafe { cbw_CookieJar_free(self.inner) };
-	}
-}
+			if error.code != 0 && !complete_cb.is_none() {
+				(complete_cb.unwrap())(CookieJarImpl {inner: self.inner}, cb_data, Err(CookieStorageError::Unknown));
+			}
 
-impl<'a> CookieIteratorExt for CookieIteratorImpl<'a> {
-	fn next(&mut self) -> Option<CookieImpl> {
-		let mut cookie_ptr: *mut cbw_Cookie = ptr::null_mut();
-		let success = unsafe { cbw_CookieIterator_next(self.inner, &mut cookie_ptr) };
-		
-		if success > 0 {
-			Some(CookieImpl { inner: cookie_ptr })
-		}
-		else {
-			None
+			cbw_Err_free(&mut error);
 		}
 	}
 }
 
-impl<'a> Drop for CookieIteratorImpl<'a> {
-	fn drop(&mut self) {
+impl CookieIteratorExt for CookieIteratorImpl {
+	fn free(&mut self) {
 		unsafe { cbw_CookieIterator_free(self.inner) }
 	}
+
+	fn next(&mut self, on_next: CookieIteratorNextCallbackFn, cb_data: *mut ()) -> bool {
+		let data = Box::into_raw(Box::new(CookieIteratorNextCallbackData {
+			callback: on_next,
+			data: cb_data
+		}));
+
+		let success = unsafe { cbw_CookieIterator_next(self.inner, Some(ffi_cookie_iterator_next_handler), data as _) };
+		
+		return success > 0;
+	}
 }
+
 
 
 
@@ -250,4 +263,19 @@ unsafe extern "C" fn ffi_cookie_storage_callback_handler(cookie_jar: *mut cbw_Co
 	};
 
 	(data.callback)( handle, data.data, result );
+}
+
+unsafe extern "C" fn ffi_cookie_iterator_next_handler(cookie_iterator: *mut cbw_CookieIterator, _data: *mut c_void, _cookie: *mut cbw_Cookie) {
+	let data_ptr = _data as *mut CookieIteratorNextCallbackData;
+	let data: Box<CookieIteratorNextCallbackData> = Box::from_raw(data_ptr);
+
+	let handle = CookieIteratorImpl {inner: cookie_iterator};
+	let cookie = if _cookie == ptr::null_mut() {
+		None
+	}
+	else {
+		Some(CookieImpl {inner: _cookie})
+	};
+
+	(data.callback)(handle, data.data, cookie);
 }
