@@ -134,33 +134,6 @@ pub const c_BITS_TYPES_LOCALE_T_H: u32 = 1;
 pub const c_BITS_TYPES___LOCALE_T_H: u32 = 1;
 pub const c_STRINGS_H: u32 = 1;
 pub const cBW_ERR_CODE_SUCCESS: u32 = 0;
-pub const c_ASSERT_H: u32 = 1;
-pub const c_STDIO_H: u32 = 1;
-pub const c__GNUC_VA_LIST: u32 = 1;
-pub const c_____fpos_t_defined: u32 = 1;
-pub const c____mbstate_t_defined: u32 = 1;
-pub const c_____fpos64_t_defined: u32 = 1;
-pub const c____FILE_defined: u32 = 1;
-pub const c__FILE_defined: u32 = 1;
-pub const c__struct_FILE_defined: u32 = 1;
-pub const c_IO_EOF_SEEN: u32 = 16;
-pub const c_IO_ERR_SEEN: u32 = 32;
-pub const c_IO_USER_LOCK: u32 = 32768;
-pub const c_IOFBF: u32 = 0;
-pub const c_IOLBF: u32 = 1;
-pub const c_IONBF: u32 = 2;
-pub const cBUFSIZ: u32 = 8192;
-pub const cEOF: i32 = -1;
-pub const cSEEK_SET: u32 = 0;
-pub const cSEEK_CUR: u32 = 1;
-pub const cSEEK_END: u32 = 2;
-pub const cP_tmpdir: &'static [u8; 5usize] = b"/tmp\0";
-pub const c_BITS_STDIO_LIM_H: u32 = 1;
-pub const cL_tmpnam: u32 = 20;
-pub const cTMP_MAX: u32 = 238328;
-pub const cFILENAME_MAX: u32 = 4096;
-pub const cL_ctermid: u32 = 9;
-pub const cFOPEN_MAX: u32 = 16;
 pub const c_STDINT_H: u32 = 1;
 pub const c_BITS_WCHAR_H: u32 = 1;
 pub const c_BITS_STDINT_UINTN_H: u32 = 1;
@@ -201,6 +174,33 @@ pub const cSIG_ATOMIC_MAX: u32 = 2147483647;
 pub const cSIZE_MAX: i32 = -1;
 pub const cWINT_MIN: u32 = 0;
 pub const cWINT_MAX: u32 = 4294967295;
+pub const c_ASSERT_H: u32 = 1;
+pub const c_STDIO_H: u32 = 1;
+pub const c__GNUC_VA_LIST: u32 = 1;
+pub const c_____fpos_t_defined: u32 = 1;
+pub const c____mbstate_t_defined: u32 = 1;
+pub const c_____fpos64_t_defined: u32 = 1;
+pub const c____FILE_defined: u32 = 1;
+pub const c__FILE_defined: u32 = 1;
+pub const c__struct_FILE_defined: u32 = 1;
+pub const c_IO_EOF_SEEN: u32 = 16;
+pub const c_IO_ERR_SEEN: u32 = 32;
+pub const c_IO_USER_LOCK: u32 = 32768;
+pub const c_IOFBF: u32 = 0;
+pub const c_IOLBF: u32 = 1;
+pub const c_IONBF: u32 = 2;
+pub const cBUFSIZ: u32 = 8192;
+pub const cEOF: i32 = -1;
+pub const cSEEK_SET: u32 = 0;
+pub const cSEEK_CUR: u32 = 1;
+pub const cSEEK_END: u32 = 2;
+pub const cP_tmpdir: &'static [u8; 5usize] = b"/tmp\0";
+pub const c_BITS_STDIO_LIM_H: u32 = 1;
+pub const cL_tmpnam: u32 = 20;
+pub const cTMP_MAX: u32 = 238328;
+pub const cFILENAME_MAX: u32 = 4096;
+pub const cL_ctermid: u32 = 9;
+pub const cFOPEN_MAX: u32 = 16;
 pub const ctrue: u32 = 1;
 pub const cfalse: u32 = 0;
 pub const c__bool_true_false_are_defined: u32 = 1;
@@ -346,6 +346,10 @@ extern "C" {
     #[link_name = "\u{1}bw_string_freeCstr"]
     pub fn cbw_string_freeCstr(str_: *mut ::std::os::raw::c_char);
 }
+extern "C" {
+    #[link_name = "\u{1}bw_string_free"]
+    pub fn cbw_string_free(str_: cbw_StrSlice);
+}
 pub type cbw_ApplicationDispatchFn = ::std::option::Option<
     unsafe extern "C" fn(app: *mut cbw_Application, data: *mut ::std::os::raw::c_void),
 >;
@@ -380,245 +384,6 @@ fn bindgen_test_layout_cbw_ApplicationEngineImpl() {
         ::std::mem::align_of::<cbw_ApplicationEngineImpl>(),
         1usize,
         concat!("Alignment of ", stringify!(cbw_ApplicationEngineImpl))
-    );
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct cbw_Application {
-    pub windows_alive: ::std::os::raw::c_uint,
-    pub impl_: cbw_ApplicationImpl,
-    pub engine_impl: cbw_ApplicationEngineImpl,
-}
-#[test]
-fn bindgen_test_layout_cbw_Application() {
-    assert_eq!(
-        ::std::mem::size_of::<cbw_Application>(),
-        4usize,
-        concat!("Size of: ", stringify!(cbw_Application))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cbw_Application>(),
-        4usize,
-        concat!("Alignment of ", stringify!(cbw_Application))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<cbw_Application>())).windows_alive as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_Application),
-            "::",
-            stringify!(windows_alive)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<cbw_Application>())).impl_ as *const _ as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_Application),
-            "::",
-            stringify!(impl_)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<cbw_Application>())).engine_impl as *const _ as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_Application),
-            "::",
-            stringify!(engine_impl)
-        )
-    );
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct cbw_ApplicationEngineData {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct cbw_ApplicationDispatchData {
-    pub func: cbw_ApplicationDispatchFn,
-    pub data: *mut ::std::os::raw::c_void,
-}
-#[test]
-fn bindgen_test_layout_cbw_ApplicationDispatchData() {
-    assert_eq!(
-        ::std::mem::size_of::<cbw_ApplicationDispatchData>(),
-        16usize,
-        concat!("Size of: ", stringify!(cbw_ApplicationDispatchData))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cbw_ApplicationDispatchData>(),
-        8usize,
-        concat!("Alignment of ", stringify!(cbw_ApplicationDispatchData))
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<cbw_ApplicationDispatchData>())).func as *const _ as usize
-        },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_ApplicationDispatchData),
-            "::",
-            stringify!(func)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<cbw_ApplicationDispatchData>())).data as *const _ as usize
-        },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_ApplicationDispatchData),
-            "::",
-            stringify!(data)
-        )
-    );
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct cbw_ApplicationSettings {
-    pub resource_dir: cbw_CStrSlice,
-}
-#[test]
-fn bindgen_test_layout_cbw_ApplicationSettings() {
-    assert_eq!(
-        ::std::mem::size_of::<cbw_ApplicationSettings>(),
-        16usize,
-        concat!("Size of: ", stringify!(cbw_ApplicationSettings))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cbw_ApplicationSettings>(),
-        8usize,
-        concat!("Alignment of ", stringify!(cbw_ApplicationSettings))
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<cbw_ApplicationSettings>())).resource_dir as *const _ as usize
-        },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_ApplicationSettings),
-            "::",
-            stringify!(resource_dir)
-        )
-    );
-}
-extern "C" {
-    #[doc = " Safety check that makes sure the given application handle is used on the correct thread."]
-    #[doc = " Does nothing in release mode."]
-    #[link_name = "\u{1}bw_Application_assertCorrectThread"]
-    pub fn cbw_Application_assertCorrectThread(arg1: *const cbw_Application);
-}
-extern "C" {
-    #[doc = " Exits the main loop, returning execution to the function that invoked the run call."]
-    #[doc = " The exit_code will be returned by bw_Application_run."]
-    #[link_name = "\u{1}bw_Application_exit"]
-    pub fn cbw_Application_exit(app: *mut cbw_Application, exit_code: ::std::os::raw::c_int);
-}
-extern "C" {
-    #[doc = " Same as bw_Application_exit, but guaranteed to be thread-safe"]
-    #[doc = " The exit_code will be returned by bw_Application_run."]
-    #[link_name = "\u{1}bw_Application_exitAsync"]
-    pub fn cbw_Application_exitAsync(app: *mut cbw_Application, exit_code: ::std::os::raw::c_int);
-}
-extern "C" {
-    #[doc = " Dispatches the given function to be executed on the thread this application instance has been created on,"]
-    #[doc = "     and passes the given data to it."]
-    #[doc = " This function is thread safe."]
-    #[doc = ""]
-    #[doc = " # Returns"]
-    #[doc = " An indication of whether or not the function was able to be dispatched."]
-    #[doc = " Dispatching a function fails when the application has already been terminated."]
-    #[link_name = "\u{1}bw_Application_dispatch"]
-    pub fn cbw_Application_dispatch(
-        app: *mut cbw_Application,
-        func: cbw_ApplicationDispatchFn,
-        data: *mut ::std::os::raw::c_void,
-    ) -> cBOOL;
-}
-extern "C" {
-    #[doc = " Shuts down all application processes and performs necessary clean-up code."]
-    #[link_name = "\u{1}bw_Application_finish"]
-    pub fn cbw_Application_finish(app: *mut cbw_Application);
-}
-extern "C" {
-    #[doc = " Frees memory for the application handle."]
-    #[doc = " Call `bw_Application_finish` before you call this function."]
-    #[doc = " Freeing the application handle is generally not necessary, as all memory in use by the process gets released anyway after shutdown."]
-    #[link_name = "\u{1}bw_Application_free"]
-    pub fn cbw_Application_free(app: *mut cbw_Application);
-}
-extern "C" {
-    #[doc = " Initializes browser window."]
-    #[doc = " Starts up browser engine process(es)."]
-    #[doc = " Returns an application handle."]
-    #[link_name = "\u{1}bw_Application_initialize"]
-    pub fn cbw_Application_initialize(
-        argc: ::std::os::raw::c_int,
-        argv: *mut *mut ::std::os::raw::c_char,
-        settings: *const cbw_ApplicationSettings,
-    ) -> *mut cbw_Application;
-}
-extern "C" {
-    #[link_name = "\u{1}bw_Application_isRunning"]
-    pub fn cbw_Application_isRunning(app: *const cbw_Application) -> cBOOL;
-}
-extern "C" {
-    #[doc = " Runs the event loop."]
-    #[doc = " Calls the `on_ready` callback when `app` can be used."]
-    #[link_name = "\u{1}bw_Application_run"]
-    pub fn cbw_Application_run(
-        app: *mut cbw_Application,
-        on_ready: cbw_ApplicationReadyFn,
-        user_data: *mut ::std::os::raw::c_void,
-    ) -> ::std::os::raw::c_int;
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct cbw_BrowserWindowImpl {
-    pub cef_ptr: *mut ::std::os::raw::c_void,
-    pub resource_path: *mut ::std::os::raw::c_char,
-}
-#[test]
-fn bindgen_test_layout_cbw_BrowserWindowImpl() {
-    assert_eq!(
-        ::std::mem::size_of::<cbw_BrowserWindowImpl>(),
-        16usize,
-        concat!("Size of: ", stringify!(cbw_BrowserWindowImpl))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cbw_BrowserWindowImpl>(),
-        8usize,
-        concat!("Alignment of ", stringify!(cbw_BrowserWindowImpl))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<cbw_BrowserWindowImpl>())).cef_ptr as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_BrowserWindowImpl),
-            "::",
-            stringify!(cef_ptr)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<cbw_BrowserWindowImpl>())).resource_path as *const _ as usize
-        },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_BrowserWindowImpl),
-            "::",
-            stringify!(resource_path)
-        )
     );
 }
 pub const cidtype_t_P_ALL: cidtype_t = 0;
@@ -3311,6 +3076,318 @@ extern "C" {
     pub fn cbw_Err_new_with_msg(code: cbw_ErrCode, msg: *const ::std::os::raw::c_char) -> cbw_Err;
 }
 extern "C" {
+    #[link_name = "\u{1}bw_Err_message"]
+    pub fn cbw_Err_message(error: *const cbw_Err) -> *mut ::std::os::raw::c_char;
+}
+pub type cint_least8_t = c__int_least8_t;
+pub type cint_least16_t = c__int_least16_t;
+pub type cint_least32_t = c__int_least32_t;
+pub type cint_least64_t = c__int_least64_t;
+pub type cuint_least8_t = c__uint_least8_t;
+pub type cuint_least16_t = c__uint_least16_t;
+pub type cuint_least32_t = c__uint_least32_t;
+pub type cuint_least64_t = c__uint_least64_t;
+pub type cint_fast8_t = ::std::os::raw::c_schar;
+pub type cint_fast16_t = ::std::os::raw::c_long;
+pub type cint_fast32_t = ::std::os::raw::c_long;
+pub type cint_fast64_t = ::std::os::raw::c_long;
+pub type cuint_fast8_t = ::std::os::raw::c_uchar;
+pub type cuint_fast16_t = ::std::os::raw::c_ulong;
+pub type cuint_fast32_t = ::std::os::raw::c_ulong;
+pub type cuint_fast64_t = ::std::os::raw::c_ulong;
+pub type cintmax_t = c__intmax_t;
+pub type cuintmax_t = c__uintmax_t;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct cbw_Application {
+    pub windows_alive: ::std::os::raw::c_uint,
+    pub is_running: cBOOL,
+    pub is_done: cBOOL,
+    pub impl_: cbw_ApplicationImpl,
+    pub engine_impl: cbw_ApplicationEngineImpl,
+}
+#[test]
+fn bindgen_test_layout_cbw_Application() {
+    assert_eq!(
+        ::std::mem::size_of::<cbw_Application>(),
+        12usize,
+        concat!("Size of: ", stringify!(cbw_Application))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<cbw_Application>(),
+        4usize,
+        concat!("Alignment of ", stringify!(cbw_Application))
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<cbw_Application>())).windows_alive as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(cbw_Application),
+            "::",
+            stringify!(windows_alive)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<cbw_Application>())).is_running as *const _ as usize },
+        4usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(cbw_Application),
+            "::",
+            stringify!(is_running)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<cbw_Application>())).is_done as *const _ as usize },
+        8usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(cbw_Application),
+            "::",
+            stringify!(is_done)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<cbw_Application>())).impl_ as *const _ as usize },
+        12usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(cbw_Application),
+            "::",
+            stringify!(impl_)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<cbw_Application>())).engine_impl as *const _ as usize },
+        12usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(cbw_Application),
+            "::",
+            stringify!(engine_impl)
+        )
+    );
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct cbw_ApplicationEngineData {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct cbw_ApplicationDispatchData {
+    pub func: cbw_ApplicationDispatchFn,
+    pub data: *mut ::std::os::raw::c_void,
+}
+#[test]
+fn bindgen_test_layout_cbw_ApplicationDispatchData() {
+    assert_eq!(
+        ::std::mem::size_of::<cbw_ApplicationDispatchData>(),
+        16usize,
+        concat!("Size of: ", stringify!(cbw_ApplicationDispatchData))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<cbw_ApplicationDispatchData>(),
+        8usize,
+        concat!("Alignment of ", stringify!(cbw_ApplicationDispatchData))
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<cbw_ApplicationDispatchData>())).func as *const _ as usize
+        },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(cbw_ApplicationDispatchData),
+            "::",
+            stringify!(func)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<cbw_ApplicationDispatchData>())).data as *const _ as usize
+        },
+        8usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(cbw_ApplicationDispatchData),
+            "::",
+            stringify!(data)
+        )
+    );
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct cbw_ApplicationSettings {
+    pub engine_seperate_executable_path: cbw_CStrSlice,
+    pub resource_dir: cbw_CStrSlice,
+}
+#[test]
+fn bindgen_test_layout_cbw_ApplicationSettings() {
+    assert_eq!(
+        ::std::mem::size_of::<cbw_ApplicationSettings>(),
+        32usize,
+        concat!("Size of: ", stringify!(cbw_ApplicationSettings))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<cbw_ApplicationSettings>(),
+        8usize,
+        concat!("Alignment of ", stringify!(cbw_ApplicationSettings))
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<cbw_ApplicationSettings>())).engine_seperate_executable_path
+                as *const _ as usize
+        },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(cbw_ApplicationSettings),
+            "::",
+            stringify!(engine_seperate_executable_path)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<cbw_ApplicationSettings>())).resource_dir as *const _ as usize
+        },
+        16usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(cbw_ApplicationSettings),
+            "::",
+            stringify!(resource_dir)
+        )
+    );
+}
+extern "C" {
+    #[doc = " Safety check that makes sure the given application handle is used on the correct thread."]
+    #[doc = " Does nothing in release mode."]
+    #[link_name = "\u{1}bw_Application_assertCorrectThread"]
+    pub fn cbw_Application_assertCorrectThread(arg1: *const cbw_Application);
+}
+extern "C" {
+    #[doc = " Exits the main loop, returning execution to the function that invoked the run call."]
+    #[doc = " The exit_code will be returned by bw_Application_run."]
+    #[link_name = "\u{1}bw_Application_exit"]
+    pub fn cbw_Application_exit(app: *mut cbw_Application, exit_code: ::std::os::raw::c_int);
+}
+extern "C" {
+    #[doc = " Same as bw_Application_exit, but guaranteed to be thread-safe"]
+    #[doc = " The exit_code will be returned by bw_Application_run."]
+    #[link_name = "\u{1}bw_Application_exitAsync"]
+    pub fn cbw_Application_exitAsync(app: *mut cbw_Application, exit_code: ::std::os::raw::c_int);
+}
+extern "C" {
+    #[doc = " Dispatches the given function to be executed on the thread this application instance has been created on,"]
+    #[doc = "     and passes the given data to it."]
+    #[doc = " This function is thread safe."]
+    #[doc = ""]
+    #[doc = " # Returns"]
+    #[doc = " An indication of whether or not the function was able to be dispatched."]
+    #[doc = " Dispatching a function fails when the application has already been terminated."]
+    #[link_name = "\u{1}bw_Application_dispatch"]
+    pub fn cbw_Application_dispatch(
+        app: *mut cbw_Application,
+        func: cbw_ApplicationDispatchFn,
+        data: *mut ::std::os::raw::c_void,
+    ) -> cBOOL;
+}
+extern "C" {
+    #[doc = " Shuts down all application processes and performs necessary clean-up code."]
+    #[link_name = "\u{1}bw_Application_finish"]
+    pub fn cbw_Application_finish(app: *mut cbw_Application);
+}
+extern "C" {
+    #[doc = " Frees memory for the application handle."]
+    #[doc = " Call `bw_Application_finish` before you call this function."]
+    #[doc = " Freeing the application handle is generally not necessary, as all memory in use by the process gets released anyway after shutdown."]
+    #[link_name = "\u{1}bw_Application_free"]
+    pub fn cbw_Application_free(app: *mut cbw_Application);
+}
+extern "C" {
+    #[doc = " Initializes browser window."]
+    #[doc = " Starts up browser engine process(es)."]
+    #[doc = " Returns an application handle."]
+    #[link_name = "\u{1}bw_Application_initialize"]
+    pub fn cbw_Application_initialize(
+        application: *mut *mut cbw_Application,
+        argc: ::std::os::raw::c_int,
+        argv: *mut *mut ::std::os::raw::c_char,
+        settings: *const cbw_ApplicationSettings,
+    ) -> cbw_Err;
+}
+extern "C" {
+    #[link_name = "\u{1}bw_Application_isRunning"]
+    pub fn cbw_Application_isRunning(app: *const cbw_Application) -> cBOOL;
+}
+extern "C" {
+    #[link_name = "\u{1}bw_Application_markAsDone"]
+    pub fn cbw_Application_markAsDone(app: *mut cbw_Application);
+}
+extern "C" {
+    #[doc = " Runs the event loop."]
+    #[doc = " Calls the `on_ready` callback when `app` can be used."]
+    #[link_name = "\u{1}bw_Application_run"]
+    pub fn cbw_Application_run(
+        app: *mut cbw_Application,
+        on_ready: cbw_ApplicationReadyFn,
+        user_data: *mut ::std::os::raw::c_void,
+    ) -> ::std::os::raw::c_int;
+}
+extern "C" {
+    #[doc = " Executes the given closure after the specified delay."]
+    #[link_name = "\u{1}bw_Application_dispatchDelayed"]
+    pub fn cbw_Application_dispatchDelayed(
+        app: *mut cbw_Application,
+        func: cbw_ApplicationDispatchFn,
+        user_data: *mut ::std::os::raw::c_void,
+        milliseconds: u64,
+    ) -> cBOOL;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct cbw_BrowserWindowImpl {
+    pub cef_ptr: *mut ::std::os::raw::c_void,
+    pub resource_path: *mut ::std::os::raw::c_char,
+}
+#[test]
+fn bindgen_test_layout_cbw_BrowserWindowImpl() {
+    assert_eq!(
+        ::std::mem::size_of::<cbw_BrowserWindowImpl>(),
+        16usize,
+        concat!("Size of: ", stringify!(cbw_BrowserWindowImpl))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<cbw_BrowserWindowImpl>(),
+        8usize,
+        concat!("Alignment of ", stringify!(cbw_BrowserWindowImpl))
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<cbw_BrowserWindowImpl>())).cef_ptr as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(cbw_BrowserWindowImpl),
+            "::",
+            stringify!(cef_ptr)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<cbw_BrowserWindowImpl>())).resource_path as *const _ as usize
+        },
+        8usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(cbw_BrowserWindowImpl),
+            "::",
+            stringify!(resource_path)
+        )
+    );
+}
+extern "C" {
     #[link_name = "\u{1}__assert_fail"]
     pub fn c__assert_fail(
         __assertion: *const ::std::os::raw::c_char,
@@ -4402,24 +4479,6 @@ extern "C" {
     #[link_name = "\u{1}__overflow"]
     pub fn c__overflow(arg1: *mut cFILE, arg2: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
-pub type cint_least8_t = c__int_least8_t;
-pub type cint_least16_t = c__int_least16_t;
-pub type cint_least32_t = c__int_least32_t;
-pub type cint_least64_t = c__int_least64_t;
-pub type cuint_least8_t = c__uint_least8_t;
-pub type cuint_least16_t = c__uint_least16_t;
-pub type cuint_least32_t = c__uint_least32_t;
-pub type cuint_least64_t = c__uint_least64_t;
-pub type cint_fast8_t = ::std::os::raw::c_schar;
-pub type cint_fast16_t = ::std::os::raw::c_long;
-pub type cint_fast32_t = ::std::os::raw::c_long;
-pub type cint_fast64_t = ::std::os::raw::c_long;
-pub type cuint_fast8_t = ::std::os::raw::c_uchar;
-pub type cuint_fast16_t = ::std::os::raw::c_ulong;
-pub type cuint_fast32_t = ::std::os::raw::c_ulong;
-pub type cuint_fast64_t = ::std::os::raw::c_ulong;
-pub type cintmax_t = c__intmax_t;
-pub type cuintmax_t = c__uintmax_t;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct cbw_Dims2D {
@@ -4866,7 +4925,7 @@ pub type cbw_BrowserWindowJsCallbackFn = ::std::option::Option<
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct cbw_BrowserWindowOptions {
-    pub dev_tools: bool,
+    pub dev_tools: cBOOL,
     pub resource_path: cbw_CStrSlice,
 }
 #[test]
@@ -4910,7 +4969,7 @@ fn bindgen_test_layout_cbw_BrowserWindowOptions() {
 #[derive(Debug, Copy, Clone)]
 pub struct cbw_BrowserWindowSource {
     pub data: cbw_CStrSlice,
-    pub is_html: bool,
+    pub is_html: cBOOL,
 }
 #[test]
 fn bindgen_test_layout_cbw_BrowserWindowSource() {
@@ -5048,6 +5107,10 @@ extern "C" {
         -> *mut ::std::os::raw::c_void;
 }
 extern "C" {
+    #[link_name = "\u{1}bw_BrowserWindow_getUrl"]
+    pub fn cbw_BrowserWindow_getUrl(bw: *mut cbw_BrowserWindow, url: *mut cbw_StrSlice) -> cBOOL;
+}
+extern "C" {
     #[link_name = "\u{1}bw_BrowserWindow_getWindow"]
     pub fn cbw_BrowserWindow_getWindow(bw: *mut cbw_BrowserWindow) -> *mut cbw_Window;
 }
@@ -5072,6 +5135,332 @@ extern "C" {
         callback: cbw_BrowserWindowCreationCallbackFn,
         callback_data: *mut ::std::os::raw::c_void,
     );
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct cbw_CookieImpl {
+    pub handle_ptr: *mut ::std::os::raw::c_void,
+}
+#[test]
+fn bindgen_test_layout_cbw_CookieImpl() {
+    assert_eq!(
+        ::std::mem::size_of::<cbw_CookieImpl>(),
+        8usize,
+        concat!("Size of: ", stringify!(cbw_CookieImpl))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<cbw_CookieImpl>(),
+        8usize,
+        concat!("Alignment of ", stringify!(cbw_CookieImpl))
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<cbw_CookieImpl>())).handle_ptr as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(cbw_CookieImpl),
+            "::",
+            stringify!(handle_ptr)
+        )
+    );
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct cbw_CookieJarImpl {
+    pub handle_ptr: *mut ::std::os::raw::c_void,
+}
+#[test]
+fn bindgen_test_layout_cbw_CookieJarImpl() {
+    assert_eq!(
+        ::std::mem::size_of::<cbw_CookieJarImpl>(),
+        8usize,
+        concat!("Size of: ", stringify!(cbw_CookieJarImpl))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<cbw_CookieJarImpl>(),
+        8usize,
+        concat!("Alignment of ", stringify!(cbw_CookieJarImpl))
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<cbw_CookieJarImpl>())).handle_ptr as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(cbw_CookieJarImpl),
+            "::",
+            stringify!(handle_ptr)
+        )
+    );
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct cbw_CookieIteratorImpl {
+    pub index: csize_t,
+    pub visitor_ptr: *mut ::std::os::raw::c_void,
+}
+#[test]
+fn bindgen_test_layout_cbw_CookieIteratorImpl() {
+    assert_eq!(
+        ::std::mem::size_of::<cbw_CookieIteratorImpl>(),
+        16usize,
+        concat!("Size of: ", stringify!(cbw_CookieIteratorImpl))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<cbw_CookieIteratorImpl>(),
+        8usize,
+        concat!("Alignment of ", stringify!(cbw_CookieIteratorImpl))
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<cbw_CookieIteratorImpl>())).index as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(cbw_CookieIteratorImpl),
+            "::",
+            stringify!(index)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<cbw_CookieIteratorImpl>())).visitor_ptr as *const _ as usize
+        },
+        8usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(cbw_CookieIteratorImpl),
+            "::",
+            stringify!(visitor_ptr)
+        )
+    );
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct cbw_Cookie {
+    pub impl_: cbw_CookieImpl,
+}
+#[test]
+fn bindgen_test_layout_cbw_Cookie() {
+    assert_eq!(
+        ::std::mem::size_of::<cbw_Cookie>(),
+        8usize,
+        concat!("Size of: ", stringify!(cbw_Cookie))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<cbw_Cookie>(),
+        8usize,
+        concat!("Alignment of ", stringify!(cbw_Cookie))
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<cbw_Cookie>())).impl_ as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(cbw_Cookie),
+            "::",
+            stringify!(impl_)
+        )
+    );
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct cbw_CookieJar {
+    pub impl_: cbw_CookieJarImpl,
+}
+#[test]
+fn bindgen_test_layout_cbw_CookieJar() {
+    assert_eq!(
+        ::std::mem::size_of::<cbw_CookieJar>(),
+        8usize,
+        concat!("Size of: ", stringify!(cbw_CookieJar))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<cbw_CookieJar>(),
+        8usize,
+        concat!("Alignment of ", stringify!(cbw_CookieJar))
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<cbw_CookieJar>())).impl_ as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(cbw_CookieJar),
+            "::",
+            stringify!(impl_)
+        )
+    );
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct cbw_CookieIterator {
+    pub impl_: cbw_CookieIteratorImpl,
+}
+#[test]
+fn bindgen_test_layout_cbw_CookieIterator() {
+    assert_eq!(
+        ::std::mem::size_of::<cbw_CookieIterator>(),
+        16usize,
+        concat!("Size of: ", stringify!(cbw_CookieIterator))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<cbw_CookieIterator>(),
+        8usize,
+        concat!("Alignment of ", stringify!(cbw_CookieIterator))
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<cbw_CookieIterator>())).impl_ as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(cbw_CookieIterator),
+            "::",
+            stringify!(impl_)
+        )
+    );
+}
+pub type cbw_CookieJarStorageCallbackFn = ::std::option::Option<
+    unsafe extern "C" fn(cj: *mut cbw_CookieJar, data: *mut ::std::os::raw::c_void, error: cbw_Err),
+>;
+pub type cbw_CookieIteratorNextCallbackFn = ::std::option::Option<
+    unsafe extern "C" fn(
+        ci: *mut cbw_CookieIterator,
+        data: *mut ::std::os::raw::c_void,
+        cookie: *mut cbw_Cookie,
+    ),
+>;
+pub type cbw_CookieJarDeleteCallbackFn = ::std::option::Option<
+    unsafe extern "C" fn(
+        cj: *mut cbw_CookieJar,
+        data: *mut ::std::os::raw::c_void,
+        deleted: ::std::os::raw::c_uint,
+    ),
+>;
+extern "C" {
+    #[link_name = "\u{1}bw_Cookie_free"]
+    pub fn cbw_Cookie_free(cookie: *mut cbw_Cookie);
+}
+extern "C" {
+    #[link_name = "\u{1}bw_Cookie_new"]
+    pub fn cbw_Cookie_new(name: cbw_CStrSlice, value: cbw_CStrSlice) -> *mut cbw_Cookie;
+}
+extern "C" {
+    #[link_name = "\u{1}bw_Cookie_getCreationTime"]
+    pub fn cbw_Cookie_getCreationTime(cookie: *const cbw_Cookie) -> u64;
+}
+extern "C" {
+    #[link_name = "\u{1}bw_Cookie_setCreationTime"]
+    pub fn cbw_Cookie_setCreationTime(cookie: *mut cbw_Cookie, time: u64);
+}
+extern "C" {
+    #[link_name = "\u{1}bw_Cookie_getDomain"]
+    pub fn cbw_Cookie_getDomain(cookie: *const cbw_Cookie, domain: *mut cbw_StrSlice) -> cBOOL;
+}
+extern "C" {
+    #[link_name = "\u{1}bw_Cookie_setDomain"]
+    pub fn cbw_Cookie_setDomain(cookie: *mut cbw_Cookie, domain: cbw_CStrSlice);
+}
+extern "C" {
+    #[link_name = "\u{1}bw_Cookie_getExpires"]
+    pub fn cbw_Cookie_getExpires(cookie: *const cbw_Cookie) -> u64;
+}
+extern "C" {
+    #[link_name = "\u{1}bw_Cookie_setExpires"]
+    pub fn cbw_Cookie_setExpires(cookie: *mut cbw_Cookie, time: u64);
+}
+extern "C" {
+    #[link_name = "\u{1}bw_Cookie_getName"]
+    pub fn cbw_Cookie_getName(cookie: *const cbw_Cookie, name: *mut cbw_StrSlice) -> cBOOL;
+}
+extern "C" {
+    #[link_name = "\u{1}bw_Cookie_setName"]
+    pub fn cbw_Cookie_setName(cookie: *mut cbw_Cookie, name: cbw_CStrSlice);
+}
+extern "C" {
+    #[link_name = "\u{1}bw_Cookie_getPath"]
+    pub fn cbw_Cookie_getPath(cookie: *const cbw_Cookie, path: *mut cbw_StrSlice) -> cBOOL;
+}
+extern "C" {
+    #[link_name = "\u{1}bw_Cookie_setPath"]
+    pub fn cbw_Cookie_setPath(cookie: *mut cbw_Cookie, path: cbw_CStrSlice);
+}
+extern "C" {
+    #[link_name = "\u{1}bw_Cookie_getValue"]
+    pub fn cbw_Cookie_getValue(cookie: *const cbw_Cookie, value: *mut cbw_StrSlice) -> cBOOL;
+}
+extern "C" {
+    #[link_name = "\u{1}bw_Cookie_setValue"]
+    pub fn cbw_Cookie_setValue(cookie: *mut cbw_Cookie, value: cbw_CStrSlice);
+}
+extern "C" {
+    #[link_name = "\u{1}bw_Cookie_isHttpOnly"]
+    pub fn cbw_Cookie_isHttpOnly(cookie: *const cbw_Cookie) -> cBOOL;
+}
+extern "C" {
+    #[link_name = "\u{1}bw_Cookie_makeHttpOnly"]
+    pub fn cbw_Cookie_makeHttpOnly(cookie: *mut cbw_Cookie);
+}
+extern "C" {
+    #[link_name = "\u{1}bw_Cookie_isSecure"]
+    pub fn cbw_Cookie_isSecure(cookie: *const cbw_Cookie) -> cBOOL;
+}
+extern "C" {
+    #[link_name = "\u{1}bw_Cookie_makeSecure"]
+    pub fn cbw_Cookie_makeSecure(cookie: *mut cbw_Cookie);
+}
+extern "C" {
+    #[link_name = "\u{1}bw_CookieJar_delete"]
+    pub fn cbw_CookieJar_delete(
+        jar: *mut cbw_CookieJar,
+        url: cbw_CStrSlice,
+        name: cbw_CStrSlice,
+        cb: cbw_CookieJarDeleteCallbackFn,
+        cb_data: *mut ::std::os::raw::c_void,
+    );
+}
+extern "C" {
+    #[link_name = "\u{1}bw_CookieJar_free"]
+    pub fn cbw_CookieJar_free(jar: *mut cbw_CookieJar);
+}
+extern "C" {
+    #[link_name = "\u{1}bw_CookieJar_iterator"]
+    pub fn cbw_CookieJar_iterator(
+        jar: *mut cbw_CookieJar,
+        iterator: *mut *mut cbw_CookieIterator,
+        include_http_only: cBOOL,
+        url: cbw_CStrSlice,
+    );
+}
+extern "C" {
+    #[link_name = "\u{1}bw_CookieJar_iteratorAll"]
+    pub fn cbw_CookieJar_iteratorAll(
+        jar: *mut cbw_CookieJar,
+        iterator: *mut *mut cbw_CookieIterator,
+    );
+}
+extern "C" {
+    #[link_name = "\u{1}bw_CookieJar_newGlobal"]
+    pub fn cbw_CookieJar_newGlobal() -> *mut cbw_CookieJar;
+}
+extern "C" {
+    #[link_name = "\u{1}bw_CookieJar_store"]
+    pub fn cbw_CookieJar_store(
+        jar: *mut cbw_CookieJar,
+        url: cbw_CStrSlice,
+        cookie: *const cbw_Cookie,
+        cb: cbw_CookieJarStorageCallbackFn,
+        cb_data: *mut ::std::os::raw::c_void,
+    ) -> cbw_Err;
+}
+extern "C" {
+    #[link_name = "\u{1}bw_CookieIterator_free"]
+    pub fn cbw_CookieIterator_free(iterator: *mut cbw_CookieIterator);
+}
+extern "C" {
+    #[link_name = "\u{1}bw_CookieIterator_next"]
+    pub fn cbw_CookieIterator_next(
+        iterator: *mut cbw_CookieIterator,
+        on_next: cbw_CookieIteratorNextCallbackFn,
+        cb_data: *mut ::std::os::raw::c_void,
+    ) -> cBOOL;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
