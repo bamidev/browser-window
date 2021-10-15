@@ -67,3 +67,12 @@ BOOL bw_Application_dispatch( bw_Application* app, bw_ApplicationDispatchFn func
 
 	return bw_ApplicationImpl_dispatch( app, dispatch_data );
 }
+
+BOOL bw_Application_dispatchDelayed( bw_Application* app, bw_ApplicationDispatchFn func, void* data, uint64_t milliseconds ) {
+
+	bw_ApplicationDispatchData* dispatch_data = (bw_ApplicationDispatchData*)malloc( sizeof(bw_ApplicationDispatchData) );
+	dispatch_data->func = func;
+	dispatch_data->data = data;
+
+	return bw_ApplicationImpl_dispatchDelayed( app, dispatch_data, milliseconds );
+}

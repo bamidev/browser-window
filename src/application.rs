@@ -73,12 +73,16 @@ fn main() {
 use std::env;
 use std::ffi::{CString};
 use std::future::Future;
+#[cfg(feature = "threadsafe")]
+use std::ops::Deref;
 use std::os::raw::{c_int};
 use std::pin::Pin;
 use std::ptr;
 use std::task::{Context, Poll, Waker, RawWaker, RawWakerVTable};
+use std::time::Duration;
 
 use browser_window_core::application::*;
+use futures_channel::oneshot;
 use lazy_static::lazy_static;
 
 pub use browser_window_core::application::ApplicationSettings;
@@ -115,8 +119,14 @@ pub struct ApplicationHandle {
 	pub(in super) inner: ApplicationImpl
 }
 
-#[cfg(feature = "threadsafe")]
 struct ApplicationDispatchData<'a> {
+
+	handle: ApplicationHandle,
+	func: Box<dyn FnOnce(ApplicationHandle) + 'a>
+}
+
+#[cfg(feature = "threadsafe")]
+struct ApplicationDispatchSendData<'a> {
 
 	handle: ApplicationHandle,
 	func: Box<dyn FnOnce(ApplicationHandle) + Send + 'a>
@@ -381,6 +391,34 @@ impl ApplicationHandle {
 		// First poll
 		unsafe { Runtime::poll_future( waker_data ) };
 	}
+
+	/// Queues the given closure `func` to be executed on the GUI thread somewhere in the future, at least after the given delay.
+	/// The closure will only execute when and if the runtime is still running.
+	/// Returns whether or not the closure will be able to execute.
+	pub fn dispatch_delayed<'a,F>( &self, func: F, delay: Duration ) -> bool where
+		F:  FnOnce( ApplicationHandle ) + 'a
+	{
+		let data_ptr = Box::into_raw( Box::new( ApplicationDispatchData {
+			handle: self.app_handle(),
+			func: Box::new( func )
+		} ) );
+
+		self.inner.dispatch_delayed( dispatch_handler, data_ptr as _, delay )
+	}
+
+	/// Will wait the given `duration` before returning execution back to the caller.
+	/// This does not put the current thread in a sleeping state, it just waits.
+	pub async fn sleep(&self, duration: Duration) {
+		let (tx, rx) = oneshot::channel::<()>();
+
+		self.dispatch_delayed(|handle| {
+			if let Err(_) = tx.send(()) {
+				panic!("unable to send signal back to sleeping function");
+			}
+		}, duration);
+
+		rx.await.unwrap();
+	}
 }
 
 
@@ -484,12 +522,26 @@ impl ApplicationHandleThreaded {
 	pub fn dispatch<'a,F>( &self, func: F ) -> bool where
 		F:  FnOnce( ApplicationHandle ) + Send + 'a
 	{
+		let data_ptr = Box::into_raw( Box::new( ApplicationDispatchSendData {
+			handle: self.handle,
+			func: Box::new( func )
+		} ) );
+
+		self.handle.inner.dispatch( dispatch_handler_send, data_ptr as _ )
+	}
+
+	/// Queues the given closure `func` to be executed on the GUI thread somewhere in the future, at least after the given delay.
+	/// The closure will only execute when and if the runtime is still running.
+	/// Returns whether or not the closure will be able to execute.
+	pub fn dispatch_delayed<'a,F>( &self, func: F, delay: Duration ) -> bool where
+		F:  FnOnce( ApplicationHandle ) + Send + 'a
+	{
 		let data_ptr = Box::into_raw( Box::new( ApplicationDispatchData {
 			handle: self.handle,
 			func: Box::new( func )
 		} ) );
 
-		self.handle.inner.dispatch( dispatch_handler, data_ptr as _ )
+		self.handle.inner.dispatch_delayed( dispatch_handler, data_ptr as _, delay )
 	}
 
 	/// Queues the given async closure `func` to be executed on the GUI thread somewhere in the future.
@@ -558,10 +610,18 @@ impl HasAppHandle for ApplicationHandle {
 
 
 
-#[cfg(feature = "threadsafe")]
 unsafe fn dispatch_handler( _app: ApplicationImpl, _data: *mut () ) {
 
 	let data_ptr = _data as *mut ApplicationDispatchData<'static>;
+	let data = Box::from_raw( data_ptr );
+
+	(data.func)( data.handle.into() );
+}
+
+#[cfg(feature = "threadsafe")]
+unsafe fn dispatch_handler_send( _app: ApplicationImpl, _data: *mut () ) {
+
+	let data_ptr = _data as *mut ApplicationDispatchSendData<'static>;
 	let data = Box::from_raw( data_ptr );
 
 	(data.func)( data.handle.into() );

@@ -178,7 +178,7 @@ protected:
 		bw_Application_dispatch(
 			our_handle->window->app,
 			externalInvocationHandlerFunc,
-			(void*)dispatch_data
+			dispatch_data
 		);
 	}
 
