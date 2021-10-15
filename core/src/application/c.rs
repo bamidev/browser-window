@@ -84,6 +84,10 @@ impl ApplicationExt for ApplicationImpl {
 		})
 	}
 
+	fn mark_as_done(&self) {
+		unsafe { cbw_Application_markAsDone(self.inner) };
+	}
+
 	fn run( &self, on_ready: unsafe fn( ApplicationImpl, *mut () ), _data: *mut () ) -> i32 {
 		let data = Box::new( DispatchData {
 			func: on_ready,

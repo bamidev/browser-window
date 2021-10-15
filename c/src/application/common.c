@@ -11,15 +11,15 @@ void bw_Application_free( bw_Application* app ) {
 	free( app );
 }
 
+void bw_Application_markAsDone(bw_Application* app) { printf("bw_Application_markAsDone %i\n", app->windows_alive);
+	if (app->windows_alive == 0)
+		bw_Application_exit(app, 0);
+}
+
 void bw_Application_runOnReady(bw_Application* app, void* user_data) {
 	bw_ApplicationImpl_ReadyHandlerData* ready_handler_data = (bw_ApplicationImpl_ReadyHandlerData*)user_data;
 
 	ready_handler_data->func(app, ready_handler_data->data);
-
-	// If there are no windows left when the on-ready-handler has finished, we can exit.
-	app->finished = TRUE;
-	if (app->windows_alive == 0)
-		bw_Application_exit(app, 0);
 }
 
 int bw_Application_run( bw_Application* app, bw_ApplicationReadyFn on_ready, void* user_data ) {

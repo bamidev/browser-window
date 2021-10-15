@@ -104,6 +104,8 @@ bw_Err bw_Application_initialize( bw_Application** application, int argc, char**
 
 BOOL bw_Application_isRunning( const bw_Application* app );
 
+void bw_Application_markAsDone(bw_Application* app);
+
 /// Runs the event loop.
 /// Calls the `on_ready` callback when `app` can be used.
 int bw_Application_run( bw_Application* app, bw_ApplicationReadyFn on_ready, void* user_data );

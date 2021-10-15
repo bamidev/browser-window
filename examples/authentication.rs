@@ -27,7 +27,7 @@ fn main() {
 		// Wait until we moved away from the login page
 		while bw.url() == "" || bw.url() == "https://github.com/login" || bw.url() == "https://github.com/session" {
 			println!("URL: {}", bw.url());
-			app.sleep(Duration::from_millis(100)).await;
+			app.sleep(Duration::from_millis(10000)).await;
 		}
 
 		// Check if logged in

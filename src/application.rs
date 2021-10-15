@@ -277,7 +277,10 @@ impl Runtime {
 		H: FnOnce( ApplicationHandle )
 	{
 		return self._run( |handle| {
-			on_ready( handle )
+			let result = on_ready( handle );
+			handle.inner.mark_as_done();
+			
+			result
 		} )
 	}
 
@@ -296,7 +299,8 @@ impl Runtime {
 		self._run(|handle| {
 
 			self.spawn( async move {
-				func( handle.into() ).await;
+				func( handle.clone() ).await;
+				handle.inner.mark_as_done();
 			} );
 		})
 	}

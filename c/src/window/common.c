@@ -8,7 +8,7 @@
 
 
 
-void bw_Window_destroy( bw_Window* window ) {
+void bw_Window_destroy( bw_Window* window ) { printf("bw_Window_destrpy\n");
 
 	// Call cleanup handler
 	if ( window->callbacks.do_cleanup != 0 )
@@ -17,17 +17,17 @@ void bw_Window_destroy( bw_Window* window ) {
 	// Actually destroy our window
 	bw_WindowImpl_destroy( &window->impl );
 
+	// Free the memory
+	free( window );
+
 	// Decrease the window counter
 	bw_Application* app = window->app;
 	app->windows_alive -= 1;
 
 	// Exit application if this was our last window
 	if ( app->windows_alive == 0 )
-		if (app->finished)
-			bw_Application_exit( app, 0 );
-
-	// Free the memory
-	free( window );
+		if (app->finished) {
+			bw_Application_exit( app, 0 ); }
 }
 
 
@@ -78,6 +78,7 @@ bw_Window* bw_Window_new(
 	window->impl = bw_WindowImpl_new( window, title, width, height, options );
 
 	app->windows_alive += 1;
+	printf("app->windows_alive %i\n", app->windows_alive);
 
 	return window;
 }
