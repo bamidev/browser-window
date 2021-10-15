@@ -24,13 +24,9 @@ fn main() {
 
 		let cookie_jar = app.cookie_jar();
 		
-		// Wait until page is loaded
-		while bw.url() == "" {
-			app.sleep(Duration::from_millis(100)).await;
-		}
-		
 		// Wait until we moved away from the login page
-		while bw.url() == "https://github.com/login" || bw.url() == "https://github.com/session" {
+		while bw.url() == "" || bw.url() == "https://github.com/login" || bw.url() == "https://github.com/session" {
+			println!("URL: {}", bw.url());
 			app.sleep(Duration::from_millis(100)).await;
 		}
 
