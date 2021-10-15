@@ -27,6 +27,12 @@ typedef struct {
 	SRWLOCK is_running_mtx;
 } bw_ApplicationImpl;
 
+typedef struct {
+	void* dispatch_data;
+	UINT delay;
+	struct bw_Application* app;
+} bw_ApplicationDispatchDelayedData;
+
 
 
 #ifdef __cplusplus
