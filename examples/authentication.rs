@@ -4,6 +4,8 @@ use browser_window::application::*;
 use browser_window::browser::*;
 use browser_window::prelude::*;
 
+use std::time::Duration;
+
 
 
 fn main() {
@@ -21,15 +23,32 @@ fn main() {
 		bw.show();
 
 		let cookie_jar = app.cookie_jar();
-
-		// Wait until logged in
-		while bw.url() == "https://github.com/login" {
-			// TODO: sleep
+		
+		// Wait until page is loaded
+		while bw.url() == "" {
+			app.sleep(Duration::from_millis(100)).await;
+		}
+		
+		// Wait until we moved away from the login page
+		while bw.url() == "https://github.com/login" || bw.url() == "https://github.com/session" {
+			app.sleep(Duration::from_millis(100)).await;
 		}
 
-		let mut iter = cookie_jar.iter("https://github.com/", true);
-		while let Some(cookie) = iter.next().await {
-			println!("Cookie {}: {}", cookie.name(), cookie.value());
+		// Check if logged in
+		let logged_in_cookie = cookie_jar.find_from_all("logged_in").await;
+		if logged_in_cookie.is_none() || logged_in_cookie.unwrap().value() != "yes" {
+			eprintln!("Not logged in.");
+			bw.close();
+			return;
 		}
+
+		// Get session cookie
+		let session_cookie = cookie_jar.find_from_all("_gh_sess").await.expect("session cookie not found");
+		let session_id = session_cookie.value();
+		// You can use this `session_id` to do anything, like scraping user information.
+
+		bw.close();
+
+		eprintln!("Logged in with session ID: {}", session_id);
 	});
 }
