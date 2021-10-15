@@ -90,7 +90,6 @@ impl WindowExt for WindowImpl {
 
 	fn get_title( &self ) -> String {
 		// First obtain string size
-		println!("get_title");
 		let mut buf: *mut c_char = ptr::null_mut();
 		let buf_len = unsafe { cbw_Window_getTitle( self.inner, &mut buf) };
 
