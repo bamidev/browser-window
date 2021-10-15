@@ -23,7 +23,6 @@ typedef struct {
 	DWORD thread_id;
 	HINSTANCE handle;
 	WNDCLASSEXW wc;
-	bool is_running;
 	SRWLOCK is_running_mtx;
 } bw_ApplicationImpl;
 

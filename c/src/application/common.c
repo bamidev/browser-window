@@ -11,7 +11,12 @@ void bw_Application_free( bw_Application* app ) {
 	free( app );
 }
 
-void bw_Application_markAsDone(bw_Application* app) { printf("bw_Application_markAsDone %i\n", app->windows_alive);
+BOOL bw_Application_isRunning( const bw_Application* app ) {
+	return app->is_running;
+}
+
+void bw_Application_markAsDone(bw_Application* app) {
+	app->is_done = TRUE;
 	if (app->windows_alive == 0)
 		bw_Application_exit(app, 0);
 }
@@ -24,6 +29,8 @@ void bw_Application_runOnReady(bw_Application* app, void* user_data) {
 
 int bw_Application_run( bw_Application* app, bw_ApplicationReadyFn on_ready, void* user_data ) {
 	bw_Application_assertCorrectThread( app );
+	app->is_running = TRUE;
+	app->is_done = FALSE;
 
 	bw_ApplicationImpl_ReadyHandlerData ready_handler_data = {
 		app,
@@ -37,7 +44,9 @@ int bw_Application_run( bw_Application* app, bw_ApplicationReadyFn on_ready, voi
 		(void*)&ready_handler_data
 	};
 
-	return bw_ApplicationImpl_run( app, &handler_data_wrapper );
+	int exit_code = bw_ApplicationImpl_run( app, &handler_data_wrapper );
+	app->is_running = FALSE;
+	return exit_code;
 }
 
 void bw_Application_finish( bw_Application* app ) {
@@ -50,7 +59,8 @@ bw_Err bw_Application_initialize( bw_Application** app, int argc, char** argv, c
 
 	*app = (bw_Application*)malloc( sizeof( bw_Application ) );
 	(*app)->windows_alive = 0;
-	(*app)->finished = FALSE;
+	(*app)->is_running = FALSE;
+	(*app)->is_done = FALSE;
 
 	bw_Err error = bw_ApplicationEngineImpl_initialize( &(*app)->engine_impl, (*app), argc, argv, settings );
 	if (BW_ERR_IS_FAIL(error))	return error;

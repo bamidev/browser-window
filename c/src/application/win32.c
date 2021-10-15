@@ -51,7 +51,7 @@ BOOL bw_ApplicationImpl_dispatch( bw_Application* app, bw_ApplicationDispatchDat
 	
 	// Check if the runtime is still running
 	AcquireSRWLockShared( &app->impl.is_running_mtx );
-	bool result = app->impl.is_running;
+	bool result = app->is_running;
 	ReleaseSRWLockShared( &app->impl.is_running_mtx );
 	if ( result == false )
 		return false;
@@ -67,7 +67,7 @@ BOOL bw_ApplicationImpl_dispatchDelayed(bw_Application* app, bw_ApplicationDispa
 
 	// Check if the runtime is still running
 	AcquireSRWLockShared( &app->impl.is_running_mtx );
-	bool result = app->impl.is_running;
+	bool result = app->is_running;
 	ReleaseSRWLockShared( &app->impl.is_running_mtx );
 	if ( result == false )
 		return false;
@@ -193,26 +193,12 @@ void bw_ApplicationWin32_timerHandler(HWND hwnd, UINT _, UINT_PTR timer_id, DWOR
 }
 
 
-BOOL bw_Application_isRunning( const bw_Application* app ) {
-
-	AcquireSRWLockShared( (SRWLOCK*)&app->impl.is_running_mtx );
-	BOOL result = app->impl.is_running;
-	ReleaseSRWLockShared( (SRWLOCK*)&app->impl.is_running_mtx );
-
-	return result;
-}
-
 
 int bw_ApplicationImpl_run( bw_Application* app, bw_ApplicationImpl_ReadyHandlerData* ready_handler_data ) {
 
 	MSG msg;
 	BOOL res;
 	int exit_code = 0;
-
-	// We are ready immediately because all messages get queued anyway.
-	AcquireSRWLockExclusive( &app->impl.is_running_mtx );
-	app->impl.is_running = true;
-	ReleaseSRWLockExclusive( &app->impl.is_running_mtx );
 
 	(ready_handler_data->func)( app, ready_handler_data->data );
 
@@ -227,11 +213,6 @@ int bw_ApplicationImpl_run( bw_Application* app, bw_ApplicationImpl_ReadyHandler
 			if ( res == 0 ) {
 				exit_code = (int)msg.wParam;
 				exiting = true;
-
-				// Set running flag to false
-				AcquireSRWLockExclusive( &app->impl.is_running_mtx );
-				app->impl.is_running = false;
-				ReleaseSRWLockExclusive( &app->impl.is_running_mtx );
 			}
 		}
 		// If exiting, don't wait on messages.
@@ -260,7 +241,6 @@ int bw_ApplicationImpl_run( bw_Application* app, bw_ApplicationImpl_ReadyHandler
 	}
 
 	// TODO: Wakeup all waiting delegation futures, so that they can return an error indiating that the runtime has exitted.
-
 	return exit_code;
 }
 
@@ -272,7 +252,6 @@ bw_ApplicationImpl bw_ApplicationImpl_initialize( bw_Application* _app, int argc
 	UNUSED(settings);
 
 	bw_ApplicationImpl app;
-	app.is_running = false;
 	InitializeSRWLock( &app.is_running_mtx );
 	app.thread_id = GetCurrentThreadId();
 	app.handle = GetModuleHandle(NULL);

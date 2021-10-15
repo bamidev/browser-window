@@ -21,7 +21,6 @@ void bw_Application_exit( bw_Application* app, int exit_code ) {
 	bw_Application_assertCorrectThread( app );
 
 	app->impl.exit_code = exit_code;
-	app->impl.is_running = false;
 
 	CefQuitMessageLoop();
 }
@@ -58,7 +57,6 @@ int bw_ApplicationImpl_run( bw_Application* app, bw_ApplicationImpl_ReadyHandler
 	bw_Application_assertCorrectThread( app );
 
 	app->impl.exit_code = 0;
-	app->impl.is_running = true;
 
 	CefPostTask(TID_UI, base::Bind(ready_handler_data->func, app, ready_handler_data->data ));
 	CefRunMessageLoop();
@@ -74,6 +72,5 @@ bw_ApplicationImpl bw_ApplicationImpl_initialize( bw_Application* app, int argc,
 	UNUSED( settings );
 
 	bw_ApplicationImpl impl;
-	impl.is_running = false;
 	return impl;
 }

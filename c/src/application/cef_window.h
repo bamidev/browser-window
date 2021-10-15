@@ -15,7 +15,6 @@ extern "C" {
 
 typedef struct {
 	int exit_code;
-	BOOL is_running;
 } bw_ApplicationImpl;
 
 
