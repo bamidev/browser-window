@@ -18,10 +18,10 @@ void bw_Window_destroy( bw_Window* window ) {
 	bw_WindowImpl_destroy( &window->impl );
 
 	// Free the memory
+	bw_Application* app = window->app;
 	free( window );
 
 	// Decrease the window counter
-	bw_Application* app = window->app;
 	app->windows_alive -= 1;
 
 	// Exit application if this was our last window
