@@ -1,10 +1,13 @@
 pub mod c;
 
+use std::borrow::Cow;
+
 pub use c::BrowserWindowImpl;
 pub use c::JsEvaluationError;
 
 use super::{
 	application::ApplicationImpl,
+	cookie::CookieJarImpl,
 	window::{WindowImpl, WindowOptions}
 };
 
@@ -20,6 +23,8 @@ pub type EvalJsCallbackFn = unsafe fn( bw: BrowserWindowImpl, data: *mut (), res
 pub type ExternalInvocationHandlerFn = unsafe fn( bw: BrowserWindowImpl, cmd: &str, args: Vec<String> );
 
 pub trait BrowserWindowExt: Copy {
+
+	fn cookie_jar(&self) -> CookieJarImpl;
 
 	/// Executes the given JavaScript string.
 	/// The result will be provided by invoking the callback function.
@@ -63,6 +68,8 @@ pub trait BrowserWindowExt: Copy {
 	);
 
 	fn user_data( &self ) -> *mut ();
+
+	fn url<'a>(&'a self) -> Cow<'a, str>;
 
 	/// Gives a handle to the underlying window.
 	fn window( &self ) -> WindowImpl;

@@ -23,7 +23,8 @@ void bw_Window_destroy( bw_Window* window ) {
 
 	// Exit application if this was our last window
 	if ( app->windows_alive == 0 )
-		bw_Application_exit( app, 0 );
+		if (app->finished)
+			bw_Application_exit( app, 0 );
 
 	// Free the memory
 	free( window );
@@ -75,6 +76,8 @@ bw_Window* bw_Window_new(
 	memset( &window->callbacks, 0, sizeof( window->callbacks ) );
 
 	window->impl = bw_WindowImpl_new( window, title, width, height, options );
+
+	app->windows_alive += 1;
 
 	return window;
 }

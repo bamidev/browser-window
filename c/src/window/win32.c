@@ -199,9 +199,6 @@ bw_WindowImpl bw_WindowImpl_new(
 	if ( !SetLayeredWindowAttributes( impl.handle, 0, impl.opacity, LWA_ALPHA ) )
 		BW_WIN32_PANIC_LAST_ERROR
 
-	// Increase the application's window counter
-	window->app->windows_alive += 1;
-
 	return impl;
 }
 

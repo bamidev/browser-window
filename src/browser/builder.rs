@@ -142,13 +142,11 @@ impl BrowserWindowBuilder {
 	///
 	/// # Arguments
 	/// * `app` - An application handle that this browser window can spawn into
-	#[cfg(not(feature = "threadsafe"))]
 	pub async fn build( self, app: ApplicationHandle ) -> BrowserWindow
 	{
 		let (tx, rx) = oneshot::channel::<BrowserWindowHandle>();
 
 		self._build( app, move |handle| {
-
 			if let Err(_) = tx.send( handle ) {
 				panic!("Unable to send browser handle back")
 			}
@@ -161,14 +159,14 @@ impl BrowserWindowBuilder {
 	///
 	/// Keep in mind that the description of this function is for when feature `threadsafe` is enabled.
 	/// When it is not enabled, it looks like this:
-	/// ```
-	/// pub async fn build( self, app: ApplicationHandle ) -> BrowserWindow { /* ... */ }
+	/// ```ignore
+	/// pub async fn build( self, app: ApplicationHandle ) -> Result<BrowserWindowThreaded, DelegateError> { /* ... */ }
 	/// ```
 	///
 	/// # Arguments
 	/// * `app` - An (thread-safe) application handle.
 	#[cfg(feature = "threadsafe")]
-	pub async fn build( self, app: ApplicationHandleThreaded ) -> Result<BrowserWindowThreaded, DelegateError> {
+	pub async fn build_threaded( self, app: ApplicationHandleThreaded ) -> Result<BrowserWindowThreaded, DelegateError> {
 
 		let (tx, rx) = oneshot::channel::<UnsafeSend<BrowserWindowHandle>>();
 

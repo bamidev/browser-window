@@ -137,6 +137,7 @@ fn main() {
 		.clang_arg("-DBW_BINDGEN")
 		.header("src/application.h")
 		.header("src/browser_window.h")
+		.header("src/cookie.h")
 		.header("src/common.h")
 		.header("src/err.h")
 		.header("src/string.h")
@@ -270,6 +271,7 @@ fn main() {
 		build
 			.file("src/application/cef.cpp")
 			.file("src/browser_window/cef.cpp")
+			.file("src/cookie/cef.cpp")
 			.file("src/cef/bw_handle_map.cpp")
 			.file("src/cef/client_handler.cpp")
 			.file("src/cef/exception.cpp")

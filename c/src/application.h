@@ -42,10 +42,13 @@ typedef struct {} bw_ApplicationEngineImpl;
 
 #include "err.h"
 
+#include <stdint.h>
+
 
 
 struct bw_Application {
 	unsigned int windows_alive;
+	BOOL finished;
 	bw_ApplicationImpl impl;
 	bw_ApplicationEngineImpl engine_impl;	/// Can be set by the implementation of a browser engine
 };
@@ -104,6 +107,9 @@ BOOL bw_Application_isRunning( const bw_Application* app );
 /// Runs the event loop.
 /// Calls the `on_ready` callback when `app` can be used.
 int bw_Application_run( bw_Application* app, bw_ApplicationReadyFn on_ready, void* user_data );
+
+/// Executes the given closure after the specified delay.
+BOOL bw_Application_dispatchDelayed(bw_Application* app, bw_ApplicationDispatchFn func, void* user_data, uint64_t milliseconds);
 
 
 

@@ -1,5 +1,7 @@
 pub use browser_window_c::*;
 
+pub use crate::cookie::*;
+
 
 
 pub struct Dims2D(pub(crate) cbw_Dims2D);

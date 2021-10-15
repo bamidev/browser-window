@@ -9,6 +9,10 @@
 
 
 
+void bw_ApplicationImpl_dispatchHandler( bw_Application* app, bw_ApplicationDispatchData* data );
+
+
+
 void bw_Application_assertCorrectThread( const bw_Application* app ) {
 	BW_ASSERT( CefCurrentlyOn( TID_UI ), "Not called from the GUI thread!" );
 }
@@ -26,6 +30,13 @@ void bw_Application_exitAsync( bw_Application* app, int exit_code ) {
 	CefPostTask( TID_UI, base::Bind( &bw_Application_exit, app, exit_code ));
 }
 
+BOOL bw_ApplicationImpl_dispatchDelayed(bw_Application* app, bw_ApplicationDispatchData* data,  uint64_t milliseconds) {
+	BW_ASSERT(milliseconds < 0x8000000000000000, "CEF doesn't support delays of 0x8000000000000000 or longer");	// The milliseconds in CefPostDelayedTask is signed.
+
+	CefPostDelayedTask(TID_UI, base::Bind(&bw_ApplicationImpl_dispatchHandler, app, data), milliseconds);
+	return TRUE;
+}
+
 void bw_ApplicationImpl_dispatchHandler( bw_Application* app, bw_ApplicationDispatchData* data ) {
 	data->func( app, data->data );
 }
@@ -35,7 +46,7 @@ void bw_ApplicationImpl_dispatchHandler( bw_Application* app, bw_ApplicationDisp
 BOOL bw_ApplicationImpl_dispatch( bw_Application* app, bw_ApplicationDispatchData* data ) {
 
 	CefPostTask( TID_UI, base::Bind( &bw_ApplicationImpl_dispatchHandler, app, data ) );
-	return true;
+	return TRUE;
 }
 
 void bw_ApplicationImpl_finish( bw_ApplicationImpl* app ) {
@@ -49,8 +60,7 @@ int bw_ApplicationImpl_run( bw_Application* app, bw_ApplicationImpl_ReadyHandler
 	app->impl.exit_code = 0;
 	app->impl.is_running = true;
 
-	ready_handler_data->func( app, ready_handler_data->data );
-
+	CefPostTask(TID_UI, base::Bind(ready_handler_data->func, app, ready_handler_data->data ));
 	CefRunMessageLoop();
 
 	return app->impl.exit_code;
@@ -67,5 +77,3 @@ bw_ApplicationImpl bw_ApplicationImpl_initialize( bw_Application* app, int argc,
 	impl.is_running = false;
 	return impl;
 }
-
-

@@ -78,7 +78,7 @@ bw_Err bw_ApplicationEngineImpl_initialize( bw_ApplicationEngineImpl* impl, bw_A
 	// TODO: For unsupported systems (like macOS), CefDoMessageLoopWork needs to be called repeatedly.
 	//       This is usually less effecient than using the multithreaded message loop though.
 	// TODO: If GTK will be used on macOS in the future, the 'if' macro below needs to be corrected.
-#if defined(BW_WIN32) || defined(BW_GTK)
+#if defined(BW_WIN32)
 	app_settings.multi_threaded_message_loop = true;
 #endif
 	if ( settings->resource_dir.data != 0 ) {

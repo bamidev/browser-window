@@ -7,7 +7,8 @@ use crate::error::CbwResult;
 
 use std::{
 	path::PathBuf,
-	os::raw::{c_char, c_int}
+	os::raw::{c_char, c_int},
+	time::Duration
 };
 
 
@@ -17,6 +18,8 @@ pub trait ApplicationExt: Copy {
 	fn assert_correct_thread( &self );
 	/// Dispatches work to be executed on the GUI thread.
 	fn dispatch( &self, work: unsafe fn(ApplicationImpl, *mut ()), data: *mut () ) -> bool;
+	/// Dispatches work to be executed on the GUI thread, but delayed by the specified number of milliseconds.
+	fn dispatch_delayed(&self, work: unsafe fn(ApplicationImpl, *mut ()), data: *mut (), delay: Duration ) -> bool;
 	/// Causes the main loop to exit and lets it return the given code.
 	fn exit( &self, exit_code: i32 );
 	/// Same as `exit`, but is thread-safe.

@@ -9,11 +9,11 @@
 
 
 class MyWindowDelegate : public CefWindowDelegate {
-	bw_Application* app;
+	bw_Window* window;
 	bw_WindowOptions options;
 
 public:
-	MyWindowDelegate( bw_Application* app, const bw_WindowOptions& options ) : app(app), options(options) {}
+	MyWindowDelegate( bw_Window* window, const bw_WindowOptions& options ) : window(window), options(options) {}
 
 	bool CanClose( CefRefPtr<CefWindow> window ) override {
 		UNUSED( window );
@@ -60,17 +60,12 @@ public:
 
 	void OnWindowCreated( CefRefPtr<CefWindow> window ) override {
 		UNUSED( window );
-
-		this->app->windows_alive += 1;
 	}
 
 	void OnWindowDestroyed( CefRefPtr<CefWindow> window ) override {
 		UNUSED( window );
 
-		this->app->windows_alive -= 1;
-
-		if (this->app->windows_alive == 0)
-			bw_Application_exit(this->app, 0);
+		bw_Window_triggerClose(this->window);
 	}
 
 protected:
@@ -90,17 +85,17 @@ void bw_Window_setOpacity( bw_Window* window, uint8_t opacity ) {
 }
 
 bw_WindowImpl bw_WindowImpl_new(
-	const bw_Window* _window,
+	bw_Window* _window,
 	bw_CStrSlice _title,
 	int width, int height,
 	const bw_WindowOptions* options
 ) {
 	UNUSED( _window );
 
-	CefRefPtr<CefWindowDelegate> cef_window_options( new MyWindowDelegate( _window->app, *options ) );
+	CefRefPtr<CefWindowDelegate> cef_window_options( new MyWindowDelegate( _window, *options ) );
 	CefRefPtr<CefWindow> window = CefWindow::CreateTopLevelWindow( cef_window_options );
 
-	window->SetTitle( bw_cef_copyToString( _title ) );
+	window->SetTitle( bw_cef_copyFromStrSlice( _title ) );
 
 	CefSize size( width, height );
 	window->SetSize( size );
@@ -177,7 +172,7 @@ void bw_Window_setPosition( bw_Window* window, bw_Pos2D position ) {
 }
 
 void bw_Window_setTitle( bw_Window* window, bw_CStrSlice _title ) {
-	CefString title = bw_cef_copyToString( _title );
+	CefString title = bw_cef_copyFromStrSlice( _title );
 
 	(*(CefRefPtr<CefWindow>*)window->impl.handle_ptr)->SetTitle(title);
 }

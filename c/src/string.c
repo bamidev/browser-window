@@ -12,6 +12,10 @@ char* bw_string_copyAsNewCstr( bw_CStrSlice str ) {
 	return new_str;
 }
 
+void bw_string_free(bw_StrSlice slice) {
+	free(slice.data);
+}
+
 void bw_string_freeCstr( char* str ) {
 	free( str );
 }

@@ -20,7 +20,7 @@ pub use crate::bindings::*;
  * Implementations for C structs that are also useful in Rust *
  **************************************************************/
 
- impl cbw_CStrSlice {
+impl cbw_CStrSlice {
 	pub fn empty() -> Self {
 		Self { len: 0, data: ptr::null() }
 	}

@@ -4,16 +4,15 @@ target
 # CEF generated files
 GPUCache
 
-# Eclipse project files
-.project
-.settings
-
-# Intelij IDEA project files
-.idea
-browser-window.iml
-
 # Visual Studio project files
 .vs
 
 # Visual Studio Code project files
 .vscode
+
+# CEF's bin and resource files
+chrome-sandbox
+*.bin
+*.dat
+*.pak
+*.so

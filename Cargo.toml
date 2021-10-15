@@ -26,6 +26,10 @@ path = "src/lib.rs"
 name = "terminal"
 path = "examples/terminal.rs"
 
+[[example]]
+name = "authentication"
+path = "examples/authentication.rs"
+
 [dependencies]
 browser-window-core = { path = "./core", version = "0.1.0", features = [ "cef" ] }
 futures-channel = { version = "^0.3" }
@@ -37,7 +41,7 @@ serde_json = "^1.0"
 tokio = { version = "^1.0", features = ["rt", "rt-multi-thread"] }
 
 [package.metadata.docs.rs]
-all-features = true
+features = ["threadsafe"]
 
 [workspace]
 members = ["c", "core"]

@@ -7,7 +7,6 @@ use std::io::prelude::*;
 use std::process::{Command, exit, Stdio};
 
 
-
 async fn execute_command( bw: BrowserWindowHandle, line: &str ) {
 	let working_dir = bw.eval_js("working_dir").await.expect("Unable to obtain working dir from JavaScript!");
 
@@ -74,6 +73,7 @@ fn read_stream<R>( bw: BrowserWindowHandle, reader: &mut R, buffer: &mut [u8], j
 	true
 }
 
+// This example does not work with feature `threadsafe` enabled
 fn main() {
 	let settings = ApplicationSettings::default();
 	let application = match Application::initialize( &settings ) {

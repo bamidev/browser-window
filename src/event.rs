@@ -72,7 +72,7 @@ impl<'a,A> Event<'a,A> {
 	/// Register an 'async closure' to be invoked for this event.
 	///
 	/// # Example
-	/// ```rust
+	/// ```ignore
 	/// my_event.register_async(|args| async move {
 	///     // Do something ...
 	/// });

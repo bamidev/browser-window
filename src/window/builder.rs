@@ -149,13 +149,6 @@ impl WindowBuilder {
 		self.minimizable = value;	self
 	}
 
-	/// Sets the opacity of the window.
-	/// An opacity of 255 is the default and means the window is fully visible.
-	/// An lower opacity means the window will be transparent.
-	//pub fn opacity( &mut self, value: u8 ) -> &mut Self {
-	//   self.opacity = value;   self
-	//}
-
 	/// Configure a parent window.
 	/// When a parent window closes, this browser window will close as well.
 	/// This could be a reference to a `Browser` or `BrowserThreaded` handle.

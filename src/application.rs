@@ -8,17 +8,23 @@
 //!
 //! # Example #1
 //! Here is an example to show how you can construct your application:
-//! ```ignore
+//! ```
+//! use std::process;
 //! use browser_window::application::*;
 //!
 //! fn main() {
 //! 	let application = Application::initialize( &ApplicationSettings::default() ).unwrap();
 //! 	let runtime = application.start();
 //!
-//! 	runtime.run_async(|handle| async move {
+//! 	let exit_code = runtime.run_async(|handle| async move {
 //!
 //! 		// Do something ...
+//! 
+//! 		// Not normally needed:
+//! 		handle.exit(0);
 //! 	});
+//! 
+//! 	process::exit(exit_code);
 //! }
 //! ```
 //!
@@ -34,11 +40,14 @@ However, you will need to enable feature `threadsafe`, as it will enable all thr
 Here is an example:
 
 ```rust
+use std::process;
 use browser_window::application::*;
 use tokio;
 
 async fn async_main( app: ApplicationHandleThreaded ) {
 	// Do something ...
+
+	app.exit(0);
 }
 
 fn main() {
@@ -48,30 +57,37 @@ fn main() {
 	let tokio_runtime = tokio::runtime::Runtime::new().unwrap();
 
 	// First run our own runtime on the main thread
-	bw_runtime.run(|_app| {
+	let exit_code = bw_runtime.run(|_app| {
 		let app = _app.into_threaded();
 
 		// Spawn the main logic into the tokio runtime
 		tokio_runtime.spawn( async_main( app ) );
 	});
 
-	tokio_runtime.shutdown_on_idle();
+	process::exit(exit_code);
 }
 ```"#)]
 
 
-use browser_window_core::application::*;
-use lazy_static::lazy_static;
+
 use std::env;
 use std::ffi::{CString};
 use std::future::Future;
+#[cfg(feature = "threadsafe")]
+use std::ops::Deref;
 use std::os::raw::{c_int};
 use std::pin::Pin;
 use std::ptr;
 use std::task::{Context, Poll, Waker, RawWaker, RawWakerVTable};
+use std::time::Duration;
+
+use browser_window_core::application::*;
+use futures_channel::oneshot;
+use lazy_static::lazy_static;
 
 pub use browser_window_core::application::ApplicationSettings;
 
+use crate::cookie::CookieJar;
 #[cfg(feature = "threadsafe")]
 use crate::delegate::*;
 use crate::error;
@@ -103,8 +119,14 @@ pub struct ApplicationHandle {
 	pub(in super) inner: ApplicationImpl
 }
 
-#[cfg(feature = "threadsafe")]
 struct ApplicationDispatchData<'a> {
+
+	handle: ApplicationHandle,
+	func: Box<dyn FnOnce(ApplicationHandle) + 'a>
+}
+
+#[cfg(feature = "threadsafe")]
+struct ApplicationDispatchSendData<'a> {
 
 	handle: ApplicationHandle,
 	func: Box<dyn FnOnce(ApplicationHandle) + Send + 'a>
@@ -328,6 +350,10 @@ impl From<ApplicationHandle> for Application {
 
 impl ApplicationHandle {
 
+	pub fn cookie_jar(&self) -> CookieJar {
+		CookieJar::global()
+	}
+
 	/// Causes the `Runtime` to terminate.
 	/// The `Runtime`'s [`Runtime::run`] or spawn command will return the exit code provided.
 	/// This will mean that not all tasks might complete.
@@ -365,6 +391,34 @@ impl ApplicationHandle {
 		// First poll
 		unsafe { Runtime::poll_future( waker_data ) };
 	}
+
+	/// Queues the given closure `func` to be executed on the GUI thread somewhere in the future, at least after the given delay.
+	/// The closure will only execute when and if the runtime is still running.
+	/// Returns whether or not the closure will be able to execute.
+	pub fn dispatch_delayed<'a,F>( &self, func: F, delay: Duration ) -> bool where
+		F:  FnOnce( ApplicationHandle ) + 'a
+	{
+		let data_ptr = Box::into_raw( Box::new( ApplicationDispatchData {
+			handle: self.app_handle(),
+			func: Box::new( func )
+		} ) );
+
+		self.inner.dispatch_delayed( dispatch_handler, data_ptr as _, delay )
+	}
+
+	/// Will wait the given `duration` before returning execution back to the caller.
+	/// This does not put the current thread in a sleeping state, it just waits.
+	pub async fn sleep(&self, duration: Duration) {
+		let (tx, rx) = oneshot::channel::<()>();
+
+		self.dispatch_delayed(|handle| {
+			if let Err(_) = tx.send(()) {
+				panic!("unable to send signal back to sleeping function");
+			}
+		}, duration);
+
+		rx.await.unwrap();
+	}
 }
 
 
@@ -377,7 +431,7 @@ impl ApplicationHandleThreaded {
 	/// If the closure panicked, or the runtime is not running, this will return an error.
 	///
 	/// The function signature is practically the same as:
-	/// ```rust
+	/// ```ignore
 	/// pub async fn delegate<'a,F,R>( &self, func: F ) -> Result<R, DelegateError> where
 	/// 	F: FnOnce( ApplicationHandle ) -> R + Send + 'a,
 	/// 	R: Send { /* ... */ }
@@ -387,9 +441,9 @@ impl ApplicationHandleThreaded {
 	/// The output value _will_ be copied.
 	///
 	/// # Example
-	/// ```rust
+	/// ```ignore
 	/// let my_value: String = app.delegate(|handle| {
-	/// 	"String".to_owned()
+	/// 	"string".to_owned()
 	/// }).unwrap();
 	/// ```
 	pub fn delegate<'a,F,R>( &self, func: F ) -> ApplicationDelegateFuture<'a,R> where
@@ -407,16 +461,16 @@ impl ApplicationHandleThreaded {
 	/// See also `delegate`.
 	///
 	/// The function signature is practically the same as:
-	/// ```rust
+	/// ```ignore
 	/// pub async fn delegate_future<'a,F,R>( &self, func: F ) -> Result<R, DelegateError> where
-	/// 	F: Future<Output=R> + 'static,,
+	/// 	F: Future<Output=R> + 'static,
 	/// 	R: Send { /* ... */ }
 	/// ```
 	///
 	/// # Example
-	/// ```rust
+	/// ```ignore
 	/// let my_value: String = app.delegate_future(async {
-	/// 	"String".to_owned()
+	/// 	"string".to_owned()
 	/// }).unwrap();
 	/// ```
 	pub fn delegate_future<F,R>( &self, future: F ) -> DelegateFutureFuture<R> where
@@ -432,12 +486,12 @@ impl ApplicationHandleThreaded {
 	///
 	/// Except, async closures are not yet supported in stable Rust.
 	/// What we actually mean are closures of the form:
-	/// ```no_run
+	/// ```ignore
 	/// |handle| async move { /* ... */ }
 	/// ```
 	///
 	/// The function signature is practically the same as:
-	/// ```rust
+	/// ```ignore
 	/// pub async fn delegate_async<'a,C,F,R>( &self, func: C ) -> Result<R, DelegateError> where
 	/// 	C: FnOnce( ApplicationHandle ) -> F + Send + 'a,
 	/// 	F: Future<Output=R>,
@@ -446,7 +500,7 @@ impl ApplicationHandleThreaded {
 	/// ```
 	///
 	/// # Example
-	/// ```rust
+	/// ```ignore
 	/// let my_value: String = app.delegate_async(|handle| async move {
 	/// 	"String".to_owned()
 	/// }).unwrap();
@@ -468,12 +522,26 @@ impl ApplicationHandleThreaded {
 	pub fn dispatch<'a,F>( &self, func: F ) -> bool where
 		F:  FnOnce( ApplicationHandle ) + Send + 'a
 	{
+		let data_ptr = Box::into_raw( Box::new( ApplicationDispatchSendData {
+			handle: self.handle,
+			func: Box::new( func )
+		} ) );
+
+		self.handle.inner.dispatch( dispatch_handler_send, data_ptr as _ )
+	}
+
+	/// Queues the given closure `func` to be executed on the GUI thread somewhere in the future, at least after the given delay.
+	/// The closure will only execute when and if the runtime is still running.
+	/// Returns whether or not the closure will be able to execute.
+	pub fn dispatch_delayed<'a,F>( &self, func: F, delay: Duration ) -> bool where
+		F:  FnOnce( ApplicationHandle ) + Send + 'a
+	{
 		let data_ptr = Box::into_raw( Box::new( ApplicationDispatchData {
 			handle: self.handle,
 			func: Box::new( func )
 		} ) );
 
-		self.handle.inner.dispatch( dispatch_handler, data_ptr as _ )
+		self.handle.inner.dispatch_delayed( dispatch_handler, data_ptr as _, delay )
 	}
 
 	/// Queues the given async closure `func` to be executed on the GUI thread somewhere in the future.
@@ -522,6 +590,15 @@ impl From<ApplicationHandle> for ApplicationHandleThreaded {
 	}
 }
 
+#[cfg(feature = "threadsafe")]
+impl Deref for ApplicationHandleThreaded {
+	type Target = ApplicationHandle;
+
+	fn deref(&self) -> &Self::Target {
+		&self.handle
+	}
+}
+
 
 
 impl HasAppHandle for ApplicationHandle {
@@ -533,10 +610,18 @@ impl HasAppHandle for ApplicationHandle {
 
 
 
-#[cfg(feature = "threadsafe")]
 unsafe fn dispatch_handler( _app: ApplicationImpl, _data: *mut () ) {
 
 	let data_ptr = _data as *mut ApplicationDispatchData<'static>;
+	let data = Box::from_raw( data_ptr );
+
+	(data.func)( data.handle.into() );
+}
+
+#[cfg(feature = "threadsafe")]
+unsafe fn dispatch_handler_send( _app: ApplicationImpl, _data: *mut () ) {
+
+	let data_ptr = _data as *mut ApplicationDispatchSendData<'static>;
 	let data = Box::from_raw( data_ptr );
 
 	(data.func)( data.handle.into() );

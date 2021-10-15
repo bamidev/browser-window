@@ -10,7 +10,8 @@ use crate::{
 
 use std::{
 	os::raw::{c_char, c_int, c_void},
-	ptr
+	ptr,
+	time::Duration
 };
 
 
@@ -35,6 +36,17 @@ impl ApplicationExt for ApplicationImpl {
 		let data_ptr = Box::into_raw( data );
 
 		unsafe { cbw_Application_dispatch( self.inner, Some( invocation_handler ), data_ptr as _ ) != 0 }
+	}
+
+	fn dispatch_delayed( &self, work: unsafe fn(ApplicationImpl, *mut ()), _data: *mut (), delay: Duration ) -> bool {
+		let data = Box::new( DispatchData {
+			func: work,
+			data: _data
+		} );
+
+		let data_ptr = Box::into_raw( data );
+
+		unsafe { cbw_Application_dispatchDelayed( self.inner, Some( invocation_handler ), data_ptr as _, delay.as_millis() as _ ) != 0 }
 	}
 	
 	fn exit( &self, exit_code: i32 ) {
