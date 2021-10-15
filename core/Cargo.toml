@@ -1,6 +1,6 @@
 [package]
 name = "browser-window-core"
-version = "0.1.0"
+version = "0.2.0"
 description = "The non-user friendly inner functionality of crate browser-window, providing an cross-platform and browser engine independent interface."
 edition = "2018"
 authors = ["Danny de Jong"]
@@ -20,5 +20,5 @@ path = "src/lib.rs"
 crate-type = ["rlib"]
 
 [dependencies]
-browser-window-c = { path = "../c", version = "0.0.9" }
+browser-window-c = { path = "../c", version = "0.0.10" }
 
