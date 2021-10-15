@@ -411,7 +411,7 @@ impl ApplicationHandle {
 	pub async fn sleep(&self, duration: Duration) {
 		let (tx, rx) = oneshot::channel::<()>();
 
-		self.dispatch_delayed(|handle| {
+		self.dispatch_delayed(|_handle| {
 			if let Err(_) = tx.send(()) {
 				panic!("unable to send signal back to sleeping function");
 			}
