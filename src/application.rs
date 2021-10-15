@@ -139,6 +139,8 @@ pub trait HasAppHandle {
 }
 
 /// The runtime to run the application with.
+/// 
+/// This runtime will run until all windows have been closed _and_ the (async) closure given to the `run*` functions have ended.
 pub struct Runtime {
 	pub(in super) handle: ApplicationHandle
 }
