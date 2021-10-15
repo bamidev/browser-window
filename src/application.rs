@@ -69,19 +69,21 @@ fn main() {
 ```"#)]
 
 
-use browser_window_core::application::*;
-use lazy_static::lazy_static;
+
 use std::env;
 use std::ffi::{CString};
 use std::future::Future;
-use std::ops::Deref;
 use std::os::raw::{c_int};
 use std::pin::Pin;
 use std::ptr;
 use std::task::{Context, Poll, Waker, RawWaker, RawWakerVTable};
 
+use browser_window_core::application::*;
+use lazy_static::lazy_static;
+
 pub use browser_window_core::application::ApplicationSettings;
 
+use crate::cookie::CookieJar;
 #[cfg(feature = "threadsafe")]
 use crate::delegate::*;
 use crate::error;
@@ -337,6 +339,10 @@ impl From<ApplicationHandle> for Application {
 
 
 impl ApplicationHandle {
+
+	pub fn cookie_jar(&self) -> CookieJar {
+		CookieJar::global()
+	}
 
 	/// Causes the `Runtime` to terminate.
 	/// The `Runtime`'s [`Runtime::run`] or spawn command will return the exit code provided.

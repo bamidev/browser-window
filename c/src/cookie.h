@@ -29,6 +29,7 @@ typedef struct {
 
 typedef void (*bw_CookieJarStorageCallbackFn)( bw_CookieJar* cj, void* data, bw_Err error );
 typedef void (*bw_CookieIteratorNextCallbackFn)(bw_CookieIterator* ci, void* data, bw_Cookie* cookie);
+typedef void (*bw_CookieJarDeleteCallbackFn)(bw_CookieJar* cj, void* data, unsigned int deleted);
 
 
 
@@ -51,6 +52,7 @@ void bw_Cookie_makeHttpOnly(bw_Cookie* cookie);
 BOOL bw_Cookie_isSecure(const bw_Cookie* cookie);
 void bw_Cookie_makeSecure(bw_Cookie* cookie);
 
+void bw_CookieJar_delete(bw_CookieJar* jar, bw_CStrSlice url, bw_CStrSlice name, bw_CookieJarDeleteCallbackFn cb, void* cb_data);
 void bw_CookieJar_free(bw_CookieJar* jar);
 void bw_CookieJar_iterator(bw_CookieJar* jar, bw_CookieIterator** iterator, BOOL include_http_only, bw_CStrSlice url);
 void bw_CookieJar_iteratorAll(bw_CookieJar* jar, bw_CookieIterator** iterator);

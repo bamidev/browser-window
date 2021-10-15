@@ -4,7 +4,7 @@ use std::{
 	borrow::Cow,
 	ffi::c_void,
 	ops::Add,
-	marker::PhantomData,
+	os::raw::c_uint,
 	mem::MaybeUninit,
 	ptr,
 	time::{Duration, SystemTime}
@@ -30,6 +30,11 @@ pub struct CookieIteratorImpl {
 
 struct CookieStorageCallbackData {
 	callback: CookieStorageCallbackFn,
+	data: *mut ()
+}
+
+struct CookieDeleteCallbackData {
+	callback: CookieDeleteCallbackFn,
 	data: *mut ()
 }
 
@@ -174,6 +179,15 @@ impl CookieExt for CookieImpl {
 
 impl CookieJarExt for CookieJarImpl {
 
+	fn delete(&mut self, url: &str, name: &str, complete_cb: CookieDeleteCallbackFn, cb_data: *mut ()) {
+		let data = Box::into_raw(Box::new(CookieDeleteCallbackData {
+			callback: complete_cb,
+			data: cb_data
+		}));
+
+		unsafe { cbw_CookieJar_delete(self.inner, url.into(), name.into(), Some(ffi_cookie_delete_callback_handler), data as _ ) };
+	}
+
 	fn free(&mut self) {
 		unsafe { cbw_CookieJar_free(self.inner) };
 	}
@@ -200,7 +214,7 @@ impl CookieJarExt for CookieJarImpl {
 		return iterator;
 	}
 
-	fn store(&self, url: &str, cookie: &CookieImpl, complete_cb: Option<CookieStorageCallbackFn>, cb_data: *mut ()) {
+	fn store(&mut self, url: &str, cookie: &CookieImpl, complete_cb: Option<CookieStorageCallbackFn>, cb_data: *mut ()) {
 		let data = if !complete_cb.is_none() {
 			Box::into_raw( Box::new( CookieStorageCallbackData {
 				callback: complete_cb.unwrap(),
@@ -263,6 +277,16 @@ unsafe extern "C" fn ffi_cookie_storage_callback_handler(cookie_jar: *mut cbw_Co
 	};
 
 	(data.callback)( handle, data.data, result );
+}
+
+unsafe extern "C" fn ffi_cookie_delete_callback_handler(cookie_jar: *mut cbw_CookieJar, _data: *mut c_void, deleted: c_uint) {
+
+	let data_ptr = _data as *mut CookieDeleteCallbackData;
+	let data: Box<CookieDeleteCallbackData> = Box::from_raw( data_ptr );
+
+	let handle = CookieJarImpl {inner: cookie_jar};
+
+	(data.callback)( handle, data.data, deleted as _ );
 }
 
 unsafe extern "C" fn ffi_cookie_iterator_next_handler(cookie_iterator: *mut cbw_CookieIterator, _data: *mut c_void, _cookie: *mut cbw_Cookie) {

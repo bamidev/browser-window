@@ -12,6 +12,22 @@
 
 bw_Cookie* bw_Cookie_fromCef(const CefCookie& cef_cookie);
 
+class BwDeleteCookiesCallback : public CefDeleteCookiesCallback {
+public:
+	bw_CookieJar* jar;
+	bw_CookieJarDeleteCallbackFn cb;
+	void* cb_data;
+
+	BwDeleteCookiesCallback(bw_CookieJar* jar, bw_CookieJarDeleteCallbackFn cb, void* cb_data) : jar(jar), cb(cb), cb_data(cb_data) {}
+
+	void OnComplete(int num_deleted) override {
+		this->cb(this->jar, this->cb_data, num_deleted);
+	}
+
+protected:
+	IMPLEMENT_REFCOUNTING(BwDeleteCookiesCallback);
+};
+
 class BwCookieVisitor : public CefCookieVisitor {
 public:
 	bw_CookieIterator* iterator;
@@ -182,6 +198,14 @@ BOOL bw_Cookie_getValue(const bw_Cookie* cookie, bw_StrSlice* value) {
 	CefString string(&((CefCookie*)cookie->impl.handle_ptr)->value);
 	*value = bw_cef_copyToStrSlice(string);
 	return TRUE;
+}
+
+void bw_CookieJar_delete(bw_CookieJar* jar, bw_CStrSlice _url, bw_CStrSlice _name, bw_CookieJarDeleteCallbackFn cb, void* cb_data) {
+	CefRefPtr<BwDeleteCookiesCallback> cef_cb(new BwDeleteCookiesCallback(jar, cb, cb_data));
+
+	CefString url = bw_cef_copyFromStrSlice(_url);
+	CefString name = bw_cef_copyFromStrSlice(_name);
+	CEF_COOKIE_MANAGER(jar)->DeleteCookies(url, name, cef_cb);
 }
 
 void bw_CookieJar_free(bw_CookieJar* jar) {

@@ -21,7 +21,7 @@ fn main() {
 
 		bw.show();
 
-		let cookie_jar = CookieJar::global(&app);
+		let cookie_jar = app.cookie_jar();
 		let mut iter = cookie_jar.iter("https://github.com/", true);
 		while let Some(cookie) = iter.next().await {
 			println!("Cookie {}: {}", cookie.name(), cookie.value());

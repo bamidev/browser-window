@@ -13,6 +13,7 @@ pub use c::*;
 
 
 pub type CookieStorageCallbackFn = unsafe fn( cj: CookieJarImpl, data: *mut (), Result<(), CookieStorageError> );
+pub type CookieDeleteCallbackFn = unsafe fn(cj: CookieJarImpl, data: *mut (), deleted: usize);
 pub type CookieIteratorNextCallbackFn = unsafe fn(cj: CookieIteratorImpl, data: *mut (), Option<CookieImpl>);
 
 pub trait CookieExt {
@@ -39,11 +40,12 @@ pub trait CookieExt {
 }
 
 pub trait CookieJarExt {
+	fn delete(&mut self, url: &str, name: &str, complete_cb: CookieDeleteCallbackFn, cb_data: *mut ());
 	fn free(&mut self);
 	fn global() -> CookieJarImpl;
 	fn iterator<'a>(&'a self, url: &str, include_http_only: bool) -> CookieIteratorImpl;
 	fn iterator_all<'a>(&'a self) -> CookieIteratorImpl;
-	fn store(&self, url: &str, cookie: &CookieImpl, success_cb: Option<CookieStorageCallbackFn>, cb_data: *mut ());
+	fn store(&mut self, url: &str, cookie: &CookieImpl, success_cb: Option<CookieStorageCallbackFn>, cb_data: *mut ());
 }
 
 pub trait CookieIteratorExt {

@@ -6,6 +6,7 @@
 
 use futures_channel::oneshot;
 use std::{
+	borrow::Cow,
 	future::Future,
 	marker::PhantomData,
 	ops::Deref,
@@ -189,6 +190,10 @@ impl BrowserWindowHandle {
 	/// Causes the browser to navigate to the given url.
 	pub fn navigate( &self, url: &str ) {
 		self.inner.navigate( url )
+	}
+
+	pub fn url<'a>(&'a self) -> Cow<'a, str> {
+		self.inner.url()
 	}
 
 	pub fn window( &self ) -> WindowHandle {

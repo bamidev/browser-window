@@ -5,11 +5,8 @@ use futures_channel::oneshot;
 
 use std::{
 	marker::PhantomData,
-	ops::*,
-	ptr
+	ops::*
 };
-
-use super::application::ApplicationHandle;
 
 
 
@@ -99,7 +96,47 @@ impl<'a> Drop for CookieIterator<'a> {
 
 impl CookieJar {
 
-	pub async fn find(&self, name: &str, url: &str, include_http_only: bool) -> Option<Cookie> {
+	/// Deletes all cookies.
+	/// If `url` is not an empty string, only the cookies of the given url will be deleted.
+	pub async fn clear(&mut self, url: &str) -> usize {
+		self.delete(url, "").await
+	}
+
+	/// Like `clear`, but with `url` set empty.
+	pub async fn clear_all(&mut self) -> usize {
+		self.clear("").await
+	}
+
+	fn _delete<H>(&mut self, url: &str, name: &str, on_complete: H) where
+		H: FnOnce(usize)
+	{
+		let data = Box::into_raw(Box::new(on_complete));
+
+		self.inner.delete(url, name, cookie_delete_callback::<H>, data as _);
+	}
+
+	/// Deletes all cookies with the given `name`.
+	/// If `url` is not empty, only the cookie with the given `name` at that `url` will be deleted.
+	/// If `name` is empty, all cookies at the given `url` will be deleted.
+	/// If both `url` and `name` are empty, all cookies will be deleted.
+	pub async fn delete(&mut self, url: &str, name: &str) -> usize {
+		let (tx, rx) = oneshot::channel::<usize>();
+
+		self._delete(url, name, |result| {
+			tx.send(result).expect("unable to send back cookie delete count");
+		});
+
+		rx.await.unwrap()
+	}
+
+	/// Like `delete`, but with `url` set empty.
+	pub async fn delete_all(&mut self, name: &str) -> usize {
+		self.delete("", name).await
+	}
+
+	/// Finds the first cookie that has the given `name` in the given `url`.
+	/// If `include_http_only` is set to `false`, a `HttpOnly` cookie will not be found.
+	pub async fn find(&self, url: &str, name: &str, include_http_only: bool) -> Option<Cookie> {
 		let mut iter = self.iter(url, include_http_only);
 
 		while let Some(cookie) = iter.next().await {
@@ -111,6 +148,7 @@ impl CookieJar {
 		None
 	}
 
+	/// Finds the first cookie that has the given `name`.
 	pub async fn find_from_all(&self, name: &str) -> Option<Cookie> {
 		let mut iter = self.iter_all();
 
@@ -123,12 +161,24 @@ impl CookieJar {
 		None
 	}
 
-	pub fn global(_app: &ApplicationHandle) -> Self {
+	pub(in crate) fn global() -> Self {
 		Self {
 			inner: CookieJarImpl::global()
 		}
 	}
 
+	/// Returns a `CookieIterator` that iterates over cookies asynchronously.
+	/// The `CookieIterator` has an async `next` function that you can use.
+	/// 
+	/// # Example
+	/// ```ignore
+	/// let cookie_jar = app.cookie_jar();
+	/// let mut iterator = cookie_jar.iter("http://localhost/", true);
+	/// 
+	/// while let Some(cookie) = iterator.next().await {
+	/// 	// ... do something with `cookie`
+	/// }
+	/// ```
 	pub fn iter<'a>(&'a self, url: &str, include_http_only: bool) -> CookieIterator<'a> {
 		let inner = self.inner.iterator(url, include_http_only);
 
@@ -138,6 +188,8 @@ impl CookieJar {
 		}
 	}
 
+	/// Returns a `CookieIterator` that iterators over cookies asynchronously.
+	/// Like `iter`, but iterates over all cookies from any url.
 	pub fn iter_all<'a>(&'a self) -> CookieIterator<'a> {
 		let inner = self.inner.iterator_all();
 
@@ -155,6 +207,7 @@ impl CookieJar {
 		self.inner.store(url.into(), &cookie.inner, Some(cookie_store_callback::<'a,H>), data as _);
 	}
 
+	/// Stores the given `cookie` for the given `url`.
 	pub async fn store(&mut self, url: &str, cookie: &Cookie) -> Result<(), CookieStorageError> {
 		let (tx, rx) = oneshot::channel::<Result<(), CookieStorageError>>();
 
@@ -163,10 +216,6 @@ impl CookieJar {
 		});
 
 		rx.await.unwrap()
-	}
-
-	pub fn store_start(&mut self, url: &str, cookie: &Cookie) {
-		self.inner.store(url.into(), &cookie.inner, None, ptr::null_mut());
 	}
 }
 
@@ -177,6 +226,15 @@ impl Drop for CookieJar {
 }
 
 
+
+unsafe fn cookie_delete_callback<'a, H>(_handle: CookieJarImpl, cb_data: *mut (), deleted: usize) where
+	H: FnOnce(usize) + 'a
+{
+	let data_ptr = cb_data as *mut H;
+	let data: Box<H> = Box::from_raw( data_ptr );
+
+	(*data)( deleted );
+}
 
 unsafe fn cookie_store_callback<'a, H>( _handle: CookieJarImpl, cb_data: *mut (), result: Result<(), CookieStorageError> ) where
 	H: FnOnce(Result<(), CookieStorageError>) + 'a

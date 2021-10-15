@@ -74,21 +74,32 @@ async fn async_basic(app: ApplicationHandle) -> BrowserWindow {
 }
 
 async fn async_cookies(app: ApplicationHandle) {
-	let mut jar = CookieJar::global(&app);
+	let mut jar = app.cookie_jar();
 
 	let cookie = Cookie::new("name", "value");
 
 	// Store cookies
 	jar.store("/", &cookie).await.unwrap_err();	// Should give error
-	jar.store_start("http://localhost/test", &cookie);
 	jar.store("http://localhost/", &cookie).await.unwrap();
 
+	// Delete cookie
+	assert!(jar.delete("http://localhost/", "name").await == 1);
+	jar.store("http://localhost/", &cookie).await.unwrap();
+	assert!(jar.delete_all("name").await == 1);
+	jar.store("http://localhost/", &cookie).await.unwrap();
+	assert!(jar.clear("http://localhost/").await == 1);
+	jar.store("http://localhost/", &cookie).await.unwrap();
+	assert!(jar.clear_all().await == 1);
+
 	// Using a wrong url
-	let mut iter = jar.iter("/", true);
-	assert!(iter.next().await.is_none());
+	{
+		let mut iter = jar.iter("/", true);
+		assert!(iter.next().await.is_none());
+	}
 	
 	// Finding our set cookie back
-	let cookie = jar.find("name", "http://localhost/", true).await.unwrap();
+	jar.store("http://localhost/", &cookie).await.unwrap();
+	let cookie = jar.find("http://localhost/", "name", true).await.unwrap();
 	assert!(cookie.name() == "name");
 	assert!(cookie.value() == "value");
 
