@@ -2,7 +2,6 @@
 
 use browser_window::application::*;
 use browser_window::browser::*;
-use browser_window::cookie::*;
 use browser_window::prelude::*;
 
 
@@ -22,6 +21,12 @@ fn main() {
 		bw.show();
 
 		let cookie_jar = app.cookie_jar();
+
+		// Wait until logged in
+		while bw.url() == "https://github.com/login" {
+			// TODO: sleep
+		}
+
 		let mut iter = cookie_jar.iter("https://github.com/", true);
 		while let Some(cookie) = iter.next().await {
 			println!("Cookie {}: {}", cookie.name(), cookie.value());

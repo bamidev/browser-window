@@ -4,6 +4,7 @@ use std::{
 	error::Error,
 	ffi::CStr,
 	fmt,
+	mem::MaybeUninit,
 	os::raw::*
 };
 
@@ -146,6 +147,21 @@ impl BrowserWindowExt for BrowserWindowImpl {
 
 		// The actual user data pointer is stored within the `UserData` struct that is stored within the C handle
 		unsafe { (*c_user_data_ptr).data }
+	}
+
+	fn url<'a>(&'a self) -> Cow<'a, str> {
+		let mut slice: cbw_StrSlice = unsafe { MaybeUninit::uninit().assume_init() };
+		let owned = unsafe { cbw_BrowserWindow_getUrl(self.inner, &mut slice) };
+
+		if owned > 0 {
+			let url: String = slice.into();
+			unsafe { cbw_string_free(slice) };
+			url.into()
+		}
+		else {
+			let url: &'a str = slice.into();
+			url.into()
+		}
 	}
 
 	fn window( &self ) -> WindowImpl {

@@ -1,5 +1,7 @@
 pub mod c;
 
+use std::borrow::Cow;
+
 pub use c::BrowserWindowImpl;
 pub use c::JsEvaluationError;
 
@@ -66,6 +68,8 @@ pub trait BrowserWindowExt: Copy {
 	);
 
 	fn user_data( &self ) -> *mut ();
+
+	fn url<'a>(&'a self) -> Cow<'a, str>;
 
 	/// Gives a handle to the underlying window.
 	fn window( &self ) -> WindowImpl;

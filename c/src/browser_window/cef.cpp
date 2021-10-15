@@ -4,6 +4,7 @@
 #include "../browser_window.h"
 #include "../cef/bw_handle_map.hpp"
 #include "../cef/exception.hpp"
+#include "../cef/util.hpp"
 #include "../common.h"
 #include "../debug.h"
 #include "impl.h"
@@ -57,12 +58,6 @@ CefWindowInfo _bw_BrowserWindow_windowInfo( bw_Window* window, int width, int he
 
 
 
-/*void bw_BrowserWindow_close( bw_BrowserWindow* bw ) { BW_DEBUG("bw_BrowserWindow_close")
-	// Actually close the brower
-	CefRefPtr<CefBrowser>* cef_ptr = (CefRefPtr<CefBrowser>*)bw->impl.cef_ptr;
-	(*cef_ptr)->GetHost()->CloseBrowser( true );
-}*/
-
 void bw_BrowserWindow_evalJs( bw_BrowserWindow* bw, bw_CStrSlice js, bw_BrowserWindowJsCallbackFn cb, void* user_data ) {
 
 	// Wrap the JS code within a temporary function and execute it, and convert the return value to a string
@@ -85,6 +80,15 @@ void bw_BrowserWindow_evalJs( bw_BrowserWindow* bw, bw_CStrSlice js, bw_BrowserW
 //  we're sending it off to another process anyway.
 void bw_BrowserWindow_evalJsThreaded( bw_BrowserWindow* bw, bw_CStrSlice js, bw_BrowserWindowJsCallbackFn cb, void* user_data ) {
 	bw_BrowserWindow_evalJs( bw, js, cb, user_data );
+}
+
+BOOL bw_BrowserWindow_getUrl(bw_BrowserWindow* bw, bw_StrSlice* url) {
+	CefRefPtr<CefBrowser> cef_browser = *(CefRefPtr<CefBrowser>*)bw->impl.cef_ptr;
+
+	CefString _url = cef_browser->GetMainFrame()->GetURL();
+	*url = bw_cef_copyToStrSlice(_url);
+
+	return TRUE;
 }
 
 #ifdef BW_GTK

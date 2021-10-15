@@ -64,6 +64,7 @@ void bw_BrowserWindow_evalJsThreaded( bw_BrowserWindow* bw, bw_CStrSlice js, bw_
 
 bw_Application* bw_BrowserWindow_getApp( bw_BrowserWindow* bw );
 void* bw_BrowserWindow_getUserData( bw_BrowserWindow* bw );
+BOOL bw_BrowserWindow_getUrl(bw_BrowserWindow* bw, bw_StrSlice* url);
 bw_Window* bw_BrowserWindow_getWindow( bw_BrowserWindow* bw );
 
 bw_Err bw_BrowserWindow_navigate( bw_BrowserWindow* bw, bw_CStrSlice url );
