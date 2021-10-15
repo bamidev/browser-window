@@ -68,9 +68,9 @@ pub struct BrowserWindow {
 ///     let result = bw.delegate_async( |handle| async move {
 ///         // Execute `eval_js` on the GUI thread
 ///         handle.eval_js("document.cookies").await
-///     } ).await.expect("Unable to delegate code!");
+///     } ).await.unwrap();
 ///
-///     result.expect("Unable to evaluate JavaScript!")
+///     result.unwrap()
 /// }
 /// ```
 #[cfg(feature = "threadsafe")]

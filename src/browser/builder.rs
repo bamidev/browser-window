@@ -131,7 +131,7 @@ impl BrowserWindowBuilder {
 	/// * `source` - The content that will be displayed in the browser window.
 	pub fn new( source: Source ) -> Self {
 		Self {
-			dev_tools: cfg!(debug_assertions),
+			dev_tools: false,
 			source,
 			handler: None,
 			window: WindowBuilder::new()
@@ -204,23 +204,23 @@ impl BrowserWindowBuilder {
 				};
 
 				// Source
-				let mut _url: PathBuf = "file:///".into();	// Stays here so that the reference to it that gets passed to C stays valid for the function call to `bw_BrowserWindow_new`.
+				let mut _url: String = "file:///".into();	// Stays here so that the reference to it that gets passed to C stays valid for the function call to `bw_BrowserWindow_new`.
 				let source = match &source {	// Use a reference, we want source to live until the end of the function because bw_BrowserWindowSource holds a reference to its internal string.
 					Source::File( path ) => {
-						_url.push( path );
+						_url += path.to_str().unwrap();
 
 						browser_window::Source {
-							data: _url.to_str().unwrap().into(),
-							is_html: false
+							data: _url.as_str().into(),
+							is_html: 0
 						}
 					},
 					Source::Html( html ) => { browser_window::Source {
 						data: html.as_str().into(),
-						is_html: true
+						is_html: 1
 					} },
 					Source::Url( url ) => { browser_window::Source {
 						data: url.as_str().into(),
-						is_html: false
+						is_html: 0
 					} }
 				};
 
@@ -248,7 +248,7 @@ impl BrowserWindowBuilder {
 					resizable: window.resizable
 				};
 				let other_options = BrowserWindowOptions {
-					dev_tools,
+					dev_tools: if dev_tools {1} else {0},
 					resource_path: "".into()
 				};
 

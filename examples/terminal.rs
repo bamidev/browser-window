@@ -75,7 +75,7 @@ fn read_stream<R>( bw: BrowserWindowHandle, reader: &mut R, buffer: &mut [u8], j
 }
 
 fn main() {
-	let mut settings = ApplicationSettings::default();
+	let settings = ApplicationSettings::default();
 	let application = match Application::initialize( &settings ) {
 		Err(e) => panic!("Unable to initialize application: {}", e),
 		Ok(app) => app

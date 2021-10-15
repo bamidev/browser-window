@@ -22,12 +22,17 @@ End of story.
 ## Goals
 
 Browser Window aims to be cross-platform, very simple, and straight forward.
-Some methods in Browser Window are asynchronous, such as evaluating JavaScript code.
-Browser Window is built to utilize Rust's async/await syntax, to keep your code and logic as simple as possible.
-This also makes it possible to communicate smoothly with JavaScript on the client side.
+Browser Window is built to utilize Rust's async/await fully, to keep your code and logic as simple and clean as possible.
+This also makes it possible to communicate with JavaScript back and forth smoothly.
 
-Moreover, if you want to use it in a multi-threaded environment, you can.
-There are thread-safe handles available for easy exchange of data and work between the GUI thread and others.
+With other alternative crates, you can't just invoke a JavaScript function and return its output as simple as this:
+```
+let js_return_value = my_window.eval_js("my_js_func()").await.unwrap();
+```
+Something similar is available in _Electron_ as well, and this is just something that is paramount to making two-way communication between the host-code (Rust) and client-code (JavaScript) straightforward.
+
+Moreover, if you want to use it in a multi-threaded environment, you can as well.
+There are thread-safe handles available for easy exchange of data & work between the GUI thread and others.
 
 You can view an [example](https://github.com/bamilab/browser-window/tree/master/examples) of a terminal emulator, to see how easily a GUI made with Browser Window can be done.
 
@@ -39,7 +44,7 @@ Currently those are Linux, macOS and Windows, but macOS has not been tested so f
 
 ## Getting Started
 
-Click [here](./docs/GETTING-STARTED.md) for a manual on how to set up everything to be able to use Browser Window.
+Click [here](./docs/GETTING-STARTED.md) for a manual on how to set up everything to be able to compile and run you app with Browser Window.
 
 ## License
 
@@ -54,6 +59,6 @@ If you want to help out, you're more than welcome!
 At the moment, only basic functionality is available, but there is more to come.
 These are features that are planned to be implemented at some point:
 
-* Cookie support (including HttpOnly cookies)
+* Cookie support [underway]
 * Events [underway]
 * Servo engine support (currently missing good embedding support)

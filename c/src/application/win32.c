@@ -111,7 +111,6 @@ int bw_ApplicationImpl_run( bw_Application* app, bw_ApplicationImpl_ReadyHandler
 	}
 
 	// TODO: Wakeup all waiting delegation futures, so that they can return an error indiating that the runtime has exitted.
-	UnregisterClassW( L"bw-window", app->impl.handle );
 
 	return exit_code;
 }
@@ -155,5 +154,5 @@ void bw_Application_exitAsync( bw_Application* app, int code ) {
 }
 
 void bw_ApplicationImpl_finish( bw_ApplicationImpl* app ) {
-	UNUSED(app);
+	UnregisterClassW( L"bw-window", app->handle );
 }
