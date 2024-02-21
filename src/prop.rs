@@ -1,8 +1,10 @@
 //! A 'property' is basically something that exposes both a getter and a setter.
-//! Keep in mind that if you just need only either of those, a 'property' wouldn't really be useful in the first place.
-//! Also keep in mind that this implementation of properties only support immutable setters.
-//! This design is suitable for our application because _Browser Window_ only exposes getters and setters that call C functions that do all the work.
-//! There is no memory unsafety caused by any of this.
+//! Keep in mind that if you just need only either of those, a 'property'
+//! wouldn't really be useful in the first place. Also keep in mind that this
+//! implementation of properties only support immutable setters. This design is
+//! suitable for our application because _Browser Window_ only exposes getters
+//! and setters that call C functions that do all the work. There is no memory
+//! unsafety caused by any of this.
 //!
 //! # Usage
 //! ```ignore
@@ -21,12 +23,15 @@
 //!     }
 //! }
 //! ```
-//! This property is called `MyProperty`, of which the getter returns a `String` and the setter takes a `&str`.
-//! Also, the property will be part of `MyStruct`, taking a reference to it in its `get` and `set` implementations called `this` (note that the keyword `self` is taken already and can not be used within the macro).
-//! The syntax was chosen to be somewhat Rust-like, but require as little as possible boilerplate.
+//! This property is called `MyProperty`, of which the getter returns a `String`
+//! and the setter takes a `&str`. Also, the property will be part of
+//! `MyStruct`, taking a reference to it in its `get` and `set` implementations
+//! called `this` (note that the keyword `self` is taken already and can not be
+//! used within the macro). The syntax was chosen to be somewhat Rust-like, but
+//! require as little as possible boilerplate.
 //!
-//! There is one last thing that needs to be done, and that is that the property needs to be added in the implementation of `MyStruct`:
-//! ```ignore
+//! There is one last thing that needs to be done, and that is that the property
+//! needs to be added in the implementation of `MyStruct`: ```ignore
 //! impl MyStruct {
 //!     impl_prop!( pub my_property: MyProperty );
 //! }
@@ -44,13 +49,12 @@
 
 /// A property is something that has a setter and a getter.
 // The setters are immutable.
-// This is because they can not be changed from threads other than the GUI thread anyway.
-pub trait Property<G,S> {
-	fn get( &self ) -> G;
-	fn set( &self, value: S );
+// This is because they can not be changed from threads other than the GUI
+// thread anyway.
+pub trait Property<G, S> {
+	fn get(&self) -> G;
+	fn set(&self, value: S);
 }
-
-
 
 #[doc(hidden)]
 #[macro_export]
@@ -98,10 +102,10 @@ macro_rules! prop {
 #[macro_export]
 #[doc(hidden)]
 macro_rules! impl_prop {
-	( $name:ident: $property:ident ) => {
-		fn $name<'a>( &'a self ) -> $property { $property { parent: self } }
+	($name:ident : $property:ident) => {
+		fn $name<'a>(&'a self) -> $property { $property { parent: self } }
 	};
-	( pub $name:ident: $property:ident ) => {
-		pub fn $name<'a>( &'a self ) -> $property { $property { parent: self } }
+	(pub $name:ident : $property:ident) => {
+		pub fn $name<'a>(&'a self) -> $property { $property { parent: self } }
 	};
 }

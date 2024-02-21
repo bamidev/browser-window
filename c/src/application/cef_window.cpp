@@ -49,7 +49,7 @@ BOOL bw_ApplicationImpl_dispatch( bw_Application* app, bw_ApplicationDispatchDat
 	return TRUE;
 }
 
-void bw_ApplicationImpl_finish( bw_ApplicationImpl* app ) {
+void bw_ApplicationImpl_free( bw_ApplicationImpl* app ) {
 	UNUSED( app );
 	CefShutdown();
 }

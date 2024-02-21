@@ -90,12 +90,7 @@ void bw_Application_exitAsync(  bw_Application* app, int exit_code );
 /// Dispatching a function fails when the application has already been terminated.
 BOOL bw_Application_dispatch( bw_Application* app, bw_ApplicationDispatchFn func, void* data );
 
-/// Shuts down all application processes and performs necessary clean-up code.
-void bw_Application_finish( bw_Application* app );
-
-/// Frees memory for the application handle.
-/// Call `bw_Application_finish` before you call this function.
-/// Freeing the application handle is generally not necessary, as all memory in use by the process gets released anyway after shutdown.
+/// Shuts down the applcation runtime & frees it's memory.
 void bw_Application_free( bw_Application* app );
 
 /// Initializes browser window.

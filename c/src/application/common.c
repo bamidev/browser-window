@@ -6,11 +6,6 @@
 #include <stdlib.h>
 
 
-
-void bw_Application_free( bw_Application* app ) {
-	free( app );
-}
-
 BOOL bw_Application_isRunning( const bw_Application* app ) {
 	return app->is_running;
 }
@@ -49,10 +44,11 @@ int bw_Application_run( bw_Application* app, bw_ApplicationReadyFn on_ready, voi
 	return exit_code;
 }
 
-void bw_Application_finish( bw_Application* app ) {
+void bw_Application_free( bw_Application* app ) {
 
-	bw_ApplicationEngineImpl_finish( &app->engine_impl );
-	bw_ApplicationImpl_finish( &app->impl );
+	bw_ApplicationEngineImpl_free( &app->engine_impl );
+	bw_ApplicationImpl_free( &app->impl );
+	free(app);
 }
 
 bw_Err bw_Application_initialize( bw_Application** app, int argc, char** argv, const bw_ApplicationSettings* settings ) {

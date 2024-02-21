@@ -1,54 +1,54 @@
-# Browser Window
+# BrowserWindow
 
-_Browser Window_ is a simple Rust crate for utilizing a browser engine to create a graphical user interface.
+_BrowserWindow_ is a simple Rust crate for utilizing a browser engine to create a graphical user interface.
 Just like [Electron.js](https://www.electronjs.org/), you can build your GUI with HTML, CSS & JS, or simply have some basic browser functionality at your disposal.
-_Browser Window_ was born from the lack of a good and simple Electron alternative for Rust.
+_BrowserWindow_ was born from the lack of a good and simple Electron alternative for Rust.
 
-## Design Principles
+## Introduction
 
-_Browser Window_ is designed to be simple to use, and to work cross-platform.
-It is built to utilize Rust's async/await syntax fully, so that exchanging data between the browser and your application can be straightforward, instead of using messy callbacks.
+_BrowserWindow_ is designed to be easy to use, and work cross-platform. It is built to work in Rust
+applications that utilize async/await syntax - or that don't that at all.
+One of the following underlying browser embedding frameworks can be selected: CEF or WebkitGTK.
 
-With other alternative crates, you can't just simply invoke a JavaScript function and return its output in one line like this:
-```
-let js_return_value = my_window.eval_js("my_js_func()").await.unwrap();
-```
-Something similar is available in _Electron_ as well, and this is just something that is paramount to making two-way communication between the host-code (Rust) and client-code (JavaScript) comfortable.
+CEF (or the Chromium Embedding Framework) is recommended when used on Windows.
+WebkitGTK is recommended when used on Unix-like systems, or when cross-compiling.
+Enable feature `cef` or `webkitgtk` to select either one.
+
+If you're wondering why _BrowserWindow_ doesn't actually support the pre-installed EdgeHTML
+framework for Windows: EdgeHTML is deprecated in favor of the Microsoft Edge WebView2, but the
+latter needs to be uninstalled manually be the end-user, defeating it's utility over CEF, if you're planning to ship your application to Windows users anyway.
 
 Moreover, if you wish to use it in a multi-threaded environment, you can do that as well.
 There are thread-safe handles available for easy exchange of data & work between the GUI thread and others.
 
-You can view some [example](https://github.com/bamilab/browser-window/tree/master/examples) to get some ideas of what is possible with _Browser Window_.
-There is an example of a basic terminal emulator, and an example of an authentication dialog that fetches the session cookie.
+You can view some [example](https://github.com/bamilab/browser-window/tree/master/examples) to get
+some ideas of what is possible with _BrowserWindow_.
 
 ## Requirements
 
-_Browser Window_ relies on the [Chromium Embedding Framework](https://bitbucket.org/chromiumembedded/cef/wiki/Home), or CEF in short.
-_Browser Window_ works on any platform that is also supported by CEF.
-Currently those are Linux, macOS and Windows, but macOS needs some testing.
+The underlying framework, be it CEF or WebkitGTK, needs to be installed on your system. There is a
+[guide](./docs/GETTING-STARTED.md) to get your started.
 
-However, that does mean it requires a bit of effort to set things up.
-Also, due to CEF's frequent release schedule, be sure to pick a version that is _compatible_ with Browser Window, or try a new version at your own risk.
-
-The latest known CEF version that is compatible with this version of Browser Window is: v121.3.13
+Also keep in mind that latest known CEF version that is compatible with this version of
+_BrowserWindow_ is: v121.3.13
 
 ## Getting Started
 
-Click [here](./docs/GETTING-STARTED.md) for a manual on how to set up everything to be able to compile and run you app with _Browser Window_.
+Click [here](./docs/GETTING-STARTED.md) for a manual on how to set up everything to be able to
+compile and run you app with _BrowserWindow_.
 
 ## License
 
-This software is available as open source software under a MIT license, for maximum freedom and minimum restrictions.
-
-## Development
-
-If you want to help out, you're more than welcome!
+This software is available as open source software under a MIT license, for maximum freedom and
+minimum restrictions.
 
 ## Future Plans
 
 At the moment, there is a decent set of functionality available, but if something is lacking, please [submit an issue](https://github.com/bamilab/browser-window/issues), and I'll take a look at it.
+There are not a lot of functions exposed in the BrowserWindow object. If you need a feature that
+isn't there, let me know!
 
 Otherwise, there are some things that are yet to come:
 
-* Events [underway]
-* Servo engine support (currently missing good embedding support)
+* Events
+* Support for Webkit with Cocoa on MacOS.

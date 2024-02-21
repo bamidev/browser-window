@@ -1,54 +1,45 @@
 //! This module contains all event related types.
 
-
-
-use std::{
-	boxed::Box,
-	future::Future,
-	pin::Pin
-};
-
-
+use std::{boxed::Box, future::Future, pin::Pin};
 
 #[cfg(not(feature = "threadsafe"))]
-type EventHandler<'a,A> = Box<dyn FnMut( &A ) -> Pin<Box<dyn Future<Output=()> + 'a>> + 'a>;
+type EventHandler<'a, A> = Box<dyn FnMut(&A) -> Pin<Box<dyn Future<Output = ()> + 'a>> + 'a>;
 #[cfg(feature = "threadsafe")]
-type EventHandler<'a,A> = Box<dyn FnMut( &A ) -> Pin<Box<dyn Future<Output=()> + 'a>> + Send + 'a>;
+type EventHandler<'a, A> = Box<dyn FnMut(&A) -> Pin<Box<dyn Future<Output = ()> + 'a>> + Send + 'a>;
 
-pub struct Event<'a,A> {
-	handlers: Vec<EventHandler<'a,A>>
+pub struct Event<'a, A> {
+	handlers: Vec<EventHandler<'a, A>>,
 }
 
-
-
-impl<'a,A> Event<'a,A> {
-
-	/// Invokes the event, which calls all handlers that have been registered to this event.
-	pub(in crate) fn invoke( &mut self, args: &A  ) {
-
+impl<'a, A> Event<'a, A> {
+	/// Invokes the event, which calls all handlers that have been registered to
+	/// this event.
+	pub(crate) fn invoke(&mut self, args: &A) {
 		for h in self.handlers.iter_mut() {
-			h( args );
+			h(args);
 		}
 	}
 
 	/// Register a closure to be invoked for this event.
 	#[cfg(not(feature = "threadsafe"))]
-	pub fn register<H>( &mut self, mut handler: H ) where
-		H: FnMut( &A ) + 'a
+	pub fn register<H>(&mut self, mut handler: H)
+	where
+		H: FnMut(&A) + 'a,
 	{
 		self.handlers.push(Box::new(move |args| {
-			handler( args );
+			handler(args);
 			Box::pin(async {})
 		}));
 	}
 
 	/// Register a closure to be invoked for this event.
 	#[cfg(feature = "threadsafe")]
-	pub fn register<H>( &mut self, mut handler: H ) where
-		H: FnMut( &A ) + Send + 'a
+	pub fn register<H>(&mut self, mut handler: H)
+	where
+		H: FnMut(&A) + Send + 'a,
 	{
 		self.handlers.push(Box::new(move |args| {
-			handler( args );
+			handler(args);
 			Box::pin(async {})
 		}));
 	}
@@ -62,11 +53,13 @@ impl<'a,A> Event<'a,A> {
 	/// });
 	/// ```
 	#[cfg(not(feature = "threadsafe"))]
-	pub fn register_async<H,F>( &mut self, mut handler: H ) where
-		H: FnMut( &A ) -> F + 'a,
-		F: Future<Output=()> + 'a
+	pub fn register_async<H, F>(&mut self, mut handler: H)
+	where
+		H: FnMut(&A) -> F + 'a,
+		F: Future<Output = ()> + 'a,
 	{
-		self.handlers.push(Box::new(move |args| Box::pin( handler( args ) ) ) );
+		self.handlers
+			.push(Box::new(move |args| Box::pin(handler(args))));
 	}
 
 	/// Register an 'async closure' to be invoked for this event.
@@ -78,19 +71,20 @@ impl<'a,A> Event<'a,A> {
 	/// });
 	/// ```
 	#[cfg(feature = "threadsafe")]
-	pub fn register_async<H,F>( &mut self, mut handler: H ) where
-		H: FnMut( &A ) -> F + Send + 'a,
-		F: Future<Output=()> + 'a
+	pub fn register_async<H, F>(&mut self, mut handler: H)
+	where
+		H: FnMut(&A) -> F + Send + 'a,
+		F: Future<Output = ()> + 'a,
 	{
-		self.handlers.push(Box::new(move |args| Box::pin( handler( args ) ) ) );
+		self.handlers
+			.push(Box::new(move |args| Box::pin(handler(args))));
 	}
 }
 
-impl<'a,A> Default for Event<'a,A> {
-	
+impl<'a, A> Default for Event<'a, A> {
 	fn default() -> Self {
 		Self {
-			handlers: Vec::new()
+			handlers: Vec::new(),
 		}
 	}
 }
