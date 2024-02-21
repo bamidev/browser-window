@@ -356,7 +356,7 @@ impl From<ApplicationHandle> for Application {
 
 impl ApplicationHandle {
 
-	pub fn cookie_jar(&self) -> CookieJar {
+	pub fn cookie_jar(&self) -> Option<CookieJar> {
 		CookieJar::global()
 	}
 

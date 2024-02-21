@@ -161,10 +161,10 @@ impl CookieJar {
 		None
 	}
 
-	pub(in crate) fn global() -> Self {
-		Self {
+	pub(in crate) fn global() -> Option<Self> {
+		Some(Self {
 			inner: CookieJarImpl::global()
-		}
+		})
 	}
 
 	/// Returns a `CookieIterator` that iterates over cookies asynchronously.
