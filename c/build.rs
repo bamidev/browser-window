@@ -114,7 +114,7 @@ fn main() {
 	let mut build_se = cc::Build::new();	// For seperate executable
 	let std_flag = if cfg!(feature = "cef") {
 		if target.contains("msvc") {
-			"/std:c++latest"
+			"/std:c++17"
 		}
 		else {
 			"-std=c++17"
