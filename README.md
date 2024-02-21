@@ -1,20 +1,8 @@
 # Browser Window
 
 _Browser Window_ is a simple Rust crate for utilizing a browser engine to create a graphical user interface.
-Just like [Electron.js](https://www.electronjs.org/), you can build your GUI with HTML, CSS & JS, or simply have some browser functionality at your disposal.
-
+Just like [Electron.js](https://www.electronjs.org/), you can build your GUI with HTML, CSS & JS, or simply have some basic browser functionality at your disposal.
 _Browser Window_ was born from the lack of a good and simple Electron alternative for Rust.
-There are other crates out there doing a similar thing, but they lack a few important key features.
-
-Other alternatives tend to depend on the target platform's native browser engine(s), initially intended to have something that works _out-of-the-box_.
-However, nowadays that is really only true for macOS.
-Moreover, claims of _small memory footprints_ are being made, with no actual evidence to back that up.
-This is quite deceiving really, as when you are using your platform's browser engine, this may only mean that the engine's memory resides in _another process_.
-
-And then you still run into issues of portability because different browser engines support different HTML/JS/CSS features.
-So using _one_ browser engine for all platforms should actually be desired if portability is of a concern.
-If you don't use platform dependent JavaScript (or Rust), and it works, it works everywhere.
-End of story.
 
 ## Design Principles
 
@@ -40,7 +28,9 @@ _Browser Window_ works on any platform that is also supported by CEF.
 Currently those are Linux, macOS and Windows, but macOS needs some testing.
 
 However, that does mean it requires a bit of effort to set things up.
-Also, due to CEF's frequent release schedule, be sure to pick a version that is _known to work_, or try a new version at your own risk.
+Also, due to CEF's frequent release schedule, be sure to pick a version that is _compatible_ with Browser Window, or try a new version at your own risk.
+
+The latest CEF version that is compatible is: 121.3.13
 
 ## Getting Started
 

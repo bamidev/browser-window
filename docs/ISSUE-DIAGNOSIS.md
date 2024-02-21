@@ -5,13 +5,25 @@ If your issues isn't explained in here, please file the issue [here](https://git
 
 ## Compilation Errors
 
+### Cross-platform
+
+####
+
+```rustc
+undefined reference to `base::cef_subtle::RefCountedThreadSafeBase::~RefCountedThreadSafeBase()'
+```
+
+This tends to happen when you compile `libcef_dll_wrapper` in release mode.
+For some reason, libcef_dll_wrapper doesn't compile these symbols in release
+mode. Therefore, currently only build with debug symbols:
+
+```
+make clean
+cmake -DCMAKE_BUILD_TYPE=Debug .
+make
+```
+
 ### Unix-like Systems
-
-#### Missing gtk/gtk.h
-
-TODO: Paste console error here...
-
-This error means that the GTK development files are not available.
 
 #### Missing "stdlib.h" or "stddef.h"
 
@@ -23,7 +35,6 @@ thread 'main' panicked at 'Unable to generate FFI bindings! ...
 
 `bindgen` might fail when `clang` isn't properly installed.
 To fix this for Debian-like systems, try `apt install libclang-dev`.
-To fix this on Windows, install clang [here]().
 
 ### Windows
 
