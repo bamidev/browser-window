@@ -1,6 +1,6 @@
 //! Module for dealing with cookies.
 
-use browser_window_core::cookie::*;
+use crate::core::cookie::*;
 use futures_channel::oneshot;
 
 use std::{

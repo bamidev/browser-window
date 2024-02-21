@@ -1,6 +1,8 @@
 pub use browser_window_c::*;
 
-pub use crate::cookie::*;
+pub use super::cookie::*;
+
+pub use core::prelude::*;
 
 
 
@@ -9,9 +11,9 @@ pub struct Pos2D(pub(crate) cbw_Pos2D);
 
 
 
-pub use crate::application::{ApplicationExt, ApplicationImpl};
-pub use crate::browser_window::{BrowserWindowExt, BrowserWindowImpl};
-pub use crate::window::{WindowExt, WindowImpl};
+pub use super::application::{ApplicationExt, ApplicationImpl};
+pub use super::browser_window::{BrowserWindowExt, BrowserWindowImpl};
+pub use super::window::{WindowExt, WindowImpl};
 
 
 

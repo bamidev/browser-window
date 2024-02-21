@@ -1,4 +1,4 @@
-pub mod c;
+mod c;
 
 
 use std::{

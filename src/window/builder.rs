@@ -1,10 +1,8 @@
 use crate::application::*;
 use crate::window::*;
 
-use browser_window_core::prelude::*;
-use std::{
-	future::Future
-};
+use crate::core::prelude::*;
+use std::future::Future;
 use unsafe_send_sync::UnsafeSend;
 
 

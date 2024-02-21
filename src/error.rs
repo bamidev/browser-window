@@ -1,6 +1,6 @@
 //! Error types.
 
-pub use browser_window_core::error::{CbwError, CbwResult};
+pub use crate::core::error::{CbwError, CbwResult};
 
 use std::fmt;
 

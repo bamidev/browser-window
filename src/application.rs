@@ -81,11 +81,11 @@ use std::ptr;
 use std::task::{Context, Poll, Waker, RawWaker, RawWakerVTable};
 use std::time::Duration;
 
-use browser_window_core::application::*;
+use crate::core::application::*;
 use futures_channel::oneshot;
 use lazy_static::lazy_static;
 
-pub use browser_window_core::application::ApplicationSettings;
+pub use crate::core::application::ApplicationSettings;
 
 use crate::cookie::CookieJar;
 #[cfg(feature = "threadsafe")]

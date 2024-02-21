@@ -17,10 +17,12 @@
 //! To use the threadsafe version of _Browser Window_, enable feature `threadsafe`.
 
 
+mod core;
 #[macro_use]
 mod prop;
 #[cfg(test)]
 mod tests;
+
 
 pub mod application;
 pub mod browser;

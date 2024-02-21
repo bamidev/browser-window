@@ -10,7 +10,7 @@ use std::{
 
 use browser_window_c::*;
 
-use crate::window::WindowImpl;
+use super::super::window::WindowImpl;
 
 
 

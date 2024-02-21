@@ -7,7 +7,7 @@ use super::{
 };
 
 use crate::{
-	application::ApplicationImpl,
+	core::application::ApplicationImpl,
 	prelude::*
 };
 

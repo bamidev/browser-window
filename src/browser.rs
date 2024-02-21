@@ -18,8 +18,8 @@ use crate::application::*;
 use crate::delegate::*;
 use crate::window::*;
 
-use browser_window_core::browser_window::{BrowserWindowExt, BrowserWindowImpl, JsEvaluationError};
-use browser_window_core::window::WindowExt;
+use crate::core::browser_window::{BrowserWindowExt, BrowserWindowImpl, JsEvaluationError};
+use crate::core::window::WindowExt;
 
 #[cfg(feature = "threadsafe")]
 use unsafe_send_sync::UnsafeSend;

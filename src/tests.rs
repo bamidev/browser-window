@@ -74,7 +74,7 @@ async fn async_basic(app: ApplicationHandle) -> BrowserWindow {
 }
 
 async fn async_cookies(app: ApplicationHandle) {
-	let mut jar = app.cookie_jar();
+	let mut jar = app.cookie_jar().expect("cookies not supported");
 
 	let cookie = Cookie::new("name", "value");
 

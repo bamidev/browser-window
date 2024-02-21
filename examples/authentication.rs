@@ -22,7 +22,7 @@ fn main() {
 
 		bw.show();
 
-		let cookie_jar = app.cookie_jar();
+		let cookie_jar = app.cookie_jar().expect("cookies not supported");
 		
 		// Wait until we moved away from the login page
 		while bw.url() == "" || bw.url() == "https://github.com/login" || bw.url() == "https://github.com/session" {

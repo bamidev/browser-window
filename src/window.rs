@@ -5,7 +5,7 @@ mod builder;
 use super::prelude::*;
 use super::event::Event;
 
-
+use crate::core::prelude::*;
 
 pub use builder::WindowBuilder;
 

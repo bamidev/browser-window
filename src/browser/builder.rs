@@ -1,8 +1,8 @@
-use browser_window_core::*;
-use browser_window_core::browser_window::*;
-use browser_window_core::window::*;
+use crate::core::*;
+use crate::core::browser_window::*;
+use crate::core::window::*;
 
-use crate::application::{ApplicationHandle};
+use crate::application::ApplicationHandle;
 use crate::browser::*;
 use crate::window::WindowBuilder;
 
