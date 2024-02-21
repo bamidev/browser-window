@@ -30,7 +30,7 @@ Currently those are Linux, macOS and Windows, but macOS needs some testing.
 However, that does mean it requires a bit of effort to set things up.
 Also, due to CEF's frequent release schedule, be sure to pick a version that is _compatible_ with Browser Window, or try a new version at your own risk.
 
-The latest CEF version that is compatible is: 121.3.13
+The latest known CEF version that is compatible with this version of Browser Window is: v121.3.13
 
 ## Getting Started
 

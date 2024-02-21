@@ -1,6 +1,6 @@
 [package]
 name = "browser-window"
-version = "0.7.0"
+version = "0.8.0"
 description = "A simple async/await aware browser (GUI) toolkit."
 edition = "2018"
 authors = ["Danny de Jong"]
@@ -31,7 +31,7 @@ name = "authentication"
 path = "examples/authentication.rs"
 
 [dependencies]
-browser-window-core = { path = "./core", version = "0.2.0", features = [ "cef" ] }
+browser-window-core = { path = "./core", version = "0.2.1", features = [ "cef" ] }
 futures-channel = { version = "^0.3" }
 lazy_static = "1"
 unsafe-send-sync = "^0.1"
