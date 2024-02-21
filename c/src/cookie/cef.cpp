@@ -115,13 +115,12 @@ bw_Cookie* bw_Cookie_new(bw_CStrSlice name, bw_CStrSlice value) {
 }
 
 uint64_t bw_Cookie_getCreationTime(const bw_Cookie* cookie) {
-	CefTime time(((CefCookie*)cookie->impl.handle_ptr)->creation);
-	return time.GetDoubleT() * 1000;
+	return (((CefCookie*)cookie->impl.handle_ptr)->creation).val * 1000;
 }
 
 void bw_Cookie_setCreationTime(bw_Cookie* cookie, uint64_t time) {
-	CefTime cef_time;
-	cef_time.SetDoubleT((double)time / 1000);
+	CefBaseTime cef_time;
+	cef_time.val = (double)time / 1000;
 	((CefCookie*)cookie->impl.handle_ptr)->creation = cef_time;
 }
 
@@ -141,16 +140,16 @@ uint64_t bw_Cookie_getExpires(const bw_Cookie* cookie) {
 
 	if (!cef_cookie->has_expires)
 		return 0;
-		
-	CefTime time(cef_cookie->expires);
-	return time.GetDoubleT() * 1000;
+	
+	return cef_cookie->expires.val * 1000;
 }
 
 void bw_Cookie_setExpires(bw_Cookie* cookie, uint64_t time) {
 	CefCookie* cef_cookie = (CefCookie*)cookie->impl.handle_ptr;
 
 	cef_cookie->has_expires = 1;
-	CefTime temp;	temp.SetDoubleT((double)time / 1000);
+	CefBaseTime temp;
+	temp.val = (double)time / 1000;
 	cef_cookie->expires = temp;
 }
 
@@ -240,7 +239,7 @@ void bw_CookieJar_iteratorAll(bw_CookieJar* jar, bw_CookieIterator** iterator) {
 
 bw_CookieJar* bw_CookieJar_newGlobal() {
 
-	CefRefPtr<CefCookieManager>* mgr = new CefRefPtr<CefCookieManager>(CefCookieManager::GetGlobalManager(0));
+	CefRefPtr<CefCookieManager>* mgr = new CefRefPtr<CefCookieManager>(CefCookieManager::GetGlobalManager(nullptr));
 
 	bw_CookieJar* cj = (bw_CookieJar*)malloc(sizeof(bw_CookieJar));
 	cj->impl.handle_ptr = mgr;

@@ -2,11 +2,12 @@
 #include "../common.h"
 #include "impl.h"
 
-#include <include/cef_base.h>
-#include <include/cef_app.h>
 #include <include/base/cef_bind.h>
+#include <include/base/cef_callback_helpers.h>
+#include <include/cef_app.h>
+#include <include/cef_base.h>
+#include <include/cef_callback.h>
 #include <include/wrapper/cef_closure_task.h>
-
 
 
 void bw_ApplicationImpl_dispatchHandler( bw_Application* app, bw_ApplicationDispatchData* data );
@@ -26,13 +27,13 @@ void bw_Application_exit( bw_Application* app, int exit_code ) {
 }
 
 void bw_Application_exitAsync( bw_Application* app, int exit_code ) {
-	CefPostTask( TID_UI, base::Bind( &bw_Application_exit, app, exit_code ));
+	CefPostTask( TID_UI, base::BindOnce( &bw_Application_exit, app, exit_code ));
 }
 
 BOOL bw_ApplicationImpl_dispatchDelayed(bw_Application* app, bw_ApplicationDispatchData* data,  uint64_t milliseconds) {
 	BW_ASSERT(milliseconds < 0x8000000000000000, "CEF doesn't support delays of 0x8000000000000000 or longer");	// The milliseconds in CefPostDelayedTask is signed.
 
-	CefPostDelayedTask(TID_UI, base::Bind(&bw_ApplicationImpl_dispatchHandler, app, data), milliseconds);
+	CefPostDelayedTask(TID_UI, base::BindOnce(&bw_ApplicationImpl_dispatchHandler, app, data), milliseconds);
 	return TRUE;
 }
 
@@ -44,7 +45,7 @@ void bw_ApplicationImpl_dispatchHandler( bw_Application* app, bw_ApplicationDisp
 
 BOOL bw_ApplicationImpl_dispatch( bw_Application* app, bw_ApplicationDispatchData* data ) {
 
-	CefPostTask( TID_UI, base::Bind( &bw_ApplicationImpl_dispatchHandler, app, data ) );
+	CefPostTask( TID_UI, base::BindOnce( &bw_ApplicationImpl_dispatchHandler, app, data ) );
 	return TRUE;
 }
 
@@ -58,7 +59,7 @@ int bw_ApplicationImpl_run( bw_Application* app, bw_ApplicationImpl_ReadyHandler
 
 	app->impl.exit_code = 0;
 
-	CefPostTask(TID_UI, base::Bind(ready_handler_data->func, app, ready_handler_data->data ));
+	CefPostTask(TID_UI, base::BindOnce(ready_handler_data->func, app, ready_handler_data->data ));
 	CefRunMessageLoop();
 
 	return app->impl.exit_code;

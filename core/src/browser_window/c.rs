@@ -41,20 +41,6 @@ struct UserData {
 	data: *mut ()
 }
 
-/// For some reason, Rust doesn't allow converting function signatures with differing argument types, even when we are sure the bit representation of both types are exactly the same.
-/// In this case, `arg_count` of `ffi_handler` is of type `usize`.
-/// However, bindgen translates C's `size_t` type into `u64` or `u32` depending on your architecture.
-/// Using `usize` would make sense since it is always the same as what `size_t` translates into bitwise.
-/// However, due to Rust's type system constraints, we can't really use `usize`.
-/// Therefore, we use this as a workaround.
-#[cfg(target_pointer_width = "16")]
-type UsizeFix = u16;
-#[cfg(target_pointer_width = "32")]
-type UsizeFix = u32;
-#[cfg(target_pointer_width = "64")]
-type UsizeFix = u64;
-
-
 
 impl BrowserWindowExt for BrowserWindowImpl {
 
@@ -224,7 +210,7 @@ unsafe extern "C" fn ffi_eval_js_callback_handler( bw: *mut cbw_BrowserWindow, _
 	(data.callback)( handle, data.data, result );
 }
 
-unsafe extern "C" fn ffi_handler( bw: *mut cbw_BrowserWindow, cmd: cbw_CStrSlice, args: *mut cbw_CStrSlice, arg_count: UsizeFix ) {
+unsafe extern "C" fn ffi_handler( bw: *mut cbw_BrowserWindow, cmd: cbw_CStrSlice, args: *mut cbw_CStrSlice, arg_count: usize ) {
 
 	let handle = BrowserWindowImpl { inner: bw };
 
