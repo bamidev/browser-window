@@ -81,7 +81,7 @@ impl<'a> CookieIterator<'a> {
 		let called_closure = self.inner.next(cookie_iterator_next_handler::<H>, data as _);
 
 		if !called_closure {
-			unsafe { Box::from_raw(data) };
+			unsafe { let _ = Box::from_raw(data); }
 		}
 
 		called_closure

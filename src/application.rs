@@ -253,7 +253,7 @@ impl Runtime {
 		// When the future is ready, free the memory allocated for the waker data
 		match result {
 			Poll::Ready(_) => {
-				Box::from_raw( data );
+				let _ = Box::from_raw( data );
 			},
 			Poll::Pending => {}
 		}
