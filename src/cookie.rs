@@ -4,53 +4,49 @@ use crate::core::cookie::*;
 use futures_channel::oneshot;
 
 use std::{
-	marker::PhantomData,
-	ops::*
+	borrow::Cow, marker::PhantomData, ops::*, time::SystemTime
 };
 
 
 
-pub struct Cookie {
-	inner: CookieImpl
-}
+pub struct Cookie (CookieImpl);
 
-//pub struct CookieMut (Cookie);
-
-pub struct CookieJar {
-	inner: CookieJarImpl
-}
+pub struct CookieJar (CookieJarImpl);
 
 pub struct CookieIterator<'a> {
 	inner: CookieIteratorImpl,
 	_phantom: PhantomData<&'a u8>
 }
 
-//pub struct CookieIteratorMut<'a> (CookieIterator<'a>);
-
 
 impl Cookie {
 	pub fn new(name: &str, value: &str) -> Self {
-		Self { inner: CookieImpl::new(name, value) }
+		Self (CookieImpl::new(name, value))
 	}
-}
-
-impl Deref for Cookie {
-	type Target = CookieImpl;
-
-	fn deref(&self) -> &Self::Target {
-		&self.inner
-	}
-}
-
-impl DerefMut for Cookie {
-	fn deref_mut(&mut self) -> &mut Self::Target {
-		&mut self.inner
-	}
+	
+	
+	pub fn creation_time(&self) -> SystemTime { self.0.creation_time() }
+	pub fn expires(&self) -> Option<SystemTime> { self.0.expires() }
+	pub fn domain(&self) -> Cow<'_, str> { self.0.domain() }
+	pub fn is_http_only(&self) -> bool { self.0.is_http_only() }
+	pub fn name(&self) -> Cow<'_, str> { self.0.name() }
+	pub fn path(&self) -> Cow<'_, str> { self.0.path() }
+	pub fn is_secure(&self) -> bool { self.0.is_secure() }
+	pub fn value(&self) -> Cow<'_, str> { self.0.value() }
+	
+	pub fn make_http_only(&mut self) -> &mut Self { self.0.make_http_only(); self }
+	pub fn make_secure(&mut self) -> &mut Self { self.0.make_secure(); self }
+	pub fn set_creation_time(&mut self, time: &SystemTime) -> &mut Self { self.0.set_creation_time(time); self }
+	pub fn set_expires(&mut self, time: &SystemTime) -> &mut Self { self.0.set_expires(time); self }
+	pub fn set_domain(&mut self, domain: &str) -> &mut Self { self.0.set_domain(domain); self }
+	pub fn set_name(&mut self, name: &str) -> &mut Self { self.0.set_name(name); self }
+	pub fn set_path(&mut self, path: &str) -> &mut Self { self.0.set_path(path); self }
+	pub fn set_value(&mut self, value: &str) -> &mut Self { self.0.set_value(value); self }
 }
 
 impl Drop for Cookie {
 	fn drop(&mut self) {
-		self.inner.free();
+		self.0.free();
 	}
 }
 
@@ -112,7 +108,7 @@ impl CookieJar {
 	{
 		let data = Box::into_raw(Box::new(on_complete));
 
-		self.inner.delete(url, name, cookie_delete_callback::<H>, data as _);
+		self.0.delete(url, name, cookie_delete_callback::<H>, data as _);
 	}
 
 	/// Deletes all cookies with the given `name`.
@@ -162,9 +158,7 @@ impl CookieJar {
 	}
 
 	pub(in crate) fn global() -> Option<Self> {
-		Some(Self {
-			inner: CookieJarImpl::global()
-		})
+		Some(Self (CookieJarImpl::global()))
 	}
 
 	/// Returns a `CookieIterator` that iterates over cookies asynchronously.
@@ -180,7 +174,7 @@ impl CookieJar {
 	/// }
 	/// ```
 	pub fn iter<'a>(&'a self, url: &str, include_http_only: bool) -> CookieIterator<'a> {
-		let inner = self.inner.iterator(url, include_http_only);
+		let inner = self.0.iterator(url, include_http_only);
 
 		CookieIterator {
 			inner,
@@ -191,7 +185,7 @@ impl CookieJar {
 	/// Returns a `CookieIterator` that iterators over cookies asynchronously.
 	/// Like `iter`, but iterates over all cookies from any url.
 	pub fn iter_all<'a>(&'a self) -> CookieIterator<'a> {
-		let inner = self.inner.iterator_all();
+		let inner = self.0.iterator_all();
 
 		CookieIterator {
 			inner,
@@ -204,7 +198,7 @@ impl CookieJar {
 	{
 		let data = Box::into_raw(Box::new(on_complete));
 
-		self.inner.store(url.into(), &cookie.inner, Some(cookie_store_callback::<'a,H>), data as _);
+		self.0.store(url.into(), &cookie.0, Some(cookie_store_callback::<'a,H>), data as _);
 	}
 
 	/// Stores the given `cookie` for the given `url`.
@@ -221,7 +215,7 @@ impl CookieJar {
 
 impl Drop for CookieJar {
 	fn drop(&mut self) {
-		self.inner.free();
+		self.0.free();
 	}
 }
 
@@ -251,5 +245,5 @@ unsafe fn cookie_iterator_next_handler<H>(_handle: CookieIteratorImpl, cb_data: 
 	let data_ptr = cb_data as *mut H;
 	let data: Box<H> = Box::from_raw(data_ptr);
 
-	(*data)(cookie.map(|c| Cookie {inner: c}));
+	(*data)(cookie.map(|c| Cookie(c)));
 }

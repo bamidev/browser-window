@@ -29,14 +29,14 @@ pub trait CookieExt {
 	fn is_secure(&self) -> bool;
 	fn value<'a>(&'a self) -> Cow<'a, str>;
 	
-	fn make_http_only(&mut self) -> &mut Self;
-	fn make_secure(&mut self) -> &mut Self;
-	fn set_creation_time(&mut self, time: &SystemTime) -> &mut Self;
-	fn set_expires(&mut self, time: &SystemTime) -> &mut Self;
-	fn set_domain(&mut self, domain: &str) -> &mut Self;
-	fn set_name(&mut self, name: &str) -> &mut Self;
-	fn set_path(&mut self, path: &str) -> &mut Self;
-	fn set_value(&mut self, value: &str) -> &mut Self;
+	fn make_http_only(&mut self);
+	fn make_secure(&mut self);
+	fn set_creation_time(&mut self, time: &SystemTime);
+	fn set_expires(&mut self, time: &SystemTime);
+	fn set_domain(&mut self, domain: &str);
+	fn set_name(&mut self, name: &str);
+	fn set_path(&mut self, path: &str);
+	fn set_value(&mut self, value: &str);
 }
 
 pub trait CookieJarExt {

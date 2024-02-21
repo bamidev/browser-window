@@ -143,37 +143,37 @@ impl CookieExt for CookieImpl {
 		}
 	}
 	
-	fn make_http_only(&mut self) -> &mut Self {
-		unsafe { cbw_Cookie_makeHttpOnly(self.inner) };	self
+	fn make_http_only(&mut self) {
+		unsafe { cbw_Cookie_makeHttpOnly(self.inner) };
 	}
 
-	fn make_secure(&mut self) -> &mut Self {
-		unsafe { cbw_Cookie_makeSecure(self.inner) };	self
+	fn make_secure(&mut self) {
+		unsafe { cbw_Cookie_makeSecure(self.inner) };
 	}
 
-	fn set_creation_time(&mut self, time: &SystemTime) -> &mut Self {
-		unsafe { cbw_Cookie_setCreationTime(self.inner, time.duration_since(SystemTime::UNIX_EPOCH).unwrap().as_millis() as _) };	self
+	fn set_creation_time(&mut self, time: &SystemTime) {
+		unsafe { cbw_Cookie_setCreationTime(self.inner, time.duration_since(SystemTime::UNIX_EPOCH).unwrap().as_millis() as _) };
 	}
 
-	fn set_expires(&mut self, time: &SystemTime) -> &mut Self {
-		unsafe { cbw_Cookie_setExpires(self.inner, time.duration_since(SystemTime::UNIX_EPOCH).unwrap().as_millis() as _) };	self
+	fn set_expires(&mut self, time: &SystemTime) {
+		unsafe { cbw_Cookie_setExpires(self.inner, time.duration_since(SystemTime::UNIX_EPOCH).unwrap().as_millis() as _) };
 	}
 
-	fn set_domain(&mut self, domain: &str) -> &mut Self {
-		unsafe { cbw_Cookie_setDomain(self.inner, domain.into()) };	self
+	fn set_domain(&mut self, domain: &str) {
+		unsafe { cbw_Cookie_setDomain(self.inner, domain.into()) };
 	}
 
-	fn set_name(&mut self, name: &str) -> &mut Self {
-		unsafe { cbw_Cookie_setName(self.inner, name.into()) };	self
+	fn set_name(&mut self, name: &str) {
+		unsafe { cbw_Cookie_setName(self.inner, name.into()) };
 	}
 
 
-	fn set_path(&mut self, path: &str) -> &mut Self {
-		unsafe { cbw_Cookie_setPath(self.inner, path.into()) };	self
+	fn set_path(&mut self, path: &str) {
+		unsafe { cbw_Cookie_setPath(self.inner, path.into()) };
 	}
 
-	fn set_value(&mut self, value: &str) -> &mut Self{
-		unsafe { cbw_Cookie_setValue(self.inner, value.into()) };	self
+	fn set_value(&mut self, value: &str) {
+		unsafe { cbw_Cookie_setValue(self.inner, value.into()) };
 	}
 }
 
