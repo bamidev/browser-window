@@ -30,6 +30,7 @@ pub mod browser;
 pub mod cookie;
 pub mod error;
 pub mod event;
+pub mod javascript;
 pub mod prelude;
 pub mod window;
 

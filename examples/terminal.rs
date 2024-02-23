@@ -52,7 +52,9 @@ async fn execute_command(bw: BrowserWindowHandle, line: &str) {
 	bw.exec_js("onExecutionEnded()");
 }
 
-fn read_stream<R>(bw: &BrowserWindowHandle, reader: &mut R, buffer: &mut [u8], js_func: &str) -> bool
+fn read_stream<R>(
+	bw: &BrowserWindowHandle, reader: &mut R, buffer: &mut [u8], js_func: &str,
+) -> bool
 where
 	R: Read,
 {

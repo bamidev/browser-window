@@ -11,6 +11,8 @@ pub use c::{BrowserWindowImpl, JsEvaluationError};
 #[cfg(feature = "gtk")]
 pub use webkit::{BrowserWindowImpl, JsEvaluationError};
 
+use crate::prelude::JsValue;
+
 use super::{
 	application::ApplicationImpl,
 	cookie::CookieJarImpl,
@@ -22,9 +24,8 @@ pub type Source = cbw_BrowserWindowSource;
 
 pub type CreationCallbackFn = fn(bw: BrowserWindowImpl, data: *mut ());
 pub type EvalJsCallbackFn =
-	fn(bw: BrowserWindowImpl, data: *mut (), result: Result<String, JsEvaluationError>);
-pub type ExternalInvocationHandlerFn =
-	fn(bw: BrowserWindowImpl, cmd: &str, args: Vec<String>);
+	fn(bw: BrowserWindowImpl, data: *mut (), result: Result<JsValue, JsEvaluationError>);
+pub type ExternalInvocationHandlerFn = fn(bw: BrowserWindowImpl, cmd: &str, args: Vec<JsValue>);
 
 pub trait BrowserWindowExt: Clone {
 	fn cookie_jar(&self) -> Option<CookieJarImpl>;

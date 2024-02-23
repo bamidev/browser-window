@@ -9,8 +9,12 @@ extern "C" {
 #include "err.h"
 #include "string.h"
 
-#if defined(BW_CEF)
+#ifdef BW_CEF
 #include "cookie/cef.h"
+#else
+struct bw_CookieImpl {};
+struct bw_CookieIteratorImpl {};
+struct bw_CookieJarImpl {};
 #endif
 
 

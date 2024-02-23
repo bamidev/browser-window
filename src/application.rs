@@ -159,7 +159,8 @@ struct WakerData<'a> {
 pub type ApplicationDelegateFuture<'a, R> = DelegateFuture<'a, ApplicationHandle, R>;
 
 lazy_static! {
-	static ref WAKER_VTABLE: RawWakerVTable = RawWakerVTable::new(waker_clone, waker_wake, waker_wake_by_ref, waker_drop);
+	static ref WAKER_VTABLE: RawWakerVTable =
+		RawWakerVTable::new(waker_clone, waker_wake, waker_wake_by_ref, waker_drop);
 }
 
 impl Application {
@@ -221,7 +222,9 @@ impl Application {
 }
 
 impl Drop for Application {
-	fn drop(&mut self) { self.handle.inner.free() }
+	fn drop(&mut self) {
+		self.handle.inner.free()
+	}
 }
 
 impl Runtime {
@@ -330,25 +333,35 @@ impl Application {
 }
 
 impl From<ApplicationHandle> for Application {
-	fn from(other: ApplicationHandle) -> Self { Self { handle: other } }
+	fn from(other: ApplicationHandle) -> Self {
+		Self { handle: other }
+	}
 }
 
 impl ApplicationHandle {
-	pub fn cookie_jar(&self) -> Option<CookieJar> { CookieJar::global() }
+	pub fn cookie_jar(&self) -> Option<CookieJar> {
+		CookieJar::global()
+	}
 
 	/// Causes the `Runtime` to terminate.
 	/// The `Runtime`'s [`Runtime::run`] or spawn command will return the exit
 	/// code provided. This will mean that not all tasks might complete.
 	/// If you were awaiting
-	pub fn exit(&self, exit_code: i32) { self.inner.exit(exit_code as _); }
+	pub fn exit(&self, exit_code: i32) {
+		self.inner.exit(exit_code as _);
+	}
 
-	pub(super) fn new(inner: ApplicationImpl) -> Self { Self { inner } }
+	pub(super) fn new(inner: ApplicationImpl) -> Self {
+		Self { inner }
+	}
 
 	/// **Note:** Only available with feature `threadsafe` enabled.
 	///
 	/// Transforms this application handle into a thread-safe version of it.
 	#[cfg(feature = "threadsafe")]
-	pub fn into_threaded(self) -> ApplicationHandleThreaded { self.into() }
+	pub fn into_threaded(self) -> ApplicationHandleThreaded {
+		self.into()
+	}
 
 	/// Spawns the given future, executing it on the GUI thread somewhere in the
 	/// near future.
@@ -589,11 +602,15 @@ impl From<ApplicationHandle> for ApplicationHandleThreaded {
 impl Deref for ApplicationHandleThreaded {
 	type Target = ApplicationHandle;
 
-	fn deref(&self) -> &Self::Target { &self.handle }
+	fn deref(&self) -> &Self::Target {
+		&self.handle
+	}
 }
 
 impl HasAppHandle for ApplicationHandle {
-	fn app_handle(&self) -> ApplicationHandle { self.clone() }
+	fn app_handle(&self) -> ApplicationHandle {
+		self.clone()
+	}
 }
 
 fn dispatch_handler(_app: ApplicationImpl, _data: *mut ()) {
@@ -617,7 +634,7 @@ where
 	H: FnOnce(ApplicationHandle),
 {
 	let app = ApplicationHandle::new(handle);
-	let closure = unsafe { Box::from_raw(user_data as *mut H ) };
+	let closure = unsafe { Box::from_raw(user_data as *mut H) };
 
 	closure(app);
 }
@@ -629,7 +646,9 @@ fn wakeup_handler(_app: ApplicationImpl, user_data: *mut ()) {
 	Runtime::poll_future(data);
 }
 
-unsafe fn waker_clone(data: *const ()) -> RawWaker { RawWaker::new(data, &WAKER_VTABLE) }
+unsafe fn waker_clone(data: *const ()) -> RawWaker {
+	RawWaker::new(data, &WAKER_VTABLE)
+}
 
 unsafe fn waker_wake(data: *const ()) {
 	let data_ptr = data as *const WakerData;
@@ -640,6 +659,8 @@ unsafe fn waker_wake(data: *const ()) {
 		.dispatch(wakeup_handler, data_ptr as _);
 }
 
-unsafe fn waker_wake_by_ref(data: *const ()) { waker_wake(data); }
+unsafe fn waker_wake_by_ref(data: *const ()) {
+	waker_wake(data);
+}
 
 fn waker_drop(_data: *const ()) {}

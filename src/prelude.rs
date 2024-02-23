@@ -4,3 +4,4 @@
 pub use super::delegate::{DelegateError, DelegateFuture, DelegateFutureFuture};
 pub use super::prop::*;
 pub use crate::core::prelude::*;
+pub use crate::javascript::JsValue;

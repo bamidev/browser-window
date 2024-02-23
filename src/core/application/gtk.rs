@@ -1,11 +1,15 @@
 use std::{
-	ffi::{c_char, c_int}, sync::{atomic::{AtomicI32, Ordering}, Arc}, time::Duration
+	ffi::{c_char, c_int},
+	sync::{
+		atomic::{AtomicI32, Ordering},
+		Arc,
+	},
+	time::Duration,
 };
 
 use gtk::prelude::{ApplicationExt, ApplicationExtManual};
 
 use super::{super::error::*, ApplicationSettings};
-
 
 #[derive(Clone)]
 pub struct ApplicationImpl {
@@ -14,25 +18,35 @@ pub struct ApplicationImpl {
 }
 
 impl super::ApplicationExt for ApplicationImpl {
-	fn assert_correct_thread(&self) { unimplemented!() }
+	fn assert_correct_thread(&self) {
+		unimplemented!()
+	}
 
 	fn dispatch(&self, work: fn(ApplicationImpl, *mut ()), data: *mut ()) -> bool {
 		let this = self.clone();
-		gtk::glib::source::idle_add_local_once(move || work(this, data)); true
+		gtk::glib::source::idle_add_local_once(move || work(this, data));
+		true
 	}
 
 	fn dispatch_delayed(
 		&self, work: fn(ApplicationImpl, *mut ()), data: *mut (), delay: Duration,
 	) -> bool {
 		let this = self.clone();
-		gtk::glib::source::timeout_add_local_once(delay, move || work(this, data)); true
+		gtk::glib::source::timeout_add_local_once(delay, move || work(this, data));
+		true
 	}
 
-	fn exit(&self, exit_code: i32) { self.exit_code.store(exit_code, Ordering::Relaxed); }
+	fn exit(&self, exit_code: i32) {
+		self.exit_code.store(exit_code, Ordering::Relaxed);
+	}
 
-	fn exit_threadsafe(&self, exit_code: i32) { self.exit(exit_code); }
+	fn exit_threadsafe(&self, exit_code: i32) {
+		self.exit(exit_code);
+	}
 
-	fn free(&self) { self.inner.quit(); }
+	fn free(&self) {
+		self.inner.quit();
+	}
 
 	fn initialize(
 		argc: c_int, argv: *mut *mut c_char, _settings: &ApplicationSettings,
@@ -40,7 +54,7 @@ impl super::ApplicationExt for ApplicationImpl {
 		let inner = gtk::Application::builder().build();
 		Ok(Self {
 			inner,
-			exit_code: Arc::new(AtomicI32::new(0))
+			exit_code: Arc::new(AtomicI32::new(0)),
 		})
 	}
 

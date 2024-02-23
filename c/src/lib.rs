@@ -74,7 +74,9 @@ impl Into<String> for cbw_StrSlice {
 }
 
 impl Error for cbw_Err {
-	fn source(&self) -> Option<&(dyn Error + 'static)> { None }
+	fn source(&self) -> Option<&(dyn Error + 'static)> {
+		None
+	}
 }
 
 impl fmt::Display for cbw_Err {

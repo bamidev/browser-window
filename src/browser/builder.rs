@@ -22,7 +22,7 @@ pub enum Source {
 
 #[cfg(not(feature = "threadsafe"))]
 type BrowserJsInvocationHandler =
-	Box<dyn FnMut(BrowserWindowHandle, String, Vec<String>) -> Pin<Box<dyn Future<Output = ()>>>>;
+	Box<dyn FnMut(BrowserWindowHandle, String, Vec<JsValue>) -> Pin<Box<dyn Future<Output = ()>>>>;
 #[cfg(feature = "threadsafe")]
 type BrowserJsInvocationHandler = Box<
 	dyn FnMut(BrowserWindowHandle, String, Vec<String>) -> Pin<Box<dyn Future<Output = ()>>> + Send,
@@ -82,7 +82,7 @@ impl BrowserWindowBuilder {
 	#[cfg(not(feature = "threadsafe"))]
 	pub fn async_handler<H, F>(&mut self, mut handler: H) -> &mut Self
 	where
-		H: FnMut(BrowserWindowHandle, String, Vec<String>) -> F + 'static,
+		H: FnMut(BrowserWindowHandle, String, Vec<JsValue>) -> F + 'static,
 		F: Future<Output = ()> + 'static,
 	{
 		self.handler = Some(Box::new(move |handle, cmd, args| {
@@ -97,7 +97,7 @@ impl BrowserWindowBuilder {
 	#[cfg(feature = "threadsafe")]
 	pub fn async_handler<H, F>(&mut self, mut handler: H) -> &mut Self
 	where
-		H: FnMut(BrowserWindowHandle, String, Vec<String>) -> F + Send + 'static,
+		H: FnMut(BrowserWindowHandle, String, Vec<JsValue>) -> F + Send + 'static,
 		F: Future<Output = ()> + 'static,
 	{
 		self.handler = Some(Box::new(move |handle, cmd, args| {
@@ -270,11 +270,15 @@ impl BrowserWindowBuilder {
 impl Deref for BrowserWindowBuilder {
 	type Target = WindowBuilder;
 
-	fn deref(&self) -> &Self::Target { &self.window }
+	fn deref(&self) -> &Self::Target {
+		&self.window
+	}
 }
 
 impl DerefMut for BrowserWindowBuilder {
-	fn deref_mut(&mut self) -> &mut Self::Target { &mut self.window }
+	fn deref_mut(&mut self) -> &mut Self::Target {
+		&mut self.window
+	}
 }
 
 /// The data that is passed to the creation callback function
@@ -314,9 +318,7 @@ impl DerefMut for BrowserWindowBuilder {
 	}
 }*/
 
-fn browser_window_invoke_handler(
-	inner_handle: BrowserWindowImpl, cmd: &str, args: Vec<String>,
-) {
+fn browser_window_invoke_handler(inner_handle: BrowserWindowImpl, cmd: &str, args: Vec<JsValue>) {
 	let data_ptr: *mut BrowserUserData = inner_handle.user_data() as _;
 	let data = unsafe { &mut *data_ptr };
 

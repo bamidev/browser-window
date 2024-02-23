@@ -15,7 +15,7 @@ repository = "https://github.com/bamidev/browser-window/"
 [features]
 cef = ["browser-window-c/cef"]
 gtk = []
-webkitgtk = ["dep:gtk", "dep:webkit2gtk", "gtk"]
+webkitgtk = ["dep:gtk", "dep:javascriptcore-rs", "dep:webkit2gtk", "gtk"]
 threadsafe = []
 
 [target.'cfg(target_os = "windows")'.features]
@@ -40,7 +40,9 @@ path = "examples/authentication.rs"
 browser-window-c = { path = "c", version = "=0.0.11" }
 futures-channel = { version = "^0.3" }
 gtk = { version = "0.18", optional = true }
+javascriptcore-rs = { optional = true }
 lazy_static = "1"
+num-bigfloat = "1"
 unsafe-send-sync = "^0.1"
 webkit2gtk = { version = "2.0", optional = true, features = ["v2_40"] }
 

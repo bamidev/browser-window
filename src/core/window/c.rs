@@ -46,9 +46,11 @@ impl WindowImpl {
 }
 
 impl Default for WindowImpl {
-    fn default() -> Self {
-        Self { inner: ptr::null_mut() }
-    }
+	fn default() -> Self {
+		Self {
+			inner: ptr::null_mut(),
+		}
+	}
 }
 
 impl WindowExt for WindowImpl {
@@ -58,17 +60,25 @@ impl WindowExt for WindowImpl {
 		}
 	}
 
-	fn destroy(&self) { unsafe { cbw_Window_destroy(self.inner) } }
+	fn destroy(&self) {
+		unsafe { cbw_Window_destroy(self.inner) }
+	}
 
-	fn drop(&self) { unsafe { cbw_Window_drop(self.inner) } }
+	fn drop(&self) {
+		unsafe { cbw_Window_drop(self.inner) }
+	}
 
 	fn get_content_dimensions(&self) -> Dims2D {
 		unsafe { cbw_Window_getContentDimensions(self.inner) }
 	}
 
-	fn get_opacity(&self) -> u8 { unsafe { cbw_Window_getOpacity(self.inner) } }
+	fn get_opacity(&self) -> u8 {
+		unsafe { cbw_Window_getOpacity(self.inner) }
+	}
 
-	fn get_position(&self) -> Pos2D { unsafe { cbw_Window_getPosition(self.inner) } }
+	fn get_position(&self) -> Pos2D {
+		unsafe { cbw_Window_getPosition(self.inner) }
+	}
 
 	fn get_title(&self) -> String {
 		// First obtain string size
@@ -90,13 +100,17 @@ impl WindowExt for WindowImpl {
 		unsafe { cbw_Window_getWindowDimensions(self.inner) }
 	}
 
-	fn hide(&self) { unsafe { cbw_Window_hide(self.inner) } }
+	fn hide(&self) {
+		unsafe { cbw_Window_hide(self.inner) }
+	}
 
 	fn set_content_dimensions(&self, dimensions: Dims2D) {
 		unsafe { cbw_Window_setContentDimensions(self.inner, dimensions) }
 	}
 
-	fn set_opacity(&self, opacity: u8) { unsafe { cbw_Window_setOpacity(self.inner, opacity) } }
+	fn set_opacity(&self, opacity: u8) {
+		unsafe { cbw_Window_setOpacity(self.inner, opacity) }
+	}
 
 	fn set_position(&self, position: Pos2D) {
 		unsafe { cbw_Window_setPosition(self.inner, position) }
@@ -111,5 +125,7 @@ impl WindowExt for WindowImpl {
 		unsafe { cbw_Window_setWindowDimensions(self.inner, dimensions) }
 	}
 
-	fn show(&self) { unsafe { cbw_Window_show(self.inner) } }
+	fn show(&self) {
+		unsafe { cbw_Window_show(self.inner) }
+	}
 }

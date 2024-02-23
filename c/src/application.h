@@ -15,9 +15,6 @@ typedef void (*bw_ApplicationDispatchFn)( struct bw_Application* app, void* data
 typedef bw_ApplicationDispatchFn bw_ApplicationReadyFn;
 
 
-
-#ifndef BW_BINDGEN
-
 // Import bw_ApplicationImpl and bw_ApplicationEngineImpl definitions
 #if defined(BW_WIN32)
 #include "application/win32.h"
@@ -25,20 +22,12 @@ typedef bw_ApplicationDispatchFn bw_ApplicationReadyFn;
 #include "application/gtk.h"
 #elif defined(BW_CEF_WINDOW)
 #include "application/cef_window.h"
-#else
-#error Unsupported platform
-#endif
-
-#if defined(BW_CEF)
 #include "application/cef.h"
-#else
-typedef struct {} bw_ApplicationEngineImpl;
-#endif
-
 #else
 typedef struct {} bw_ApplicationImpl;
 typedef struct {} bw_ApplicationEngineImpl;
 #endif
+
 
 #include "err.h"
 

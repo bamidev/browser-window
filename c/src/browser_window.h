@@ -8,7 +8,9 @@ extern "C" {
 #ifdef BW_CEF
 #include "browser_window/cef.h"
 #else
-#error Unsupported engine
+
+typedef struct {} bw_BrowserWindowImpl;
+
 #endif
 
 #include "application.h"

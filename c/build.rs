@@ -33,7 +33,7 @@ where
 				path.as_os_str().to_str().unwrap(),
 				e
 			),
-			Ok(entry) =>
+			Ok(entry) => {
 				if entry.path().is_dir() {
 					rerun_if_directory_changed(entry.path());
 				} else {
@@ -41,7 +41,8 @@ where
 						"cargo:rerun-if-changed={}",
 						entry.path().as_os_str().to_str().unwrap()
 					);
-				},
+				}
+			}
 		}
 	}
 }
@@ -356,5 +357,7 @@ fn main() {
 }
 
 impl bindgen::callbacks::ParseCallbacks for BwBindgenCallbacks {
-	fn item_name(&self, item_name: &str) -> Option<String> { Some("c".to_owned() + item_name) }
+	fn item_name(&self, item_name: &str) -> Option<String> {
+		Some("c".to_owned() + item_name)
+	}
 }

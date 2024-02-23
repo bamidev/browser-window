@@ -74,7 +74,9 @@ impl BrowserWindowExt for BrowserWindowImpl {
 		}
 	}
 
-	fn navigate(&self, uri: &str) { unsafe { cbw_BrowserWindow_navigate(self.inner, uri.into()) }; }
+	fn navigate(&self, uri: &str) {
+		unsafe { cbw_BrowserWindow_navigate(self.inner, uri.into()) };
+	}
 
 	fn new(
 		app: ApplicationImpl, parent: WindowImpl, source: Source, title: &str, width: Option<u32>,
@@ -161,7 +163,9 @@ impl JsEvaluationError {
 }
 
 impl Error for JsEvaluationError {
-	fn source(&self) -> Option<&(dyn Error + 'static)> { None }
+	fn source(&self) -> Option<&(dyn Error + 'static)> {
+		None
+	}
 }
 
 impl fmt::Display for JsEvaluationError {
@@ -206,9 +210,9 @@ unsafe extern "C" fn ffi_handler(
 
 	// Convert the command and args to a String and `Vec<&str>`
 	let cmd_string: &str = cmd.into();
-	let mut args_vec: Vec<String> = Vec::with_capacity(arg_count as usize);
+	let mut args_vec: Vec<JsValue> = Vec::with_capacity(arg_count as usize);
 	for i in 0..arg_count {
-		args_vec.push((*args.add(i as usize)).into());
+		args_vec.push(JsValue::Other((*args.add(i as usize)).into()));
 	}
 
 	(data.func)(handle, cmd_string, args_vec);
@@ -218,15 +222,15 @@ unsafe extern "C" fn ffi_handler(
 /// Result.
 unsafe fn ffi_eval_js_callback_result(
 	bw: *mut cbw_BrowserWindow, result: *const c_char, error: *const cbw_Err,
-) -> (BrowserWindowImpl, Result<String, JsEvaluationError>) {
+) -> (BrowserWindowImpl, Result<JsValue, JsEvaluationError>) {
 	// Construct a result value depending on whether the result or error parameters
 	// are set
-	let result_val: Result<String, JsEvaluationError> = if error.is_null() {
+	let result_val: Result<JsValue, JsEvaluationError> = if error.is_null() {
 		let result_str = CStr::from_ptr(result)
 			.to_string_lossy()
 			.to_owned()
 			.to_string();
-		Ok(result_str)
+		Ok(JsValue::Other(result_str))
 	} else {
 		Err(JsEvaluationError::new(error))
 	};

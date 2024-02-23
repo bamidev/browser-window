@@ -48,12 +48,18 @@ impl WindowHandle {
 	}
 
 	/// Make the window invisible to the user.
-	pub fn hide(&self) { self.inner.hide() }
+	pub fn hide(&self) {
+		self.inner.hide()
+	}
 
-	pub(super) fn new(inner: WindowImpl) -> Self { Self { inner } }
+	pub(super) fn new(inner: WindowImpl) -> Self {
+		Self { inner }
+	}
 
 	/// Make the window visible to the user.
-	pub fn show(&self) { self.inner.show() }
+	pub fn show(&self) {
+		self.inner.show()
+	}
 }
 
 prop! { /// Gets or sets the width and height of the content of the window.
