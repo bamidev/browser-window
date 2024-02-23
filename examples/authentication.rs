@@ -35,19 +35,17 @@ fn main() {
 		if logged_in_cookie.is_none() || logged_in_cookie.unwrap().value() != "yes" {
 			eprintln!("Not logged in.");
 			bw.close();
-			return;
+		} else {
+			// Get session cookie
+			let session_cookie = cookie_jar
+				.find_from_all("_gh_sess")
+				.await
+				.expect("session cookie not found");
+			let session_id = session_cookie.value();
+			// You can use this `session_id` to do anything, like scraping user information.
+
+			eprintln!("Logged in with session ID: {}", session_id);
+			bw.close();
 		}
-
-		// Get session cookie
-		let session_cookie = cookie_jar
-			.find_from_all("_gh_sess")
-			.await
-			.expect("session cookie not found");
-		let session_id = session_cookie.value();
-		// You can use this `session_id` to do anything, like scraping user information.
-
-		bw.close();
-
-		eprintln!("Logged in with session ID: {}", session_id);
 	});
 }
