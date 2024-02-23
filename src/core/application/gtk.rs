@@ -18,9 +18,7 @@ pub struct ApplicationImpl {
 }
 
 impl super::ApplicationExt for ApplicationImpl {
-	fn assert_correct_thread(&self) {
-		unimplemented!()
-	}
+	fn assert_correct_thread(&self) { unimplemented!() }
 
 	fn dispatch(&self, work: fn(ApplicationImpl, *mut ()), data: *mut ()) -> bool {
 		let this = self.clone();
@@ -36,17 +34,11 @@ impl super::ApplicationExt for ApplicationImpl {
 		true
 	}
 
-	fn exit(&self, exit_code: i32) {
-		self.exit_code.store(exit_code, Ordering::Relaxed);
-	}
+	fn exit(&self, exit_code: i32) { self.exit_code.store(exit_code, Ordering::Relaxed); }
 
-	fn exit_threadsafe(&self, exit_code: i32) {
-		self.exit(exit_code);
-	}
+	fn exit_threadsafe(&self, exit_code: i32) { self.exit(exit_code); }
 
-	fn free(&self) {
-		self.inner.quit();
-	}
+	fn free(&self) { self.inner.quit(); }
 
 	fn initialize(
 		argc: c_int, argv: *mut *mut c_char, _settings: &ApplicationSettings,

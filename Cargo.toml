@@ -18,12 +18,6 @@ gtk = []
 webkitgtk = ["dep:gtk", "dep:javascriptcore-rs", "dep:webkit2gtk", "gtk"]
 threadsafe = []
 
-[target.'cfg(target_os = "windows")'.features]
-default = ["cef"]
-
-[target.'cfg(not(target_os = "windows"))'.features]
-default = ["webkitgtk"]
-
 [lib]
 name = "browser_window"
 path = "src/lib.rs"

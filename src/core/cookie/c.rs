@@ -72,17 +72,11 @@ impl CookieExt for CookieImpl {
 		}
 	}
 
-	fn free(&mut self) {
-		unsafe { cbw_Cookie_free(self.inner) };
-	}
+	fn free(&mut self) { unsafe { cbw_Cookie_free(self.inner) }; }
 
-	fn is_http_only(&self) -> bool {
-		(unsafe { cbw_Cookie_isHttpOnly(self.inner) }) > 0
-	}
+	fn is_http_only(&self) -> bool { (unsafe { cbw_Cookie_isHttpOnly(self.inner) }) > 0 }
 
-	fn is_secure(&self) -> bool {
-		(unsafe { cbw_Cookie_isSecure(self.inner) }) > 0
-	}
+	fn is_secure(&self) -> bool { (unsafe { cbw_Cookie_isSecure(self.inner) }) > 0 }
 
 	fn name<'a>(&'a self) -> Cow<'a, str> {
 		let mut slice: cbw_StrSlice = unsafe { MaybeUninit::uninit().assume_init() };
@@ -133,13 +127,9 @@ impl CookieExt for CookieImpl {
 		}
 	}
 
-	fn make_http_only(&mut self) {
-		unsafe { cbw_Cookie_makeHttpOnly(self.inner) };
-	}
+	fn make_http_only(&mut self) { unsafe { cbw_Cookie_makeHttpOnly(self.inner) }; }
 
-	fn make_secure(&mut self) {
-		unsafe { cbw_Cookie_makeSecure(self.inner) };
-	}
+	fn make_secure(&mut self) { unsafe { cbw_Cookie_makeSecure(self.inner) }; }
 
 	fn set_creation_time(&mut self, time: &SystemTime) {
 		unsafe {
@@ -167,13 +157,9 @@ impl CookieExt for CookieImpl {
 		unsafe { cbw_Cookie_setDomain(self.inner, domain.into()) };
 	}
 
-	fn set_name(&mut self, name: &str) {
-		unsafe { cbw_Cookie_setName(self.inner, name.into()) };
-	}
+	fn set_name(&mut self, name: &str) { unsafe { cbw_Cookie_setName(self.inner, name.into()) }; }
 
-	fn set_path(&mut self, path: &str) {
-		unsafe { cbw_Cookie_setPath(self.inner, path.into()) };
-	}
+	fn set_path(&mut self, path: &str) { unsafe { cbw_Cookie_setPath(self.inner, path.into()) }; }
 
 	fn set_value(&mut self, value: &str) {
 		unsafe { cbw_Cookie_setValue(self.inner, value.into()) };
@@ -200,9 +186,7 @@ impl CookieJarExt for CookieJarImpl {
 		};
 	}
 
-	fn free(&mut self) {
-		unsafe { cbw_CookieJar_free(self.inner) };
-	}
+	fn free(&mut self) { unsafe { cbw_CookieJar_free(self.inner) }; }
 
 	fn global() -> Option<CookieJarImpl> {
 		let inner = unsafe { cbw_CookieJar_newGlobal() };
@@ -225,10 +209,13 @@ impl CookieJarExt for CookieJarImpl {
 	}
 
 	fn iterator_all<'a>(&'a self) -> CookieIteratorImpl {
-		let mut iterator: CookieIteratorImpl = unsafe { MaybeUninit::uninit().assume_init() };
-		unsafe { cbw_CookieJar_iteratorAll(self.inner, &mut iterator.inner) };
-
-		return iterator;
+		let mut iterator = CookieIteratorImpl {
+			inner: ptr::null_mut(),
+		};
+		unsafe {
+			cbw_CookieJar_iteratorAll(self.inner, &mut iterator.inner);
+		}
+		iterator
 	}
 
 	fn store(
@@ -267,9 +254,7 @@ impl CookieJarExt for CookieJarImpl {
 }
 
 impl CookieIteratorExt for CookieIteratorImpl {
-	fn free(&mut self) {
-		unsafe { cbw_CookieIterator_free(self.inner) }
-	}
+	fn free(&mut self) { unsafe { cbw_CookieIterator_free(self.inner) } }
 
 	fn next(&mut self, on_next: CookieIteratorNextCallbackFn, cb_data: *mut ()) -> bool {
 		let data = Box::into_raw(Box::new(CookieIteratorNextCallbackData {

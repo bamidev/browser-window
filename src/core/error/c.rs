@@ -27,13 +27,9 @@ impl fmt::Display for Error {
 }
 
 impl std::error::Error for Error {
-	fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-		None
-	}
+	fn source(&self) -> Option<&(dyn std::error::Error + 'static)> { None }
 }
 
 impl From<cbw_Err> for Error {
-	fn from(e: cbw_Err) -> Self {
-		Self(e)
-	}
+	fn from(e: cbw_Err) -> Self { Self(e) }
 }

@@ -270,15 +270,11 @@ impl BrowserWindowBuilder {
 impl Deref for BrowserWindowBuilder {
 	type Target = WindowBuilder;
 
-	fn deref(&self) -> &Self::Target {
-		&self.window
-	}
+	fn deref(&self) -> &Self::Target { &self.window }
 }
 
 impl DerefMut for BrowserWindowBuilder {
-	fn deref_mut(&mut self) -> &mut Self::Target {
-		&mut self.window
-	}
+	fn deref_mut(&mut self) -> &mut Self::Target { &mut self.window }
 }
 
 /// The data that is passed to the creation callback function

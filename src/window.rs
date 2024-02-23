@@ -41,25 +41,13 @@ impl WindowHandle {
 
 	impl_prop! { pub window_dimensions: WindowDimensions }
 
-	/// Destroys the window.
-	pub fn close(self) {
-		self.hide();
-		// The window will be dropped because ownership of `self` is taken.
-	}
-
 	/// Make the window invisible to the user.
-	pub fn hide(&self) {
-		self.inner.hide()
-	}
+	pub fn hide(&self) { self.inner.hide() }
 
-	pub(super) fn new(inner: WindowImpl) -> Self {
-		Self { inner }
-	}
+	pub(super) fn new(inner: WindowImpl) -> Self { Self { inner } }
 
 	/// Make the window visible to the user.
-	pub fn show(&self) {
-		self.inner.show()
-	}
+	pub fn show(&self) { self.inner.show() }
 }
 
 prop! { /// Gets or sets the width and height of the content of the window.

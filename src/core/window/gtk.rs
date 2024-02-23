@@ -36,9 +36,7 @@ impl WindowImpl {
 }
 
 impl Default for WindowImpl {
-	fn default() -> Self {
-		Self(gtk::Window::new(gtk::WindowType::Toplevel))
-	}
+	fn default() -> Self { Self(gtk::Window::new(gtk::WindowType::Toplevel)) }
 }
 
 impl WindowExt for WindowImpl {
@@ -49,9 +47,7 @@ impl WindowExt for WindowImpl {
 		}
 	}
 
-	fn destroy(&self) {
-		self.0.close();
-	}
+	fn destroy(&self) { self.0.close(); }
 
 	fn drop(&self) {}
 
@@ -59,9 +55,7 @@ impl WindowExt for WindowImpl {
 		unimplemented!();
 	}
 
-	fn get_opacity(&self) -> u8 {
-		0
-	}
+	fn get_opacity(&self) -> u8 { 0 }
 
 	fn get_position(&self) -> Pos2D {
 		let (x, y) = self.0.position();
@@ -86,9 +80,7 @@ impl WindowExt for WindowImpl {
 		}
 	}
 
-	fn hide(&self) {
-		self.0.hide();
-	}
+	fn hide(&self) { self.0.hide(); }
 
 	fn set_content_dimensions(&self, dimensions: Dims2D) {}
 
@@ -98,16 +90,12 @@ impl WindowExt for WindowImpl {
 		unimplemented!();
 	}
 
-	fn set_title(&self, title: &str) {
-		self.0.set_title(title);
-	}
+	fn set_title(&self, title: &str) { self.0.set_title(title); }
 
 	fn set_window_dimensions(&self, dimensions: Dims2D) {
 		self.0
 			.set_size_request(dimensions.width as _, dimensions.height as _);
 	}
 
-	fn show(&self) {
-		self.0.show_all();
-	}
+	fn show(&self) { self.0.show_all(); }
 }

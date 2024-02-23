@@ -11,8 +11,10 @@ pub enum JsValue {
 	Object(HashMap<String, JsValue>),
 	String(String),
 	Undefined,
-	/// When a javascript value is returned that does not fit any of the other value types in this enum, `JsValue::Other` is returned with a string representation of the value.
-	/// When using feature `cef`, it currently always returns the javascript value as `JsValue::Other`.
+	/// When a javascript value is returned that does not fit any of the other
+	/// value types in this enum, `JsValue::Other` is returned with a string
+	/// representation of the value. When using feature `cef`, it currently
+	/// always returns the javascript value as `JsValue::Other`.
 	Other(String),
 }
 

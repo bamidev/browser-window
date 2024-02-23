@@ -8,9 +8,8 @@ use gtk::{
 use javascriptcore::{Value, ValueExt};
 use webkit2gtk::WebViewExt;
 
-use crate::prelude::{ApplicationExt, WindowExt};
-
 use super::{super::window::WindowImpl, *};
+use crate::prelude::{ApplicationExt, WindowExt};
 
 #[derive(Clone)]
 pub struct BrowserWindowImpl(webkit2gtk::WebView);
@@ -34,9 +33,7 @@ struct UserData {
 }
 
 impl BrowserWindowExt for BrowserWindowImpl {
-	fn cookie_jar(&self) -> Option<CookieJarImpl> {
-		None
-	}
+	fn cookie_jar(&self) -> Option<CookieJarImpl> { None }
 
 	fn eval_js(&self, js: &str, callback: EvalJsCallbackFn, callback_data: *mut ()) {
 		let this = self.clone();
@@ -53,9 +50,7 @@ impl BrowserWindowExt for BrowserWindowImpl {
 		unimplemented!();
 	}
 
-	fn navigate(&self, uri: &str) {
-		self.0.load_uri(uri);
-	}
+	fn navigate(&self, uri: &str) { self.0.load_uri(uri); }
 
 	fn new(
 		app: ApplicationImpl, parent: WindowImpl, source: Source, title: &str, width: Option<u32>,
@@ -70,9 +65,7 @@ impl BrowserWindowExt for BrowserWindowImpl {
 		creation_callback(Self(inner), callback_data)
 	}
 
-	fn user_data(&self) -> *mut () {
-		unsafe { *self.0.window().unwrap().user_data() }
-	}
+	fn user_data(&self) -> *mut () { unsafe { *self.0.window().unwrap().user_data() } }
 
 	fn url(&self) -> Cow<'_, str> {
 		self.0

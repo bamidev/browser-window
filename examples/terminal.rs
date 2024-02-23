@@ -11,7 +11,8 @@ async fn execute_command(bw: BrowserWindowHandle, line: &str) {
 	let working_dir = bw
 		.eval_js("working_dir")
 		.await
-		.expect("Unable to obtain working dir from JavaScript!");
+		.expect("Unable to obtain working dir from JavaScript!")
+		.to_string();
 
 	let cmd = if env::consts::OS == "windows" {
 		Command::new("cmd")
@@ -97,7 +98,7 @@ fn main() {
 				"exec" => {
 					let cmd_line = &args[0];
 
-					execute_command(handle, cmd_line).await;
+					execute_command(handle, &cmd_line.to_string()).await;
 				}
 				other => {
 					eprintln!("Received unsupported command: {}", other);

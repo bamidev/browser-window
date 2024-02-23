@@ -18,9 +18,7 @@ pub struct ApplicationImpl {
 }
 
 impl ApplicationExt for ApplicationImpl {
-	fn assert_correct_thread(&self) {
-		unsafe { cbw_Application_assertCorrectThread(self.inner) }
-	}
+	fn assert_correct_thread(&self) { unsafe { cbw_Application_assertCorrectThread(self.inner) } }
 
 	fn dispatch(&self, work: fn(ApplicationImpl, *mut ()), _data: *mut ()) -> bool {
 		let data = Box::new(DispatchData {
@@ -55,9 +53,7 @@ impl ApplicationExt for ApplicationImpl {
 		}
 	}
 
-	fn exit(&self, exit_code: i32) {
-		unsafe { cbw_Application_exit(self.inner, exit_code as _) }
-	}
+	fn exit(&self, exit_code: i32) { unsafe { cbw_Application_exit(self.inner, exit_code as _) } }
 
 	fn exit_threadsafe(self: &Self, exit_code: i32) {
 		unsafe { cbw_Application_exitAsync(self.inner, exit_code) }
@@ -90,9 +86,7 @@ impl ApplicationExt for ApplicationImpl {
 		Ok(Self { inner: c_handle })
 	}
 
-	fn mark_as_done(&self) {
-		unsafe { cbw_Application_markAsDone(self.inner) };
-	}
+	fn mark_as_done(&self) { unsafe { cbw_Application_markAsDone(self.inner) }; }
 
 	fn run(&self, on_ready: fn(ApplicationImpl, *mut ()), _data: *mut ()) -> i32 {
 		let data = Box::new(DispatchData {

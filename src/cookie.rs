@@ -16,41 +16,23 @@ pub struct CookieIterator<'a> {
 }
 
 impl Cookie {
-	pub fn new(name: &str, value: &str) -> Self {
-		Self(CookieImpl::new(name, value))
-	}
+	pub fn new(name: &str, value: &str) -> Self { Self(CookieImpl::new(name, value)) }
 
-	pub fn creation_time(&self) -> SystemTime {
-		self.0.creation_time()
-	}
+	pub fn creation_time(&self) -> SystemTime { self.0.creation_time() }
 
-	pub fn expires(&self) -> Option<SystemTime> {
-		self.0.expires()
-	}
+	pub fn expires(&self) -> Option<SystemTime> { self.0.expires() }
 
-	pub fn domain(&self) -> Cow<'_, str> {
-		self.0.domain()
-	}
+	pub fn domain(&self) -> Cow<'_, str> { self.0.domain() }
 
-	pub fn is_http_only(&self) -> bool {
-		self.0.is_http_only()
-	}
+	pub fn is_http_only(&self) -> bool { self.0.is_http_only() }
 
-	pub fn name(&self) -> Cow<'_, str> {
-		self.0.name()
-	}
+	pub fn name(&self) -> Cow<'_, str> { self.0.name() }
 
-	pub fn path(&self) -> Cow<'_, str> {
-		self.0.path()
-	}
+	pub fn path(&self) -> Cow<'_, str> { self.0.path() }
 
-	pub fn is_secure(&self) -> bool {
-		self.0.is_secure()
-	}
+	pub fn is_secure(&self) -> bool { self.0.is_secure() }
 
-	pub fn value(&self) -> Cow<'_, str> {
-		self.0.value()
-	}
+	pub fn value(&self) -> Cow<'_, str> { self.0.value() }
 
 	pub fn make_http_only(&mut self) -> &mut Self {
 		self.0.make_http_only();
@@ -94,9 +76,7 @@ impl Cookie {
 }
 
 impl Drop for Cookie {
-	fn drop(&mut self) {
-		self.0.free();
-	}
+	fn drop(&mut self) { self.0.free(); }
 }
 
 impl<'a> CookieIterator<'a> {
@@ -137,23 +117,17 @@ impl<'a> CookieIterator<'a> {
 }
 
 impl<'a> Drop for CookieIterator<'a> {
-	fn drop(&mut self) {
-		self.inner.free();
-	}
+	fn drop(&mut self) { self.inner.free(); }
 }
 
 impl CookieJar {
 	/// Deletes all cookies.
 	/// If `url` is not an empty string, only the cookies of the given url will
 	/// be deleted.
-	pub async fn clear(&mut self, url: &str) -> usize {
-		self.delete(url, "").await
-	}
+	pub async fn clear(&mut self, url: &str) -> usize { self.delete(url, "").await }
 
 	/// Like `clear`, but with `url` set empty.
-	pub async fn clear_all(&mut self) -> usize {
-		self.clear("").await
-	}
+	pub async fn clear_all(&mut self) -> usize { self.clear("").await }
 
 	fn _delete<H>(&mut self, url: &str, name: &str, on_complete: H)
 	where
@@ -182,9 +156,7 @@ impl CookieJar {
 	}
 
 	/// Like `delete`, but with `url` set empty.
-	pub async fn delete_all(&mut self, name: &str) -> usize {
-		self.delete("", name).await
-	}
+	pub async fn delete_all(&mut self, name: &str) -> usize { self.delete("", name).await }
 
 	/// Finds the first cookie that has the given `name` in the given `url`.
 	/// If `include_http_only` is set to `false`, a `HttpOnly` cookie will not
@@ -214,9 +186,7 @@ impl CookieJar {
 		None
 	}
 
-	pub(crate) fn global() -> Option<Self> {
-		CookieJarImpl::global().map(|i| Self(i))
-	}
+	pub(crate) fn global() -> Option<Self> { CookieJarImpl::global().map(|i| Self(i)) }
 
 	/// Returns a `CookieIterator` that iterates over cookies asynchronously.
 	/// The `CookieIterator` has an async `next` function that you can use.
@@ -278,9 +248,7 @@ impl CookieJar {
 }
 
 impl Drop for CookieJar {
-	fn drop(&mut self) {
-		self.0.free();
-	}
+	fn drop(&mut self) { self.0.free(); }
 }
 
 unsafe fn cookie_delete_callback<'a, H>(_handle: CookieJarImpl, cb_data: *mut (), deleted: usize)

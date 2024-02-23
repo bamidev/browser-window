@@ -158,11 +158,4 @@ async fn async_correct_parent_cleanup(app: ApplicationHandle) {
 	bwb_child.title("Child Window");
 	bwb_child.parent(&bw_parent);
 	let bw_child = bwb_child.build(app.clone()).await;
-
-	// Destroy the parent handle, while a handle of the child still exists
-	bw_parent.close();
-
-	// Then close the child handle.
-	// This should cleanup the parent as well.
-	bw_child.close();
 }

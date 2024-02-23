@@ -80,9 +80,7 @@ pub trait CookieJarExt {
 		unimplemented!();
 	}
 	fn free(&mut self) {}
-	fn global() -> Option<CookieJarImpl> {
-		None
-	}
+	fn global() -> Option<CookieJarImpl> { None }
 	fn iterator<'a>(&'a self, _url: &str, _include_http_only: bool) -> CookieIteratorImpl {
 		unimplemented!();
 	}
@@ -116,7 +114,5 @@ impl fmt::Display for CookieStorageError {
 }
 
 impl Error for CookieStorageError {
-	fn source(&self) -> Option<&(dyn Error + 'static)> {
-		None
-	}
+	fn source(&self) -> Option<&(dyn Error + 'static)> { None }
 }

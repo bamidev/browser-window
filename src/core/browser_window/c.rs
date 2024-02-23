@@ -74,9 +74,7 @@ impl BrowserWindowExt for BrowserWindowImpl {
 		}
 	}
 
-	fn navigate(&self, uri: &str) {
-		unsafe { cbw_BrowserWindow_navigate(self.inner, uri.into()) };
-	}
+	fn navigate(&self, uri: &str) { unsafe { cbw_BrowserWindow_navigate(self.inner, uri.into()) }; }
 
 	fn new(
 		app: ApplicationImpl, parent: WindowImpl, source: Source, title: &str, width: Option<u32>,
@@ -163,9 +161,7 @@ impl JsEvaluationError {
 }
 
 impl Error for JsEvaluationError {
-	fn source(&self) -> Option<&(dyn Error + 'static)> {
-		None
-	}
+	fn source(&self) -> Option<&(dyn Error + 'static)> { None }
 }
 
 impl fmt::Display for JsEvaluationError {

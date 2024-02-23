@@ -33,7 +33,7 @@ where
 				path.as_os_str().to_str().unwrap(),
 				e
 			),
-			Ok(entry) => {
+			Ok(entry) =>
 				if entry.path().is_dir() {
 					rerun_if_directory_changed(entry.path());
 				} else {
@@ -41,8 +41,7 @@ where
 						"cargo:rerun-if-changed={}",
 						entry.path().as_os_str().to_str().unwrap()
 					);
-				}
-			}
+				},
 		}
 	}
 }
@@ -139,7 +138,7 @@ fn main() {
 
 	/**************************************
 	 *	C header files for bindgen
-	 *********************************** */
+	 ********************************** */
 	let mut bgbuilder = bindgen::Builder::default()
 		.parse_callbacks(Box::new(BwBindgenCallbacks {}))
 		.clang_arg("-DBW_BINDGEN")
@@ -153,7 +152,7 @@ fn main() {
 
 	/**************************************
 	 *	The Platform source files
-	 *********************************** */
+	 ********************************** */
 	if target.contains("windows") {
 		bgbuilder = bgbuilder.clang_arg("-DBW_WIN32");
 
@@ -212,7 +211,7 @@ fn main() {
 
 	/**************************************
 	 *	The Browser Engine (CEF3) source files
-	 *********************************** */
+	 ********************************** */
 	if cfg!(feature = "cef") {
 		bgbuilder = bgbuilder.clang_arg("-DBW_CEF");
 
@@ -333,7 +332,7 @@ fn main() {
 
 	/**************************************
 	 *	All other source files
-	 *********************************** */
+	 ********************************** */
 	build
 		.file("src/application/common.c")
 		.file("src/browser_window/common.c")
@@ -357,7 +356,5 @@ fn main() {
 }
 
 impl bindgen::callbacks::ParseCallbacks for BwBindgenCallbacks {
-	fn item_name(&self, item_name: &str) -> Option<String> {
-		Some("c".to_owned() + item_name)
-	}
+	fn item_name(&self, item_name: &str) -> Option<String> { Some("c".to_owned() + item_name) }
 }

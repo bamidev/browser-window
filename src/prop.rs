@@ -103,13 +103,9 @@ macro_rules! prop {
 #[doc(hidden)]
 macro_rules! impl_prop {
 	($name:ident : $property:ident) => {
-		fn $name<'a>(&'a self) -> $property {
-			$property { parent: self }
-		}
+		fn $name<'a>(&'a self) -> $property { $property { parent: self } }
 	};
 	(pub $name:ident : $property:ident) => {
-		pub fn $name<'a>(&'a self) -> $property {
-			$property { parent: self }
-		}
+		pub fn $name<'a>(&'a self) -> $property { $property { parent: self } }
 	};
 }

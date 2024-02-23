@@ -11,13 +11,12 @@ pub use c::{BrowserWindowImpl, JsEvaluationError};
 #[cfg(feature = "gtk")]
 pub use webkit::{BrowserWindowImpl, JsEvaluationError};
 
-use crate::prelude::JsValue;
-
 use super::{
 	application::ApplicationImpl,
 	cookie::CookieJarImpl,
 	window::{WindowImpl, WindowOptions},
 };
+use crate::prelude::JsValue;
 
 pub type BrowserWindowOptions = cbw_BrowserWindowOptions;
 pub type Source = cbw_BrowserWindowSource;

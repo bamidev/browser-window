@@ -105,40 +105,28 @@ impl BrowserWindow {
 impl Deref for BrowserWindow {
 	type Target = BrowserWindowHandle;
 
-	fn deref(&self) -> &Self::Target {
-		&self.handle
-	}
+	fn deref(&self) -> &Self::Target { &self.handle }
 }
 
 impl Drop for BrowserWindow {
-	fn drop(&mut self) {
-		self.handle.inner.window().drop();
-	}
+	fn drop(&mut self) { self.handle.inner.window().drop(); }
 }
 
 impl HasAppHandle for BrowserWindow {
-	fn app_handle(&self) -> ApplicationHandle {
-		self.handle.app_handle()
-	}
+	fn app_handle(&self) -> ApplicationHandle { self.handle.app_handle() }
 }
 
 impl OwnedWindow for BrowserWindow {
-	fn window_handle(&self) -> WindowHandle {
-		self.handle.window()
-	}
+	fn window_handle(&self) -> WindowHandle { self.handle.window() }
 }
 
 impl OwnedBrowserWindow for BrowserWindow {
-	fn browser_handle(&self) -> BrowserWindowHandle {
-		self.handle.clone()
-	}
+	fn browser_handle(&self) -> BrowserWindowHandle { self.handle.clone() }
 }
 
 impl BrowserWindowHandle {
 	/// Returns the application handle associated with this browser window.
-	pub fn app(&self) -> ApplicationHandle {
-		ApplicationHandle::new(self.inner.window().app())
-	}
+	pub fn app(&self) -> ApplicationHandle { ApplicationHandle::new(self.inner.window().app()) }
 
 	/// Executes the given javascript code and returns the output as a string.
 	/// If you don't need the result, see `exec_js`.
@@ -176,22 +164,14 @@ impl BrowserWindowHandle {
 	}
 
 	/// Executes the given javascript code without waiting on it to finish.
-	pub fn exec_js(&self, js: &str) {
-		self._eval_js(js, |_, _| {});
-	}
+	pub fn exec_js(&self, js: &str) { self._eval_js(js, |_, _| {}); }
 
 	/// Causes the browser to navigate to the given url.
-	pub fn navigate(&self, url: &str) {
-		self.inner.navigate(url)
-	}
+	pub fn navigate(&self, url: &str) { self.inner.navigate(url) }
 
-	pub fn url<'a>(&'a self) -> Cow<'a, str> {
-		self.inner.url()
-	}
+	pub fn url<'a>(&'a self) -> Cow<'a, str> { self.inner.url() }
 
-	pub fn window(&self) -> WindowHandle {
-		WindowHandle::new(self.inner.window())
-	}
+	pub fn window(&self) -> WindowHandle { WindowHandle::new(self.inner.window()) }
 }
 
 #[cfg(feature = "threadsafe")]
@@ -202,9 +182,7 @@ impl BrowserWindowThreaded {
 	}
 
 	/// Closes the browser.
-	pub fn close(self) -> bool {
-		self.dispatch(|bw| bw.close())
-	}
+	pub fn close(self) -> bool { self.dispatch(|bw| bw.close()) }
 
 	/// Executes the given closure within the GUI thread, and return the value
 	/// that the closure returned. Also see `ApplicationThreaded::delegate`.
@@ -277,30 +255,22 @@ impl BrowserWindowThreaded {
 		})
 	}
 
-	fn new(handle: BrowserWindowHandle) -> Self {
-		Self { handle }
-	}
+	fn new(handle: BrowserWindowHandle) -> Self { Self { handle } }
 }
 
 #[cfg(feature = "threadsafe")]
 impl HasAppHandle for BrowserWindowThreaded {
-	fn app_handle(&self) -> ApplicationHandle {
-		self.handle.app_handle()
-	}
+	fn app_handle(&self) -> ApplicationHandle { self.handle.app_handle() }
 }
 
 #[cfg(feature = "threadsafe")]
 impl OwnedWindow for BrowserWindowThreaded {
-	fn window_handle(&self) -> WindowHandle {
-		self.handle.window()
-	}
+	fn window_handle(&self) -> WindowHandle { self.handle.window() }
 }
 
 #[cfg(feature = "threadsafe")]
 impl OwnedBrowserWindow for BrowserWindowThreaded {
-	fn browser_handle(&self) -> BrowserWindowHandle {
-		self.handle.clone()
-	}
+	fn browser_handle(&self) -> BrowserWindowHandle { self.handle.clone() }
 }
 
 impl BrowserWindowHandle {
@@ -315,15 +285,11 @@ impl BrowserWindowHandle {
 impl Deref for BrowserWindowHandle {
 	type Target = WindowHandle;
 
-	fn deref(&self) -> &Self::Target {
-		&self.window
-	}
+	fn deref(&self) -> &Self::Target { &self.window }
 }
 
 impl HasAppHandle for BrowserWindowHandle {
-	fn app_handle(&self) -> ApplicationHandle {
-		ApplicationHandle::new(self.inner.window().app())
-	}
+	fn app_handle(&self) -> ApplicationHandle { ApplicationHandle::new(self.inner.window().app()) }
 }
 
 fn eval_js_callback<H>(
