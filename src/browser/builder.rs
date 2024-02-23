@@ -1,12 +1,13 @@
 use std::{ops::DerefMut, path::PathBuf, pin::Pin, vec::Vec};
 
+
 #[cfg(feature = "threadsafe")]
 use unsafe_send_sync::UnsafeSend;
 
 use crate::{
 	application::ApplicationHandle,
 	browser::*,
-	core::{browser_window::*, window::*, *},
+	core::{browser_window::*, window::*},
 	window::WindowBuilder,
 };
 
@@ -196,29 +197,6 @@ impl BrowserWindowBuilder {
 				let parent_handle = match window.parent {
 					None => WindowImpl::default(),
 					Some(p) => p.i.inner,
-				};
-
-				// Source
-				let mut _url: String = "file:///".into(); // Stays here so that the reference to it that gets passed to C stays valid for the function call to `bw_BrowserWindow_new`.
-				let source = match &source {
-					// Use a reference, we want source to live until the end of the function because
-					// bw_BrowserWindowSource holds a reference to its internal string.
-					Source::File(path) => {
-						_url += path.to_str().unwrap();
-
-						browser_window::Source {
-							data: _url.as_str().into(),
-							is_html: 0,
-						}
-					}
-					Source::Html(html) => browser_window::Source {
-						data: html.as_str().into(),
-						is_html: 1,
-					},
-					Source::Url(url) => browser_window::Source {
-						data: url.as_str().into(),
-						is_html: 0,
-					},
 				};
 
 				// Title

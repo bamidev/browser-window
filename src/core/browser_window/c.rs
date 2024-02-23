@@ -103,11 +103,34 @@ impl BrowserWindowExt for BrowserWindowImpl {
 			data: _callback_data,
 		});
 
+		// Source
+		let mut _url: String = "file:///".into(); // Stays here so that the reference to it that gets passed to C stays valid for the function call to `bw_BrowserWindow_new`.
+		let source2 = match &source {
+			// Use a reference, we want source to live until the end of the function because
+			// bw_BrowserWindowSource holds a reference to its internal string.
+			Source::File(path) => {
+				_url += path.to_str().unwrap();
+
+				cbw_BrowserWindowSource {
+					data: _url.as_str().into(),
+					is_html: 0,
+				}
+			}
+			Source::Html(html) => cbw_BrowserWindowSource {
+				data: html.as_str().into(),
+				is_html: 1,
+			},
+			Source::Url(url) => cbw_BrowserWindowSource {
+				data: url.as_str().into(),
+				is_html: 0,
+			},
+		};
+
 		unsafe {
 			cbw_BrowserWindow_new(
 				app.inner,
 				parent.inner,
-				source,
+				source2,
 				title.into(),
 				w,
 				h,

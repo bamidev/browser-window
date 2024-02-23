@@ -2,7 +2,7 @@ use std::{borrow::Cow, collections::HashMap};
 
 use gtk::{
 	gio::Cancellable,
-	glib::{CastNone, IsA},
+	glib::{error::ErrorDomain, CastNone, IsA},
 	prelude::{ContainerExt, WidgetExt, WindowExtManual},
 };
 use javascriptcore::{Value, ValueExt};
@@ -39,7 +39,16 @@ impl BrowserWindowExt for BrowserWindowImpl {
 		let this = self.clone();
 		self.0
 			.evaluate_javascript(js, None, None, Option::<&Cancellable>::None, move |r| {
-				let result = r.map(|v| transform_js_value(v));
+				let result = match r {
+					Ok(v) => Ok(transform_js_value(v)),
+					// TODO: Test the error properly, not by testing message
+					Err(e) =>
+						if e.message() == "Unsupported result type" {
+							Ok(JsValue::Undefined)
+						} else {
+							Err(e)
+						},
+				};
 				callback(this, callback_data, result);
 			})
 	}
@@ -61,6 +70,26 @@ impl BrowserWindowExt for BrowserWindowImpl {
 		let window = WindowImpl::new(app, parent, title, width, height, options, user_data);
 		let inner = webkit2gtk::WebView::builder().build();
 		window.0.add(&inner);
+
+		// Load the source
+		match source {
+			Source::Url(url) => {
+				inner.load_uri(&url);
+			}
+			Source::File(file) => {
+				let uri = "file://".to_string()
+					+ file
+						.clone()
+						.into_os_string()
+						.into_string()
+						.unwrap()
+						.as_str();
+				inner.load_uri(&uri);
+			}
+			Source::Html(html) => {
+				inner.load_html(&html, None);
+			}
+		}
 
 		creation_callback(Self(inner), callback_data)
 	}

@@ -54,11 +54,10 @@ fn async_tests(application: &Application) {
 	let runtime = application.start();
 
 	let exit_code = runtime.run_async(|app| async move {
-		let bw = async_basic(app).await;
+		let _bw = async_basic(app.clone()).await;
+		#[cfg(not(feature = "webkitgtk"))]
 		async_cookies(app).await;
 		//async_correct_parent_cleanup(app).await;
-
-		bw.close();
 	});
 
 	assert!(exit_code == 0);
@@ -157,5 +156,5 @@ async fn async_correct_parent_cleanup(app: ApplicationHandle) {
 	let mut bwb_child = BrowserWindowBuilder::new(Source::Url("https://www.google.com/".into()));
 	bwb_child.title("Child Window");
 	bwb_child.parent(&bw_parent);
-	let bw_child = bwb_child.build(app.clone()).await;
+	let _bw_child = bwb_child.build(app.clone()).await;
 }

@@ -3,6 +3,7 @@ use std::{borrow::Cow, collections::HashMap, fmt};
 pub use num_bigfloat::BigFloat;
 
 /// A JavaScript value.
+#[derive(Clone)]
 pub enum JsValue {
 	Array(Vec<JsValue>),
 	Boolean(bool),

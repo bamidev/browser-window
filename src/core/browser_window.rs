@@ -16,10 +16,9 @@ use super::{
 	cookie::CookieJarImpl,
 	window::{WindowImpl, WindowOptions},
 };
-use crate::prelude::JsValue;
+use crate::{browser::Source, prelude::JsValue};
 
 pub type BrowserWindowOptions = cbw_BrowserWindowOptions;
-pub type Source = cbw_BrowserWindowSource;
 
 pub type CreationCallbackFn = fn(bw: BrowserWindowImpl, data: *mut ());
 pub type EvalJsCallbackFn =

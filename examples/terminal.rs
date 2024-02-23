@@ -125,7 +125,7 @@ fn main() {
 		{
 			Err(_) => bw.exec_js(
 				format!(
-					"window.onload = () => {{ initialize({}) }}",
+					"setTimeout(() => {{ initialize({}) }}, 10000)",
 					&working_dir_js
 				)
 				.as_str(),

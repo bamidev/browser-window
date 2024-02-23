@@ -34,7 +34,6 @@ fn main() {
 		let logged_in_cookie = cookie_jar.find_from_all("logged_in").await;
 		if logged_in_cookie.is_none() || logged_in_cookie.unwrap().value() != "yes" {
 			eprintln!("Not logged in.");
-			bw.close();
 		} else {
 			// Get session cookie
 			let session_cookie = cookie_jar
@@ -45,7 +44,6 @@ fn main() {
 			// You can use this `session_id` to do anything, like scraping user information.
 
 			eprintln!("Logged in with session ID: {}", session_id);
-			bw.close();
 		}
 	});
 }
