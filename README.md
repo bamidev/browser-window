@@ -4,6 +4,8 @@ _BrowserWindow_ is a simple Rust crate for utilizing a browser engine to create 
 Just like [Electron.js](https://www.electronjs.org/), you can build your GUI with HTML, CSS & JS, or simply have some basic browser functionality at your disposal.
 _BrowserWindow_ was born from the lack of a good and simple Electron alternative for Rust.
 
+![](preview.png)
+
 ## Introduction
 
 _BrowserWindow_ is designed to be easy to use, and work cross-platform. It is built to work in Rust
