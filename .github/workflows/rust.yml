@@ -16,9 +16,9 @@ jobs:
 
     steps:
     - name: Install WebkitGTK development files
-      run: sudo apt-get install -y libwebkit2gtk-4.1-dev
+      run: sudo apt-get install -y libwebkit2gtk-4.1-dev xvfb
     - uses: actions/checkout@v3
     - name: Build
       run: cargo build --verbose --features webkitgtk
     - name: Run tests
-      run: RUST_BACKTRACE=full RUST_LOG=debug cargo test --verbose --features webkitgtk
+      run: RUST_BACKTRACE=full RUST_LOG=debug xvfb-run cargo test --verbose --features webkitgtk
