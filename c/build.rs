@@ -138,7 +138,7 @@ fn main() {
 
 	/**************************************
 	 *	C header files for bindgen
-	 ******************************** */
+	 ******************************* */
 	let mut bgbuilder = bindgen::Builder::default()
 		.parse_callbacks(Box::new(BwBindgenCallbacks {}))
 		.clang_arg("-DBW_BINDGEN")
@@ -152,7 +152,7 @@ fn main() {
 
 	/**************************************
 	 *	The Platform source files
-	 ******************************** */
+	 ******************************* */
 	if target.contains("windows") {
 		bgbuilder = bgbuilder.clang_arg("-DBW_WIN32");
 
@@ -211,7 +211,7 @@ fn main() {
 
 	/**************************************
 	 *	The Browser Engine (CEF3) source files
-	 ******************************** */
+	 ******************************* */
 	if cfg!(feature = "cef") {
 		bgbuilder = bgbuilder.clang_arg("-DBW_CEF");
 
@@ -332,7 +332,7 @@ fn main() {
 
 	/**************************************
 	 *	All other source files
-	 ******************************** */
+	 ******************************* */
 	build
 		.file("src/application/common.c")
 		.file("src/browser_window/common.c")
