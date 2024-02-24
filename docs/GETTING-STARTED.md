@@ -1,5 +1,9 @@
 # Getting Started
 
+_BrowserWindow_ needs to be build with one of the following browser frameworks: [CEF](https://bitbucket.org/chromiumembedded/cef/wiki/Home) or [WebkitGTK](https://www.webkit.org/). They require the `cef` and `webkitgtk` features to be set. There is no default feature set.
+
+
+
 _Browser Window_ currently relies on [CEF3](https://bitbucket.org/chromiumembedded/cef/wiki/Home).
 You will also need [cmake](https://cmake.org/) to set up CEF.
 And on Windows, you will also need _Visual Studio_.
@@ -8,13 +12,33 @@ You can download the free _Community_ version [here](https://visualstudio.micros
 If you want to set up CEF by building it from source, take a look at [this](https://bitbucket.org/chromiumembedded/cef/wiki/MasterBuildQuickStart.md).
 However, it will take a lot of effort and time, memory & disk space for the compilation process.
 
-## Using the binary distribution for CEF
+## Set up Bindgen
+
+_BrowserWindow_ uses Bindgen,  which needs some things to be available on your system.
+This is explained [here](https://rust-lang.github.io/rust-bindgen/requirements.html) pretty well.
+
+## Set up WebkitGTK
+
+If you're going to use WebkitGTK, a lot of systems have a convenient package for this. If not, just
+make sure that `pkg-config` is set up to find all the headers & binaries.
+
+### Debian APT
+
+`apt install libwebkit2gtk-4.1-dev`
+
+## Set up CEF
+
+Keep in mind when you're going to use CEF, that _BrowserWindow_ is written to work for a specific version of CEF, and CEF does release new major versions fairly often. Therefore, it is recommended to
+obtain the version that _BrowserWindow_ supports, which currently is v121. Use other versions at
+your own risk.
+
+CEF isn't generally available in package managers, so it needs to be set up manually. Luckily, there are binaries avaiable. You can also build it from source, but that is a whole other beast and it is
+not covered by this guide.
 
 ### Download & Extract
 
-The easiest and quickest way to set up CEF is to get the binary distribution.
 You can get the latest prebuilt binaries [here](https://cef-builds.spotifycdn.com/index.html).
-The minimal version will be fine.
+The 'minimal' package will be fine.
 Once downloaded, you will need to extract it somewhere.
 
 ### Compilation
@@ -24,18 +48,16 @@ To do this, first run _cmake_ by running this on the command line from within th
 ```
 cmake -DCMAKE_BUILD_TYPE=Debug .
 ```
-Keep in mind that currently, it seems that the CEF wrapper library misses some
-symbols in release mode. Just keep that in mind.
+Keep in mind that currently, it seems that the CEF wrapper library misses some symbols in release mode. This can cause some linker errors when trying to compile against the Release binaries.
 
-### Unix-like Operating Systems
+#### Unix-like Systems
 
-After you have run `cmake`, you can just simply run `make`.
-This will build CEF.
+After you have run `cmake`, you can just simply run `make`. This will build CEF.
 
-### Windows
+#### Windows
 
 A newly generated Visual Studio solution has been generated in the folder.
-You should build this solution's Release target.
+You should build this solution's Release target with [Visual Studio](https://visualstudio.microsoft.com/vs/).
 However, before you do, you need to change one setting in the project's settings.
 
 Goto Project -> Properties -> Configuration Properties -> C/C++ -> Code Generation
@@ -45,19 +67,7 @@ Rust links against the C runtime dynamically, and thus requires CEF to link to i
 
 Now you can build the solution.
 
-## Building CEF From Source
-
-If you really want to build CEF from source, take a look at [this](https://bitbucket.org/chromiumembedded/cef/wiki/BranchesAndBuilding.md#markdown-header-automated-method).
-I won't go into it here, because it is a very involved task.
-You still need to set up the environment variables and copy the files into the working directory afterwards.
-
-## Set up Bindgen
-
-The build script of _Browser Window_ uses bindgen, which needs some things to be
-set up on your system as well.
-This is explained [here](https://rust-lang.github.io/rust-bindgen/requirements.html) pretty well.
-
-## Environment Variables & Resource Files
+### Environment Variables & Resource Files
 
 Once you have extracted and compiled everything, we need to let _Browser Window_ know where it can find the header and library files to link to.
 If you set environment variable `CEF_PATH` to the directory that you have extracted, Browser Window is able to find them.

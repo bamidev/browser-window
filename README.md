@@ -7,35 +7,26 @@ _BrowserWindow_ was born from the lack of a good and simple Electron alternative
 ## Introduction
 
 _BrowserWindow_ is designed to be easy to use, and work cross-platform. It is built to work in Rust
-applications that utilize async/await syntax - or that don't that at all.
-One of the following underlying browser embedding frameworks can be selected: CEF or WebkitGTK.
+applications that utilize async/await syntax - or that don't do that at all. It even has optional
+thread-safe handles. There are currently two different underlying browser frameworks that can be
+selected: WebkitGTK or CEF.
 
-CEF (or the Chromium Embedding Framework) is recommended when used on Windows.
-WebkitGTK is recommended when used on Unix-like systems, or when cross-compiling.
+CEF (or the Chromium Embedding Framework) is recommended when used on Windows, but requires more
+effort to set up.
+WebkitGTK is recommended when used on Unix-like systems or when cross-compiling, and is genereally
+pretty easy to set up.
 Enable feature `cef` or `webkitgtk` to select either one.
-
-If you're wondering why _BrowserWindow_ doesn't actually support the pre-installed EdgeHTML
-framework for Windows: EdgeHTML is deprecated in favor of the Microsoft Edge WebView2, but the
-latter needs to be uninstalled manually be the end-user, defeating it's utility over CEF, if you're planning to ship your application to Windows users anyway.
 
 Moreover, if you wish to use it in a multi-threaded environment, you can do that as well.
 There are thread-safe handles available for easy exchange of data & work between the GUI thread and others.
 
-You can view some [example](https://github.com/bamilab/browser-window/tree/master/examples) to get
-some ideas of what is possible with _BrowserWindow_.
-
-## Requirements
-
-The underlying framework, be it CEF or WebkitGTK, needs to be installed on your system. There is a
-[guide](./docs/GETTING-STARTED.md) to get your started.
-
-Also keep in mind that latest known CEF version that is compatible with this version of
-_BrowserWindow_ is: v121.3.13
+You can look at some [examples](https://github.com/bamilab/browser-window/tree/master/examples) to
+get an idea how you can use the api.
 
 ## Getting Started
 
-Click [here](./docs/GETTING-STARTED.md) for a manual on how to set up everything to be able to
-compile and run you app with _BrowserWindow_.
+The underlying framework, be it CEF or WebkitGTK, needs to be installed on your system. There is a
+[guide](./docs/GETTING-STARTED.md) to get you started with using _BrowserWindow_ on your own system.
 
 ## License
 
@@ -50,5 +41,6 @@ isn't there, let me know!
 
 Otherwise, there are some things that are yet to come:
 
+* Support for the Microsoft Edge WebView2 framework.
 * Events
 * Support for Webkit with Cocoa on MacOS.

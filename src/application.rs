@@ -335,6 +335,8 @@ impl From<ApplicationHandle> for Application {
 }
 
 impl ApplicationHandle {
+	/// Returns an instance of a `CookieJar`, if the underlying browser framework supports it.
+	/// Currently, only CEF supports cookies.
 	pub fn cookie_jar(&self) -> Option<CookieJar> { CookieJar::global() }
 
 	/// Causes the `Runtime` to terminate.
