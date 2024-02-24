@@ -1,9 +1,9 @@
 [package]
 name = "browser-window"
-version = "0.8.0"
-description = "A simple async/await aware browser (GUI) toolkit."
+version = "0.9.0"
+description = "A simple, async/await aware browser window."
 edition = "2018"
-authors = ["Danny de Jong"]
+authors = ["Bamidev"]
 license = "MIT"
 publish = true
 keywords = ["browser", "chromium", "electron", "gui", "webview"]
@@ -31,10 +31,10 @@ name = "authentication"
 path = "examples/authentication.rs"
 
 [dependencies]
-browser-window-c = { path = "c", version = "=0.0.11" }
+browser-window-c = { path = "c", version = "=0.0.12" }
 futures-channel = { version = "^0.3" }
 gtk = { version = "0.18", optional = true }
-javascriptcore-rs = { version = "*", optional = true }
+javascriptcore-rs = { version = "1", optional = true }
 lazy_static = "1"
 num-bigfloat = "1"
 unsafe-send-sync = "^0.1"

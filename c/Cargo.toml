@@ -1,9 +1,9 @@
 [package]
 name = "browser-window-c"
-version = "0.0.11"
+version = "0.0.12"
 description = "FFI bindings for the browser-window crate."
 edition = "2018"
-authors = ["Danny de Jong"]
+authors = ["Bamidev"]
 license = "MIT"
 publish = true
 categories = []
