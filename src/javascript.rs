@@ -19,6 +19,18 @@ pub enum JsValue {
 	Other(String),
 }
 
+
+impl JsValue {
+	/// Gets the string of the `JsValue::String`, or otherwise just a normal string representation of the
+	/// value.
+	pub fn to_string_unenclosed(&self) -> Cow<'_, str> {
+		match self {
+			Self::String(s) => Cow::Borrowed(s),
+			other => Cow::Owned(other.to_string())
+		}
+	}
+}
+
 impl fmt::Display for JsValue {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		match self {
@@ -26,8 +38,8 @@ impl fmt::Display for JsValue {
 				write!(f, "[")?;
 				if a.len() > 0 {
 					write!(f, "{}", a[0])?;
-					for i in a {
-						write!(f, "{}", i)?;
+					for i in 1..a.len() {
+						write!(f, ",{}", a[i])?;
 					}
 				}
 				write!(f, "]")
@@ -50,7 +62,7 @@ impl fmt::Display for JsValue {
 }
 
 const UNESCAPED_CHARACTERS: &str =
-	"_0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@\\*_+-./";
+	" \t_0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@\\*_+-./";
 
 fn escape_string(string: &str) -> Cow<'_, str> {
 	if string.len() == 0 {
