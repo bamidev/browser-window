@@ -8,8 +8,7 @@ _BrowserWindow_ was born from the lack of a good and simple Electron alternative
 
 ## Introduction
 
-_BrowserWindow_ is designed to be easy to use, and work cross-platform. It is built to work in Rust
-applications that utilize async/await syntax - or that don't do that at all. It even has optional
+_BrowserWindow_ is designed to be easy to use, and work cross-platform. It is built to work in Rust and utilizes the async/await syntax. It even has optional
 thread-safe handles. There are currently two different underlying browser frameworks that can be
 selected: WebkitGTK or CEF.
 

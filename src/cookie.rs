@@ -193,11 +193,12 @@ impl CookieJar {
 	///
 	/// # Example
 	/// ```ignore
-	/// let cookie_jar = app.cookie_jar();
-	/// let mut iterator = cookie_jar.iter("http://localhost/", true);
+	/// if let Some(cookie_jar) = app.cookie_jar() {
+	/// 	let mut iterator = cookie_jar.iter("http://localhost/", true);
 	///
-	/// while let Some(cookie) = iterator.next().await {
-	/// 	// ... do something with `cookie`
+	/// 	while let Some(cookie) = iterator.next().await {
+	/// 		// ... do something with `cookie`
+	/// 	}
 	/// }
 	/// ```
 	pub fn iter<'a>(&'a self, url: &str, include_http_only: bool) -> CookieIterator<'a> {
