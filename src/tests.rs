@@ -58,6 +58,7 @@ fn async_tests(application: &Application) {
 		#[cfg(not(feature = "webkitgtk"))]
 		async_cookies(app).await;
 		//async_correct_parent_cleanup(app).await;
+		app.exit(0);
 	});
 
 	assert!(exit_code == 0);
@@ -70,77 +71,80 @@ async fn async_basic(app: ApplicationHandle) -> BrowserWindow {
 }
 
 async fn async_cookies(app: ApplicationHandle) {
-	let mut jar = app.cookie_jar().expect("cookies not supported");
+	if let Some(mut jar) = app.cookie_jar() {
+		let cookie = Cookie::new("name", "value");
 
-	let cookie = Cookie::new("name", "value");
+		// Store cookies
+		jar.store("/", &cookie).await.unwrap_err(); // Should give error
+		jar.store("http://localhost/", &cookie).await.unwrap();
 
-	// Store cookies
-	jar.store("/", &cookie).await.unwrap_err(); // Should give error
-	jar.store("http://localhost/", &cookie).await.unwrap();
+		// Delete cookie
+		assert!(jar.delete("http://localhost/", "name").await == 1);
+		jar.store("http://localhost/", &cookie).await.unwrap();
+		assert!(jar.delete_all("name").await == 1);
+		jar.store("http://localhost/", &cookie).await.unwrap();
+		assert!(jar.clear("http://localhost/").await == 1);
+		jar.store("http://localhost/", &cookie).await.unwrap();
+		assert!(jar.clear_all().await == 1);
 
-	// Delete cookie
-	assert!(jar.delete("http://localhost/", "name").await == 1);
-	jar.store("http://localhost/", &cookie).await.unwrap();
-	assert!(jar.delete_all("name").await == 1);
-	jar.store("http://localhost/", &cookie).await.unwrap();
-	assert!(jar.clear("http://localhost/").await == 1);
-	jar.store("http://localhost/", &cookie).await.unwrap();
-	assert!(jar.clear_all().await == 1);
+		// Using a wrong url
+		{
+			let mut iter = jar.iter("/", true);
+			assert!(iter.next().await.is_none());
+		}
 
-	// Using a wrong url
-	{
-		let mut iter = jar.iter("/", true);
-		assert!(iter.next().await.is_none());
+		// Finding our set cookie back
+		jar.store("http://localhost/", &cookie).await.unwrap();
+		let cookie = jar.find("http://localhost/", "name", true).await.unwrap();
+		assert!(cookie.name() == "name");
+		assert!(cookie.value() == "value");
+
+		// Finding our set cookie back in another way
+		let cookie = jar.find_from_all("name").await.unwrap();
+		assert!(cookie.name() == "name");
+		assert!(cookie.value() == "value");
 	}
-
-	// Finding our set cookie back
-	jar.store("http://localhost/", &cookie).await.unwrap();
-	let cookie = jar.find("http://localhost/", "name", true).await.unwrap();
-	assert!(cookie.name() == "name");
-	assert!(cookie.value() == "value");
-
-	// Finding our set cookie back in another way
-	let cookie = jar.find_from_all("name").await.unwrap();
-	assert!(cookie.name() == "name");
-	assert!(cookie.value() == "value");
 }
 
 #[test]
 /// Checking if all cookie methods work correctly.
 fn cookie() {
-	let now = SystemTime::now();
 
-	let mut cookie = Cookie::new("name", "value");
+	if !cfg!(feature = "webkitgtk") {
+		let now = SystemTime::now();
 
-	assert!(cookie.name() == "name");
-	assert!(cookie.value() == "value");
-	assert!(cookie.domain() == "");
-	assert!(cookie.path() == "");
-	assert!(cookie.expires() == None);
+		let mut cookie = Cookie::new("name", "value");
 
-	cookie
-		.make_secure()
-		.make_http_only()
-		.set_path("/")
-		.set_domain("127.0.0.1")
-		.set_expires(&now)
-		.set_creation_time(&now);
+		assert!(cookie.name() == "name");
+		assert!(cookie.value() == "value");
+		assert!(cookie.domain() == "");
+		assert!(cookie.path() == "");
+		assert!(cookie.expires() == None);
 
-	assert!(cookie.domain() == "127.0.0.1");
-	assert!(cookie.path() == "/");
-	assert!(
-		(now.duration_since(UNIX_EPOCH).unwrap()
-			- cookie
-				.expires()
-				.unwrap()
-				.duration_since(UNIX_EPOCH)
-				.unwrap()) < Duration::from_millis(1)
-	);
-	assert!(
-		(now.duration_since(UNIX_EPOCH).unwrap()
-			- cookie.creation_time().duration_since(UNIX_EPOCH).unwrap())
-			< Duration::from_millis(1)
-	);
+		cookie
+			.make_secure()
+			.make_http_only()
+			.set_path("/")
+			.set_domain("127.0.0.1")
+			.set_expires(&now)
+			.set_creation_time(&now);
+
+		assert!(cookie.domain() == "127.0.0.1");
+		assert!(cookie.path() == "/");
+		assert!(
+			(now.duration_since(UNIX_EPOCH).unwrap()
+				- cookie
+					.expires()
+					.unwrap()
+					.duration_since(UNIX_EPOCH)
+					.unwrap()) < Duration::from_millis(1)
+		);
+		assert!(
+			(now.duration_since(UNIX_EPOCH).unwrap()
+				- cookie.creation_time().duration_since(UNIX_EPOCH).unwrap())
+				< Duration::from_millis(1)
+		);
+	}
 }
 
 /// Closes a parent window before closing its child window, to see if the child

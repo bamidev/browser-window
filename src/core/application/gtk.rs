@@ -34,11 +34,14 @@ impl super::ApplicationExt for ApplicationImpl {
 		true
 	}
 
-	fn exit(&self, exit_code: i32) { self.exit_code.store(exit_code, Ordering::Relaxed); }
+	fn exit(&self, exit_code: i32) {
+		self.exit_code.store(exit_code, Ordering::Relaxed);
+		self.inner.quit();
+	}
 
 	fn exit_threadsafe(&self, exit_code: i32) { self.exit(exit_code); }
 
-	fn free(&self) { self.inner.quit(); }
+	fn free(&self) {}
 
 	fn initialize(
 		argc: c_int, argv: *mut *mut c_char, _settings: &ApplicationSettings,
