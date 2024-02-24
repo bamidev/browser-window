@@ -211,145 +211,145 @@ pub type cwchar_t = ::std::os::raw::c_int;
 #[repr(align(16))]
 #[derive(Debug, Copy, Clone)]
 pub struct cmax_align_t {
-    pub __clang_max_align_nonce1: ::std::os::raw::c_longlong,
-    pub __bindgen_padding_0: u64,
-    pub __clang_max_align_nonce2: u128,
+	pub __clang_max_align_nonce1: ::std::os::raw::c_longlong,
+	pub __bindgen_padding_0: u64,
+	pub __clang_max_align_nonce2: u128,
 }
 #[test]
 fn bindgen_test_layout_cmax_align_t() {
-    const UNINIT: ::std::mem::MaybeUninit<cmax_align_t> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<cmax_align_t>(),
-        32usize,
-        concat!("Size of: ", stringify!(cmax_align_t))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cmax_align_t>(),
-        16usize,
-        concat!("Alignment of ", stringify!(cmax_align_t))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__clang_max_align_nonce1) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cmax_align_t),
-            "::",
-            stringify!(__clang_max_align_nonce1)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__clang_max_align_nonce2) as usize - ptr as usize },
-        16usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cmax_align_t),
-            "::",
-            stringify!(__clang_max_align_nonce2)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<cmax_align_t> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<cmax_align_t>(),
+		32usize,
+		concat!("Size of: ", stringify!(cmax_align_t))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cmax_align_t>(),
+		16usize,
+		concat!("Alignment of ", stringify!(cmax_align_t))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__clang_max_align_nonce1) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cmax_align_t),
+			"::",
+			stringify!(__clang_max_align_nonce1)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__clang_max_align_nonce2) as usize - ptr as usize },
+		16usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cmax_align_t),
+			"::",
+			stringify!(__clang_max_align_nonce2)
+		)
+	);
 }
 #[doc = " A 'string slice'\n Points to a mutable, non-zero-terminated, UTF-8 encoded string.\n Using rust's string's memory layout."]
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct cbw_StrSlice {
-    pub len: usize,
-    pub data: *mut ::std::os::raw::c_char,
+	pub len: usize,
+	pub data: *mut ::std::os::raw::c_char,
 }
 #[test]
 fn bindgen_test_layout_cbw_StrSlice() {
-    const UNINIT: ::std::mem::MaybeUninit<cbw_StrSlice> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<cbw_StrSlice>(),
-        16usize,
-        concat!("Size of: ", stringify!(cbw_StrSlice))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cbw_StrSlice>(),
-        8usize,
-        concat!("Alignment of ", stringify!(cbw_StrSlice))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).len) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_StrSlice),
-            "::",
-            stringify!(len)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).data) as usize - ptr as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_StrSlice),
-            "::",
-            stringify!(data)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<cbw_StrSlice> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<cbw_StrSlice>(),
+		16usize,
+		concat!("Size of: ", stringify!(cbw_StrSlice))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cbw_StrSlice>(),
+		8usize,
+		concat!("Alignment of ", stringify!(cbw_StrSlice))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).len) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_StrSlice),
+			"::",
+			stringify!(len)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).data) as usize - ptr as usize },
+		8usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_StrSlice),
+			"::",
+			stringify!(data)
+		)
+	);
 }
 #[doc = " A 'const string slice'\n Points to a immutable, non-zero-terminated, UTF-8 encoded string.\n Using rust's string's memory layout."]
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct cbw_CStrSlice {
-    pub len: usize,
-    pub data: *const ::std::os::raw::c_char,
+	pub len: usize,
+	pub data: *const ::std::os::raw::c_char,
 }
 #[test]
 fn bindgen_test_layout_cbw_CStrSlice() {
-    const UNINIT: ::std::mem::MaybeUninit<cbw_CStrSlice> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<cbw_CStrSlice>(),
-        16usize,
-        concat!("Size of: ", stringify!(cbw_CStrSlice))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cbw_CStrSlice>(),
-        8usize,
-        concat!("Alignment of ", stringify!(cbw_CStrSlice))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).len) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_CStrSlice),
-            "::",
-            stringify!(len)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).data) as usize - ptr as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_CStrSlice),
-            "::",
-            stringify!(data)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<cbw_CStrSlice> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<cbw_CStrSlice>(),
+		16usize,
+		concat!("Size of: ", stringify!(cbw_CStrSlice))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cbw_CStrSlice>(),
+		8usize,
+		concat!("Alignment of ", stringify!(cbw_CStrSlice))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).len) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_CStrSlice),
+			"::",
+			stringify!(len)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).data) as usize - ptr as usize },
+		8usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_CStrSlice),
+			"::",
+			stringify!(data)
+		)
+	);
 }
 extern "C" {
-    #[doc = " Copies the string from the given `bw_CStrSlice` to a C compatible, nul-terminated string."]
-    #[link_name = "\u{1}bw_string_copyAsNewCstr"]
-    pub fn cbw_string_copyAsNewCstr(str_: cbw_CStrSlice) -> *mut ::std::os::raw::c_char;
+	#[doc = " Copies the string from the given `bw_CStrSlice` to a C compatible, nul-terminated string."]
+	#[link_name = "\u{1}bw_string_copyAsNewCstr"]
+	pub fn cbw_string_copyAsNewCstr(str_: cbw_CStrSlice) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[doc = " Frees the string allocated with any of the functions of this module."]
-    #[link_name = "\u{1}bw_string_freeCstr"]
-    pub fn cbw_string_freeCstr(str_: *mut ::std::os::raw::c_char);
+	#[doc = " Frees the string allocated with any of the functions of this module."]
+	#[link_name = "\u{1}bw_string_freeCstr"]
+	pub fn cbw_string_freeCstr(str_: *mut ::std::os::raw::c_char);
 }
 extern "C" {
-    #[link_name = "\u{1}bw_string_free"]
-    pub fn cbw_string_free(str_: cbw_StrSlice);
+	#[link_name = "\u{1}bw_string_free"]
+	pub fn cbw_string_free(str_: cbw_StrSlice);
 }
 pub type cbw_ApplicationDispatchFn = ::std::option::Option<
-    unsafe extern "C" fn(app: *mut cbw_Application, data: *mut ::std::os::raw::c_void),
+	unsafe extern "C" fn(app: *mut cbw_Application, data: *mut ::std::os::raw::c_void),
 >;
 pub type cbw_ApplicationReadyFn = cbw_ApplicationDispatchFn;
 #[repr(C)]
@@ -357,32 +357,32 @@ pub type cbw_ApplicationReadyFn = cbw_ApplicationDispatchFn;
 pub struct cbw_ApplicationImpl {}
 #[test]
 fn bindgen_test_layout_cbw_ApplicationImpl() {
-    assert_eq!(
-        ::std::mem::size_of::<cbw_ApplicationImpl>(),
-        0usize,
-        concat!("Size of: ", stringify!(cbw_ApplicationImpl))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cbw_ApplicationImpl>(),
-        1usize,
-        concat!("Alignment of ", stringify!(cbw_ApplicationImpl))
-    );
+	assert_eq!(
+		::std::mem::size_of::<cbw_ApplicationImpl>(),
+		0usize,
+		concat!("Size of: ", stringify!(cbw_ApplicationImpl))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cbw_ApplicationImpl>(),
+		1usize,
+		concat!("Alignment of ", stringify!(cbw_ApplicationImpl))
+	);
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct cbw_ApplicationEngineImpl {}
 #[test]
 fn bindgen_test_layout_cbw_ApplicationEngineImpl() {
-    assert_eq!(
-        ::std::mem::size_of::<cbw_ApplicationEngineImpl>(),
-        0usize,
-        concat!("Size of: ", stringify!(cbw_ApplicationEngineImpl))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cbw_ApplicationEngineImpl>(),
-        1usize,
-        concat!("Alignment of ", stringify!(cbw_ApplicationEngineImpl))
-    );
+	assert_eq!(
+		::std::mem::size_of::<cbw_ApplicationEngineImpl>(),
+		0usize,
+		concat!("Size of: ", stringify!(cbw_ApplicationEngineImpl))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cbw_ApplicationEngineImpl>(),
+		1usize,
+		concat!("Alignment of ", stringify!(cbw_ApplicationEngineImpl))
+	);
 }
 pub type c_Float32 = f32;
 pub type c_Float64 = f64;
@@ -391,222 +391,213 @@ pub type c_Float64x = u128;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct cdiv_t {
-    pub quot: ::std::os::raw::c_int,
-    pub rem: ::std::os::raw::c_int,
+	pub quot: ::std::os::raw::c_int,
+	pub rem: ::std::os::raw::c_int,
 }
 #[test]
 fn bindgen_test_layout_cdiv_t() {
-    const UNINIT: ::std::mem::MaybeUninit<cdiv_t> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<cdiv_t>(),
-        8usize,
-        concat!("Size of: ", stringify!(cdiv_t))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cdiv_t>(),
-        4usize,
-        concat!("Alignment of ", stringify!(cdiv_t))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).quot) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cdiv_t),
-            "::",
-            stringify!(quot)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).rem) as usize - ptr as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cdiv_t),
-            "::",
-            stringify!(rem)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<cdiv_t> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<cdiv_t>(),
+		8usize,
+		concat!("Size of: ", stringify!(cdiv_t))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cdiv_t>(),
+		4usize,
+		concat!("Alignment of ", stringify!(cdiv_t))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).quot) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cdiv_t),
+			"::",
+			stringify!(quot)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).rem) as usize - ptr as usize },
+		4usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cdiv_t),
+			"::",
+			stringify!(rem)
+		)
+	);
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct cldiv_t {
-    pub quot: ::std::os::raw::c_long,
-    pub rem: ::std::os::raw::c_long,
+	pub quot: ::std::os::raw::c_long,
+	pub rem: ::std::os::raw::c_long,
 }
 #[test]
 fn bindgen_test_layout_cldiv_t() {
-    const UNINIT: ::std::mem::MaybeUninit<cldiv_t> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<cldiv_t>(),
-        16usize,
-        concat!("Size of: ", stringify!(cldiv_t))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cldiv_t>(),
-        8usize,
-        concat!("Alignment of ", stringify!(cldiv_t))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).quot) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cldiv_t),
-            "::",
-            stringify!(quot)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).rem) as usize - ptr as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cldiv_t),
-            "::",
-            stringify!(rem)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<cldiv_t> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<cldiv_t>(),
+		16usize,
+		concat!("Size of: ", stringify!(cldiv_t))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cldiv_t>(),
+		8usize,
+		concat!("Alignment of ", stringify!(cldiv_t))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).quot) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cldiv_t),
+			"::",
+			stringify!(quot)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).rem) as usize - ptr as usize },
+		8usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cldiv_t),
+			"::",
+			stringify!(rem)
+		)
+	);
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct clldiv_t {
-    pub quot: ::std::os::raw::c_longlong,
-    pub rem: ::std::os::raw::c_longlong,
+	pub quot: ::std::os::raw::c_longlong,
+	pub rem: ::std::os::raw::c_longlong,
 }
 #[test]
 fn bindgen_test_layout_clldiv_t() {
-    const UNINIT: ::std::mem::MaybeUninit<clldiv_t> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<clldiv_t>(),
-        16usize,
-        concat!("Size of: ", stringify!(clldiv_t))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<clldiv_t>(),
-        8usize,
-        concat!("Alignment of ", stringify!(clldiv_t))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).quot) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(clldiv_t),
-            "::",
-            stringify!(quot)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).rem) as usize - ptr as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(clldiv_t),
-            "::",
-            stringify!(rem)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<clldiv_t> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<clldiv_t>(),
+		16usize,
+		concat!("Size of: ", stringify!(clldiv_t))
+	);
+	assert_eq!(
+		::std::mem::align_of::<clldiv_t>(),
+		8usize,
+		concat!("Alignment of ", stringify!(clldiv_t))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).quot) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(clldiv_t),
+			"::",
+			stringify!(quot)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).rem) as usize - ptr as usize },
+		8usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(clldiv_t),
+			"::",
+			stringify!(rem)
+		)
+	);
 }
 extern "C" {
-    #[link_name = "\u{1}__ctype_get_mb_cur_max"]
-    pub fn c__ctype_get_mb_cur_max() -> usize;
+	#[link_name = "\u{1}__ctype_get_mb_cur_max"]
+	pub fn c__ctype_get_mb_cur_max() -> usize;
 }
 extern "C" {
-    #[link_name = "\u{1}atof"]
-    pub fn catof(__nptr: *const ::std::os::raw::c_char) -> f64;
+	#[link_name = "\u{1}atof"]
+	pub fn catof(__nptr: *const ::std::os::raw::c_char) -> f64;
 }
 extern "C" {
-    #[link_name = "\u{1}atoi"]
-    pub fn catoi(__nptr: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}atoi"]
+	pub fn catoi(__nptr: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}atol"]
-    pub fn catol(__nptr: *const ::std::os::raw::c_char) -> ::std::os::raw::c_long;
+	#[link_name = "\u{1}atol"]
+	pub fn catol(__nptr: *const ::std::os::raw::c_char) -> ::std::os::raw::c_long;
 }
 extern "C" {
-    #[link_name = "\u{1}atoll"]
-    pub fn catoll(__nptr: *const ::std::os::raw::c_char) -> ::std::os::raw::c_longlong;
+	#[link_name = "\u{1}atoll"]
+	pub fn catoll(__nptr: *const ::std::os::raw::c_char) -> ::std::os::raw::c_longlong;
 }
 extern "C" {
-    #[link_name = "\u{1}strtod"]
-    pub fn cstrtod(
-        __nptr: *const ::std::os::raw::c_char,
-        __endptr: *mut *mut ::std::os::raw::c_char,
-    ) -> f64;
+	#[link_name = "\u{1}strtod"]
+	pub fn cstrtod(
+		__nptr: *const ::std::os::raw::c_char, __endptr: *mut *mut ::std::os::raw::c_char,
+	) -> f64;
 }
 extern "C" {
-    #[link_name = "\u{1}strtof"]
-    pub fn cstrtof(
-        __nptr: *const ::std::os::raw::c_char,
-        __endptr: *mut *mut ::std::os::raw::c_char,
-    ) -> f32;
+	#[link_name = "\u{1}strtof"]
+	pub fn cstrtof(
+		__nptr: *const ::std::os::raw::c_char, __endptr: *mut *mut ::std::os::raw::c_char,
+	) -> f32;
 }
 extern "C" {
-    #[link_name = "\u{1}strtold"]
-    pub fn cstrtold(
-        __nptr: *const ::std::os::raw::c_char,
-        __endptr: *mut *mut ::std::os::raw::c_char,
-    ) -> u128;
+	#[link_name = "\u{1}strtold"]
+	pub fn cstrtold(
+		__nptr: *const ::std::os::raw::c_char, __endptr: *mut *mut ::std::os::raw::c_char,
+	) -> u128;
 }
 extern "C" {
-    #[link_name = "\u{1}strtol"]
-    pub fn cstrtol(
-        __nptr: *const ::std::os::raw::c_char,
-        __endptr: *mut *mut ::std::os::raw::c_char,
-        __base: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_long;
+	#[link_name = "\u{1}strtol"]
+	pub fn cstrtol(
+		__nptr: *const ::std::os::raw::c_char, __endptr: *mut *mut ::std::os::raw::c_char,
+		__base: ::std::os::raw::c_int,
+	) -> ::std::os::raw::c_long;
 }
 extern "C" {
-    #[link_name = "\u{1}strtoul"]
-    pub fn cstrtoul(
-        __nptr: *const ::std::os::raw::c_char,
-        __endptr: *mut *mut ::std::os::raw::c_char,
-        __base: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_ulong;
+	#[link_name = "\u{1}strtoul"]
+	pub fn cstrtoul(
+		__nptr: *const ::std::os::raw::c_char, __endptr: *mut *mut ::std::os::raw::c_char,
+		__base: ::std::os::raw::c_int,
+	) -> ::std::os::raw::c_ulong;
 }
 extern "C" {
-    #[link_name = "\u{1}strtoq"]
-    pub fn cstrtoq(
-        __nptr: *const ::std::os::raw::c_char,
-        __endptr: *mut *mut ::std::os::raw::c_char,
-        __base: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_longlong;
+	#[link_name = "\u{1}strtoq"]
+	pub fn cstrtoq(
+		__nptr: *const ::std::os::raw::c_char, __endptr: *mut *mut ::std::os::raw::c_char,
+		__base: ::std::os::raw::c_int,
+	) -> ::std::os::raw::c_longlong;
 }
 extern "C" {
-    #[link_name = "\u{1}strtouq"]
-    pub fn cstrtouq(
-        __nptr: *const ::std::os::raw::c_char,
-        __endptr: *mut *mut ::std::os::raw::c_char,
-        __base: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_ulonglong;
+	#[link_name = "\u{1}strtouq"]
+	pub fn cstrtouq(
+		__nptr: *const ::std::os::raw::c_char, __endptr: *mut *mut ::std::os::raw::c_char,
+		__base: ::std::os::raw::c_int,
+	) -> ::std::os::raw::c_ulonglong;
 }
 extern "C" {
-    #[link_name = "\u{1}strtoll"]
-    pub fn cstrtoll(
-        __nptr: *const ::std::os::raw::c_char,
-        __endptr: *mut *mut ::std::os::raw::c_char,
-        __base: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_longlong;
+	#[link_name = "\u{1}strtoll"]
+	pub fn cstrtoll(
+		__nptr: *const ::std::os::raw::c_char, __endptr: *mut *mut ::std::os::raw::c_char,
+		__base: ::std::os::raw::c_int,
+	) -> ::std::os::raw::c_longlong;
 }
 extern "C" {
-    #[link_name = "\u{1}strtoull"]
-    pub fn cstrtoull(
-        __nptr: *const ::std::os::raw::c_char,
-        __endptr: *mut *mut ::std::os::raw::c_char,
-        __base: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_ulonglong;
+	#[link_name = "\u{1}strtoull"]
+	pub fn cstrtoull(
+		__nptr: *const ::std::os::raw::c_char, __endptr: *mut *mut ::std::os::raw::c_char,
+		__base: ::std::os::raw::c_int,
+	) -> ::std::os::raw::c_ulonglong;
 }
 extern "C" {
-    #[link_name = "\u{1}l64a"]
-    pub fn cl64a(__n: ::std::os::raw::c_long) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}l64a"]
+	pub fn cl64a(__n: ::std::os::raw::c_long) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[link_name = "\u{1}a64l"]
-    pub fn ca64l(__s: *const ::std::os::raw::c_char) -> ::std::os::raw::c_long;
+	#[link_name = "\u{1}a64l"]
+	pub fn ca64l(__s: *const ::std::os::raw::c_char) -> ::std::os::raw::c_long;
 }
 pub type c__u_char = ::std::os::raw::c_uchar;
 pub type c__u_short = ::std::os::raw::c_ushort;
@@ -645,32 +636,32 @@ pub type c__pid_t = ::std::os::raw::c_int;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct c__fsid_t {
-    pub __val: [::std::os::raw::c_int; 2usize],
+	pub __val: [::std::os::raw::c_int; 2usize],
 }
 #[test]
 fn bindgen_test_layout_c__fsid_t() {
-    const UNINIT: ::std::mem::MaybeUninit<c__fsid_t> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<c__fsid_t>(),
-        8usize,
-        concat!("Size of: ", stringify!(c__fsid_t))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<c__fsid_t>(),
-        4usize,
-        concat!("Alignment of ", stringify!(c__fsid_t))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__val) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__fsid_t),
-            "::",
-            stringify!(__val)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<c__fsid_t> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<c__fsid_t>(),
+		8usize,
+		concat!("Size of: ", stringify!(c__fsid_t))
+	);
+	assert_eq!(
+		::std::mem::align_of::<c__fsid_t>(),
+		4usize,
+		concat!("Alignment of ", stringify!(c__fsid_t))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__val) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__fsid_t),
+			"::",
+			stringify!(__val)
+		)
+	);
 }
 pub type c__clock_t = ::std::os::raw::c_long;
 pub type c__rlim_t = ::std::os::raw::c_ulong;
@@ -735,169 +726,162 @@ pub type cregister_t = ::std::os::raw::c_long;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct c__sigset_t {
-    pub __val: [::std::os::raw::c_ulong; 16usize],
+	pub __val: [::std::os::raw::c_ulong; 16usize],
 }
 #[test]
 fn bindgen_test_layout_c__sigset_t() {
-    const UNINIT: ::std::mem::MaybeUninit<c__sigset_t> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<c__sigset_t>(),
-        128usize,
-        concat!("Size of: ", stringify!(c__sigset_t))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<c__sigset_t>(),
-        8usize,
-        concat!("Alignment of ", stringify!(c__sigset_t))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__val) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__sigset_t),
-            "::",
-            stringify!(__val)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<c__sigset_t> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<c__sigset_t>(),
+		128usize,
+		concat!("Size of: ", stringify!(c__sigset_t))
+	);
+	assert_eq!(
+		::std::mem::align_of::<c__sigset_t>(),
+		8usize,
+		concat!("Alignment of ", stringify!(c__sigset_t))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__val) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__sigset_t),
+			"::",
+			stringify!(__val)
+		)
+	);
 }
 pub type csigset_t = c__sigset_t;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct ctimeval {
-    pub tv_sec: c__time_t,
-    pub tv_usec: c__suseconds_t,
+	pub tv_sec: c__time_t,
+	pub tv_usec: c__suseconds_t,
 }
 #[test]
 fn bindgen_test_layout_ctimeval() {
-    const UNINIT: ::std::mem::MaybeUninit<ctimeval> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<ctimeval>(),
-        16usize,
-        concat!("Size of: ", stringify!(ctimeval))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ctimeval>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ctimeval))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).tv_sec) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ctimeval),
-            "::",
-            stringify!(tv_sec)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).tv_usec) as usize - ptr as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ctimeval),
-            "::",
-            stringify!(tv_usec)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<ctimeval> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<ctimeval>(),
+		16usize,
+		concat!("Size of: ", stringify!(ctimeval))
+	);
+	assert_eq!(
+		::std::mem::align_of::<ctimeval>(),
+		8usize,
+		concat!("Alignment of ", stringify!(ctimeval))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).tv_sec) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(ctimeval),
+			"::",
+			stringify!(tv_sec)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).tv_usec) as usize - ptr as usize },
+		8usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(ctimeval),
+			"::",
+			stringify!(tv_usec)
+		)
+	);
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct ctimespec {
-    pub tv_sec: c__time_t,
-    pub tv_nsec: c__syscall_slong_t,
+	pub tv_sec: c__time_t,
+	pub tv_nsec: c__syscall_slong_t,
 }
 #[test]
 fn bindgen_test_layout_ctimespec() {
-    const UNINIT: ::std::mem::MaybeUninit<ctimespec> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<ctimespec>(),
-        16usize,
-        concat!("Size of: ", stringify!(ctimespec))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<ctimespec>(),
-        8usize,
-        concat!("Alignment of ", stringify!(ctimespec))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).tv_sec) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ctimespec),
-            "::",
-            stringify!(tv_sec)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).tv_nsec) as usize - ptr as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ctimespec),
-            "::",
-            stringify!(tv_nsec)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<ctimespec> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<ctimespec>(),
+		16usize,
+		concat!("Size of: ", stringify!(ctimespec))
+	);
+	assert_eq!(
+		::std::mem::align_of::<ctimespec>(),
+		8usize,
+		concat!("Alignment of ", stringify!(ctimespec))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).tv_sec) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(ctimespec),
+			"::",
+			stringify!(tv_sec)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).tv_nsec) as usize - ptr as usize },
+		8usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(ctimespec),
+			"::",
+			stringify!(tv_nsec)
+		)
+	);
 }
 pub type csuseconds_t = c__suseconds_t;
 pub type c__fd_mask = ::std::os::raw::c_long;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct cfd_set {
-    pub __fds_bits: [c__fd_mask; 16usize],
+	pub __fds_bits: [c__fd_mask; 16usize],
 }
 #[test]
 fn bindgen_test_layout_cfd_set() {
-    const UNINIT: ::std::mem::MaybeUninit<cfd_set> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<cfd_set>(),
-        128usize,
-        concat!("Size of: ", stringify!(cfd_set))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cfd_set>(),
-        8usize,
-        concat!("Alignment of ", stringify!(cfd_set))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__fds_bits) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cfd_set),
-            "::",
-            stringify!(__fds_bits)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<cfd_set> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<cfd_set>(),
+		128usize,
+		concat!("Size of: ", stringify!(cfd_set))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cfd_set>(),
+		8usize,
+		concat!("Alignment of ", stringify!(cfd_set))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__fds_bits) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cfd_set),
+			"::",
+			stringify!(__fds_bits)
+		)
+	);
 }
 pub type cfd_mask = c__fd_mask;
 extern "C" {
-    #[link_name = "\u{1}select"]
-    pub fn cselect(
-        __nfds: ::std::os::raw::c_int,
-        __readfds: *mut cfd_set,
-        __writefds: *mut cfd_set,
-        __exceptfds: *mut cfd_set,
-        __timeout: *mut ctimeval,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}select"]
+	pub fn cselect(
+		__nfds: ::std::os::raw::c_int, __readfds: *mut cfd_set, __writefds: *mut cfd_set,
+		__exceptfds: *mut cfd_set, __timeout: *mut ctimeval,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}pselect"]
-    pub fn cpselect(
-        __nfds: ::std::os::raw::c_int,
-        __readfds: *mut cfd_set,
-        __writefds: *mut cfd_set,
-        __exceptfds: *mut cfd_set,
-        __timeout: *const ctimespec,
-        __sigmask: *const c__sigset_t,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}pselect"]
+	pub fn cpselect(
+		__nfds: ::std::os::raw::c_int, __readfds: *mut cfd_set, __writefds: *mut cfd_set,
+		__exceptfds: *mut cfd_set, __timeout: *const ctimespec, __sigmask: *const c__sigset_t,
+	) -> ::std::os::raw::c_int;
 }
 pub type cblksize_t = c__blksize_t;
 pub type cblkcnt_t = c__blkcnt_t;
@@ -906,2166 +890,2045 @@ pub type cfsfilcnt_t = c__fsfilcnt_t;
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub union c__atomic_wide_counter {
-    pub __value64: ::std::os::raw::c_ulonglong,
-    pub __value32: c__atomic_wide_counter__bindgen_ty_1,
+	pub __value64: ::std::os::raw::c_ulonglong,
+	pub __value32: c__atomic_wide_counter__bindgen_ty_1,
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct c__atomic_wide_counter__bindgen_ty_1 {
-    pub __low: ::std::os::raw::c_uint,
-    pub __high: ::std::os::raw::c_uint,
+	pub __low: ::std::os::raw::c_uint,
+	pub __high: ::std::os::raw::c_uint,
 }
 #[test]
 fn bindgen_test_layout_c__atomic_wide_counter__bindgen_ty_1() {
-    const UNINIT: ::std::mem::MaybeUninit<c__atomic_wide_counter__bindgen_ty_1> =
-        ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<c__atomic_wide_counter__bindgen_ty_1>(),
-        8usize,
-        concat!(
-            "Size of: ",
-            stringify!(c__atomic_wide_counter__bindgen_ty_1)
-        )
-    );
-    assert_eq!(
-        ::std::mem::align_of::<c__atomic_wide_counter__bindgen_ty_1>(),
-        4usize,
-        concat!(
-            "Alignment of ",
-            stringify!(c__atomic_wide_counter__bindgen_ty_1)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__low) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__atomic_wide_counter__bindgen_ty_1),
-            "::",
-            stringify!(__low)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__high) as usize - ptr as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__atomic_wide_counter__bindgen_ty_1),
-            "::",
-            stringify!(__high)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<c__atomic_wide_counter__bindgen_ty_1> =
+		::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<c__atomic_wide_counter__bindgen_ty_1>(),
+		8usize,
+		concat!(
+			"Size of: ",
+			stringify!(c__atomic_wide_counter__bindgen_ty_1)
+		)
+	);
+	assert_eq!(
+		::std::mem::align_of::<c__atomic_wide_counter__bindgen_ty_1>(),
+		4usize,
+		concat!(
+			"Alignment of ",
+			stringify!(c__atomic_wide_counter__bindgen_ty_1)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__low) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__atomic_wide_counter__bindgen_ty_1),
+			"::",
+			stringify!(__low)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__high) as usize - ptr as usize },
+		4usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__atomic_wide_counter__bindgen_ty_1),
+			"::",
+			stringify!(__high)
+		)
+	);
 }
 #[test]
 fn bindgen_test_layout_c__atomic_wide_counter() {
-    const UNINIT: ::std::mem::MaybeUninit<c__atomic_wide_counter> =
-        ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<c__atomic_wide_counter>(),
-        8usize,
-        concat!("Size of: ", stringify!(c__atomic_wide_counter))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<c__atomic_wide_counter>(),
-        8usize,
-        concat!("Alignment of ", stringify!(c__atomic_wide_counter))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__value64) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__atomic_wide_counter),
-            "::",
-            stringify!(__value64)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__value32) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__atomic_wide_counter),
-            "::",
-            stringify!(__value32)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<c__atomic_wide_counter> =
+		::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<c__atomic_wide_counter>(),
+		8usize,
+		concat!("Size of: ", stringify!(c__atomic_wide_counter))
+	);
+	assert_eq!(
+		::std::mem::align_of::<c__atomic_wide_counter>(),
+		8usize,
+		concat!("Alignment of ", stringify!(c__atomic_wide_counter))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__value64) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__atomic_wide_counter),
+			"::",
+			stringify!(__value64)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__value32) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__atomic_wide_counter),
+			"::",
+			stringify!(__value32)
+		)
+	);
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct c__pthread_internal_list {
-    pub __prev: *mut c__pthread_internal_list,
-    pub __next: *mut c__pthread_internal_list,
+	pub __prev: *mut c__pthread_internal_list,
+	pub __next: *mut c__pthread_internal_list,
 }
 #[test]
 fn bindgen_test_layout_c__pthread_internal_list() {
-    const UNINIT: ::std::mem::MaybeUninit<c__pthread_internal_list> =
-        ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<c__pthread_internal_list>(),
-        16usize,
-        concat!("Size of: ", stringify!(c__pthread_internal_list))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<c__pthread_internal_list>(),
-        8usize,
-        concat!("Alignment of ", stringify!(c__pthread_internal_list))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__prev) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__pthread_internal_list),
-            "::",
-            stringify!(__prev)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__next) as usize - ptr as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__pthread_internal_list),
-            "::",
-            stringify!(__next)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<c__pthread_internal_list> =
+		::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<c__pthread_internal_list>(),
+		16usize,
+		concat!("Size of: ", stringify!(c__pthread_internal_list))
+	);
+	assert_eq!(
+		::std::mem::align_of::<c__pthread_internal_list>(),
+		8usize,
+		concat!("Alignment of ", stringify!(c__pthread_internal_list))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__prev) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__pthread_internal_list),
+			"::",
+			stringify!(__prev)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__next) as usize - ptr as usize },
+		8usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__pthread_internal_list),
+			"::",
+			stringify!(__next)
+		)
+	);
 }
 pub type c__pthread_list_t = c__pthread_internal_list;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct c__pthread_internal_slist {
-    pub __next: *mut c__pthread_internal_slist,
+	pub __next: *mut c__pthread_internal_slist,
 }
 #[test]
 fn bindgen_test_layout_c__pthread_internal_slist() {
-    const UNINIT: ::std::mem::MaybeUninit<c__pthread_internal_slist> =
-        ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<c__pthread_internal_slist>(),
-        8usize,
-        concat!("Size of: ", stringify!(c__pthread_internal_slist))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<c__pthread_internal_slist>(),
-        8usize,
-        concat!("Alignment of ", stringify!(c__pthread_internal_slist))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__next) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__pthread_internal_slist),
-            "::",
-            stringify!(__next)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<c__pthread_internal_slist> =
+		::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<c__pthread_internal_slist>(),
+		8usize,
+		concat!("Size of: ", stringify!(c__pthread_internal_slist))
+	);
+	assert_eq!(
+		::std::mem::align_of::<c__pthread_internal_slist>(),
+		8usize,
+		concat!("Alignment of ", stringify!(c__pthread_internal_slist))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__next) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__pthread_internal_slist),
+			"::",
+			stringify!(__next)
+		)
+	);
 }
 pub type c__pthread_slist_t = c__pthread_internal_slist;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct c__pthread_mutex_s {
-    pub __lock: ::std::os::raw::c_int,
-    pub __count: ::std::os::raw::c_uint,
-    pub __owner: ::std::os::raw::c_int,
-    pub __nusers: ::std::os::raw::c_uint,
-    pub __kind: ::std::os::raw::c_int,
-    pub __spins: ::std::os::raw::c_short,
-    pub __elision: ::std::os::raw::c_short,
-    pub __list: c__pthread_list_t,
+	pub __lock: ::std::os::raw::c_int,
+	pub __count: ::std::os::raw::c_uint,
+	pub __owner: ::std::os::raw::c_int,
+	pub __nusers: ::std::os::raw::c_uint,
+	pub __kind: ::std::os::raw::c_int,
+	pub __spins: ::std::os::raw::c_short,
+	pub __elision: ::std::os::raw::c_short,
+	pub __list: c__pthread_list_t,
 }
 #[test]
 fn bindgen_test_layout_c__pthread_mutex_s() {
-    const UNINIT: ::std::mem::MaybeUninit<c__pthread_mutex_s> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<c__pthread_mutex_s>(),
-        40usize,
-        concat!("Size of: ", stringify!(c__pthread_mutex_s))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<c__pthread_mutex_s>(),
-        8usize,
-        concat!("Alignment of ", stringify!(c__pthread_mutex_s))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__lock) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__pthread_mutex_s),
-            "::",
-            stringify!(__lock)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__count) as usize - ptr as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__pthread_mutex_s),
-            "::",
-            stringify!(__count)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__owner) as usize - ptr as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__pthread_mutex_s),
-            "::",
-            stringify!(__owner)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__nusers) as usize - ptr as usize },
-        12usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__pthread_mutex_s),
-            "::",
-            stringify!(__nusers)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__kind) as usize - ptr as usize },
-        16usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__pthread_mutex_s),
-            "::",
-            stringify!(__kind)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__spins) as usize - ptr as usize },
-        20usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__pthread_mutex_s),
-            "::",
-            stringify!(__spins)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__elision) as usize - ptr as usize },
-        22usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__pthread_mutex_s),
-            "::",
-            stringify!(__elision)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__list) as usize - ptr as usize },
-        24usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__pthread_mutex_s),
-            "::",
-            stringify!(__list)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<c__pthread_mutex_s> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<c__pthread_mutex_s>(),
+		40usize,
+		concat!("Size of: ", stringify!(c__pthread_mutex_s))
+	);
+	assert_eq!(
+		::std::mem::align_of::<c__pthread_mutex_s>(),
+		8usize,
+		concat!("Alignment of ", stringify!(c__pthread_mutex_s))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__lock) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__pthread_mutex_s),
+			"::",
+			stringify!(__lock)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__count) as usize - ptr as usize },
+		4usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__pthread_mutex_s),
+			"::",
+			stringify!(__count)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__owner) as usize - ptr as usize },
+		8usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__pthread_mutex_s),
+			"::",
+			stringify!(__owner)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__nusers) as usize - ptr as usize },
+		12usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__pthread_mutex_s),
+			"::",
+			stringify!(__nusers)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__kind) as usize - ptr as usize },
+		16usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__pthread_mutex_s),
+			"::",
+			stringify!(__kind)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__spins) as usize - ptr as usize },
+		20usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__pthread_mutex_s),
+			"::",
+			stringify!(__spins)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__elision) as usize - ptr as usize },
+		22usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__pthread_mutex_s),
+			"::",
+			stringify!(__elision)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__list) as usize - ptr as usize },
+		24usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__pthread_mutex_s),
+			"::",
+			stringify!(__list)
+		)
+	);
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct c__pthread_rwlock_arch_t {
-    pub __readers: ::std::os::raw::c_uint,
-    pub __writers: ::std::os::raw::c_uint,
-    pub __wrphase_futex: ::std::os::raw::c_uint,
-    pub __writers_futex: ::std::os::raw::c_uint,
-    pub __pad3: ::std::os::raw::c_uint,
-    pub __pad4: ::std::os::raw::c_uint,
-    pub __cur_writer: ::std::os::raw::c_int,
-    pub __shared: ::std::os::raw::c_int,
-    pub __rwelision: ::std::os::raw::c_schar,
-    pub __pad1: [::std::os::raw::c_uchar; 7usize],
-    pub __pad2: ::std::os::raw::c_ulong,
-    pub __flags: ::std::os::raw::c_uint,
+	pub __readers: ::std::os::raw::c_uint,
+	pub __writers: ::std::os::raw::c_uint,
+	pub __wrphase_futex: ::std::os::raw::c_uint,
+	pub __writers_futex: ::std::os::raw::c_uint,
+	pub __pad3: ::std::os::raw::c_uint,
+	pub __pad4: ::std::os::raw::c_uint,
+	pub __cur_writer: ::std::os::raw::c_int,
+	pub __shared: ::std::os::raw::c_int,
+	pub __rwelision: ::std::os::raw::c_schar,
+	pub __pad1: [::std::os::raw::c_uchar; 7usize],
+	pub __pad2: ::std::os::raw::c_ulong,
+	pub __flags: ::std::os::raw::c_uint,
 }
 #[test]
 fn bindgen_test_layout_c__pthread_rwlock_arch_t() {
-    const UNINIT: ::std::mem::MaybeUninit<c__pthread_rwlock_arch_t> =
-        ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<c__pthread_rwlock_arch_t>(),
-        56usize,
-        concat!("Size of: ", stringify!(c__pthread_rwlock_arch_t))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<c__pthread_rwlock_arch_t>(),
-        8usize,
-        concat!("Alignment of ", stringify!(c__pthread_rwlock_arch_t))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__readers) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__pthread_rwlock_arch_t),
-            "::",
-            stringify!(__readers)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__writers) as usize - ptr as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__pthread_rwlock_arch_t),
-            "::",
-            stringify!(__writers)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__wrphase_futex) as usize - ptr as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__pthread_rwlock_arch_t),
-            "::",
-            stringify!(__wrphase_futex)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__writers_futex) as usize - ptr as usize },
-        12usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__pthread_rwlock_arch_t),
-            "::",
-            stringify!(__writers_futex)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__pad3) as usize - ptr as usize },
-        16usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__pthread_rwlock_arch_t),
-            "::",
-            stringify!(__pad3)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__pad4) as usize - ptr as usize },
-        20usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__pthread_rwlock_arch_t),
-            "::",
-            stringify!(__pad4)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__cur_writer) as usize - ptr as usize },
-        24usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__pthread_rwlock_arch_t),
-            "::",
-            stringify!(__cur_writer)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__shared) as usize - ptr as usize },
-        28usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__pthread_rwlock_arch_t),
-            "::",
-            stringify!(__shared)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__rwelision) as usize - ptr as usize },
-        32usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__pthread_rwlock_arch_t),
-            "::",
-            stringify!(__rwelision)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__pad1) as usize - ptr as usize },
-        33usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__pthread_rwlock_arch_t),
-            "::",
-            stringify!(__pad1)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__pad2) as usize - ptr as usize },
-        40usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__pthread_rwlock_arch_t),
-            "::",
-            stringify!(__pad2)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__flags) as usize - ptr as usize },
-        48usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__pthread_rwlock_arch_t),
-            "::",
-            stringify!(__flags)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<c__pthread_rwlock_arch_t> =
+		::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<c__pthread_rwlock_arch_t>(),
+		56usize,
+		concat!("Size of: ", stringify!(c__pthread_rwlock_arch_t))
+	);
+	assert_eq!(
+		::std::mem::align_of::<c__pthread_rwlock_arch_t>(),
+		8usize,
+		concat!("Alignment of ", stringify!(c__pthread_rwlock_arch_t))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__readers) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__pthread_rwlock_arch_t),
+			"::",
+			stringify!(__readers)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__writers) as usize - ptr as usize },
+		4usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__pthread_rwlock_arch_t),
+			"::",
+			stringify!(__writers)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__wrphase_futex) as usize - ptr as usize },
+		8usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__pthread_rwlock_arch_t),
+			"::",
+			stringify!(__wrphase_futex)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__writers_futex) as usize - ptr as usize },
+		12usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__pthread_rwlock_arch_t),
+			"::",
+			stringify!(__writers_futex)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__pad3) as usize - ptr as usize },
+		16usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__pthread_rwlock_arch_t),
+			"::",
+			stringify!(__pad3)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__pad4) as usize - ptr as usize },
+		20usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__pthread_rwlock_arch_t),
+			"::",
+			stringify!(__pad4)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__cur_writer) as usize - ptr as usize },
+		24usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__pthread_rwlock_arch_t),
+			"::",
+			stringify!(__cur_writer)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__shared) as usize - ptr as usize },
+		28usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__pthread_rwlock_arch_t),
+			"::",
+			stringify!(__shared)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__rwelision) as usize - ptr as usize },
+		32usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__pthread_rwlock_arch_t),
+			"::",
+			stringify!(__rwelision)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__pad1) as usize - ptr as usize },
+		33usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__pthread_rwlock_arch_t),
+			"::",
+			stringify!(__pad1)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__pad2) as usize - ptr as usize },
+		40usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__pthread_rwlock_arch_t),
+			"::",
+			stringify!(__pad2)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__flags) as usize - ptr as usize },
+		48usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__pthread_rwlock_arch_t),
+			"::",
+			stringify!(__flags)
+		)
+	);
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct c__pthread_cond_s {
-    pub __wseq: c__atomic_wide_counter,
-    pub __g1_start: c__atomic_wide_counter,
-    pub __g_refs: [::std::os::raw::c_uint; 2usize],
-    pub __g_size: [::std::os::raw::c_uint; 2usize],
-    pub __g1_orig_size: ::std::os::raw::c_uint,
-    pub __wrefs: ::std::os::raw::c_uint,
-    pub __g_signals: [::std::os::raw::c_uint; 2usize],
+	pub __wseq: c__atomic_wide_counter,
+	pub __g1_start: c__atomic_wide_counter,
+	pub __g_refs: [::std::os::raw::c_uint; 2usize],
+	pub __g_size: [::std::os::raw::c_uint; 2usize],
+	pub __g1_orig_size: ::std::os::raw::c_uint,
+	pub __wrefs: ::std::os::raw::c_uint,
+	pub __g_signals: [::std::os::raw::c_uint; 2usize],
 }
 #[test]
 fn bindgen_test_layout_c__pthread_cond_s() {
-    const UNINIT: ::std::mem::MaybeUninit<c__pthread_cond_s> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<c__pthread_cond_s>(),
-        48usize,
-        concat!("Size of: ", stringify!(c__pthread_cond_s))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<c__pthread_cond_s>(),
-        8usize,
-        concat!("Alignment of ", stringify!(c__pthread_cond_s))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__wseq) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__pthread_cond_s),
-            "::",
-            stringify!(__wseq)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__g1_start) as usize - ptr as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__pthread_cond_s),
-            "::",
-            stringify!(__g1_start)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__g_refs) as usize - ptr as usize },
-        16usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__pthread_cond_s),
-            "::",
-            stringify!(__g_refs)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__g_size) as usize - ptr as usize },
-        24usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__pthread_cond_s),
-            "::",
-            stringify!(__g_size)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__g1_orig_size) as usize - ptr as usize },
-        32usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__pthread_cond_s),
-            "::",
-            stringify!(__g1_orig_size)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__wrefs) as usize - ptr as usize },
-        36usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__pthread_cond_s),
-            "::",
-            stringify!(__wrefs)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__g_signals) as usize - ptr as usize },
-        40usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__pthread_cond_s),
-            "::",
-            stringify!(__g_signals)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<c__pthread_cond_s> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<c__pthread_cond_s>(),
+		48usize,
+		concat!("Size of: ", stringify!(c__pthread_cond_s))
+	);
+	assert_eq!(
+		::std::mem::align_of::<c__pthread_cond_s>(),
+		8usize,
+		concat!("Alignment of ", stringify!(c__pthread_cond_s))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__wseq) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__pthread_cond_s),
+			"::",
+			stringify!(__wseq)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__g1_start) as usize - ptr as usize },
+		8usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__pthread_cond_s),
+			"::",
+			stringify!(__g1_start)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__g_refs) as usize - ptr as usize },
+		16usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__pthread_cond_s),
+			"::",
+			stringify!(__g_refs)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__g_size) as usize - ptr as usize },
+		24usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__pthread_cond_s),
+			"::",
+			stringify!(__g_size)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__g1_orig_size) as usize - ptr as usize },
+		32usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__pthread_cond_s),
+			"::",
+			stringify!(__g1_orig_size)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__wrefs) as usize - ptr as usize },
+		36usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__pthread_cond_s),
+			"::",
+			stringify!(__wrefs)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__g_signals) as usize - ptr as usize },
+		40usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__pthread_cond_s),
+			"::",
+			stringify!(__g_signals)
+		)
+	);
 }
 pub type c__tss_t = ::std::os::raw::c_uint;
 pub type c__thrd_t = ::std::os::raw::c_ulong;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct c__once_flag {
-    pub __data: ::std::os::raw::c_int,
+	pub __data: ::std::os::raw::c_int,
 }
 #[test]
 fn bindgen_test_layout_c__once_flag() {
-    const UNINIT: ::std::mem::MaybeUninit<c__once_flag> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<c__once_flag>(),
-        4usize,
-        concat!("Size of: ", stringify!(c__once_flag))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<c__once_flag>(),
-        4usize,
-        concat!("Alignment of ", stringify!(c__once_flag))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__data) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__once_flag),
-            "::",
-            stringify!(__data)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<c__once_flag> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<c__once_flag>(),
+		4usize,
+		concat!("Size of: ", stringify!(c__once_flag))
+	);
+	assert_eq!(
+		::std::mem::align_of::<c__once_flag>(),
+		4usize,
+		concat!("Alignment of ", stringify!(c__once_flag))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__data) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__once_flag),
+			"::",
+			stringify!(__data)
+		)
+	);
 }
 pub type cpthread_t = ::std::os::raw::c_ulong;
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub union cpthread_mutexattr_t {
-    pub __size: [::std::os::raw::c_char; 4usize],
-    pub __align: ::std::os::raw::c_int,
+	pub __size: [::std::os::raw::c_char; 4usize],
+	pub __align: ::std::os::raw::c_int,
 }
 #[test]
 fn bindgen_test_layout_cpthread_mutexattr_t() {
-    const UNINIT: ::std::mem::MaybeUninit<cpthread_mutexattr_t> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<cpthread_mutexattr_t>(),
-        4usize,
-        concat!("Size of: ", stringify!(cpthread_mutexattr_t))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cpthread_mutexattr_t>(),
-        4usize,
-        concat!("Alignment of ", stringify!(cpthread_mutexattr_t))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__size) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cpthread_mutexattr_t),
-            "::",
-            stringify!(__size)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__align) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cpthread_mutexattr_t),
-            "::",
-            stringify!(__align)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<cpthread_mutexattr_t> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<cpthread_mutexattr_t>(),
+		4usize,
+		concat!("Size of: ", stringify!(cpthread_mutexattr_t))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cpthread_mutexattr_t>(),
+		4usize,
+		concat!("Alignment of ", stringify!(cpthread_mutexattr_t))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__size) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cpthread_mutexattr_t),
+			"::",
+			stringify!(__size)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__align) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cpthread_mutexattr_t),
+			"::",
+			stringify!(__align)
+		)
+	);
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub union cpthread_condattr_t {
-    pub __size: [::std::os::raw::c_char; 4usize],
-    pub __align: ::std::os::raw::c_int,
+	pub __size: [::std::os::raw::c_char; 4usize],
+	pub __align: ::std::os::raw::c_int,
 }
 #[test]
 fn bindgen_test_layout_cpthread_condattr_t() {
-    const UNINIT: ::std::mem::MaybeUninit<cpthread_condattr_t> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<cpthread_condattr_t>(),
-        4usize,
-        concat!("Size of: ", stringify!(cpthread_condattr_t))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cpthread_condattr_t>(),
-        4usize,
-        concat!("Alignment of ", stringify!(cpthread_condattr_t))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__size) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cpthread_condattr_t),
-            "::",
-            stringify!(__size)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__align) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cpthread_condattr_t),
-            "::",
-            stringify!(__align)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<cpthread_condattr_t> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<cpthread_condattr_t>(),
+		4usize,
+		concat!("Size of: ", stringify!(cpthread_condattr_t))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cpthread_condattr_t>(),
+		4usize,
+		concat!("Alignment of ", stringify!(cpthread_condattr_t))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__size) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cpthread_condattr_t),
+			"::",
+			stringify!(__size)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__align) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cpthread_condattr_t),
+			"::",
+			stringify!(__align)
+		)
+	);
 }
 pub type cpthread_key_t = ::std::os::raw::c_uint;
 pub type cpthread_once_t = ::std::os::raw::c_int;
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub union cpthread_attr_t {
-    pub __size: [::std::os::raw::c_char; 56usize],
-    pub __align: ::std::os::raw::c_long,
+	pub __size: [::std::os::raw::c_char; 56usize],
+	pub __align: ::std::os::raw::c_long,
 }
 #[test]
 fn bindgen_test_layout_cpthread_attr_t() {
-    const UNINIT: ::std::mem::MaybeUninit<cpthread_attr_t> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<cpthread_attr_t>(),
-        56usize,
-        concat!("Size of: ", stringify!(cpthread_attr_t))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cpthread_attr_t>(),
-        8usize,
-        concat!("Alignment of ", stringify!(cpthread_attr_t))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__size) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cpthread_attr_t),
-            "::",
-            stringify!(__size)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__align) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cpthread_attr_t),
-            "::",
-            stringify!(__align)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<cpthread_attr_t> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<cpthread_attr_t>(),
+		56usize,
+		concat!("Size of: ", stringify!(cpthread_attr_t))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cpthread_attr_t>(),
+		8usize,
+		concat!("Alignment of ", stringify!(cpthread_attr_t))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__size) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cpthread_attr_t),
+			"::",
+			stringify!(__size)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__align) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cpthread_attr_t),
+			"::",
+			stringify!(__align)
+		)
+	);
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub union cpthread_mutex_t {
-    pub __data: c__pthread_mutex_s,
-    pub __size: [::std::os::raw::c_char; 40usize],
-    pub __align: ::std::os::raw::c_long,
+	pub __data: c__pthread_mutex_s,
+	pub __size: [::std::os::raw::c_char; 40usize],
+	pub __align: ::std::os::raw::c_long,
 }
 #[test]
 fn bindgen_test_layout_cpthread_mutex_t() {
-    const UNINIT: ::std::mem::MaybeUninit<cpthread_mutex_t> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<cpthread_mutex_t>(),
-        40usize,
-        concat!("Size of: ", stringify!(cpthread_mutex_t))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cpthread_mutex_t>(),
-        8usize,
-        concat!("Alignment of ", stringify!(cpthread_mutex_t))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__data) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cpthread_mutex_t),
-            "::",
-            stringify!(__data)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__size) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cpthread_mutex_t),
-            "::",
-            stringify!(__size)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__align) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cpthread_mutex_t),
-            "::",
-            stringify!(__align)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<cpthread_mutex_t> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<cpthread_mutex_t>(),
+		40usize,
+		concat!("Size of: ", stringify!(cpthread_mutex_t))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cpthread_mutex_t>(),
+		8usize,
+		concat!("Alignment of ", stringify!(cpthread_mutex_t))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__data) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cpthread_mutex_t),
+			"::",
+			stringify!(__data)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__size) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cpthread_mutex_t),
+			"::",
+			stringify!(__size)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__align) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cpthread_mutex_t),
+			"::",
+			stringify!(__align)
+		)
+	);
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub union cpthread_cond_t {
-    pub __data: c__pthread_cond_s,
-    pub __size: [::std::os::raw::c_char; 48usize],
-    pub __align: ::std::os::raw::c_longlong,
+	pub __data: c__pthread_cond_s,
+	pub __size: [::std::os::raw::c_char; 48usize],
+	pub __align: ::std::os::raw::c_longlong,
 }
 #[test]
 fn bindgen_test_layout_cpthread_cond_t() {
-    const UNINIT: ::std::mem::MaybeUninit<cpthread_cond_t> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<cpthread_cond_t>(),
-        48usize,
-        concat!("Size of: ", stringify!(cpthread_cond_t))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cpthread_cond_t>(),
-        8usize,
-        concat!("Alignment of ", stringify!(cpthread_cond_t))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__data) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cpthread_cond_t),
-            "::",
-            stringify!(__data)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__size) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cpthread_cond_t),
-            "::",
-            stringify!(__size)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__align) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cpthread_cond_t),
-            "::",
-            stringify!(__align)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<cpthread_cond_t> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<cpthread_cond_t>(),
+		48usize,
+		concat!("Size of: ", stringify!(cpthread_cond_t))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cpthread_cond_t>(),
+		8usize,
+		concat!("Alignment of ", stringify!(cpthread_cond_t))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__data) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cpthread_cond_t),
+			"::",
+			stringify!(__data)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__size) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cpthread_cond_t),
+			"::",
+			stringify!(__size)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__align) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cpthread_cond_t),
+			"::",
+			stringify!(__align)
+		)
+	);
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub union cpthread_rwlock_t {
-    pub __data: c__pthread_rwlock_arch_t,
-    pub __size: [::std::os::raw::c_char; 56usize],
-    pub __align: ::std::os::raw::c_long,
+	pub __data: c__pthread_rwlock_arch_t,
+	pub __size: [::std::os::raw::c_char; 56usize],
+	pub __align: ::std::os::raw::c_long,
 }
 #[test]
 fn bindgen_test_layout_cpthread_rwlock_t() {
-    const UNINIT: ::std::mem::MaybeUninit<cpthread_rwlock_t> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<cpthread_rwlock_t>(),
-        56usize,
-        concat!("Size of: ", stringify!(cpthread_rwlock_t))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cpthread_rwlock_t>(),
-        8usize,
-        concat!("Alignment of ", stringify!(cpthread_rwlock_t))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__data) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cpthread_rwlock_t),
-            "::",
-            stringify!(__data)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__size) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cpthread_rwlock_t),
-            "::",
-            stringify!(__size)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__align) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cpthread_rwlock_t),
-            "::",
-            stringify!(__align)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<cpthread_rwlock_t> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<cpthread_rwlock_t>(),
+		56usize,
+		concat!("Size of: ", stringify!(cpthread_rwlock_t))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cpthread_rwlock_t>(),
+		8usize,
+		concat!("Alignment of ", stringify!(cpthread_rwlock_t))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__data) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cpthread_rwlock_t),
+			"::",
+			stringify!(__data)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__size) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cpthread_rwlock_t),
+			"::",
+			stringify!(__size)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__align) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cpthread_rwlock_t),
+			"::",
+			stringify!(__align)
+		)
+	);
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub union cpthread_rwlockattr_t {
-    pub __size: [::std::os::raw::c_char; 8usize],
-    pub __align: ::std::os::raw::c_long,
+	pub __size: [::std::os::raw::c_char; 8usize],
+	pub __align: ::std::os::raw::c_long,
 }
 #[test]
 fn bindgen_test_layout_cpthread_rwlockattr_t() {
-    const UNINIT: ::std::mem::MaybeUninit<cpthread_rwlockattr_t> =
-        ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<cpthread_rwlockattr_t>(),
-        8usize,
-        concat!("Size of: ", stringify!(cpthread_rwlockattr_t))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cpthread_rwlockattr_t>(),
-        8usize,
-        concat!("Alignment of ", stringify!(cpthread_rwlockattr_t))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__size) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cpthread_rwlockattr_t),
-            "::",
-            stringify!(__size)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__align) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cpthread_rwlockattr_t),
-            "::",
-            stringify!(__align)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<cpthread_rwlockattr_t> =
+		::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<cpthread_rwlockattr_t>(),
+		8usize,
+		concat!("Size of: ", stringify!(cpthread_rwlockattr_t))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cpthread_rwlockattr_t>(),
+		8usize,
+		concat!("Alignment of ", stringify!(cpthread_rwlockattr_t))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__size) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cpthread_rwlockattr_t),
+			"::",
+			stringify!(__size)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__align) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cpthread_rwlockattr_t),
+			"::",
+			stringify!(__align)
+		)
+	);
 }
 pub type cpthread_spinlock_t = ::std::os::raw::c_int;
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub union cpthread_barrier_t {
-    pub __size: [::std::os::raw::c_char; 32usize],
-    pub __align: ::std::os::raw::c_long,
+	pub __size: [::std::os::raw::c_char; 32usize],
+	pub __align: ::std::os::raw::c_long,
 }
 #[test]
 fn bindgen_test_layout_cpthread_barrier_t() {
-    const UNINIT: ::std::mem::MaybeUninit<cpthread_barrier_t> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<cpthread_barrier_t>(),
-        32usize,
-        concat!("Size of: ", stringify!(cpthread_barrier_t))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cpthread_barrier_t>(),
-        8usize,
-        concat!("Alignment of ", stringify!(cpthread_barrier_t))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__size) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cpthread_barrier_t),
-            "::",
-            stringify!(__size)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__align) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cpthread_barrier_t),
-            "::",
-            stringify!(__align)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<cpthread_barrier_t> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<cpthread_barrier_t>(),
+		32usize,
+		concat!("Size of: ", stringify!(cpthread_barrier_t))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cpthread_barrier_t>(),
+		8usize,
+		concat!("Alignment of ", stringify!(cpthread_barrier_t))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__size) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cpthread_barrier_t),
+			"::",
+			stringify!(__size)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__align) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cpthread_barrier_t),
+			"::",
+			stringify!(__align)
+		)
+	);
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub union cpthread_barrierattr_t {
-    pub __size: [::std::os::raw::c_char; 4usize],
-    pub __align: ::std::os::raw::c_int,
+	pub __size: [::std::os::raw::c_char; 4usize],
+	pub __align: ::std::os::raw::c_int,
 }
 #[test]
 fn bindgen_test_layout_cpthread_barrierattr_t() {
-    const UNINIT: ::std::mem::MaybeUninit<cpthread_barrierattr_t> =
-        ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<cpthread_barrierattr_t>(),
-        4usize,
-        concat!("Size of: ", stringify!(cpthread_barrierattr_t))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cpthread_barrierattr_t>(),
-        4usize,
-        concat!("Alignment of ", stringify!(cpthread_barrierattr_t))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__size) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cpthread_barrierattr_t),
-            "::",
-            stringify!(__size)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__align) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cpthread_barrierattr_t),
-            "::",
-            stringify!(__align)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<cpthread_barrierattr_t> =
+		::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<cpthread_barrierattr_t>(),
+		4usize,
+		concat!("Size of: ", stringify!(cpthread_barrierattr_t))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cpthread_barrierattr_t>(),
+		4usize,
+		concat!("Alignment of ", stringify!(cpthread_barrierattr_t))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__size) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cpthread_barrierattr_t),
+			"::",
+			stringify!(__size)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__align) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cpthread_barrierattr_t),
+			"::",
+			stringify!(__align)
+		)
+	);
 }
 extern "C" {
-    #[link_name = "\u{1}random"]
-    pub fn crandom() -> ::std::os::raw::c_long;
+	#[link_name = "\u{1}random"]
+	pub fn crandom() -> ::std::os::raw::c_long;
 }
 extern "C" {
-    #[link_name = "\u{1}srandom"]
-    pub fn csrandom(__seed: ::std::os::raw::c_uint);
+	#[link_name = "\u{1}srandom"]
+	pub fn csrandom(__seed: ::std::os::raw::c_uint);
 }
 extern "C" {
-    #[link_name = "\u{1}initstate"]
-    pub fn cinitstate(
-        __seed: ::std::os::raw::c_uint,
-        __statebuf: *mut ::std::os::raw::c_char,
-        __statelen: usize,
-    ) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}initstate"]
+	pub fn cinitstate(
+		__seed: ::std::os::raw::c_uint, __statebuf: *mut ::std::os::raw::c_char, __statelen: usize,
+	) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[link_name = "\u{1}setstate"]
-    pub fn csetstate(__statebuf: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}setstate"]
+	pub fn csetstate(__statebuf: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct crandom_data {
-    pub fptr: *mut i32,
-    pub rptr: *mut i32,
-    pub state: *mut i32,
-    pub rand_type: ::std::os::raw::c_int,
-    pub rand_deg: ::std::os::raw::c_int,
-    pub rand_sep: ::std::os::raw::c_int,
-    pub end_ptr: *mut i32,
+	pub fptr: *mut i32,
+	pub rptr: *mut i32,
+	pub state: *mut i32,
+	pub rand_type: ::std::os::raw::c_int,
+	pub rand_deg: ::std::os::raw::c_int,
+	pub rand_sep: ::std::os::raw::c_int,
+	pub end_ptr: *mut i32,
 }
 #[test]
 fn bindgen_test_layout_crandom_data() {
-    const UNINIT: ::std::mem::MaybeUninit<crandom_data> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<crandom_data>(),
-        48usize,
-        concat!("Size of: ", stringify!(crandom_data))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<crandom_data>(),
-        8usize,
-        concat!("Alignment of ", stringify!(crandom_data))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).fptr) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(crandom_data),
-            "::",
-            stringify!(fptr)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).rptr) as usize - ptr as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(crandom_data),
-            "::",
-            stringify!(rptr)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).state) as usize - ptr as usize },
-        16usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(crandom_data),
-            "::",
-            stringify!(state)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).rand_type) as usize - ptr as usize },
-        24usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(crandom_data),
-            "::",
-            stringify!(rand_type)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).rand_deg) as usize - ptr as usize },
-        28usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(crandom_data),
-            "::",
-            stringify!(rand_deg)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).rand_sep) as usize - ptr as usize },
-        32usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(crandom_data),
-            "::",
-            stringify!(rand_sep)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).end_ptr) as usize - ptr as usize },
-        40usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(crandom_data),
-            "::",
-            stringify!(end_ptr)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<crandom_data> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<crandom_data>(),
+		48usize,
+		concat!("Size of: ", stringify!(crandom_data))
+	);
+	assert_eq!(
+		::std::mem::align_of::<crandom_data>(),
+		8usize,
+		concat!("Alignment of ", stringify!(crandom_data))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).fptr) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(crandom_data),
+			"::",
+			stringify!(fptr)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).rptr) as usize - ptr as usize },
+		8usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(crandom_data),
+			"::",
+			stringify!(rptr)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).state) as usize - ptr as usize },
+		16usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(crandom_data),
+			"::",
+			stringify!(state)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).rand_type) as usize - ptr as usize },
+		24usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(crandom_data),
+			"::",
+			stringify!(rand_type)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).rand_deg) as usize - ptr as usize },
+		28usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(crandom_data),
+			"::",
+			stringify!(rand_deg)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).rand_sep) as usize - ptr as usize },
+		32usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(crandom_data),
+			"::",
+			stringify!(rand_sep)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).end_ptr) as usize - ptr as usize },
+		40usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(crandom_data),
+			"::",
+			stringify!(end_ptr)
+		)
+	);
 }
 extern "C" {
-    #[link_name = "\u{1}random_r"]
-    pub fn crandom_r(__buf: *mut crandom_data, __result: *mut i32) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}random_r"]
+	pub fn crandom_r(__buf: *mut crandom_data, __result: *mut i32) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}srandom_r"]
-    pub fn csrandom_r(
-        __seed: ::std::os::raw::c_uint,
-        __buf: *mut crandom_data,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}srandom_r"]
+	pub fn csrandom_r(
+		__seed: ::std::os::raw::c_uint, __buf: *mut crandom_data,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}initstate_r"]
-    pub fn cinitstate_r(
-        __seed: ::std::os::raw::c_uint,
-        __statebuf: *mut ::std::os::raw::c_char,
-        __statelen: usize,
-        __buf: *mut crandom_data,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}initstate_r"]
+	pub fn cinitstate_r(
+		__seed: ::std::os::raw::c_uint, __statebuf: *mut ::std::os::raw::c_char, __statelen: usize,
+		__buf: *mut crandom_data,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}setstate_r"]
-    pub fn csetstate_r(
-        __statebuf: *mut ::std::os::raw::c_char,
-        __buf: *mut crandom_data,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}setstate_r"]
+	pub fn csetstate_r(
+		__statebuf: *mut ::std::os::raw::c_char, __buf: *mut crandom_data,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}rand"]
-    pub fn crand() -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}rand"]
+	pub fn crand() -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}srand"]
-    pub fn csrand(__seed: ::std::os::raw::c_uint);
+	#[link_name = "\u{1}srand"]
+	pub fn csrand(__seed: ::std::os::raw::c_uint);
 }
 extern "C" {
-    #[link_name = "\u{1}rand_r"]
-    pub fn crand_r(__seed: *mut ::std::os::raw::c_uint) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}rand_r"]
+	pub fn crand_r(__seed: *mut ::std::os::raw::c_uint) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}drand48"]
-    pub fn cdrand48() -> f64;
+	#[link_name = "\u{1}drand48"]
+	pub fn cdrand48() -> f64;
 }
 extern "C" {
-    #[link_name = "\u{1}erand48"]
-    pub fn cerand48(__xsubi: *mut ::std::os::raw::c_ushort) -> f64;
+	#[link_name = "\u{1}erand48"]
+	pub fn cerand48(__xsubi: *mut ::std::os::raw::c_ushort) -> f64;
 }
 extern "C" {
-    #[link_name = "\u{1}lrand48"]
-    pub fn clrand48() -> ::std::os::raw::c_long;
+	#[link_name = "\u{1}lrand48"]
+	pub fn clrand48() -> ::std::os::raw::c_long;
 }
 extern "C" {
-    #[link_name = "\u{1}nrand48"]
-    pub fn cnrand48(__xsubi: *mut ::std::os::raw::c_ushort) -> ::std::os::raw::c_long;
+	#[link_name = "\u{1}nrand48"]
+	pub fn cnrand48(__xsubi: *mut ::std::os::raw::c_ushort) -> ::std::os::raw::c_long;
 }
 extern "C" {
-    #[link_name = "\u{1}mrand48"]
-    pub fn cmrand48() -> ::std::os::raw::c_long;
+	#[link_name = "\u{1}mrand48"]
+	pub fn cmrand48() -> ::std::os::raw::c_long;
 }
 extern "C" {
-    #[link_name = "\u{1}jrand48"]
-    pub fn cjrand48(__xsubi: *mut ::std::os::raw::c_ushort) -> ::std::os::raw::c_long;
+	#[link_name = "\u{1}jrand48"]
+	pub fn cjrand48(__xsubi: *mut ::std::os::raw::c_ushort) -> ::std::os::raw::c_long;
 }
 extern "C" {
-    #[link_name = "\u{1}srand48"]
-    pub fn csrand48(__seedval: ::std::os::raw::c_long);
+	#[link_name = "\u{1}srand48"]
+	pub fn csrand48(__seedval: ::std::os::raw::c_long);
 }
 extern "C" {
-    #[link_name = "\u{1}seed48"]
-    pub fn cseed48(__seed16v: *mut ::std::os::raw::c_ushort) -> *mut ::std::os::raw::c_ushort;
+	#[link_name = "\u{1}seed48"]
+	pub fn cseed48(__seed16v: *mut ::std::os::raw::c_ushort) -> *mut ::std::os::raw::c_ushort;
 }
 extern "C" {
-    #[link_name = "\u{1}lcong48"]
-    pub fn clcong48(__param: *mut ::std::os::raw::c_ushort);
+	#[link_name = "\u{1}lcong48"]
+	pub fn clcong48(__param: *mut ::std::os::raw::c_ushort);
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct cdrand48_data {
-    pub __x: [::std::os::raw::c_ushort; 3usize],
-    pub __old_x: [::std::os::raw::c_ushort; 3usize],
-    pub __c: ::std::os::raw::c_ushort,
-    pub __init: ::std::os::raw::c_ushort,
-    pub __a: ::std::os::raw::c_ulonglong,
+	pub __x: [::std::os::raw::c_ushort; 3usize],
+	pub __old_x: [::std::os::raw::c_ushort; 3usize],
+	pub __c: ::std::os::raw::c_ushort,
+	pub __init: ::std::os::raw::c_ushort,
+	pub __a: ::std::os::raw::c_ulonglong,
 }
 #[test]
 fn bindgen_test_layout_cdrand48_data() {
-    const UNINIT: ::std::mem::MaybeUninit<cdrand48_data> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<cdrand48_data>(),
-        24usize,
-        concat!("Size of: ", stringify!(cdrand48_data))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cdrand48_data>(),
-        8usize,
-        concat!("Alignment of ", stringify!(cdrand48_data))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__x) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cdrand48_data),
-            "::",
-            stringify!(__x)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__old_x) as usize - ptr as usize },
-        6usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cdrand48_data),
-            "::",
-            stringify!(__old_x)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__c) as usize - ptr as usize },
-        12usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cdrand48_data),
-            "::",
-            stringify!(__c)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__init) as usize - ptr as usize },
-        14usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cdrand48_data),
-            "::",
-            stringify!(__init)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__a) as usize - ptr as usize },
-        16usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cdrand48_data),
-            "::",
-            stringify!(__a)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<cdrand48_data> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<cdrand48_data>(),
+		24usize,
+		concat!("Size of: ", stringify!(cdrand48_data))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cdrand48_data>(),
+		8usize,
+		concat!("Alignment of ", stringify!(cdrand48_data))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__x) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cdrand48_data),
+			"::",
+			stringify!(__x)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__old_x) as usize - ptr as usize },
+		6usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cdrand48_data),
+			"::",
+			stringify!(__old_x)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__c) as usize - ptr as usize },
+		12usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cdrand48_data),
+			"::",
+			stringify!(__c)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__init) as usize - ptr as usize },
+		14usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cdrand48_data),
+			"::",
+			stringify!(__init)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__a) as usize - ptr as usize },
+		16usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cdrand48_data),
+			"::",
+			stringify!(__a)
+		)
+	);
 }
 extern "C" {
-    #[link_name = "\u{1}drand48_r"]
-    pub fn cdrand48_r(__buffer: *mut cdrand48_data, __result: *mut f64) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}drand48_r"]
+	pub fn cdrand48_r(__buffer: *mut cdrand48_data, __result: *mut f64) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}erand48_r"]
-    pub fn cerand48_r(
-        __xsubi: *mut ::std::os::raw::c_ushort,
-        __buffer: *mut cdrand48_data,
-        __result: *mut f64,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}erand48_r"]
+	pub fn cerand48_r(
+		__xsubi: *mut ::std::os::raw::c_ushort, __buffer: *mut cdrand48_data, __result: *mut f64,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}lrand48_r"]
-    pub fn clrand48_r(
-        __buffer: *mut cdrand48_data,
-        __result: *mut ::std::os::raw::c_long,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}lrand48_r"]
+	pub fn clrand48_r(
+		__buffer: *mut cdrand48_data, __result: *mut ::std::os::raw::c_long,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}nrand48_r"]
-    pub fn cnrand48_r(
-        __xsubi: *mut ::std::os::raw::c_ushort,
-        __buffer: *mut cdrand48_data,
-        __result: *mut ::std::os::raw::c_long,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}nrand48_r"]
+	pub fn cnrand48_r(
+		__xsubi: *mut ::std::os::raw::c_ushort, __buffer: *mut cdrand48_data,
+		__result: *mut ::std::os::raw::c_long,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}mrand48_r"]
-    pub fn cmrand48_r(
-        __buffer: *mut cdrand48_data,
-        __result: *mut ::std::os::raw::c_long,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}mrand48_r"]
+	pub fn cmrand48_r(
+		__buffer: *mut cdrand48_data, __result: *mut ::std::os::raw::c_long,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}jrand48_r"]
-    pub fn cjrand48_r(
-        __xsubi: *mut ::std::os::raw::c_ushort,
-        __buffer: *mut cdrand48_data,
-        __result: *mut ::std::os::raw::c_long,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}jrand48_r"]
+	pub fn cjrand48_r(
+		__xsubi: *mut ::std::os::raw::c_ushort, __buffer: *mut cdrand48_data,
+		__result: *mut ::std::os::raw::c_long,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}srand48_r"]
-    pub fn csrand48_r(
-        __seedval: ::std::os::raw::c_long,
-        __buffer: *mut cdrand48_data,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}srand48_r"]
+	pub fn csrand48_r(
+		__seedval: ::std::os::raw::c_long, __buffer: *mut cdrand48_data,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}seed48_r"]
-    pub fn cseed48_r(
-        __seed16v: *mut ::std::os::raw::c_ushort,
-        __buffer: *mut cdrand48_data,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}seed48_r"]
+	pub fn cseed48_r(
+		__seed16v: *mut ::std::os::raw::c_ushort, __buffer: *mut cdrand48_data,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}lcong48_r"]
-    pub fn clcong48_r(
-        __param: *mut ::std::os::raw::c_ushort,
-        __buffer: *mut cdrand48_data,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}lcong48_r"]
+	pub fn clcong48_r(
+		__param: *mut ::std::os::raw::c_ushort, __buffer: *mut cdrand48_data,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}arc4random"]
-    pub fn carc4random() -> c__uint32_t;
+	#[link_name = "\u{1}arc4random"]
+	pub fn carc4random() -> c__uint32_t;
 }
 extern "C" {
-    #[link_name = "\u{1}arc4random_buf"]
-    pub fn carc4random_buf(__buf: *mut ::std::os::raw::c_void, __size: usize);
+	#[link_name = "\u{1}arc4random_buf"]
+	pub fn carc4random_buf(__buf: *mut ::std::os::raw::c_void, __size: usize);
 }
 extern "C" {
-    #[link_name = "\u{1}arc4random_uniform"]
-    pub fn carc4random_uniform(__upper_bound: c__uint32_t) -> c__uint32_t;
+	#[link_name = "\u{1}arc4random_uniform"]
+	pub fn carc4random_uniform(__upper_bound: c__uint32_t) -> c__uint32_t;
 }
 extern "C" {
-    #[link_name = "\u{1}malloc"]
-    pub fn cmalloc(__size: ::std::os::raw::c_ulong) -> *mut ::std::os::raw::c_void;
+	#[link_name = "\u{1}malloc"]
+	pub fn cmalloc(__size: ::std::os::raw::c_ulong) -> *mut ::std::os::raw::c_void;
 }
 extern "C" {
-    #[link_name = "\u{1}calloc"]
-    pub fn ccalloc(
-        __nmemb: ::std::os::raw::c_ulong,
-        __size: ::std::os::raw::c_ulong,
-    ) -> *mut ::std::os::raw::c_void;
+	#[link_name = "\u{1}calloc"]
+	pub fn ccalloc(
+		__nmemb: ::std::os::raw::c_ulong, __size: ::std::os::raw::c_ulong,
+	) -> *mut ::std::os::raw::c_void;
 }
 extern "C" {
-    #[link_name = "\u{1}realloc"]
-    pub fn crealloc(
-        __ptr: *mut ::std::os::raw::c_void,
-        __size: ::std::os::raw::c_ulong,
-    ) -> *mut ::std::os::raw::c_void;
+	#[link_name = "\u{1}realloc"]
+	pub fn crealloc(
+		__ptr: *mut ::std::os::raw::c_void, __size: ::std::os::raw::c_ulong,
+	) -> *mut ::std::os::raw::c_void;
 }
 extern "C" {
-    #[link_name = "\u{1}free"]
-    pub fn cfree(__ptr: *mut ::std::os::raw::c_void);
+	#[link_name = "\u{1}free"]
+	pub fn cfree(__ptr: *mut ::std::os::raw::c_void);
 }
 extern "C" {
-    #[link_name = "\u{1}reallocarray"]
-    pub fn creallocarray(
-        __ptr: *mut ::std::os::raw::c_void,
-        __nmemb: usize,
-        __size: usize,
-    ) -> *mut ::std::os::raw::c_void;
+	#[link_name = "\u{1}reallocarray"]
+	pub fn creallocarray(
+		__ptr: *mut ::std::os::raw::c_void, __nmemb: usize, __size: usize,
+	) -> *mut ::std::os::raw::c_void;
 }
 extern "C" {
-    #[link_name = "\u{1}alloca"]
-    pub fn calloca(__size: ::std::os::raw::c_ulong) -> *mut ::std::os::raw::c_void;
+	#[link_name = "\u{1}alloca"]
+	pub fn calloca(__size: ::std::os::raw::c_ulong) -> *mut ::std::os::raw::c_void;
 }
 extern "C" {
-    #[link_name = "\u{1}valloc"]
-    pub fn cvalloc(__size: usize) -> *mut ::std::os::raw::c_void;
+	#[link_name = "\u{1}valloc"]
+	pub fn cvalloc(__size: usize) -> *mut ::std::os::raw::c_void;
 }
 extern "C" {
-    #[link_name = "\u{1}posix_memalign"]
-    pub fn cposix_memalign(
-        __memptr: *mut *mut ::std::os::raw::c_void,
-        __alignment: usize,
-        __size: usize,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}posix_memalign"]
+	pub fn cposix_memalign(
+		__memptr: *mut *mut ::std::os::raw::c_void, __alignment: usize, __size: usize,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}aligned_alloc"]
-    pub fn caligned_alloc(
-        __alignment: ::std::os::raw::c_ulong,
-        __size: ::std::os::raw::c_ulong,
-    ) -> *mut ::std::os::raw::c_void;
+	#[link_name = "\u{1}aligned_alloc"]
+	pub fn caligned_alloc(
+		__alignment: ::std::os::raw::c_ulong, __size: ::std::os::raw::c_ulong,
+	) -> *mut ::std::os::raw::c_void;
 }
 extern "C" {
-    #[link_name = "\u{1}abort"]
-    pub fn cabort() -> !;
+	#[link_name = "\u{1}abort"]
+	pub fn cabort() -> !;
 }
 extern "C" {
-    #[link_name = "\u{1}atexit"]
-    pub fn catexit(__func: ::std::option::Option<unsafe extern "C" fn()>) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}atexit"]
+	pub fn catexit(__func: ::std::option::Option<unsafe extern "C" fn()>) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}at_quick_exit"]
-    pub fn cat_quick_exit(
-        __func: ::std::option::Option<unsafe extern "C" fn()>,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}at_quick_exit"]
+	pub fn cat_quick_exit(
+		__func: ::std::option::Option<unsafe extern "C" fn()>,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}on_exit"]
-    pub fn con_exit(
-        __func: ::std::option::Option<
-            unsafe extern "C" fn(
-                __status: ::std::os::raw::c_int,
-                __arg: *mut ::std::os::raw::c_void,
-            ),
-        >,
-        __arg: *mut ::std::os::raw::c_void,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}on_exit"]
+	pub fn con_exit(
+		__func: ::std::option::Option<
+			unsafe extern "C" fn(
+				__status: ::std::os::raw::c_int,
+				__arg: *mut ::std::os::raw::c_void,
+			),
+		>,
+		__arg: *mut ::std::os::raw::c_void,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}exit"]
-    pub fn cexit(__status: ::std::os::raw::c_int) -> !;
+	#[link_name = "\u{1}exit"]
+	pub fn cexit(__status: ::std::os::raw::c_int) -> !;
 }
 extern "C" {
-    #[link_name = "\u{1}quick_exit"]
-    pub fn cquick_exit(__status: ::std::os::raw::c_int) -> !;
+	#[link_name = "\u{1}quick_exit"]
+	pub fn cquick_exit(__status: ::std::os::raw::c_int) -> !;
 }
 extern "C" {
-    #[link_name = "\u{1}_Exit"]
-    pub fn c_Exit(__status: ::std::os::raw::c_int) -> !;
+	#[link_name = "\u{1}_Exit"]
+	pub fn c_Exit(__status: ::std::os::raw::c_int) -> !;
 }
 extern "C" {
-    #[link_name = "\u{1}getenv"]
-    pub fn cgetenv(__name: *const ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}getenv"]
+	pub fn cgetenv(__name: *const ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[link_name = "\u{1}putenv"]
-    pub fn cputenv(__string: *mut ::std::os::raw::c_char) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}putenv"]
+	pub fn cputenv(__string: *mut ::std::os::raw::c_char) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}setenv"]
-    pub fn csetenv(
-        __name: *const ::std::os::raw::c_char,
-        __value: *const ::std::os::raw::c_char,
-        __replace: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}setenv"]
+	pub fn csetenv(
+		__name: *const ::std::os::raw::c_char, __value: *const ::std::os::raw::c_char,
+		__replace: ::std::os::raw::c_int,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}unsetenv"]
-    pub fn cunsetenv(__name: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}unsetenv"]
+	pub fn cunsetenv(__name: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}clearenv"]
-    pub fn cclearenv() -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}clearenv"]
+	pub fn cclearenv() -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}mktemp"]
-    pub fn cmktemp(__template: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}mktemp"]
+	pub fn cmktemp(__template: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[link_name = "\u{1}mkstemp"]
-    pub fn cmkstemp(__template: *mut ::std::os::raw::c_char) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}mkstemp"]
+	pub fn cmkstemp(__template: *mut ::std::os::raw::c_char) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}mkstemps"]
-    pub fn cmkstemps(
-        __template: *mut ::std::os::raw::c_char,
-        __suffixlen: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}mkstemps"]
+	pub fn cmkstemps(
+		__template: *mut ::std::os::raw::c_char, __suffixlen: ::std::os::raw::c_int,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}mkdtemp"]
-    pub fn cmkdtemp(__template: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}mkdtemp"]
+	pub fn cmkdtemp(__template: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[link_name = "\u{1}system"]
-    pub fn csystem(__command: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}system"]
+	pub fn csystem(__command: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}realpath"]
-    pub fn crealpath(
-        __name: *const ::std::os::raw::c_char,
-        __resolved: *mut ::std::os::raw::c_char,
-    ) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}realpath"]
+	pub fn crealpath(
+		__name: *const ::std::os::raw::c_char, __resolved: *mut ::std::os::raw::c_char,
+	) -> *mut ::std::os::raw::c_char;
 }
 pub type c__compar_fn_t = ::std::option::Option<
-    unsafe extern "C" fn(
-        arg1: *const ::std::os::raw::c_void,
-        arg2: *const ::std::os::raw::c_void,
-    ) -> ::std::os::raw::c_int,
+	unsafe extern "C" fn(
+		arg1: *const ::std::os::raw::c_void,
+		arg2: *const ::std::os::raw::c_void,
+	) -> ::std::os::raw::c_int,
 >;
 extern "C" {
-    #[link_name = "\u{1}bsearch"]
-    pub fn cbsearch(
-        __key: *const ::std::os::raw::c_void,
-        __base: *const ::std::os::raw::c_void,
-        __nmemb: usize,
-        __size: usize,
-        __compar: c__compar_fn_t,
-    ) -> *mut ::std::os::raw::c_void;
+	#[link_name = "\u{1}bsearch"]
+	pub fn cbsearch(
+		__key: *const ::std::os::raw::c_void, __base: *const ::std::os::raw::c_void,
+		__nmemb: usize, __size: usize, __compar: c__compar_fn_t,
+	) -> *mut ::std::os::raw::c_void;
 }
 extern "C" {
-    #[link_name = "\u{1}qsort"]
-    pub fn cqsort(
-        __base: *mut ::std::os::raw::c_void,
-        __nmemb: usize,
-        __size: usize,
-        __compar: c__compar_fn_t,
-    );
+	#[link_name = "\u{1}qsort"]
+	pub fn cqsort(
+		__base: *mut ::std::os::raw::c_void, __nmemb: usize, __size: usize,
+		__compar: c__compar_fn_t,
+	);
 }
 extern "C" {
-    #[link_name = "\u{1}abs"]
-    pub fn cabs(__x: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}abs"]
+	pub fn cabs(__x: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}labs"]
-    pub fn clabs(__x: ::std::os::raw::c_long) -> ::std::os::raw::c_long;
+	#[link_name = "\u{1}labs"]
+	pub fn clabs(__x: ::std::os::raw::c_long) -> ::std::os::raw::c_long;
 }
 extern "C" {
-    #[link_name = "\u{1}llabs"]
-    pub fn cllabs(__x: ::std::os::raw::c_longlong) -> ::std::os::raw::c_longlong;
+	#[link_name = "\u{1}llabs"]
+	pub fn cllabs(__x: ::std::os::raw::c_longlong) -> ::std::os::raw::c_longlong;
 }
 extern "C" {
-    #[link_name = "\u{1}div"]
-    pub fn cdiv(__numer: ::std::os::raw::c_int, __denom: ::std::os::raw::c_int) -> cdiv_t;
+	#[link_name = "\u{1}div"]
+	pub fn cdiv(__numer: ::std::os::raw::c_int, __denom: ::std::os::raw::c_int) -> cdiv_t;
 }
 extern "C" {
-    #[link_name = "\u{1}ldiv"]
-    pub fn cldiv(__numer: ::std::os::raw::c_long, __denom: ::std::os::raw::c_long) -> cldiv_t;
+	#[link_name = "\u{1}ldiv"]
+	pub fn cldiv(__numer: ::std::os::raw::c_long, __denom: ::std::os::raw::c_long) -> cldiv_t;
 }
 extern "C" {
-    #[link_name = "\u{1}lldiv"]
-    pub fn clldiv(
-        __numer: ::std::os::raw::c_longlong,
-        __denom: ::std::os::raw::c_longlong,
-    ) -> clldiv_t;
+	#[link_name = "\u{1}lldiv"]
+	pub fn clldiv(
+		__numer: ::std::os::raw::c_longlong, __denom: ::std::os::raw::c_longlong,
+	) -> clldiv_t;
 }
 extern "C" {
-    #[link_name = "\u{1}ecvt"]
-    pub fn cecvt(
-        __value: f64,
-        __ndigit: ::std::os::raw::c_int,
-        __decpt: *mut ::std::os::raw::c_int,
-        __sign: *mut ::std::os::raw::c_int,
-    ) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}ecvt"]
+	pub fn cecvt(
+		__value: f64, __ndigit: ::std::os::raw::c_int, __decpt: *mut ::std::os::raw::c_int,
+		__sign: *mut ::std::os::raw::c_int,
+	) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[link_name = "\u{1}fcvt"]
-    pub fn cfcvt(
-        __value: f64,
-        __ndigit: ::std::os::raw::c_int,
-        __decpt: *mut ::std::os::raw::c_int,
-        __sign: *mut ::std::os::raw::c_int,
-    ) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}fcvt"]
+	pub fn cfcvt(
+		__value: f64, __ndigit: ::std::os::raw::c_int, __decpt: *mut ::std::os::raw::c_int,
+		__sign: *mut ::std::os::raw::c_int,
+	) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[link_name = "\u{1}gcvt"]
-    pub fn cgcvt(
-        __value: f64,
-        __ndigit: ::std::os::raw::c_int,
-        __buf: *mut ::std::os::raw::c_char,
-    ) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}gcvt"]
+	pub fn cgcvt(
+		__value: f64, __ndigit: ::std::os::raw::c_int, __buf: *mut ::std::os::raw::c_char,
+	) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[link_name = "\u{1}qecvt"]
-    pub fn cqecvt(
-        __value: u128,
-        __ndigit: ::std::os::raw::c_int,
-        __decpt: *mut ::std::os::raw::c_int,
-        __sign: *mut ::std::os::raw::c_int,
-    ) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}qecvt"]
+	pub fn cqecvt(
+		__value: u128, __ndigit: ::std::os::raw::c_int, __decpt: *mut ::std::os::raw::c_int,
+		__sign: *mut ::std::os::raw::c_int,
+	) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[link_name = "\u{1}qfcvt"]
-    pub fn cqfcvt(
-        __value: u128,
-        __ndigit: ::std::os::raw::c_int,
-        __decpt: *mut ::std::os::raw::c_int,
-        __sign: *mut ::std::os::raw::c_int,
-    ) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}qfcvt"]
+	pub fn cqfcvt(
+		__value: u128, __ndigit: ::std::os::raw::c_int, __decpt: *mut ::std::os::raw::c_int,
+		__sign: *mut ::std::os::raw::c_int,
+	) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[link_name = "\u{1}qgcvt"]
-    pub fn cqgcvt(
-        __value: u128,
-        __ndigit: ::std::os::raw::c_int,
-        __buf: *mut ::std::os::raw::c_char,
-    ) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}qgcvt"]
+	pub fn cqgcvt(
+		__value: u128, __ndigit: ::std::os::raw::c_int, __buf: *mut ::std::os::raw::c_char,
+	) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[link_name = "\u{1}ecvt_r"]
-    pub fn cecvt_r(
-        __value: f64,
-        __ndigit: ::std::os::raw::c_int,
-        __decpt: *mut ::std::os::raw::c_int,
-        __sign: *mut ::std::os::raw::c_int,
-        __buf: *mut ::std::os::raw::c_char,
-        __len: usize,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}ecvt_r"]
+	pub fn cecvt_r(
+		__value: f64, __ndigit: ::std::os::raw::c_int, __decpt: *mut ::std::os::raw::c_int,
+		__sign: *mut ::std::os::raw::c_int, __buf: *mut ::std::os::raw::c_char, __len: usize,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}fcvt_r"]
-    pub fn cfcvt_r(
-        __value: f64,
-        __ndigit: ::std::os::raw::c_int,
-        __decpt: *mut ::std::os::raw::c_int,
-        __sign: *mut ::std::os::raw::c_int,
-        __buf: *mut ::std::os::raw::c_char,
-        __len: usize,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}fcvt_r"]
+	pub fn cfcvt_r(
+		__value: f64, __ndigit: ::std::os::raw::c_int, __decpt: *mut ::std::os::raw::c_int,
+		__sign: *mut ::std::os::raw::c_int, __buf: *mut ::std::os::raw::c_char, __len: usize,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}qecvt_r"]
-    pub fn cqecvt_r(
-        __value: u128,
-        __ndigit: ::std::os::raw::c_int,
-        __decpt: *mut ::std::os::raw::c_int,
-        __sign: *mut ::std::os::raw::c_int,
-        __buf: *mut ::std::os::raw::c_char,
-        __len: usize,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}qecvt_r"]
+	pub fn cqecvt_r(
+		__value: u128, __ndigit: ::std::os::raw::c_int, __decpt: *mut ::std::os::raw::c_int,
+		__sign: *mut ::std::os::raw::c_int, __buf: *mut ::std::os::raw::c_char, __len: usize,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}qfcvt_r"]
-    pub fn cqfcvt_r(
-        __value: u128,
-        __ndigit: ::std::os::raw::c_int,
-        __decpt: *mut ::std::os::raw::c_int,
-        __sign: *mut ::std::os::raw::c_int,
-        __buf: *mut ::std::os::raw::c_char,
-        __len: usize,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}qfcvt_r"]
+	pub fn cqfcvt_r(
+		__value: u128, __ndigit: ::std::os::raw::c_int, __decpt: *mut ::std::os::raw::c_int,
+		__sign: *mut ::std::os::raw::c_int, __buf: *mut ::std::os::raw::c_char, __len: usize,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}mblen"]
-    pub fn cmblen(__s: *const ::std::os::raw::c_char, __n: usize) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}mblen"]
+	pub fn cmblen(__s: *const ::std::os::raw::c_char, __n: usize) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}mbtowc"]
-    pub fn cmbtowc(
-        __pwc: *mut cwchar_t,
-        __s: *const ::std::os::raw::c_char,
-        __n: usize,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}mbtowc"]
+	pub fn cmbtowc(
+		__pwc: *mut cwchar_t, __s: *const ::std::os::raw::c_char, __n: usize,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}wctomb"]
-    pub fn cwctomb(__s: *mut ::std::os::raw::c_char, __wchar: cwchar_t) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}wctomb"]
+	pub fn cwctomb(__s: *mut ::std::os::raw::c_char, __wchar: cwchar_t) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}mbstowcs"]
-    pub fn cmbstowcs(
-        __pwcs: *mut cwchar_t,
-        __s: *const ::std::os::raw::c_char,
-        __n: usize,
-    ) -> usize;
+	#[link_name = "\u{1}mbstowcs"]
+	pub fn cmbstowcs(
+		__pwcs: *mut cwchar_t, __s: *const ::std::os::raw::c_char, __n: usize,
+	) -> usize;
 }
 extern "C" {
-    #[link_name = "\u{1}wcstombs"]
-    pub fn cwcstombs(
-        __s: *mut ::std::os::raw::c_char,
-        __pwcs: *const cwchar_t,
-        __n: usize,
-    ) -> usize;
+	#[link_name = "\u{1}wcstombs"]
+	pub fn cwcstombs(
+		__s: *mut ::std::os::raw::c_char, __pwcs: *const cwchar_t, __n: usize,
+	) -> usize;
 }
 extern "C" {
-    #[link_name = "\u{1}rpmatch"]
-    pub fn crpmatch(__response: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}rpmatch"]
+	pub fn crpmatch(__response: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}getsubopt"]
-    pub fn cgetsubopt(
-        __optionp: *mut *mut ::std::os::raw::c_char,
-        __tokens: *const *mut ::std::os::raw::c_char,
-        __valuep: *mut *mut ::std::os::raw::c_char,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}getsubopt"]
+	pub fn cgetsubopt(
+		__optionp: *mut *mut ::std::os::raw::c_char, __tokens: *const *mut ::std::os::raw::c_char,
+		__valuep: *mut *mut ::std::os::raw::c_char,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}getloadavg"]
-    pub fn cgetloadavg(
-        __loadavg: *mut f64,
-        __nelem: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}getloadavg"]
+	pub fn cgetloadavg(
+		__loadavg: *mut f64, __nelem: ::std::os::raw::c_int,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}memcpy"]
-    pub fn cmemcpy(
-        __dest: *mut ::std::os::raw::c_void,
-        __src: *const ::std::os::raw::c_void,
-        __n: ::std::os::raw::c_ulong,
-    ) -> *mut ::std::os::raw::c_void;
+	#[link_name = "\u{1}memcpy"]
+	pub fn cmemcpy(
+		__dest: *mut ::std::os::raw::c_void, __src: *const ::std::os::raw::c_void,
+		__n: ::std::os::raw::c_ulong,
+	) -> *mut ::std::os::raw::c_void;
 }
 extern "C" {
-    #[link_name = "\u{1}memmove"]
-    pub fn cmemmove(
-        __dest: *mut ::std::os::raw::c_void,
-        __src: *const ::std::os::raw::c_void,
-        __n: ::std::os::raw::c_ulong,
-    ) -> *mut ::std::os::raw::c_void;
+	#[link_name = "\u{1}memmove"]
+	pub fn cmemmove(
+		__dest: *mut ::std::os::raw::c_void, __src: *const ::std::os::raw::c_void,
+		__n: ::std::os::raw::c_ulong,
+	) -> *mut ::std::os::raw::c_void;
 }
 extern "C" {
-    #[link_name = "\u{1}memccpy"]
-    pub fn cmemccpy(
-        __dest: *mut ::std::os::raw::c_void,
-        __src: *const ::std::os::raw::c_void,
-        __c: ::std::os::raw::c_int,
-        __n: ::std::os::raw::c_ulong,
-    ) -> *mut ::std::os::raw::c_void;
+	#[link_name = "\u{1}memccpy"]
+	pub fn cmemccpy(
+		__dest: *mut ::std::os::raw::c_void, __src: *const ::std::os::raw::c_void,
+		__c: ::std::os::raw::c_int, __n: ::std::os::raw::c_ulong,
+	) -> *mut ::std::os::raw::c_void;
 }
 extern "C" {
-    #[link_name = "\u{1}memset"]
-    pub fn cmemset(
-        __s: *mut ::std::os::raw::c_void,
-        __c: ::std::os::raw::c_int,
-        __n: ::std::os::raw::c_ulong,
-    ) -> *mut ::std::os::raw::c_void;
+	#[link_name = "\u{1}memset"]
+	pub fn cmemset(
+		__s: *mut ::std::os::raw::c_void, __c: ::std::os::raw::c_int, __n: ::std::os::raw::c_ulong,
+	) -> *mut ::std::os::raw::c_void;
 }
 extern "C" {
-    #[link_name = "\u{1}memcmp"]
-    pub fn cmemcmp(
-        __s1: *const ::std::os::raw::c_void,
-        __s2: *const ::std::os::raw::c_void,
-        __n: ::std::os::raw::c_ulong,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}memcmp"]
+	pub fn cmemcmp(
+		__s1: *const ::std::os::raw::c_void, __s2: *const ::std::os::raw::c_void,
+		__n: ::std::os::raw::c_ulong,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}__memcmpeq"]
-    pub fn c__memcmpeq(
-        __s1: *const ::std::os::raw::c_void,
-        __s2: *const ::std::os::raw::c_void,
-        __n: usize,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}__memcmpeq"]
+	pub fn c__memcmpeq(
+		__s1: *const ::std::os::raw::c_void, __s2: *const ::std::os::raw::c_void, __n: usize,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}memchr"]
-    pub fn cmemchr(
-        __s: *const ::std::os::raw::c_void,
-        __c: ::std::os::raw::c_int,
-        __n: ::std::os::raw::c_ulong,
-    ) -> *mut ::std::os::raw::c_void;
+	#[link_name = "\u{1}memchr"]
+	pub fn cmemchr(
+		__s: *const ::std::os::raw::c_void, __c: ::std::os::raw::c_int,
+		__n: ::std::os::raw::c_ulong,
+	) -> *mut ::std::os::raw::c_void;
 }
 extern "C" {
-    #[link_name = "\u{1}strcpy"]
-    pub fn cstrcpy(
-        __dest: *mut ::std::os::raw::c_char,
-        __src: *const ::std::os::raw::c_char,
-    ) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}strcpy"]
+	pub fn cstrcpy(
+		__dest: *mut ::std::os::raw::c_char, __src: *const ::std::os::raw::c_char,
+	) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[link_name = "\u{1}strncpy"]
-    pub fn cstrncpy(
-        __dest: *mut ::std::os::raw::c_char,
-        __src: *const ::std::os::raw::c_char,
-        __n: ::std::os::raw::c_ulong,
-    ) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}strncpy"]
+	pub fn cstrncpy(
+		__dest: *mut ::std::os::raw::c_char, __src: *const ::std::os::raw::c_char,
+		__n: ::std::os::raw::c_ulong,
+	) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[link_name = "\u{1}strcat"]
-    pub fn cstrcat(
-        __dest: *mut ::std::os::raw::c_char,
-        __src: *const ::std::os::raw::c_char,
-    ) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}strcat"]
+	pub fn cstrcat(
+		__dest: *mut ::std::os::raw::c_char, __src: *const ::std::os::raw::c_char,
+	) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[link_name = "\u{1}strncat"]
-    pub fn cstrncat(
-        __dest: *mut ::std::os::raw::c_char,
-        __src: *const ::std::os::raw::c_char,
-        __n: ::std::os::raw::c_ulong,
-    ) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}strncat"]
+	pub fn cstrncat(
+		__dest: *mut ::std::os::raw::c_char, __src: *const ::std::os::raw::c_char,
+		__n: ::std::os::raw::c_ulong,
+	) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[link_name = "\u{1}strcmp"]
-    pub fn cstrcmp(
-        __s1: *const ::std::os::raw::c_char,
-        __s2: *const ::std::os::raw::c_char,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}strcmp"]
+	pub fn cstrcmp(
+		__s1: *const ::std::os::raw::c_char, __s2: *const ::std::os::raw::c_char,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}strncmp"]
-    pub fn cstrncmp(
-        __s1: *const ::std::os::raw::c_char,
-        __s2: *const ::std::os::raw::c_char,
-        __n: ::std::os::raw::c_ulong,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}strncmp"]
+	pub fn cstrncmp(
+		__s1: *const ::std::os::raw::c_char, __s2: *const ::std::os::raw::c_char,
+		__n: ::std::os::raw::c_ulong,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}strcoll"]
-    pub fn cstrcoll(
-        __s1: *const ::std::os::raw::c_char,
-        __s2: *const ::std::os::raw::c_char,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}strcoll"]
+	pub fn cstrcoll(
+		__s1: *const ::std::os::raw::c_char, __s2: *const ::std::os::raw::c_char,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}strxfrm"]
-    pub fn cstrxfrm(
-        __dest: *mut ::std::os::raw::c_char,
-        __src: *const ::std::os::raw::c_char,
-        __n: ::std::os::raw::c_ulong,
-    ) -> ::std::os::raw::c_ulong;
+	#[link_name = "\u{1}strxfrm"]
+	pub fn cstrxfrm(
+		__dest: *mut ::std::os::raw::c_char, __src: *const ::std::os::raw::c_char,
+		__n: ::std::os::raw::c_ulong,
+	) -> ::std::os::raw::c_ulong;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct c__locale_struct {
-    pub __locales: [*mut c__locale_data; 13usize],
-    pub __ctype_b: *const ::std::os::raw::c_ushort,
-    pub __ctype_tolower: *const ::std::os::raw::c_int,
-    pub __ctype_toupper: *const ::std::os::raw::c_int,
-    pub __names: [*const ::std::os::raw::c_char; 13usize],
+	pub __locales: [*mut c__locale_data; 13usize],
+	pub __ctype_b: *const ::std::os::raw::c_ushort,
+	pub __ctype_tolower: *const ::std::os::raw::c_int,
+	pub __ctype_toupper: *const ::std::os::raw::c_int,
+	pub __names: [*const ::std::os::raw::c_char; 13usize],
 }
 #[test]
 fn bindgen_test_layout_c__locale_struct() {
-    const UNINIT: ::std::mem::MaybeUninit<c__locale_struct> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<c__locale_struct>(),
-        232usize,
-        concat!("Size of: ", stringify!(c__locale_struct))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<c__locale_struct>(),
-        8usize,
-        concat!("Alignment of ", stringify!(c__locale_struct))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__locales) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__locale_struct),
-            "::",
-            stringify!(__locales)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__ctype_b) as usize - ptr as usize },
-        104usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__locale_struct),
-            "::",
-            stringify!(__ctype_b)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__ctype_tolower) as usize - ptr as usize },
-        112usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__locale_struct),
-            "::",
-            stringify!(__ctype_tolower)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__ctype_toupper) as usize - ptr as usize },
-        120usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__locale_struct),
-            "::",
-            stringify!(__ctype_toupper)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__names) as usize - ptr as usize },
-        128usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__locale_struct),
-            "::",
-            stringify!(__names)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<c__locale_struct> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<c__locale_struct>(),
+		232usize,
+		concat!("Size of: ", stringify!(c__locale_struct))
+	);
+	assert_eq!(
+		::std::mem::align_of::<c__locale_struct>(),
+		8usize,
+		concat!("Alignment of ", stringify!(c__locale_struct))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__locales) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__locale_struct),
+			"::",
+			stringify!(__locales)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__ctype_b) as usize - ptr as usize },
+		104usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__locale_struct),
+			"::",
+			stringify!(__ctype_b)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__ctype_tolower) as usize - ptr as usize },
+		112usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__locale_struct),
+			"::",
+			stringify!(__ctype_tolower)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__ctype_toupper) as usize - ptr as usize },
+		120usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__locale_struct),
+			"::",
+			stringify!(__ctype_toupper)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__names) as usize - ptr as usize },
+		128usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__locale_struct),
+			"::",
+			stringify!(__names)
+		)
+	);
 }
 pub type c__locale_t = *mut c__locale_struct;
 pub type clocale_t = c__locale_t;
 extern "C" {
-    #[link_name = "\u{1}strcoll_l"]
-    pub fn cstrcoll_l(
-        __s1: *const ::std::os::raw::c_char,
-        __s2: *const ::std::os::raw::c_char,
-        __l: clocale_t,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}strcoll_l"]
+	pub fn cstrcoll_l(
+		__s1: *const ::std::os::raw::c_char, __s2: *const ::std::os::raw::c_char, __l: clocale_t,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}strxfrm_l"]
-    pub fn cstrxfrm_l(
-        __dest: *mut ::std::os::raw::c_char,
-        __src: *const ::std::os::raw::c_char,
-        __n: usize,
-        __l: clocale_t,
-    ) -> usize;
+	#[link_name = "\u{1}strxfrm_l"]
+	pub fn cstrxfrm_l(
+		__dest: *mut ::std::os::raw::c_char, __src: *const ::std::os::raw::c_char, __n: usize,
+		__l: clocale_t,
+	) -> usize;
 }
 extern "C" {
-    #[link_name = "\u{1}strdup"]
-    pub fn cstrdup(__s: *const ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}strdup"]
+	pub fn cstrdup(__s: *const ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[link_name = "\u{1}strndup"]
-    pub fn cstrndup(
-        __string: *const ::std::os::raw::c_char,
-        __n: ::std::os::raw::c_ulong,
-    ) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}strndup"]
+	pub fn cstrndup(
+		__string: *const ::std::os::raw::c_char, __n: ::std::os::raw::c_ulong,
+	) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[link_name = "\u{1}strchr"]
-    pub fn cstrchr(
-        __s: *const ::std::os::raw::c_char,
-        __c: ::std::os::raw::c_int,
-    ) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}strchr"]
+	pub fn cstrchr(
+		__s: *const ::std::os::raw::c_char, __c: ::std::os::raw::c_int,
+	) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[link_name = "\u{1}strrchr"]
-    pub fn cstrrchr(
-        __s: *const ::std::os::raw::c_char,
-        __c: ::std::os::raw::c_int,
-    ) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}strrchr"]
+	pub fn cstrrchr(
+		__s: *const ::std::os::raw::c_char, __c: ::std::os::raw::c_int,
+	) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[link_name = "\u{1}strcspn"]
-    pub fn cstrcspn(
-        __s: *const ::std::os::raw::c_char,
-        __reject: *const ::std::os::raw::c_char,
-    ) -> ::std::os::raw::c_ulong;
+	#[link_name = "\u{1}strcspn"]
+	pub fn cstrcspn(
+		__s: *const ::std::os::raw::c_char, __reject: *const ::std::os::raw::c_char,
+	) -> ::std::os::raw::c_ulong;
 }
 extern "C" {
-    #[link_name = "\u{1}strspn"]
-    pub fn cstrspn(
-        __s: *const ::std::os::raw::c_char,
-        __accept: *const ::std::os::raw::c_char,
-    ) -> ::std::os::raw::c_ulong;
+	#[link_name = "\u{1}strspn"]
+	pub fn cstrspn(
+		__s: *const ::std::os::raw::c_char, __accept: *const ::std::os::raw::c_char,
+	) -> ::std::os::raw::c_ulong;
 }
 extern "C" {
-    #[link_name = "\u{1}strpbrk"]
-    pub fn cstrpbrk(
-        __s: *const ::std::os::raw::c_char,
-        __accept: *const ::std::os::raw::c_char,
-    ) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}strpbrk"]
+	pub fn cstrpbrk(
+		__s: *const ::std::os::raw::c_char, __accept: *const ::std::os::raw::c_char,
+	) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[link_name = "\u{1}strstr"]
-    pub fn cstrstr(
-        __haystack: *const ::std::os::raw::c_char,
-        __needle: *const ::std::os::raw::c_char,
-    ) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}strstr"]
+	pub fn cstrstr(
+		__haystack: *const ::std::os::raw::c_char, __needle: *const ::std::os::raw::c_char,
+	) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[link_name = "\u{1}strtok"]
-    pub fn cstrtok(
-        __s: *mut ::std::os::raw::c_char,
-        __delim: *const ::std::os::raw::c_char,
-    ) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}strtok"]
+	pub fn cstrtok(
+		__s: *mut ::std::os::raw::c_char, __delim: *const ::std::os::raw::c_char,
+	) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[link_name = "\u{1}__strtok_r"]
-    pub fn c__strtok_r(
-        __s: *mut ::std::os::raw::c_char,
-        __delim: *const ::std::os::raw::c_char,
-        __save_ptr: *mut *mut ::std::os::raw::c_char,
-    ) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}__strtok_r"]
+	pub fn c__strtok_r(
+		__s: *mut ::std::os::raw::c_char, __delim: *const ::std::os::raw::c_char,
+		__save_ptr: *mut *mut ::std::os::raw::c_char,
+	) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[link_name = "\u{1}strtok_r"]
-    pub fn cstrtok_r(
-        __s: *mut ::std::os::raw::c_char,
-        __delim: *const ::std::os::raw::c_char,
-        __save_ptr: *mut *mut ::std::os::raw::c_char,
-    ) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}strtok_r"]
+	pub fn cstrtok_r(
+		__s: *mut ::std::os::raw::c_char, __delim: *const ::std::os::raw::c_char,
+		__save_ptr: *mut *mut ::std::os::raw::c_char,
+	) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[link_name = "\u{1}strlen"]
-    pub fn cstrlen(__s: *const ::std::os::raw::c_char) -> ::std::os::raw::c_ulong;
+	#[link_name = "\u{1}strlen"]
+	pub fn cstrlen(__s: *const ::std::os::raw::c_char) -> ::std::os::raw::c_ulong;
 }
 extern "C" {
-    #[link_name = "\u{1}strnlen"]
-    pub fn cstrnlen(__string: *const ::std::os::raw::c_char, __maxlen: usize) -> usize;
+	#[link_name = "\u{1}strnlen"]
+	pub fn cstrnlen(__string: *const ::std::os::raw::c_char, __maxlen: usize) -> usize;
 }
 extern "C" {
-    #[link_name = "\u{1}strerror"]
-    pub fn cstrerror(__errnum: ::std::os::raw::c_int) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}strerror"]
+	pub fn cstrerror(__errnum: ::std::os::raw::c_int) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[link_name = "\u{1}__xpg_strerror_r"]
-    pub fn cstrerror_r(
-        __errnum: ::std::os::raw::c_int,
-        __buf: *mut ::std::os::raw::c_char,
-        __buflen: usize,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}__xpg_strerror_r"]
+	pub fn cstrerror_r(
+		__errnum: ::std::os::raw::c_int, __buf: *mut ::std::os::raw::c_char, __buflen: usize,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}strerror_l"]
-    pub fn cstrerror_l(
-        __errnum: ::std::os::raw::c_int,
-        __l: clocale_t,
-    ) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}strerror_l"]
+	pub fn cstrerror_l(
+		__errnum: ::std::os::raw::c_int, __l: clocale_t,
+	) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[link_name = "\u{1}bcmp"]
-    pub fn cbcmp(
-        __s1: *const ::std::os::raw::c_void,
-        __s2: *const ::std::os::raw::c_void,
-        __n: ::std::os::raw::c_ulong,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}bcmp"]
+	pub fn cbcmp(
+		__s1: *const ::std::os::raw::c_void, __s2: *const ::std::os::raw::c_void,
+		__n: ::std::os::raw::c_ulong,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}bcopy"]
-    pub fn cbcopy(
-        __src: *const ::std::os::raw::c_void,
-        __dest: *mut ::std::os::raw::c_void,
-        __n: usize,
-    );
+	#[link_name = "\u{1}bcopy"]
+	pub fn cbcopy(
+		__src: *const ::std::os::raw::c_void, __dest: *mut ::std::os::raw::c_void, __n: usize,
+	);
 }
 extern "C" {
-    #[link_name = "\u{1}bzero"]
-    pub fn cbzero(__s: *mut ::std::os::raw::c_void, __n: ::std::os::raw::c_ulong);
+	#[link_name = "\u{1}bzero"]
+	pub fn cbzero(__s: *mut ::std::os::raw::c_void, __n: ::std::os::raw::c_ulong);
 }
 extern "C" {
-    #[link_name = "\u{1}index"]
-    pub fn cindex(
-        __s: *const ::std::os::raw::c_char,
-        __c: ::std::os::raw::c_int,
-    ) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}index"]
+	pub fn cindex(
+		__s: *const ::std::os::raw::c_char, __c: ::std::os::raw::c_int,
+	) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[link_name = "\u{1}rindex"]
-    pub fn crindex(
-        __s: *const ::std::os::raw::c_char,
-        __c: ::std::os::raw::c_int,
-    ) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}rindex"]
+	pub fn crindex(
+		__s: *const ::std::os::raw::c_char, __c: ::std::os::raw::c_int,
+	) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[link_name = "\u{1}ffs"]
-    pub fn cffs(__i: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}ffs"]
+	pub fn cffs(__i: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}ffsl"]
-    pub fn cffsl(__l: ::std::os::raw::c_long) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}ffsl"]
+	pub fn cffsl(__l: ::std::os::raw::c_long) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}ffsll"]
-    pub fn cffsll(__ll: ::std::os::raw::c_longlong) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}ffsll"]
+	pub fn cffsll(__ll: ::std::os::raw::c_longlong) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}strcasecmp"]
-    pub fn cstrcasecmp(
-        __s1: *const ::std::os::raw::c_char,
-        __s2: *const ::std::os::raw::c_char,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}strcasecmp"]
+	pub fn cstrcasecmp(
+		__s1: *const ::std::os::raw::c_char, __s2: *const ::std::os::raw::c_char,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}strncasecmp"]
-    pub fn cstrncasecmp(
-        __s1: *const ::std::os::raw::c_char,
-        __s2: *const ::std::os::raw::c_char,
-        __n: ::std::os::raw::c_ulong,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}strncasecmp"]
+	pub fn cstrncasecmp(
+		__s1: *const ::std::os::raw::c_char, __s2: *const ::std::os::raw::c_char,
+		__n: ::std::os::raw::c_ulong,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}strcasecmp_l"]
-    pub fn cstrcasecmp_l(
-        __s1: *const ::std::os::raw::c_char,
-        __s2: *const ::std::os::raw::c_char,
-        __loc: clocale_t,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}strcasecmp_l"]
+	pub fn cstrcasecmp_l(
+		__s1: *const ::std::os::raw::c_char, __s2: *const ::std::os::raw::c_char, __loc: clocale_t,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}strncasecmp_l"]
-    pub fn cstrncasecmp_l(
-        __s1: *const ::std::os::raw::c_char,
-        __s2: *const ::std::os::raw::c_char,
-        __n: usize,
-        __loc: clocale_t,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}strncasecmp_l"]
+	pub fn cstrncasecmp_l(
+		__s1: *const ::std::os::raw::c_char, __s2: *const ::std::os::raw::c_char, __n: usize,
+		__loc: clocale_t,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}explicit_bzero"]
-    pub fn cexplicit_bzero(__s: *mut ::std::os::raw::c_void, __n: usize);
+	#[link_name = "\u{1}explicit_bzero"]
+	pub fn cexplicit_bzero(__s: *mut ::std::os::raw::c_void, __n: usize);
 }
 extern "C" {
-    #[link_name = "\u{1}strsep"]
-    pub fn cstrsep(
-        __stringp: *mut *mut ::std::os::raw::c_char,
-        __delim: *const ::std::os::raw::c_char,
-    ) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}strsep"]
+	pub fn cstrsep(
+		__stringp: *mut *mut ::std::os::raw::c_char, __delim: *const ::std::os::raw::c_char,
+	) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[link_name = "\u{1}strsignal"]
-    pub fn cstrsignal(__sig: ::std::os::raw::c_int) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}strsignal"]
+	pub fn cstrsignal(__sig: ::std::os::raw::c_int) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[link_name = "\u{1}__stpcpy"]
-    pub fn c__stpcpy(
-        __dest: *mut ::std::os::raw::c_char,
-        __src: *const ::std::os::raw::c_char,
-    ) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}__stpcpy"]
+	pub fn c__stpcpy(
+		__dest: *mut ::std::os::raw::c_char, __src: *const ::std::os::raw::c_char,
+	) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[link_name = "\u{1}stpcpy"]
-    pub fn cstpcpy(
-        __dest: *mut ::std::os::raw::c_char,
-        __src: *const ::std::os::raw::c_char,
-    ) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}stpcpy"]
+	pub fn cstpcpy(
+		__dest: *mut ::std::os::raw::c_char, __src: *const ::std::os::raw::c_char,
+	) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[link_name = "\u{1}__stpncpy"]
-    pub fn c__stpncpy(
-        __dest: *mut ::std::os::raw::c_char,
-        __src: *const ::std::os::raw::c_char,
-        __n: usize,
-    ) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}__stpncpy"]
+	pub fn c__stpncpy(
+		__dest: *mut ::std::os::raw::c_char, __src: *const ::std::os::raw::c_char, __n: usize,
+	) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[link_name = "\u{1}stpncpy"]
-    pub fn cstpncpy(
-        __dest: *mut ::std::os::raw::c_char,
-        __src: *const ::std::os::raw::c_char,
-        __n: ::std::os::raw::c_ulong,
-    ) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}stpncpy"]
+	pub fn cstpncpy(
+		__dest: *mut ::std::os::raw::c_char, __src: *const ::std::os::raw::c_char,
+		__n: ::std::os::raw::c_ulong,
+	) -> *mut ::std::os::raw::c_char;
 }
 pub type cbw_ErrCode = ::std::os::raw::c_uint;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct cbw_Err {
-    pub code: cbw_ErrCode,
-    pub data: *const ::std::os::raw::c_void,
-    pub alloc_message: ::std::option::Option<
-        unsafe extern "C" fn(
-            code: cbw_ErrCode,
-            data: *const ::std::os::raw::c_void,
-        ) -> *mut ::std::os::raw::c_char,
-    >,
+	pub code: cbw_ErrCode,
+	pub data: *const ::std::os::raw::c_void,
+	pub alloc_message: ::std::option::Option<
+		unsafe extern "C" fn(
+			code: cbw_ErrCode,
+			data: *const ::std::os::raw::c_void,
+		) -> *mut ::std::os::raw::c_char,
+	>,
 }
 #[test]
 fn bindgen_test_layout_cbw_Err() {
-    const UNINIT: ::std::mem::MaybeUninit<cbw_Err> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<cbw_Err>(),
-        24usize,
-        concat!("Size of: ", stringify!(cbw_Err))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cbw_Err>(),
-        8usize,
-        concat!("Alignment of ", stringify!(cbw_Err))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).code) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_Err),
-            "::",
-            stringify!(code)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).data) as usize - ptr as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_Err),
-            "::",
-            stringify!(data)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).alloc_message) as usize - ptr as usize },
-        16usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_Err),
-            "::",
-            stringify!(alloc_message)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<cbw_Err> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<cbw_Err>(),
+		24usize,
+		concat!("Size of: ", stringify!(cbw_Err))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cbw_Err>(),
+		8usize,
+		concat!("Alignment of ", stringify!(cbw_Err))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).code) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_Err),
+			"::",
+			stringify!(code)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).data) as usize - ptr as usize },
+		8usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_Err),
+			"::",
+			stringify!(data)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).alloc_message) as usize - ptr as usize },
+		16usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_Err),
+			"::",
+			stringify!(alloc_message)
+		)
+	);
 }
 extern "C" {
-    #[link_name = "\u{1}bw_Err_msg_success"]
-    pub fn cbw_Err_msg_success(
-        arg1: cbw_ErrCode,
-        arg2: *const ::std::os::raw::c_void,
-    ) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}bw_Err_msg_success"]
+	pub fn cbw_Err_msg_success(
+		arg1: cbw_ErrCode, arg2: *const ::std::os::raw::c_void,
+	) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[link_name = "\u{1}bw_Err_msg_string"]
-    pub fn cbw_Err_msg_string(
-        arg1: cbw_ErrCode,
-        arg2: *const ::std::os::raw::c_void,
-    ) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}bw_Err_msg_string"]
+	pub fn cbw_Err_msg_string(
+		arg1: cbw_ErrCode, arg2: *const ::std::os::raw::c_void,
+	) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[link_name = "\u{1}bw_Err_free"]
-    pub fn cbw_Err_free(err: *mut cbw_Err);
+	#[link_name = "\u{1}bw_Err_free"]
+	pub fn cbw_Err_free(err: *mut cbw_Err);
 }
 extern "C" {
-    #[link_name = "\u{1}bw_Err_new_with_msg"]
-    pub fn cbw_Err_new_with_msg(code: cbw_ErrCode, msg: *const ::std::os::raw::c_char) -> cbw_Err;
+	#[link_name = "\u{1}bw_Err_new_with_msg"]
+	pub fn cbw_Err_new_with_msg(code: cbw_ErrCode, msg: *const ::std::os::raw::c_char) -> cbw_Err;
 }
 extern "C" {
-    #[link_name = "\u{1}bw_Err_message"]
-    pub fn cbw_Err_message(error: *const cbw_Err) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}bw_Err_message"]
+	pub fn cbw_Err_message(error: *const cbw_Err) -> *mut ::std::os::raw::c_char;
 }
 pub type cint_least8_t = c__int_least8_t;
 pub type cint_least16_t = c__int_least16_t;
@@ -3088,473 +2951,431 @@ pub type cuintmax_t = c__uintmax_t;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct cbw_Application {
-    pub windows_alive: ::std::os::raw::c_uint,
-    pub is_running: cBOOL,
-    pub is_done: cBOOL,
-    pub impl_: cbw_ApplicationImpl,
-    pub engine_impl: cbw_ApplicationEngineImpl,
+	pub windows_alive: ::std::os::raw::c_uint,
+	pub is_running: cBOOL,
+	pub is_done: cBOOL,
+	pub impl_: cbw_ApplicationImpl,
+	pub engine_impl: cbw_ApplicationEngineImpl,
 }
 #[test]
 fn bindgen_test_layout_cbw_Application() {
-    const UNINIT: ::std::mem::MaybeUninit<cbw_Application> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<cbw_Application>(),
-        12usize,
-        concat!("Size of: ", stringify!(cbw_Application))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cbw_Application>(),
-        4usize,
-        concat!("Alignment of ", stringify!(cbw_Application))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).windows_alive) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_Application),
-            "::",
-            stringify!(windows_alive)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).is_running) as usize - ptr as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_Application),
-            "::",
-            stringify!(is_running)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).is_done) as usize - ptr as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_Application),
-            "::",
-            stringify!(is_done)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).impl_) as usize - ptr as usize },
-        12usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_Application),
-            "::",
-            stringify!(impl_)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).engine_impl) as usize - ptr as usize },
-        12usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_Application),
-            "::",
-            stringify!(engine_impl)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<cbw_Application> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<cbw_Application>(),
+		12usize,
+		concat!("Size of: ", stringify!(cbw_Application))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cbw_Application>(),
+		4usize,
+		concat!("Alignment of ", stringify!(cbw_Application))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).windows_alive) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_Application),
+			"::",
+			stringify!(windows_alive)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).is_running) as usize - ptr as usize },
+		4usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_Application),
+			"::",
+			stringify!(is_running)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).is_done) as usize - ptr as usize },
+		8usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_Application),
+			"::",
+			stringify!(is_done)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).impl_) as usize - ptr as usize },
+		12usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_Application),
+			"::",
+			stringify!(impl_)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).engine_impl) as usize - ptr as usize },
+		12usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_Application),
+			"::",
+			stringify!(engine_impl)
+		)
+	);
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct cbw_ApplicationEngineData {
-    _unused: [u8; 0],
+	_unused: [u8; 0],
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct cbw_ApplicationDispatchData {
-    pub func: cbw_ApplicationDispatchFn,
-    pub data: *mut ::std::os::raw::c_void,
+	pub func: cbw_ApplicationDispatchFn,
+	pub data: *mut ::std::os::raw::c_void,
 }
 #[test]
 fn bindgen_test_layout_cbw_ApplicationDispatchData() {
-    const UNINIT: ::std::mem::MaybeUninit<cbw_ApplicationDispatchData> =
-        ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<cbw_ApplicationDispatchData>(),
-        16usize,
-        concat!("Size of: ", stringify!(cbw_ApplicationDispatchData))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cbw_ApplicationDispatchData>(),
-        8usize,
-        concat!("Alignment of ", stringify!(cbw_ApplicationDispatchData))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).func) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_ApplicationDispatchData),
-            "::",
-            stringify!(func)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).data) as usize - ptr as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_ApplicationDispatchData),
-            "::",
-            stringify!(data)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<cbw_ApplicationDispatchData> =
+		::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<cbw_ApplicationDispatchData>(),
+		16usize,
+		concat!("Size of: ", stringify!(cbw_ApplicationDispatchData))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cbw_ApplicationDispatchData>(),
+		8usize,
+		concat!("Alignment of ", stringify!(cbw_ApplicationDispatchData))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).func) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_ApplicationDispatchData),
+			"::",
+			stringify!(func)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).data) as usize - ptr as usize },
+		8usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_ApplicationDispatchData),
+			"::",
+			stringify!(data)
+		)
+	);
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct cbw_ApplicationSettings {
-    pub engine_seperate_executable_path: cbw_CStrSlice,
-    pub resource_dir: cbw_CStrSlice,
+	pub engine_seperate_executable_path: cbw_CStrSlice,
+	pub resource_dir: cbw_CStrSlice,
 }
 #[test]
 fn bindgen_test_layout_cbw_ApplicationSettings() {
-    const UNINIT: ::std::mem::MaybeUninit<cbw_ApplicationSettings> =
-        ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<cbw_ApplicationSettings>(),
-        32usize,
-        concat!("Size of: ", stringify!(cbw_ApplicationSettings))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cbw_ApplicationSettings>(),
-        8usize,
-        concat!("Alignment of ", stringify!(cbw_ApplicationSettings))
-    );
-    assert_eq!(
-        unsafe {
-            ::std::ptr::addr_of!((*ptr).engine_seperate_executable_path) as usize - ptr as usize
-        },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_ApplicationSettings),
-            "::",
-            stringify!(engine_seperate_executable_path)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).resource_dir) as usize - ptr as usize },
-        16usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_ApplicationSettings),
-            "::",
-            stringify!(resource_dir)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<cbw_ApplicationSettings> =
+		::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<cbw_ApplicationSettings>(),
+		32usize,
+		concat!("Size of: ", stringify!(cbw_ApplicationSettings))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cbw_ApplicationSettings>(),
+		8usize,
+		concat!("Alignment of ", stringify!(cbw_ApplicationSettings))
+	);
+	assert_eq!(
+		unsafe {
+			::std::ptr::addr_of!((*ptr).engine_seperate_executable_path) as usize - ptr as usize
+		},
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_ApplicationSettings),
+			"::",
+			stringify!(engine_seperate_executable_path)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).resource_dir) as usize - ptr as usize },
+		16usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_ApplicationSettings),
+			"::",
+			stringify!(resource_dir)
+		)
+	);
 }
 extern "C" {
-    #[doc = " Safety check that makes sure the given application handle is used on the correct thread.\n Does nothing in release mode."]
-    #[link_name = "\u{1}bw_Application_assertCorrectThread"]
-    pub fn cbw_Application_assertCorrectThread(arg1: *const cbw_Application);
+	#[doc = " Safety check that makes sure the given application handle is used on the correct thread.\n Does nothing in release mode."]
+	#[link_name = "\u{1}bw_Application_assertCorrectThread"]
+	pub fn cbw_Application_assertCorrectThread(arg1: *const cbw_Application);
 }
 extern "C" {
-    #[doc = " Exits the main loop, returning execution to the function that invoked the run call.\n The exit_code will be returned by bw_Application_run."]
-    #[link_name = "\u{1}bw_Application_exit"]
-    pub fn cbw_Application_exit(app: *mut cbw_Application, exit_code: ::std::os::raw::c_int);
+	#[doc = " Exits the main loop, returning execution to the function that invoked the run call.\n The exit_code will be returned by bw_Application_run."]
+	#[link_name = "\u{1}bw_Application_exit"]
+	pub fn cbw_Application_exit(app: *mut cbw_Application, exit_code: ::std::os::raw::c_int);
 }
 extern "C" {
-    #[doc = " Same as bw_Application_exit, but guaranteed to be thread-safe\n The exit_code will be returned by bw_Application_run."]
-    #[link_name = "\u{1}bw_Application_exitAsync"]
-    pub fn cbw_Application_exitAsync(app: *mut cbw_Application, exit_code: ::std::os::raw::c_int);
+	#[doc = " Same as bw_Application_exit, but guaranteed to be thread-safe\n The exit_code will be returned by bw_Application_run."]
+	#[link_name = "\u{1}bw_Application_exitAsync"]
+	pub fn cbw_Application_exitAsync(app: *mut cbw_Application, exit_code: ::std::os::raw::c_int);
 }
 extern "C" {
-    #[doc = " Dispatches the given function to be executed on the thread this application instance has been created on,\n     and passes the given data to it.\n This function is thread safe.\n\n # Returns\n An indication of whether or not the function was able to be dispatched.\n Dispatching a function fails when the application has already been terminated."]
-    #[link_name = "\u{1}bw_Application_dispatch"]
-    pub fn cbw_Application_dispatch(
-        app: *mut cbw_Application,
-        func: cbw_ApplicationDispatchFn,
-        data: *mut ::std::os::raw::c_void,
-    ) -> cBOOL;
+	#[doc = " Dispatches the given function to be executed on the thread this application instance has been created on,\n     and passes the given data to it.\n This function is thread safe.\n\n # Returns\n An indication of whether or not the function was able to be dispatched.\n Dispatching a function fails when the application has already been terminated."]
+	#[link_name = "\u{1}bw_Application_dispatch"]
+	pub fn cbw_Application_dispatch(
+		app: *mut cbw_Application, func: cbw_ApplicationDispatchFn,
+		data: *mut ::std::os::raw::c_void,
+	) -> cBOOL;
 }
 extern "C" {
-    #[doc = " Shuts down all application processes and performs necessary clean-up code."]
-    #[link_name = "\u{1}bw_Application_finish"]
-    pub fn cbw_Application_finish(app: *mut cbw_Application);
+	#[doc = " Shuts down the applcation runtime & frees it's memory."]
+	#[link_name = "\u{1}bw_Application_free"]
+	pub fn cbw_Application_free(app: *mut cbw_Application);
 }
 extern "C" {
-    #[doc = " Frees memory for the application handle.\n Call `bw_Application_finish` before you call this function.\n Freeing the application handle is generally not necessary, as all memory in use by the process gets released anyway after shutdown."]
-    #[link_name = "\u{1}bw_Application_free"]
-    pub fn cbw_Application_free(app: *mut cbw_Application);
+	#[doc = " Initializes browser window.\n Starts up browser engine process(es).\n Returns an application handle."]
+	#[link_name = "\u{1}bw_Application_initialize"]
+	pub fn cbw_Application_initialize(
+		application: *mut *mut cbw_Application, argc: ::std::os::raw::c_int,
+		argv: *mut *mut ::std::os::raw::c_char, settings: *const cbw_ApplicationSettings,
+	) -> cbw_Err;
 }
 extern "C" {
-    #[doc = " Initializes browser window.\n Starts up browser engine process(es).\n Returns an application handle."]
-    #[link_name = "\u{1}bw_Application_initialize"]
-    pub fn cbw_Application_initialize(
-        application: *mut *mut cbw_Application,
-        argc: ::std::os::raw::c_int,
-        argv: *mut *mut ::std::os::raw::c_char,
-        settings: *const cbw_ApplicationSettings,
-    ) -> cbw_Err;
+	#[link_name = "\u{1}bw_Application_isRunning"]
+	pub fn cbw_Application_isRunning(app: *const cbw_Application) -> cBOOL;
 }
 extern "C" {
-    #[link_name = "\u{1}bw_Application_isRunning"]
-    pub fn cbw_Application_isRunning(app: *const cbw_Application) -> cBOOL;
+	#[link_name = "\u{1}bw_Application_markAsDone"]
+	pub fn cbw_Application_markAsDone(app: *mut cbw_Application);
 }
 extern "C" {
-    #[link_name = "\u{1}bw_Application_markAsDone"]
-    pub fn cbw_Application_markAsDone(app: *mut cbw_Application);
+	#[doc = " Runs the event loop.\n Calls the `on_ready` callback when `app` can be used."]
+	#[link_name = "\u{1}bw_Application_run"]
+	pub fn cbw_Application_run(
+		app: *mut cbw_Application, on_ready: cbw_ApplicationReadyFn,
+		user_data: *mut ::std::os::raw::c_void,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Runs the event loop.\n Calls the `on_ready` callback when `app` can be used."]
-    #[link_name = "\u{1}bw_Application_run"]
-    pub fn cbw_Application_run(
-        app: *mut cbw_Application,
-        on_ready: cbw_ApplicationReadyFn,
-        user_data: *mut ::std::os::raw::c_void,
-    ) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    #[doc = " Executes the given closure after the specified delay."]
-    #[link_name = "\u{1}bw_Application_dispatchDelayed"]
-    pub fn cbw_Application_dispatchDelayed(
-        app: *mut cbw_Application,
-        func: cbw_ApplicationDispatchFn,
-        user_data: *mut ::std::os::raw::c_void,
-        milliseconds: u64,
-    ) -> cBOOL;
+	#[doc = " Executes the given closure after the specified delay."]
+	#[link_name = "\u{1}bw_Application_dispatchDelayed"]
+	pub fn cbw_Application_dispatchDelayed(
+		app: *mut cbw_Application, func: cbw_ApplicationDispatchFn,
+		user_data: *mut ::std::os::raw::c_void, milliseconds: u64,
+	) -> cBOOL;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct cbw_BrowserWindowImpl {
-    pub cef_ptr: *mut ::std::os::raw::c_void,
-    pub resource_path: *mut ::std::os::raw::c_char,
-}
+pub struct cbw_BrowserWindowImpl {}
 #[test]
 fn bindgen_test_layout_cbw_BrowserWindowImpl() {
-    const UNINIT: ::std::mem::MaybeUninit<cbw_BrowserWindowImpl> =
-        ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<cbw_BrowserWindowImpl>(),
-        16usize,
-        concat!("Size of: ", stringify!(cbw_BrowserWindowImpl))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cbw_BrowserWindowImpl>(),
-        8usize,
-        concat!("Alignment of ", stringify!(cbw_BrowserWindowImpl))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).cef_ptr) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_BrowserWindowImpl),
-            "::",
-            stringify!(cef_ptr)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).resource_path) as usize - ptr as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_BrowserWindowImpl),
-            "::",
-            stringify!(resource_path)
-        )
-    );
+	assert_eq!(
+		::std::mem::size_of::<cbw_BrowserWindowImpl>(),
+		0usize,
+		concat!("Size of: ", stringify!(cbw_BrowserWindowImpl))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cbw_BrowserWindowImpl>(),
+		1usize,
+		concat!("Alignment of ", stringify!(cbw_BrowserWindowImpl))
+	);
 }
 extern "C" {
-    #[link_name = "\u{1}__assert_fail"]
-    pub fn c__assert_fail(
-        __assertion: *const ::std::os::raw::c_char,
-        __file: *const ::std::os::raw::c_char,
-        __line: ::std::os::raw::c_uint,
-        __function: *const ::std::os::raw::c_char,
-    ) -> !;
+	#[link_name = "\u{1}__assert_fail"]
+	pub fn c__assert_fail(
+		__assertion: *const ::std::os::raw::c_char, __file: *const ::std::os::raw::c_char,
+		__line: ::std::os::raw::c_uint, __function: *const ::std::os::raw::c_char,
+	) -> !;
 }
 extern "C" {
-    #[link_name = "\u{1}__assert_perror_fail"]
-    pub fn c__assert_perror_fail(
-        __errnum: ::std::os::raw::c_int,
-        __file: *const ::std::os::raw::c_char,
-        __line: ::std::os::raw::c_uint,
-        __function: *const ::std::os::raw::c_char,
-    ) -> !;
+	#[link_name = "\u{1}__assert_perror_fail"]
+	pub fn c__assert_perror_fail(
+		__errnum: ::std::os::raw::c_int, __file: *const ::std::os::raw::c_char,
+		__line: ::std::os::raw::c_uint, __function: *const ::std::os::raw::c_char,
+	) -> !;
 }
 extern "C" {
-    #[link_name = "\u{1}__assert"]
-    pub fn c__assert(
-        __assertion: *const ::std::os::raw::c_char,
-        __file: *const ::std::os::raw::c_char,
-        __line: ::std::os::raw::c_int,
-    ) -> !;
+	#[link_name = "\u{1}__assert"]
+	pub fn c__assert(
+		__assertion: *const ::std::os::raw::c_char, __file: *const ::std::os::raw::c_char,
+		__line: ::std::os::raw::c_int,
+	) -> !;
 }
 pub type c__gnuc_va_list = c__builtin_va_list;
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct c__mbstate_t {
-    pub __count: ::std::os::raw::c_int,
-    pub __value: c__mbstate_t__bindgen_ty_1,
+	pub __count: ::std::os::raw::c_int,
+	pub __value: c__mbstate_t__bindgen_ty_1,
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub union c__mbstate_t__bindgen_ty_1 {
-    pub __wch: ::std::os::raw::c_uint,
-    pub __wchb: [::std::os::raw::c_char; 4usize],
+	pub __wch: ::std::os::raw::c_uint,
+	pub __wchb: [::std::os::raw::c_char; 4usize],
 }
 #[test]
 fn bindgen_test_layout_c__mbstate_t__bindgen_ty_1() {
-    const UNINIT: ::std::mem::MaybeUninit<c__mbstate_t__bindgen_ty_1> =
-        ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<c__mbstate_t__bindgen_ty_1>(),
-        4usize,
-        concat!("Size of: ", stringify!(c__mbstate_t__bindgen_ty_1))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<c__mbstate_t__bindgen_ty_1>(),
-        4usize,
-        concat!("Alignment of ", stringify!(c__mbstate_t__bindgen_ty_1))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__wch) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__mbstate_t__bindgen_ty_1),
-            "::",
-            stringify!(__wch)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__wchb) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__mbstate_t__bindgen_ty_1),
-            "::",
-            stringify!(__wchb)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<c__mbstate_t__bindgen_ty_1> =
+		::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<c__mbstate_t__bindgen_ty_1>(),
+		4usize,
+		concat!("Size of: ", stringify!(c__mbstate_t__bindgen_ty_1))
+	);
+	assert_eq!(
+		::std::mem::align_of::<c__mbstate_t__bindgen_ty_1>(),
+		4usize,
+		concat!("Alignment of ", stringify!(c__mbstate_t__bindgen_ty_1))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__wch) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__mbstate_t__bindgen_ty_1),
+			"::",
+			stringify!(__wch)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__wchb) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__mbstate_t__bindgen_ty_1),
+			"::",
+			stringify!(__wchb)
+		)
+	);
 }
 #[test]
 fn bindgen_test_layout_c__mbstate_t() {
-    const UNINIT: ::std::mem::MaybeUninit<c__mbstate_t> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<c__mbstate_t>(),
-        8usize,
-        concat!("Size of: ", stringify!(c__mbstate_t))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<c__mbstate_t>(),
-        4usize,
-        concat!("Alignment of ", stringify!(c__mbstate_t))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__count) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__mbstate_t),
-            "::",
-            stringify!(__count)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__value) as usize - ptr as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__mbstate_t),
-            "::",
-            stringify!(__value)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<c__mbstate_t> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<c__mbstate_t>(),
+		8usize,
+		concat!("Size of: ", stringify!(c__mbstate_t))
+	);
+	assert_eq!(
+		::std::mem::align_of::<c__mbstate_t>(),
+		4usize,
+		concat!("Alignment of ", stringify!(c__mbstate_t))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__count) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__mbstate_t),
+			"::",
+			stringify!(__count)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__value) as usize - ptr as usize },
+		4usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__mbstate_t),
+			"::",
+			stringify!(__value)
+		)
+	);
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct c_G_fpos_t {
-    pub __pos: c__off_t,
-    pub __state: c__mbstate_t,
+	pub __pos: c__off_t,
+	pub __state: c__mbstate_t,
 }
 #[test]
 fn bindgen_test_layout_c_G_fpos_t() {
-    const UNINIT: ::std::mem::MaybeUninit<c_G_fpos_t> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<c_G_fpos_t>(),
-        16usize,
-        concat!("Size of: ", stringify!(c_G_fpos_t))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<c_G_fpos_t>(),
-        8usize,
-        concat!("Alignment of ", stringify!(c_G_fpos_t))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__pos) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c_G_fpos_t),
-            "::",
-            stringify!(__pos)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__state) as usize - ptr as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c_G_fpos_t),
-            "::",
-            stringify!(__state)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<c_G_fpos_t> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<c_G_fpos_t>(),
+		16usize,
+		concat!("Size of: ", stringify!(c_G_fpos_t))
+	);
+	assert_eq!(
+		::std::mem::align_of::<c_G_fpos_t>(),
+		8usize,
+		concat!("Alignment of ", stringify!(c_G_fpos_t))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__pos) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c_G_fpos_t),
+			"::",
+			stringify!(__pos)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__state) as usize - ptr as usize },
+		8usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c_G_fpos_t),
+			"::",
+			stringify!(__state)
+		)
+	);
 }
 pub type c__fpos_t = c_G_fpos_t;
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct c_G_fpos64_t {
-    pub __pos: c__off64_t,
-    pub __state: c__mbstate_t,
+	pub __pos: c__off64_t,
+	pub __state: c__mbstate_t,
 }
 #[test]
 fn bindgen_test_layout_c_G_fpos64_t() {
-    const UNINIT: ::std::mem::MaybeUninit<c_G_fpos64_t> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<c_G_fpos64_t>(),
-        16usize,
-        concat!("Size of: ", stringify!(c_G_fpos64_t))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<c_G_fpos64_t>(),
-        8usize,
-        concat!("Alignment of ", stringify!(c_G_fpos64_t))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__pos) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c_G_fpos64_t),
-            "::",
-            stringify!(__pos)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__state) as usize - ptr as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c_G_fpos64_t),
-            "::",
-            stringify!(__state)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<c_G_fpos64_t> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<c_G_fpos64_t>(),
+		16usize,
+		concat!("Size of: ", stringify!(c_G_fpos64_t))
+	);
+	assert_eq!(
+		::std::mem::align_of::<c_G_fpos64_t>(),
+		8usize,
+		concat!("Alignment of ", stringify!(c_G_fpos64_t))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__pos) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c_G_fpos64_t),
+			"::",
+			stringify!(__pos)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__state) as usize - ptr as usize },
+		8usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c_G_fpos64_t),
+			"::",
+			stringify!(__state)
+		)
+	);
 }
 pub type c__fpos64_t = c_G_fpos64_t;
 pub type c__FILE = c_IO_FILE;
@@ -3562,1958 +3383,1808 @@ pub type cFILE = c_IO_FILE;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct c_IO_marker {
-    _unused: [u8; 0],
+	_unused: [u8; 0],
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct c_IO_codecvt {
-    _unused: [u8; 0],
+	_unused: [u8; 0],
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct c_IO_wide_data {
-    _unused: [u8; 0],
+	_unused: [u8; 0],
 }
 pub type c_IO_lock_t = ::std::os::raw::c_void;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct c_IO_FILE {
-    pub _flags: ::std::os::raw::c_int,
-    pub _IO_read_ptr: *mut ::std::os::raw::c_char,
-    pub _IO_read_end: *mut ::std::os::raw::c_char,
-    pub _IO_read_base: *mut ::std::os::raw::c_char,
-    pub _IO_write_base: *mut ::std::os::raw::c_char,
-    pub _IO_write_ptr: *mut ::std::os::raw::c_char,
-    pub _IO_write_end: *mut ::std::os::raw::c_char,
-    pub _IO_buf_base: *mut ::std::os::raw::c_char,
-    pub _IO_buf_end: *mut ::std::os::raw::c_char,
-    pub _IO_save_base: *mut ::std::os::raw::c_char,
-    pub _IO_backup_base: *mut ::std::os::raw::c_char,
-    pub _IO_save_end: *mut ::std::os::raw::c_char,
-    pub _markers: *mut c_IO_marker,
-    pub _chain: *mut c_IO_FILE,
-    pub _fileno: ::std::os::raw::c_int,
-    pub _flags2: ::std::os::raw::c_int,
-    pub _old_offset: c__off_t,
-    pub _cur_column: ::std::os::raw::c_ushort,
-    pub _vtable_offset: ::std::os::raw::c_schar,
-    pub _shortbuf: [::std::os::raw::c_char; 1usize],
-    pub _lock: *mut c_IO_lock_t,
-    pub _offset: c__off64_t,
-    pub _codecvt: *mut c_IO_codecvt,
-    pub _wide_data: *mut c_IO_wide_data,
-    pub _freeres_list: *mut c_IO_FILE,
-    pub _freeres_buf: *mut ::std::os::raw::c_void,
-    pub __pad5: usize,
-    pub _mode: ::std::os::raw::c_int,
-    pub _unused2: [::std::os::raw::c_char; 20usize],
+	pub _flags: ::std::os::raw::c_int,
+	pub _IO_read_ptr: *mut ::std::os::raw::c_char,
+	pub _IO_read_end: *mut ::std::os::raw::c_char,
+	pub _IO_read_base: *mut ::std::os::raw::c_char,
+	pub _IO_write_base: *mut ::std::os::raw::c_char,
+	pub _IO_write_ptr: *mut ::std::os::raw::c_char,
+	pub _IO_write_end: *mut ::std::os::raw::c_char,
+	pub _IO_buf_base: *mut ::std::os::raw::c_char,
+	pub _IO_buf_end: *mut ::std::os::raw::c_char,
+	pub _IO_save_base: *mut ::std::os::raw::c_char,
+	pub _IO_backup_base: *mut ::std::os::raw::c_char,
+	pub _IO_save_end: *mut ::std::os::raw::c_char,
+	pub _markers: *mut c_IO_marker,
+	pub _chain: *mut c_IO_FILE,
+	pub _fileno: ::std::os::raw::c_int,
+	pub _flags2: ::std::os::raw::c_int,
+	pub _old_offset: c__off_t,
+	pub _cur_column: ::std::os::raw::c_ushort,
+	pub _vtable_offset: ::std::os::raw::c_schar,
+	pub _shortbuf: [::std::os::raw::c_char; 1usize],
+	pub _lock: *mut c_IO_lock_t,
+	pub _offset: c__off64_t,
+	pub _codecvt: *mut c_IO_codecvt,
+	pub _wide_data: *mut c_IO_wide_data,
+	pub _freeres_list: *mut c_IO_FILE,
+	pub _freeres_buf: *mut ::std::os::raw::c_void,
+	pub __pad5: usize,
+	pub _mode: ::std::os::raw::c_int,
+	pub _unused2: [::std::os::raw::c_char; 20usize],
 }
 #[test]
 fn bindgen_test_layout_c_IO_FILE() {
-    const UNINIT: ::std::mem::MaybeUninit<c_IO_FILE> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<c_IO_FILE>(),
-        216usize,
-        concat!("Size of: ", stringify!(c_IO_FILE))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<c_IO_FILE>(),
-        8usize,
-        concat!("Alignment of ", stringify!(c_IO_FILE))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr)._flags) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c_IO_FILE),
-            "::",
-            stringify!(_flags)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr)._IO_read_ptr) as usize - ptr as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c_IO_FILE),
-            "::",
-            stringify!(_IO_read_ptr)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr)._IO_read_end) as usize - ptr as usize },
-        16usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c_IO_FILE),
-            "::",
-            stringify!(_IO_read_end)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr)._IO_read_base) as usize - ptr as usize },
-        24usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c_IO_FILE),
-            "::",
-            stringify!(_IO_read_base)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr)._IO_write_base) as usize - ptr as usize },
-        32usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c_IO_FILE),
-            "::",
-            stringify!(_IO_write_base)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr)._IO_write_ptr) as usize - ptr as usize },
-        40usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c_IO_FILE),
-            "::",
-            stringify!(_IO_write_ptr)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr)._IO_write_end) as usize - ptr as usize },
-        48usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c_IO_FILE),
-            "::",
-            stringify!(_IO_write_end)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr)._IO_buf_base) as usize - ptr as usize },
-        56usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c_IO_FILE),
-            "::",
-            stringify!(_IO_buf_base)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr)._IO_buf_end) as usize - ptr as usize },
-        64usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c_IO_FILE),
-            "::",
-            stringify!(_IO_buf_end)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr)._IO_save_base) as usize - ptr as usize },
-        72usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c_IO_FILE),
-            "::",
-            stringify!(_IO_save_base)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr)._IO_backup_base) as usize - ptr as usize },
-        80usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c_IO_FILE),
-            "::",
-            stringify!(_IO_backup_base)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr)._IO_save_end) as usize - ptr as usize },
-        88usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c_IO_FILE),
-            "::",
-            stringify!(_IO_save_end)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr)._markers) as usize - ptr as usize },
-        96usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c_IO_FILE),
-            "::",
-            stringify!(_markers)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr)._chain) as usize - ptr as usize },
-        104usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c_IO_FILE),
-            "::",
-            stringify!(_chain)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr)._fileno) as usize - ptr as usize },
-        112usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c_IO_FILE),
-            "::",
-            stringify!(_fileno)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr)._flags2) as usize - ptr as usize },
-        116usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c_IO_FILE),
-            "::",
-            stringify!(_flags2)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr)._old_offset) as usize - ptr as usize },
-        120usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c_IO_FILE),
-            "::",
-            stringify!(_old_offset)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr)._cur_column) as usize - ptr as usize },
-        128usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c_IO_FILE),
-            "::",
-            stringify!(_cur_column)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr)._vtable_offset) as usize - ptr as usize },
-        130usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c_IO_FILE),
-            "::",
-            stringify!(_vtable_offset)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr)._shortbuf) as usize - ptr as usize },
-        131usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c_IO_FILE),
-            "::",
-            stringify!(_shortbuf)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr)._lock) as usize - ptr as usize },
-        136usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c_IO_FILE),
-            "::",
-            stringify!(_lock)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr)._offset) as usize - ptr as usize },
-        144usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c_IO_FILE),
-            "::",
-            stringify!(_offset)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr)._codecvt) as usize - ptr as usize },
-        152usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c_IO_FILE),
-            "::",
-            stringify!(_codecvt)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr)._wide_data) as usize - ptr as usize },
-        160usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c_IO_FILE),
-            "::",
-            stringify!(_wide_data)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr)._freeres_list) as usize - ptr as usize },
-        168usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c_IO_FILE),
-            "::",
-            stringify!(_freeres_list)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr)._freeres_buf) as usize - ptr as usize },
-        176usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c_IO_FILE),
-            "::",
-            stringify!(_freeres_buf)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).__pad5) as usize - ptr as usize },
-        184usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c_IO_FILE),
-            "::",
-            stringify!(__pad5)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr)._mode) as usize - ptr as usize },
-        192usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c_IO_FILE),
-            "::",
-            stringify!(_mode)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr)._unused2) as usize - ptr as usize },
-        196usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c_IO_FILE),
-            "::",
-            stringify!(_unused2)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<c_IO_FILE> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<c_IO_FILE>(),
+		216usize,
+		concat!("Size of: ", stringify!(c_IO_FILE))
+	);
+	assert_eq!(
+		::std::mem::align_of::<c_IO_FILE>(),
+		8usize,
+		concat!("Alignment of ", stringify!(c_IO_FILE))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr)._flags) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c_IO_FILE),
+			"::",
+			stringify!(_flags)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr)._IO_read_ptr) as usize - ptr as usize },
+		8usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c_IO_FILE),
+			"::",
+			stringify!(_IO_read_ptr)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr)._IO_read_end) as usize - ptr as usize },
+		16usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c_IO_FILE),
+			"::",
+			stringify!(_IO_read_end)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr)._IO_read_base) as usize - ptr as usize },
+		24usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c_IO_FILE),
+			"::",
+			stringify!(_IO_read_base)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr)._IO_write_base) as usize - ptr as usize },
+		32usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c_IO_FILE),
+			"::",
+			stringify!(_IO_write_base)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr)._IO_write_ptr) as usize - ptr as usize },
+		40usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c_IO_FILE),
+			"::",
+			stringify!(_IO_write_ptr)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr)._IO_write_end) as usize - ptr as usize },
+		48usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c_IO_FILE),
+			"::",
+			stringify!(_IO_write_end)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr)._IO_buf_base) as usize - ptr as usize },
+		56usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c_IO_FILE),
+			"::",
+			stringify!(_IO_buf_base)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr)._IO_buf_end) as usize - ptr as usize },
+		64usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c_IO_FILE),
+			"::",
+			stringify!(_IO_buf_end)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr)._IO_save_base) as usize - ptr as usize },
+		72usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c_IO_FILE),
+			"::",
+			stringify!(_IO_save_base)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr)._IO_backup_base) as usize - ptr as usize },
+		80usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c_IO_FILE),
+			"::",
+			stringify!(_IO_backup_base)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr)._IO_save_end) as usize - ptr as usize },
+		88usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c_IO_FILE),
+			"::",
+			stringify!(_IO_save_end)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr)._markers) as usize - ptr as usize },
+		96usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c_IO_FILE),
+			"::",
+			stringify!(_markers)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr)._chain) as usize - ptr as usize },
+		104usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c_IO_FILE),
+			"::",
+			stringify!(_chain)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr)._fileno) as usize - ptr as usize },
+		112usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c_IO_FILE),
+			"::",
+			stringify!(_fileno)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr)._flags2) as usize - ptr as usize },
+		116usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c_IO_FILE),
+			"::",
+			stringify!(_flags2)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr)._old_offset) as usize - ptr as usize },
+		120usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c_IO_FILE),
+			"::",
+			stringify!(_old_offset)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr)._cur_column) as usize - ptr as usize },
+		128usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c_IO_FILE),
+			"::",
+			stringify!(_cur_column)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr)._vtable_offset) as usize - ptr as usize },
+		130usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c_IO_FILE),
+			"::",
+			stringify!(_vtable_offset)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr)._shortbuf) as usize - ptr as usize },
+		131usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c_IO_FILE),
+			"::",
+			stringify!(_shortbuf)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr)._lock) as usize - ptr as usize },
+		136usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c_IO_FILE),
+			"::",
+			stringify!(_lock)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr)._offset) as usize - ptr as usize },
+		144usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c_IO_FILE),
+			"::",
+			stringify!(_offset)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr)._codecvt) as usize - ptr as usize },
+		152usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c_IO_FILE),
+			"::",
+			stringify!(_codecvt)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr)._wide_data) as usize - ptr as usize },
+		160usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c_IO_FILE),
+			"::",
+			stringify!(_wide_data)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr)._freeres_list) as usize - ptr as usize },
+		168usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c_IO_FILE),
+			"::",
+			stringify!(_freeres_list)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr)._freeres_buf) as usize - ptr as usize },
+		176usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c_IO_FILE),
+			"::",
+			stringify!(_freeres_buf)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__pad5) as usize - ptr as usize },
+		184usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c_IO_FILE),
+			"::",
+			stringify!(__pad5)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr)._mode) as usize - ptr as usize },
+		192usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c_IO_FILE),
+			"::",
+			stringify!(_mode)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr)._unused2) as usize - ptr as usize },
+		196usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c_IO_FILE),
+			"::",
+			stringify!(_unused2)
+		)
+	);
 }
 pub type cva_list = c__gnuc_va_list;
 pub type cfpos_t = c__fpos_t;
 extern "C" {
-    #[link_name = "\u{1}stdin"]
-    pub static mut cstdin: *mut cFILE;
+	#[link_name = "\u{1}stdin"]
+	pub static mut cstdin: *mut cFILE;
 }
 extern "C" {
-    #[link_name = "\u{1}stdout"]
-    pub static mut cstdout: *mut cFILE;
+	#[link_name = "\u{1}stdout"]
+	pub static mut cstdout: *mut cFILE;
 }
 extern "C" {
-    #[link_name = "\u{1}stderr"]
-    pub static mut cstderr: *mut cFILE;
+	#[link_name = "\u{1}stderr"]
+	pub static mut cstderr: *mut cFILE;
 }
 extern "C" {
-    #[link_name = "\u{1}remove"]
-    pub fn cremove(__filename: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}remove"]
+	pub fn cremove(__filename: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}rename"]
-    pub fn crename(
-        __old: *const ::std::os::raw::c_char,
-        __new: *const ::std::os::raw::c_char,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}rename"]
+	pub fn crename(
+		__old: *const ::std::os::raw::c_char, __new: *const ::std::os::raw::c_char,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}renameat"]
-    pub fn crenameat(
-        __oldfd: ::std::os::raw::c_int,
-        __old: *const ::std::os::raw::c_char,
-        __newfd: ::std::os::raw::c_int,
-        __new: *const ::std::os::raw::c_char,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}renameat"]
+	pub fn crenameat(
+		__oldfd: ::std::os::raw::c_int, __old: *const ::std::os::raw::c_char,
+		__newfd: ::std::os::raw::c_int, __new: *const ::std::os::raw::c_char,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}fclose"]
-    pub fn cfclose(__stream: *mut cFILE) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}fclose"]
+	pub fn cfclose(__stream: *mut cFILE) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}tmpfile"]
-    pub fn ctmpfile() -> *mut cFILE;
+	#[link_name = "\u{1}tmpfile"]
+	pub fn ctmpfile() -> *mut cFILE;
 }
 extern "C" {
-    #[link_name = "\u{1}tmpnam"]
-    pub fn ctmpnam(arg1: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}tmpnam"]
+	pub fn ctmpnam(arg1: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[link_name = "\u{1}tmpnam_r"]
-    pub fn ctmpnam_r(__s: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}tmpnam_r"]
+	pub fn ctmpnam_r(__s: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[link_name = "\u{1}tempnam"]
-    pub fn ctempnam(
-        __dir: *const ::std::os::raw::c_char,
-        __pfx: *const ::std::os::raw::c_char,
-    ) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}tempnam"]
+	pub fn ctempnam(
+		__dir: *const ::std::os::raw::c_char, __pfx: *const ::std::os::raw::c_char,
+	) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[link_name = "\u{1}fflush"]
-    pub fn cfflush(__stream: *mut cFILE) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}fflush"]
+	pub fn cfflush(__stream: *mut cFILE) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}fflush_unlocked"]
-    pub fn cfflush_unlocked(__stream: *mut cFILE) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}fflush_unlocked"]
+	pub fn cfflush_unlocked(__stream: *mut cFILE) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}fopen"]
-    pub fn cfopen(
-        __filename: *const ::std::os::raw::c_char,
-        __modes: *const ::std::os::raw::c_char,
-    ) -> *mut cFILE;
+	#[link_name = "\u{1}fopen"]
+	pub fn cfopen(
+		__filename: *const ::std::os::raw::c_char, __modes: *const ::std::os::raw::c_char,
+	) -> *mut cFILE;
 }
 extern "C" {
-    #[link_name = "\u{1}freopen"]
-    pub fn cfreopen(
-        __filename: *const ::std::os::raw::c_char,
-        __modes: *const ::std::os::raw::c_char,
-        __stream: *mut cFILE,
-    ) -> *mut cFILE;
+	#[link_name = "\u{1}freopen"]
+	pub fn cfreopen(
+		__filename: *const ::std::os::raw::c_char, __modes: *const ::std::os::raw::c_char,
+		__stream: *mut cFILE,
+	) -> *mut cFILE;
 }
 extern "C" {
-    #[link_name = "\u{1}fdopen"]
-    pub fn cfdopen(
-        __fd: ::std::os::raw::c_int,
-        __modes: *const ::std::os::raw::c_char,
-    ) -> *mut cFILE;
+	#[link_name = "\u{1}fdopen"]
+	pub fn cfdopen(
+		__fd: ::std::os::raw::c_int, __modes: *const ::std::os::raw::c_char,
+	) -> *mut cFILE;
 }
 extern "C" {
-    #[link_name = "\u{1}fmemopen"]
-    pub fn cfmemopen(
-        __s: *mut ::std::os::raw::c_void,
-        __len: usize,
-        __modes: *const ::std::os::raw::c_char,
-    ) -> *mut cFILE;
+	#[link_name = "\u{1}fmemopen"]
+	pub fn cfmemopen(
+		__s: *mut ::std::os::raw::c_void, __len: usize, __modes: *const ::std::os::raw::c_char,
+	) -> *mut cFILE;
 }
 extern "C" {
-    #[link_name = "\u{1}open_memstream"]
-    pub fn copen_memstream(
-        __bufloc: *mut *mut ::std::os::raw::c_char,
-        __sizeloc: *mut usize,
-    ) -> *mut cFILE;
+	#[link_name = "\u{1}open_memstream"]
+	pub fn copen_memstream(
+		__bufloc: *mut *mut ::std::os::raw::c_char, __sizeloc: *mut usize,
+	) -> *mut cFILE;
 }
 extern "C" {
-    #[link_name = "\u{1}setbuf"]
-    pub fn csetbuf(__stream: *mut cFILE, __buf: *mut ::std::os::raw::c_char);
+	#[link_name = "\u{1}setbuf"]
+	pub fn csetbuf(__stream: *mut cFILE, __buf: *mut ::std::os::raw::c_char);
 }
 extern "C" {
-    #[link_name = "\u{1}setvbuf"]
-    pub fn csetvbuf(
-        __stream: *mut cFILE,
-        __buf: *mut ::std::os::raw::c_char,
-        __modes: ::std::os::raw::c_int,
-        __n: usize,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}setvbuf"]
+	pub fn csetvbuf(
+		__stream: *mut cFILE, __buf: *mut ::std::os::raw::c_char, __modes: ::std::os::raw::c_int,
+		__n: usize,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}setbuffer"]
-    pub fn csetbuffer(__stream: *mut cFILE, __buf: *mut ::std::os::raw::c_char, __size: usize);
+	#[link_name = "\u{1}setbuffer"]
+	pub fn csetbuffer(__stream: *mut cFILE, __buf: *mut ::std::os::raw::c_char, __size: usize);
 }
 extern "C" {
-    #[link_name = "\u{1}setlinebuf"]
-    pub fn csetlinebuf(__stream: *mut cFILE);
+	#[link_name = "\u{1}setlinebuf"]
+	pub fn csetlinebuf(__stream: *mut cFILE);
 }
 extern "C" {
-    #[link_name = "\u{1}fprintf"]
-    pub fn cfprintf(
-        __stream: *mut cFILE,
-        __format: *const ::std::os::raw::c_char,
-        ...
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}fprintf"]
+	pub fn cfprintf(
+		__stream: *mut cFILE, __format: *const ::std::os::raw::c_char, ...
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}printf"]
-    pub fn cprintf(__format: *const ::std::os::raw::c_char, ...) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}printf"]
+	pub fn cprintf(__format: *const ::std::os::raw::c_char, ...) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}sprintf"]
-    pub fn csprintf(
-        __s: *mut ::std::os::raw::c_char,
-        __format: *const ::std::os::raw::c_char,
-        ...
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}sprintf"]
+	pub fn csprintf(
+		__s: *mut ::std::os::raw::c_char, __format: *const ::std::os::raw::c_char, ...
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}vfprintf"]
-    pub fn cvfprintf(
-        __s: *mut cFILE,
-        __format: *const ::std::os::raw::c_char,
-        __arg: *mut c__va_list_tag,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}vfprintf"]
+	pub fn cvfprintf(
+		__s: *mut cFILE, __format: *const ::std::os::raw::c_char, __arg: *mut c__va_list_tag,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}vprintf"]
-    pub fn cvprintf(
-        __format: *const ::std::os::raw::c_char,
-        __arg: *mut c__va_list_tag,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}vprintf"]
+	pub fn cvprintf(
+		__format: *const ::std::os::raw::c_char, __arg: *mut c__va_list_tag,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}vsprintf"]
-    pub fn cvsprintf(
-        __s: *mut ::std::os::raw::c_char,
-        __format: *const ::std::os::raw::c_char,
-        __arg: *mut c__va_list_tag,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}vsprintf"]
+	pub fn cvsprintf(
+		__s: *mut ::std::os::raw::c_char, __format: *const ::std::os::raw::c_char,
+		__arg: *mut c__va_list_tag,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}snprintf"]
-    pub fn csnprintf(
-        __s: *mut ::std::os::raw::c_char,
-        __maxlen: ::std::os::raw::c_ulong,
-        __format: *const ::std::os::raw::c_char,
-        ...
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}snprintf"]
+	pub fn csnprintf(
+		__s: *mut ::std::os::raw::c_char, __maxlen: ::std::os::raw::c_ulong,
+		__format: *const ::std::os::raw::c_char, ...
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}vsnprintf"]
-    pub fn cvsnprintf(
-        __s: *mut ::std::os::raw::c_char,
-        __maxlen: ::std::os::raw::c_ulong,
-        __format: *const ::std::os::raw::c_char,
-        __arg: *mut c__va_list_tag,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}vsnprintf"]
+	pub fn cvsnprintf(
+		__s: *mut ::std::os::raw::c_char, __maxlen: ::std::os::raw::c_ulong,
+		__format: *const ::std::os::raw::c_char, __arg: *mut c__va_list_tag,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}vdprintf"]
-    pub fn cvdprintf(
-        __fd: ::std::os::raw::c_int,
-        __fmt: *const ::std::os::raw::c_char,
-        __arg: *mut c__va_list_tag,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}vdprintf"]
+	pub fn cvdprintf(
+		__fd: ::std::os::raw::c_int, __fmt: *const ::std::os::raw::c_char,
+		__arg: *mut c__va_list_tag,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}dprintf"]
-    pub fn cdprintf(
-        __fd: ::std::os::raw::c_int,
-        __fmt: *const ::std::os::raw::c_char,
-        ...
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}dprintf"]
+	pub fn cdprintf(
+		__fd: ::std::os::raw::c_int, __fmt: *const ::std::os::raw::c_char, ...
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}fscanf"]
-    pub fn cfscanf(
-        __stream: *mut cFILE,
-        __format: *const ::std::os::raw::c_char,
-        ...
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}fscanf"]
+	pub fn cfscanf(
+		__stream: *mut cFILE, __format: *const ::std::os::raw::c_char, ...
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}scanf"]
-    pub fn cscanf(__format: *const ::std::os::raw::c_char, ...) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}scanf"]
+	pub fn cscanf(__format: *const ::std::os::raw::c_char, ...) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}sscanf"]
-    pub fn csscanf(
-        __s: *const ::std::os::raw::c_char,
-        __format: *const ::std::os::raw::c_char,
-        ...
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}sscanf"]
+	pub fn csscanf(
+		__s: *const ::std::os::raw::c_char, __format: *const ::std::os::raw::c_char, ...
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}__isoc99_fscanf"]
-    pub fn cfscanf1(
-        __stream: *mut cFILE,
-        __format: *const ::std::os::raw::c_char,
-        ...
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}__isoc99_fscanf"]
+	pub fn cfscanf1(
+		__stream: *mut cFILE, __format: *const ::std::os::raw::c_char, ...
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}__isoc99_scanf"]
-    pub fn cscanf1(__format: *const ::std::os::raw::c_char, ...) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}__isoc99_scanf"]
+	pub fn cscanf1(__format: *const ::std::os::raw::c_char, ...) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}__isoc99_sscanf"]
-    pub fn csscanf1(
-        __s: *const ::std::os::raw::c_char,
-        __format: *const ::std::os::raw::c_char,
-        ...
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}__isoc99_sscanf"]
+	pub fn csscanf1(
+		__s: *const ::std::os::raw::c_char, __format: *const ::std::os::raw::c_char, ...
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}vfscanf"]
-    pub fn cvfscanf(
-        __s: *mut cFILE,
-        __format: *const ::std::os::raw::c_char,
-        __arg: *mut c__va_list_tag,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}vfscanf"]
+	pub fn cvfscanf(
+		__s: *mut cFILE, __format: *const ::std::os::raw::c_char, __arg: *mut c__va_list_tag,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}vscanf"]
-    pub fn cvscanf(
-        __format: *const ::std::os::raw::c_char,
-        __arg: *mut c__va_list_tag,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}vscanf"]
+	pub fn cvscanf(
+		__format: *const ::std::os::raw::c_char, __arg: *mut c__va_list_tag,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}vsscanf"]
-    pub fn cvsscanf(
-        __s: *const ::std::os::raw::c_char,
-        __format: *const ::std::os::raw::c_char,
-        __arg: *mut c__va_list_tag,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}vsscanf"]
+	pub fn cvsscanf(
+		__s: *const ::std::os::raw::c_char, __format: *const ::std::os::raw::c_char,
+		__arg: *mut c__va_list_tag,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}__isoc99_vfscanf"]
-    pub fn cvfscanf1(
-        __s: *mut cFILE,
-        __format: *const ::std::os::raw::c_char,
-        __arg: *mut c__va_list_tag,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}__isoc99_vfscanf"]
+	pub fn cvfscanf1(
+		__s: *mut cFILE, __format: *const ::std::os::raw::c_char, __arg: *mut c__va_list_tag,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}__isoc99_vscanf"]
-    pub fn cvscanf1(
-        __format: *const ::std::os::raw::c_char,
-        __arg: *mut c__va_list_tag,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}__isoc99_vscanf"]
+	pub fn cvscanf1(
+		__format: *const ::std::os::raw::c_char, __arg: *mut c__va_list_tag,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}__isoc99_vsscanf"]
-    pub fn cvsscanf1(
-        __s: *const ::std::os::raw::c_char,
-        __format: *const ::std::os::raw::c_char,
-        __arg: *mut c__va_list_tag,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}__isoc99_vsscanf"]
+	pub fn cvsscanf1(
+		__s: *const ::std::os::raw::c_char, __format: *const ::std::os::raw::c_char,
+		__arg: *mut c__va_list_tag,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}fgetc"]
-    pub fn cfgetc(__stream: *mut cFILE) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}fgetc"]
+	pub fn cfgetc(__stream: *mut cFILE) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}getc"]
-    pub fn cgetc(__stream: *mut cFILE) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}getc"]
+	pub fn cgetc(__stream: *mut cFILE) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}getchar"]
-    pub fn cgetchar() -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}getchar"]
+	pub fn cgetchar() -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}getc_unlocked"]
-    pub fn cgetc_unlocked(__stream: *mut cFILE) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}getc_unlocked"]
+	pub fn cgetc_unlocked(__stream: *mut cFILE) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}getchar_unlocked"]
-    pub fn cgetchar_unlocked() -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}getchar_unlocked"]
+	pub fn cgetchar_unlocked() -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}fgetc_unlocked"]
-    pub fn cfgetc_unlocked(__stream: *mut cFILE) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}fgetc_unlocked"]
+	pub fn cfgetc_unlocked(__stream: *mut cFILE) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}fputc"]
-    pub fn cfputc(__c: ::std::os::raw::c_int, __stream: *mut cFILE) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}fputc"]
+	pub fn cfputc(__c: ::std::os::raw::c_int, __stream: *mut cFILE) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}putc"]
-    pub fn cputc(__c: ::std::os::raw::c_int, __stream: *mut cFILE) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}putc"]
+	pub fn cputc(__c: ::std::os::raw::c_int, __stream: *mut cFILE) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}putchar"]
-    pub fn cputchar(__c: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}putchar"]
+	pub fn cputchar(__c: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}fputc_unlocked"]
-    pub fn cfputc_unlocked(
-        __c: ::std::os::raw::c_int,
-        __stream: *mut cFILE,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}fputc_unlocked"]
+	pub fn cfputc_unlocked(
+		__c: ::std::os::raw::c_int, __stream: *mut cFILE,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}putc_unlocked"]
-    pub fn cputc_unlocked(
-        __c: ::std::os::raw::c_int,
-        __stream: *mut cFILE,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}putc_unlocked"]
+	pub fn cputc_unlocked(
+		__c: ::std::os::raw::c_int, __stream: *mut cFILE,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}putchar_unlocked"]
-    pub fn cputchar_unlocked(__c: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}putchar_unlocked"]
+	pub fn cputchar_unlocked(__c: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}getw"]
-    pub fn cgetw(__stream: *mut cFILE) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}getw"]
+	pub fn cgetw(__stream: *mut cFILE) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}putw"]
-    pub fn cputw(__w: ::std::os::raw::c_int, __stream: *mut cFILE) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}putw"]
+	pub fn cputw(__w: ::std::os::raw::c_int, __stream: *mut cFILE) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}fgets"]
-    pub fn cfgets(
-        __s: *mut ::std::os::raw::c_char,
-        __n: ::std::os::raw::c_int,
-        __stream: *mut cFILE,
-    ) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}fgets"]
+	pub fn cfgets(
+		__s: *mut ::std::os::raw::c_char, __n: ::std::os::raw::c_int, __stream: *mut cFILE,
+	) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[link_name = "\u{1}__getdelim"]
-    pub fn c__getdelim(
-        __lineptr: *mut *mut ::std::os::raw::c_char,
-        __n: *mut usize,
-        __delimiter: ::std::os::raw::c_int,
-        __stream: *mut cFILE,
-    ) -> c__ssize_t;
+	#[link_name = "\u{1}__getdelim"]
+	pub fn c__getdelim(
+		__lineptr: *mut *mut ::std::os::raw::c_char, __n: *mut usize,
+		__delimiter: ::std::os::raw::c_int, __stream: *mut cFILE,
+	) -> c__ssize_t;
 }
 extern "C" {
-    #[link_name = "\u{1}getdelim"]
-    pub fn cgetdelim(
-        __lineptr: *mut *mut ::std::os::raw::c_char,
-        __n: *mut usize,
-        __delimiter: ::std::os::raw::c_int,
-        __stream: *mut cFILE,
-    ) -> c__ssize_t;
+	#[link_name = "\u{1}getdelim"]
+	pub fn cgetdelim(
+		__lineptr: *mut *mut ::std::os::raw::c_char, __n: *mut usize,
+		__delimiter: ::std::os::raw::c_int, __stream: *mut cFILE,
+	) -> c__ssize_t;
 }
 extern "C" {
-    #[link_name = "\u{1}getline"]
-    pub fn cgetline(
-        __lineptr: *mut *mut ::std::os::raw::c_char,
-        __n: *mut usize,
-        __stream: *mut cFILE,
-    ) -> c__ssize_t;
+	#[link_name = "\u{1}getline"]
+	pub fn cgetline(
+		__lineptr: *mut *mut ::std::os::raw::c_char, __n: *mut usize, __stream: *mut cFILE,
+	) -> c__ssize_t;
 }
 extern "C" {
-    #[link_name = "\u{1}fputs"]
-    pub fn cfputs(
-        __s: *const ::std::os::raw::c_char,
-        __stream: *mut cFILE,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}fputs"]
+	pub fn cfputs(
+		__s: *const ::std::os::raw::c_char, __stream: *mut cFILE,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}puts"]
-    pub fn cputs(__s: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}puts"]
+	pub fn cputs(__s: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}ungetc"]
-    pub fn cungetc(__c: ::std::os::raw::c_int, __stream: *mut cFILE) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}ungetc"]
+	pub fn cungetc(__c: ::std::os::raw::c_int, __stream: *mut cFILE) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}fread"]
-    pub fn cfread(
-        __ptr: *mut ::std::os::raw::c_void,
-        __size: ::std::os::raw::c_ulong,
-        __n: ::std::os::raw::c_ulong,
-        __stream: *mut cFILE,
-    ) -> ::std::os::raw::c_ulong;
+	#[link_name = "\u{1}fread"]
+	pub fn cfread(
+		__ptr: *mut ::std::os::raw::c_void, __size: ::std::os::raw::c_ulong,
+		__n: ::std::os::raw::c_ulong, __stream: *mut cFILE,
+	) -> ::std::os::raw::c_ulong;
 }
 extern "C" {
-    #[link_name = "\u{1}fwrite"]
-    pub fn cfwrite(
-        __ptr: *const ::std::os::raw::c_void,
-        __size: ::std::os::raw::c_ulong,
-        __n: ::std::os::raw::c_ulong,
-        __s: *mut cFILE,
-    ) -> ::std::os::raw::c_ulong;
+	#[link_name = "\u{1}fwrite"]
+	pub fn cfwrite(
+		__ptr: *const ::std::os::raw::c_void, __size: ::std::os::raw::c_ulong,
+		__n: ::std::os::raw::c_ulong, __s: *mut cFILE,
+	) -> ::std::os::raw::c_ulong;
 }
 extern "C" {
-    #[link_name = "\u{1}fread_unlocked"]
-    pub fn cfread_unlocked(
-        __ptr: *mut ::std::os::raw::c_void,
-        __size: usize,
-        __n: usize,
-        __stream: *mut cFILE,
-    ) -> usize;
+	#[link_name = "\u{1}fread_unlocked"]
+	pub fn cfread_unlocked(
+		__ptr: *mut ::std::os::raw::c_void, __size: usize, __n: usize, __stream: *mut cFILE,
+	) -> usize;
 }
 extern "C" {
-    #[link_name = "\u{1}fwrite_unlocked"]
-    pub fn cfwrite_unlocked(
-        __ptr: *const ::std::os::raw::c_void,
-        __size: usize,
-        __n: usize,
-        __stream: *mut cFILE,
-    ) -> usize;
+	#[link_name = "\u{1}fwrite_unlocked"]
+	pub fn cfwrite_unlocked(
+		__ptr: *const ::std::os::raw::c_void, __size: usize, __n: usize, __stream: *mut cFILE,
+	) -> usize;
 }
 extern "C" {
-    #[link_name = "\u{1}fseek"]
-    pub fn cfseek(
-        __stream: *mut cFILE,
-        __off: ::std::os::raw::c_long,
-        __whence: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}fseek"]
+	pub fn cfseek(
+		__stream: *mut cFILE, __off: ::std::os::raw::c_long, __whence: ::std::os::raw::c_int,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}ftell"]
-    pub fn cftell(__stream: *mut cFILE) -> ::std::os::raw::c_long;
+	#[link_name = "\u{1}ftell"]
+	pub fn cftell(__stream: *mut cFILE) -> ::std::os::raw::c_long;
 }
 extern "C" {
-    #[link_name = "\u{1}rewind"]
-    pub fn crewind(__stream: *mut cFILE);
+	#[link_name = "\u{1}rewind"]
+	pub fn crewind(__stream: *mut cFILE);
 }
 extern "C" {
-    #[link_name = "\u{1}fseeko"]
-    pub fn cfseeko(
-        __stream: *mut cFILE,
-        __off: c__off_t,
-        __whence: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}fseeko"]
+	pub fn cfseeko(
+		__stream: *mut cFILE, __off: c__off_t, __whence: ::std::os::raw::c_int,
+	) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}ftello"]
-    pub fn cftello(__stream: *mut cFILE) -> c__off_t;
+	#[link_name = "\u{1}ftello"]
+	pub fn cftello(__stream: *mut cFILE) -> c__off_t;
 }
 extern "C" {
-    #[link_name = "\u{1}fgetpos"]
-    pub fn cfgetpos(__stream: *mut cFILE, __pos: *mut cfpos_t) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}fgetpos"]
+	pub fn cfgetpos(__stream: *mut cFILE, __pos: *mut cfpos_t) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}fsetpos"]
-    pub fn cfsetpos(__stream: *mut cFILE, __pos: *const cfpos_t) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}fsetpos"]
+	pub fn cfsetpos(__stream: *mut cFILE, __pos: *const cfpos_t) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}clearerr"]
-    pub fn cclearerr(__stream: *mut cFILE);
+	#[link_name = "\u{1}clearerr"]
+	pub fn cclearerr(__stream: *mut cFILE);
 }
 extern "C" {
-    #[link_name = "\u{1}feof"]
-    pub fn cfeof(__stream: *mut cFILE) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}feof"]
+	pub fn cfeof(__stream: *mut cFILE) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}ferror"]
-    pub fn cferror(__stream: *mut cFILE) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}ferror"]
+	pub fn cferror(__stream: *mut cFILE) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}clearerr_unlocked"]
-    pub fn cclearerr_unlocked(__stream: *mut cFILE);
+	#[link_name = "\u{1}clearerr_unlocked"]
+	pub fn cclearerr_unlocked(__stream: *mut cFILE);
 }
 extern "C" {
-    #[link_name = "\u{1}feof_unlocked"]
-    pub fn cfeof_unlocked(__stream: *mut cFILE) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}feof_unlocked"]
+	pub fn cfeof_unlocked(__stream: *mut cFILE) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}ferror_unlocked"]
-    pub fn cferror_unlocked(__stream: *mut cFILE) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}ferror_unlocked"]
+	pub fn cferror_unlocked(__stream: *mut cFILE) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}perror"]
-    pub fn cperror(__s: *const ::std::os::raw::c_char);
+	#[link_name = "\u{1}perror"]
+	pub fn cperror(__s: *const ::std::os::raw::c_char);
 }
 extern "C" {
-    #[link_name = "\u{1}fileno"]
-    pub fn cfileno(__stream: *mut cFILE) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}fileno"]
+	pub fn cfileno(__stream: *mut cFILE) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}fileno_unlocked"]
-    pub fn cfileno_unlocked(__stream: *mut cFILE) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}fileno_unlocked"]
+	pub fn cfileno_unlocked(__stream: *mut cFILE) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}pclose"]
-    pub fn cpclose(__stream: *mut cFILE) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}pclose"]
+	pub fn cpclose(__stream: *mut cFILE) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}popen"]
-    pub fn cpopen(
-        __command: *const ::std::os::raw::c_char,
-        __modes: *const ::std::os::raw::c_char,
-    ) -> *mut cFILE;
+	#[link_name = "\u{1}popen"]
+	pub fn cpopen(
+		__command: *const ::std::os::raw::c_char, __modes: *const ::std::os::raw::c_char,
+	) -> *mut cFILE;
 }
 extern "C" {
-    #[link_name = "\u{1}ctermid"]
-    pub fn cctermid(__s: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
+	#[link_name = "\u{1}ctermid"]
+	pub fn cctermid(__s: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[link_name = "\u{1}flockfile"]
-    pub fn cflockfile(__stream: *mut cFILE);
+	#[link_name = "\u{1}flockfile"]
+	pub fn cflockfile(__stream: *mut cFILE);
 }
 extern "C" {
-    #[link_name = "\u{1}ftrylockfile"]
-    pub fn cftrylockfile(__stream: *mut cFILE) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}ftrylockfile"]
+	pub fn cftrylockfile(__stream: *mut cFILE) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}funlockfile"]
-    pub fn cfunlockfile(__stream: *mut cFILE);
+	#[link_name = "\u{1}funlockfile"]
+	pub fn cfunlockfile(__stream: *mut cFILE);
 }
 extern "C" {
-    #[link_name = "\u{1}__uflow"]
-    pub fn c__uflow(arg1: *mut cFILE) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}__uflow"]
+	pub fn c__uflow(arg1: *mut cFILE) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}__overflow"]
-    pub fn c__overflow(arg1: *mut cFILE, arg2: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+	#[link_name = "\u{1}__overflow"]
+	pub fn c__overflow(arg1: *mut cFILE, arg2: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct cbw_Dims2D {
-    pub width: u16,
-    pub height: u16,
+	pub width: u16,
+	pub height: u16,
 }
 #[test]
 fn bindgen_test_layout_cbw_Dims2D() {
-    const UNINIT: ::std::mem::MaybeUninit<cbw_Dims2D> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<cbw_Dims2D>(),
-        4usize,
-        concat!("Size of: ", stringify!(cbw_Dims2D))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cbw_Dims2D>(),
-        2usize,
-        concat!("Alignment of ", stringify!(cbw_Dims2D))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).width) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_Dims2D),
-            "::",
-            stringify!(width)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).height) as usize - ptr as usize },
-        2usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_Dims2D),
-            "::",
-            stringify!(height)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<cbw_Dims2D> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<cbw_Dims2D>(),
+		4usize,
+		concat!("Size of: ", stringify!(cbw_Dims2D))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cbw_Dims2D>(),
+		2usize,
+		concat!("Alignment of ", stringify!(cbw_Dims2D))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).width) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_Dims2D),
+			"::",
+			stringify!(width)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).height) as usize - ptr as usize },
+		2usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_Dims2D),
+			"::",
+			stringify!(height)
+		)
+	);
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct cbw_Pos2D {
-    pub x: u16,
-    pub y: u16,
+	pub x: u16,
+	pub y: u16,
 }
 #[test]
 fn bindgen_test_layout_cbw_Pos2D() {
-    const UNINIT: ::std::mem::MaybeUninit<cbw_Pos2D> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<cbw_Pos2D>(),
-        4usize,
-        concat!("Size of: ", stringify!(cbw_Pos2D))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cbw_Pos2D>(),
-        2usize,
-        concat!("Alignment of ", stringify!(cbw_Pos2D))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).x) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_Pos2D),
-            "::",
-            stringify!(x)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).y) as usize - ptr as usize },
-        2usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_Pos2D),
-            "::",
-            stringify!(y)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<cbw_Pos2D> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<cbw_Pos2D>(),
+		4usize,
+		concat!("Size of: ", stringify!(cbw_Pos2D))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cbw_Pos2D>(),
+		2usize,
+		concat!("Alignment of ", stringify!(cbw_Pos2D))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).x) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_Pos2D),
+			"::",
+			stringify!(x)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).y) as usize - ptr as usize },
+		2usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_Pos2D),
+			"::",
+			stringify!(y)
+		)
+	);
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct cbw_WindowImpl {}
 #[test]
 fn bindgen_test_layout_cbw_WindowImpl() {
-    assert_eq!(
-        ::std::mem::size_of::<cbw_WindowImpl>(),
-        0usize,
-        concat!("Size of: ", stringify!(cbw_WindowImpl))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cbw_WindowImpl>(),
-        1usize,
-        concat!("Alignment of ", stringify!(cbw_WindowImpl))
-    );
+	assert_eq!(
+		::std::mem::size_of::<cbw_WindowImpl>(),
+		0usize,
+		concat!("Size of: ", stringify!(cbw_WindowImpl))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cbw_WindowImpl>(),
+		1usize,
+		concat!("Alignment of ", stringify!(cbw_WindowImpl))
+	);
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct cbw_WindowCallbacks {
-    #[doc = " Fired just before the window gets destroyed and freed from memory.\n Should be implemented to free the user data provided to the window."]
-    pub do_cleanup: ::std::option::Option<unsafe extern "C" fn(arg1: *mut cbw_Window)>,
-    #[doc = " Fired when the window has been closed, either by the user or programmatically."]
-    pub on_close: ::std::option::Option<unsafe extern "C" fn(arg1: *const cbw_Window)>,
-    #[doc = " Fired when a window has finished loading"]
-    pub on_loaded: ::std::option::Option<unsafe extern "C" fn(arg1: *const cbw_Window)>,
-    #[doc = " Fired when a window is resizing"]
-    pub on_resize: ::std::option::Option<
-        unsafe extern "C" fn(
-            arg1: *const cbw_Window,
-            width: ::std::os::raw::c_uint,
-            height: ::std::os::raw::c_uint,
-        ),
-    >,
+	#[doc = " Fired just before the window gets destroyed and freed from memory.\n Should be implemented to free the user data provided to the window."]
+	pub do_cleanup: ::std::option::Option<unsafe extern "C" fn(arg1: *mut cbw_Window)>,
+	#[doc = " Fired when the window has been closed, either by the user or programmatically."]
+	pub on_close: ::std::option::Option<unsafe extern "C" fn(arg1: *const cbw_Window)>,
+	#[doc = " Fired when a window has finished loading"]
+	pub on_loaded: ::std::option::Option<unsafe extern "C" fn(arg1: *const cbw_Window)>,
+	#[doc = " Fired when a window is resizing"]
+	pub on_resize: ::std::option::Option<
+		unsafe extern "C" fn(
+			arg1: *const cbw_Window,
+			width: ::std::os::raw::c_uint,
+			height: ::std::os::raw::c_uint,
+		),
+	>,
 }
 #[test]
 fn bindgen_test_layout_cbw_WindowCallbacks() {
-    const UNINIT: ::std::mem::MaybeUninit<cbw_WindowCallbacks> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<cbw_WindowCallbacks>(),
-        32usize,
-        concat!("Size of: ", stringify!(cbw_WindowCallbacks))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cbw_WindowCallbacks>(),
-        8usize,
-        concat!("Alignment of ", stringify!(cbw_WindowCallbacks))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).do_cleanup) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_WindowCallbacks),
-            "::",
-            stringify!(do_cleanup)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).on_close) as usize - ptr as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_WindowCallbacks),
-            "::",
-            stringify!(on_close)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).on_loaded) as usize - ptr as usize },
-        16usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_WindowCallbacks),
-            "::",
-            stringify!(on_loaded)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).on_resize) as usize - ptr as usize },
-        24usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_WindowCallbacks),
-            "::",
-            stringify!(on_resize)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<cbw_WindowCallbacks> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<cbw_WindowCallbacks>(),
+		32usize,
+		concat!("Size of: ", stringify!(cbw_WindowCallbacks))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cbw_WindowCallbacks>(),
+		8usize,
+		concat!("Alignment of ", stringify!(cbw_WindowCallbacks))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).do_cleanup) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_WindowCallbacks),
+			"::",
+			stringify!(do_cleanup)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).on_close) as usize - ptr as usize },
+		8usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_WindowCallbacks),
+			"::",
+			stringify!(on_close)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).on_loaded) as usize - ptr as usize },
+		16usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_WindowCallbacks),
+			"::",
+			stringify!(on_loaded)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).on_resize) as usize - ptr as usize },
+		24usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_WindowCallbacks),
+			"::",
+			stringify!(on_resize)
+		)
+	);
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct cbw_WindowOptions {
-    pub borders: bool,
-    pub minimizable: bool,
-    pub resizable: bool,
+	pub borders: bool,
+	pub minimizable: bool,
+	pub resizable: bool,
 }
 #[test]
 fn bindgen_test_layout_cbw_WindowOptions() {
-    const UNINIT: ::std::mem::MaybeUninit<cbw_WindowOptions> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<cbw_WindowOptions>(),
-        3usize,
-        concat!("Size of: ", stringify!(cbw_WindowOptions))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cbw_WindowOptions>(),
-        1usize,
-        concat!("Alignment of ", stringify!(cbw_WindowOptions))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).borders) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_WindowOptions),
-            "::",
-            stringify!(borders)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).minimizable) as usize - ptr as usize },
-        1usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_WindowOptions),
-            "::",
-            stringify!(minimizable)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).resizable) as usize - ptr as usize },
-        2usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_WindowOptions),
-            "::",
-            stringify!(resizable)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<cbw_WindowOptions> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<cbw_WindowOptions>(),
+		3usize,
+		concat!("Size of: ", stringify!(cbw_WindowOptions))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cbw_WindowOptions>(),
+		1usize,
+		concat!("Alignment of ", stringify!(cbw_WindowOptions))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).borders) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_WindowOptions),
+			"::",
+			stringify!(borders)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).minimizable) as usize - ptr as usize },
+		1usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_WindowOptions),
+			"::",
+			stringify!(minimizable)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).resizable) as usize - ptr as usize },
+		2usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_WindowOptions),
+			"::",
+			stringify!(resizable)
+		)
+	);
 }
 pub type cbw_WindowDispatchFn = ::std::option::Option<
-    unsafe extern "C" fn(window: *mut cbw_Window, data: *mut ::std::os::raw::c_void),
+	unsafe extern "C" fn(window: *mut cbw_Window, data: *mut ::std::os::raw::c_void),
 >;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct cbw_WindowDispatchData {
-    _unused: [u8; 0],
+	_unused: [u8; 0],
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct cbw_Window {
-    pub app: *mut cbw_Application,
-    pub parent: *const cbw_Window,
-    pub closed: bool,
-    pub dropped: bool,
-    pub callbacks: cbw_WindowCallbacks,
-    pub user_data: *mut ::std::os::raw::c_void,
-    pub impl_: cbw_WindowImpl,
+	pub app: *mut cbw_Application,
+	pub parent: *const cbw_Window,
+	pub closed: bool,
+	pub dropped: bool,
+	pub callbacks: cbw_WindowCallbacks,
+	pub user_data: *mut ::std::os::raw::c_void,
+	pub impl_: cbw_WindowImpl,
 }
 #[test]
 fn bindgen_test_layout_cbw_Window() {
-    const UNINIT: ::std::mem::MaybeUninit<cbw_Window> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<cbw_Window>(),
-        64usize,
-        concat!("Size of: ", stringify!(cbw_Window))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cbw_Window>(),
-        8usize,
-        concat!("Alignment of ", stringify!(cbw_Window))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).app) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_Window),
-            "::",
-            stringify!(app)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).parent) as usize - ptr as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_Window),
-            "::",
-            stringify!(parent)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).closed) as usize - ptr as usize },
-        16usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_Window),
-            "::",
-            stringify!(closed)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).dropped) as usize - ptr as usize },
-        17usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_Window),
-            "::",
-            stringify!(dropped)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).callbacks) as usize - ptr as usize },
-        24usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_Window),
-            "::",
-            stringify!(callbacks)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).user_data) as usize - ptr as usize },
-        56usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_Window),
-            "::",
-            stringify!(user_data)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).impl_) as usize - ptr as usize },
-        64usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_Window),
-            "::",
-            stringify!(impl_)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<cbw_Window> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<cbw_Window>(),
+		64usize,
+		concat!("Size of: ", stringify!(cbw_Window))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cbw_Window>(),
+		8usize,
+		concat!("Alignment of ", stringify!(cbw_Window))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).app) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_Window),
+			"::",
+			stringify!(app)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).parent) as usize - ptr as usize },
+		8usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_Window),
+			"::",
+			stringify!(parent)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).closed) as usize - ptr as usize },
+		16usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_Window),
+			"::",
+			stringify!(closed)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).dropped) as usize - ptr as usize },
+		17usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_Window),
+			"::",
+			stringify!(dropped)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).callbacks) as usize - ptr as usize },
+		24usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_Window),
+			"::",
+			stringify!(callbacks)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).user_data) as usize - ptr as usize },
+		56usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_Window),
+			"::",
+			stringify!(user_data)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).impl_) as usize - ptr as usize },
+		64usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_Window),
+			"::",
+			stringify!(impl_)
+		)
+	);
 }
 extern "C" {
-    #[doc = " Destroy the window, releasing all resources it holds.\n After this call, the handle is considered invalid."]
-    #[link_name = "\u{1}bw_Window_destroy"]
-    pub fn cbw_Window_destroy(window: *mut cbw_Window);
+	#[doc = " Destroy the window, releasing all resources it holds.\n After this call, the handle is considered invalid."]
+	#[link_name = "\u{1}bw_Window_destroy"]
+	pub fn cbw_Window_destroy(window: *mut cbw_Window);
 }
 extern "C" {
-    #[doc = " Invalidates the window handle.\n The window will get destroyed when it is deemed possible."]
-    #[link_name = "\u{1}bw_Window_drop"]
-    pub fn cbw_Window_drop(window: *mut cbw_Window);
+	#[doc = " Invalidates the window handle.\n The window will get destroyed when it is deemed possible."]
+	#[link_name = "\u{1}bw_Window_drop"]
+	pub fn cbw_Window_drop(window: *mut cbw_Window);
 }
 extern "C" {
-    #[doc = " Gets the width and height of the usable area inside the window."]
-    #[link_name = "\u{1}bw_Window_getContentDimensions"]
-    pub fn cbw_Window_getContentDimensions(window: *mut cbw_Window) -> cbw_Dims2D;
+	#[doc = " Gets the width and height of the usable area inside the window."]
+	#[link_name = "\u{1}bw_Window_getContentDimensions"]
+	pub fn cbw_Window_getContentDimensions(window: *mut cbw_Window) -> cbw_Dims2D;
 }
 extern "C" {
-    #[doc = " Gets the opacity of the window as a value from 0 to 255."]
-    #[link_name = "\u{1}bw_Window_getOpacity"]
-    pub fn cbw_Window_getOpacity(window: *mut cbw_Window) -> u8;
+	#[doc = " Gets the opacity of the window as a value from 0 to 255."]
+	#[link_name = "\u{1}bw_Window_getOpacity"]
+	pub fn cbw_Window_getOpacity(window: *mut cbw_Window) -> u8;
 }
 extern "C" {
-    #[doc = " Gets the X and Y coordinates of the window position relative to the desktop screen."]
-    #[link_name = "\u{1}bw_Window_getPosition"]
-    pub fn cbw_Window_getPosition(window: *mut cbw_Window) -> cbw_Pos2D;
+	#[doc = " Gets the X and Y coordinates of the window position relative to the desktop screen."]
+	#[link_name = "\u{1}bw_Window_getPosition"]
+	pub fn cbw_Window_getPosition(window: *mut cbw_Window) -> cbw_Pos2D;
 }
 extern "C" {
-    #[doc = " Copies as many bytes into `title` that fit in there.\n Returns the number of characters the title actually has."]
-    #[link_name = "\u{1}bw_Window_getTitle"]
-    pub fn cbw_Window_getTitle(
-        window: *mut cbw_Window,
-        title: *mut *mut ::std::os::raw::c_char,
-    ) -> usize;
+	#[doc = " Copies as many bytes into `title` that fit in there.\n Returns the number of characters the title actually has."]
+	#[link_name = "\u{1}bw_Window_getTitle"]
+	pub fn cbw_Window_getTitle(
+		window: *mut cbw_Window, title: *mut *mut ::std::os::raw::c_char,
+	) -> usize;
 }
 extern "C" {
-    #[doc = " Gets the width and height of the window including the title bar and borders."]
-    #[link_name = "\u{1}bw_Window_getWindowDimensions"]
-    pub fn cbw_Window_getWindowDimensions(window: *mut cbw_Window) -> cbw_Dims2D;
+	#[doc = " Gets the width and height of the window including the title bar and borders."]
+	#[link_name = "\u{1}bw_Window_getWindowDimensions"]
+	pub fn cbw_Window_getWindowDimensions(window: *mut cbw_Window) -> cbw_Dims2D;
 }
 extern "C" {
-    #[link_name = "\u{1}bw_Window_hide"]
-    pub fn cbw_Window_hide(window: *mut cbw_Window);
+	#[link_name = "\u{1}bw_Window_hide"]
+	pub fn cbw_Window_hide(window: *mut cbw_Window);
 }
 extern "C" {
-    #[doc = " Returns whether or not the window is not hidden.\n `bw_Window_show` and `bw_Window_hide` change the visibility."]
-    #[link_name = "\u{1}bw_Window_isVisible"]
-    pub fn cbw_Window_isVisible(window: *const cbw_Window) -> bool;
+	#[doc = " Returns whether or not the window is not hidden.\n `bw_Window_show` and `bw_Window_hide` change the visibility."]
+	#[link_name = "\u{1}bw_Window_isVisible"]
+	pub fn cbw_Window_isVisible(window: *const cbw_Window) -> bool;
 }
 extern "C" {
-    #[doc = " Creates a new (empty) window\n The returned pointer is a handler for the window.\n bw_Window_drop needs to be called on it after it is done being used,\n     otherwise the window is never actually destroyed and memory leakes happen."]
-    #[link_name = "\u{1}bw_Window_new"]
-    pub fn cbw_Window_new(
-        app: *mut cbw_Application,
-        parent: *const cbw_Window,
-        _title: cbw_CStrSlice,
-        width: ::std::os::raw::c_int,
-        height: ::std::os::raw::c_int,
-        options: *const cbw_WindowOptions,
-        user_data: *mut ::std::os::raw::c_void,
-    ) -> *mut cbw_Window;
+	#[doc = " Creates a new (empty) window\n The returned pointer is a handler for the window.\n bw_Window_drop needs to be called on it after it is done being used,\n     otherwise the window is never actually destroyed and memory leakes happen."]
+	#[link_name = "\u{1}bw_Window_new"]
+	pub fn cbw_Window_new(
+		app: *mut cbw_Application, parent: *const cbw_Window, _title: cbw_CStrSlice,
+		width: ::std::os::raw::c_int, height: ::std::os::raw::c_int,
+		options: *const cbw_WindowOptions, user_data: *mut ::std::os::raw::c_void,
+	) -> *mut cbw_Window;
 }
 extern "C" {
-    #[link_name = "\u{1}bw_Window_setContentDimensions"]
-    pub fn cbw_Window_setContentDimensions(window: *mut cbw_Window, dimensions: cbw_Dims2D);
+	#[link_name = "\u{1}bw_Window_setContentDimensions"]
+	pub fn cbw_Window_setContentDimensions(window: *mut cbw_Window, dimensions: cbw_Dims2D);
 }
 extern "C" {
-    #[link_name = "\u{1}bw_Window_setOpacity"]
-    pub fn cbw_Window_setOpacity(window: *mut cbw_Window, opacity: u8);
+	#[link_name = "\u{1}bw_Window_setOpacity"]
+	pub fn cbw_Window_setOpacity(window: *mut cbw_Window, opacity: u8);
 }
 extern "C" {
-    #[link_name = "\u{1}bw_Window_setPosition"]
-    pub fn cbw_Window_setPosition(window: *mut cbw_Window, position: cbw_Pos2D);
+	#[link_name = "\u{1}bw_Window_setPosition"]
+	pub fn cbw_Window_setPosition(window: *mut cbw_Window, position: cbw_Pos2D);
 }
 extern "C" {
-    #[doc = " Applies the given title;"]
-    #[link_name = "\u{1}bw_Window_setTitle"]
-    pub fn cbw_Window_setTitle(window: *mut cbw_Window, title: cbw_CStrSlice);
+	#[doc = " Applies the given title;"]
+	#[link_name = "\u{1}bw_Window_setTitle"]
+	pub fn cbw_Window_setTitle(window: *mut cbw_Window, title: cbw_CStrSlice);
 }
 extern "C" {
-    #[link_name = "\u{1}bw_Window_setWindowDimensions"]
-    pub fn cbw_Window_setWindowDimensions(window: *mut cbw_Window, dimensions: cbw_Dims2D);
+	#[link_name = "\u{1}bw_Window_setWindowDimensions"]
+	pub fn cbw_Window_setWindowDimensions(window: *mut cbw_Window, dimensions: cbw_Dims2D);
 }
 extern "C" {
-    #[doc = " Shows the window if it was previously hidden\n Is generally called after window creation."]
-    #[link_name = "\u{1}bw_Window_show"]
-    pub fn cbw_Window_show(window: *mut cbw_Window);
+	#[doc = " Shows the window if it was previously hidden\n Is generally called after window creation."]
+	#[link_name = "\u{1}bw_Window_show"]
+	pub fn cbw_Window_show(window: *mut cbw_Window);
 }
 extern "C" {
-    #[link_name = "\u{1}bw_Window_triggerClose"]
-    pub fn cbw_Window_triggerClose(window: *mut cbw_Window);
+	#[link_name = "\u{1}bw_Window_triggerClose"]
+	pub fn cbw_Window_triggerClose(window: *mut cbw_Window);
 }
 extern "C" {
-    #[link_name = "\u{1}_bw_Window_onResize"]
-    pub fn c_bw_Window_onResize(
-        window: *const cbw_Window,
-        width: ::std::os::raw::c_uint,
-        height: ::std::os::raw::c_uint,
-    );
+	#[link_name = "\u{1}_bw_Window_onResize"]
+	pub fn c_bw_Window_onResize(
+		window: *const cbw_Window, width: ::std::os::raw::c_uint, height: ::std::os::raw::c_uint,
+	);
 }
 pub type cbw_BrowserWindowCreationCallbackFn = ::std::option::Option<
-    unsafe extern "C" fn(window: *mut cbw_BrowserWindow, data: *mut ::std::os::raw::c_void),
+	unsafe extern "C" fn(window: *mut cbw_BrowserWindow, data: *mut ::std::os::raw::c_void),
 >;
 pub type cbw_BrowserWindowHandlerFn = ::std::option::Option<
-    unsafe extern "C" fn(
-        window: *mut cbw_BrowserWindow,
-        cmd: cbw_CStrSlice,
-        args: *mut cbw_CStrSlice,
-        arg_count: usize,
-    ),
+	unsafe extern "C" fn(
+		window: *mut cbw_BrowserWindow,
+		cmd: cbw_CStrSlice,
+		args: *mut cbw_CStrSlice,
+		arg_count: usize,
+	),
 >;
 pub type cbw_BrowserWindowJsCallbackFn = ::std::option::Option<
-    unsafe extern "C" fn(
-        window: *mut cbw_BrowserWindow,
-        user_data: *mut ::std::os::raw::c_void,
-        result: *const ::std::os::raw::c_char,
-        err: *const cbw_Err,
-    ),
+	unsafe extern "C" fn(
+		window: *mut cbw_BrowserWindow,
+		user_data: *mut ::std::os::raw::c_void,
+		result: *const ::std::os::raw::c_char,
+		err: *const cbw_Err,
+	),
 >;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct cbw_BrowserWindowOptions {
-    pub dev_tools: cBOOL,
-    pub resource_path: cbw_CStrSlice,
+	pub dev_tools: cBOOL,
+	pub resource_path: cbw_CStrSlice,
 }
 #[test]
 fn bindgen_test_layout_cbw_BrowserWindowOptions() {
-    const UNINIT: ::std::mem::MaybeUninit<cbw_BrowserWindowOptions> =
-        ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<cbw_BrowserWindowOptions>(),
-        24usize,
-        concat!("Size of: ", stringify!(cbw_BrowserWindowOptions))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cbw_BrowserWindowOptions>(),
-        8usize,
-        concat!("Alignment of ", stringify!(cbw_BrowserWindowOptions))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).dev_tools) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_BrowserWindowOptions),
-            "::",
-            stringify!(dev_tools)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).resource_path) as usize - ptr as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_BrowserWindowOptions),
-            "::",
-            stringify!(resource_path)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<cbw_BrowserWindowOptions> =
+		::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<cbw_BrowserWindowOptions>(),
+		24usize,
+		concat!("Size of: ", stringify!(cbw_BrowserWindowOptions))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cbw_BrowserWindowOptions>(),
+		8usize,
+		concat!("Alignment of ", stringify!(cbw_BrowserWindowOptions))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).dev_tools) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_BrowserWindowOptions),
+			"::",
+			stringify!(dev_tools)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).resource_path) as usize - ptr as usize },
+		8usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_BrowserWindowOptions),
+			"::",
+			stringify!(resource_path)
+		)
+	);
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct cbw_BrowserWindowSource {
-    pub data: cbw_CStrSlice,
-    pub is_html: cBOOL,
+	pub data: cbw_CStrSlice,
+	pub is_html: cBOOL,
 }
 #[test]
 fn bindgen_test_layout_cbw_BrowserWindowSource() {
-    const UNINIT: ::std::mem::MaybeUninit<cbw_BrowserWindowSource> =
-        ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<cbw_BrowserWindowSource>(),
-        24usize,
-        concat!("Size of: ", stringify!(cbw_BrowserWindowSource))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cbw_BrowserWindowSource>(),
-        8usize,
-        concat!("Alignment of ", stringify!(cbw_BrowserWindowSource))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).data) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_BrowserWindowSource),
-            "::",
-            stringify!(data)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).is_html) as usize - ptr as usize },
-        16usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_BrowserWindowSource),
-            "::",
-            stringify!(is_html)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<cbw_BrowserWindowSource> =
+		::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<cbw_BrowserWindowSource>(),
+		24usize,
+		concat!("Size of: ", stringify!(cbw_BrowserWindowSource))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cbw_BrowserWindowSource>(),
+		8usize,
+		concat!("Alignment of ", stringify!(cbw_BrowserWindowSource))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).data) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_BrowserWindowSource),
+			"::",
+			stringify!(data)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).is_html) as usize - ptr as usize },
+		16usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_BrowserWindowSource),
+			"::",
+			stringify!(is_html)
+		)
+	);
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct cbw_BrowserWindow {
-    pub window: *mut cbw_Window,
-    pub external_handler: cbw_BrowserWindowHandlerFn,
-    pub user_data: *mut ::std::os::raw::c_void,
-    pub impl_: cbw_BrowserWindowImpl,
+	pub window: *mut cbw_Window,
+	pub external_handler: cbw_BrowserWindowHandlerFn,
+	pub user_data: *mut ::std::os::raw::c_void,
+	pub impl_: cbw_BrowserWindowImpl,
 }
 #[test]
 fn bindgen_test_layout_cbw_BrowserWindow() {
-    const UNINIT: ::std::mem::MaybeUninit<cbw_BrowserWindow> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<cbw_BrowserWindow>(),
-        40usize,
-        concat!("Size of: ", stringify!(cbw_BrowserWindow))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cbw_BrowserWindow>(),
-        8usize,
-        concat!("Alignment of ", stringify!(cbw_BrowserWindow))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).window) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_BrowserWindow),
-            "::",
-            stringify!(window)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).external_handler) as usize - ptr as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_BrowserWindow),
-            "::",
-            stringify!(external_handler)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).user_data) as usize - ptr as usize },
-        16usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_BrowserWindow),
-            "::",
-            stringify!(user_data)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).impl_) as usize - ptr as usize },
-        24usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_BrowserWindow),
-            "::",
-            stringify!(impl_)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<cbw_BrowserWindow> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<cbw_BrowserWindow>(),
+		24usize,
+		concat!("Size of: ", stringify!(cbw_BrowserWindow))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cbw_BrowserWindow>(),
+		8usize,
+		concat!("Alignment of ", stringify!(cbw_BrowserWindow))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).window) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_BrowserWindow),
+			"::",
+			stringify!(window)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).external_handler) as usize - ptr as usize },
+		8usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_BrowserWindow),
+			"::",
+			stringify!(external_handler)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).user_data) as usize - ptr as usize },
+		16usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_BrowserWindow),
+			"::",
+			stringify!(user_data)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).impl_) as usize - ptr as usize },
+		24usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_BrowserWindow),
+			"::",
+			stringify!(impl_)
+		)
+	);
 }
 extern "C" {
-    #[link_name = "\u{1}bw_BrowserWindow_destroy"]
-    pub fn cbw_BrowserWindow_destroy(bw: *mut cbw_BrowserWindow);
+	#[link_name = "\u{1}bw_BrowserWindow_destroy"]
+	pub fn cbw_BrowserWindow_destroy(bw: *mut cbw_BrowserWindow);
 }
 extern "C" {
-    #[doc = " Marks the browser window handle as not being used anymore.\n This makes it so that if and when the window gets closed, everything is freed and cleaned from memory.\n This function can be called from any thread so it needs to be thread safe."]
-    #[link_name = "\u{1}bw_BrowserWindow_drop"]
-    pub fn cbw_BrowserWindow_drop(bw: *mut cbw_BrowserWindow);
+	#[doc = " Marks the browser window handle as not being used anymore.\n This makes it so that if and when the window gets closed, everything is freed and cleaned from memory.\n This function can be called from any thread so it needs to be thread safe."]
+	#[link_name = "\u{1}bw_BrowserWindow_drop"]
+	pub fn cbw_BrowserWindow_drop(bw: *mut cbw_BrowserWindow);
 }
 extern "C" {
-    #[doc = " Executes the given JavaScript and calls the given callback (on the GUI thread) to provide the result."]
-    #[link_name = "\u{1}bw_BrowserWindow_evalJs"]
-    pub fn cbw_BrowserWindow_evalJs(
-        bw: *mut cbw_BrowserWindow,
-        js: cbw_CStrSlice,
-        callback: cbw_BrowserWindowJsCallbackFn,
-        cb_data: *mut ::std::os::raw::c_void,
-    );
+	#[doc = " Executes the given JavaScript and calls the given callback (on the GUI thread) to provide the result."]
+	#[link_name = "\u{1}bw_BrowserWindow_evalJs"]
+	pub fn cbw_BrowserWindow_evalJs(
+		bw: *mut cbw_BrowserWindow, js: cbw_CStrSlice, callback: cbw_BrowserWindowJsCallbackFn,
+		cb_data: *mut ::std::os::raw::c_void,
+	);
 }
 extern "C" {
-    #[link_name = "\u{1}bw_BrowserWindow_evalJsThreaded"]
-    pub fn cbw_BrowserWindow_evalJsThreaded(
-        bw: *mut cbw_BrowserWindow,
-        js: cbw_CStrSlice,
-        callback: cbw_BrowserWindowJsCallbackFn,
-        cb_data: *mut ::std::os::raw::c_void,
-    );
+	#[link_name = "\u{1}bw_BrowserWindow_evalJsThreaded"]
+	pub fn cbw_BrowserWindow_evalJsThreaded(
+		bw: *mut cbw_BrowserWindow, js: cbw_CStrSlice, callback: cbw_BrowserWindowJsCallbackFn,
+		cb_data: *mut ::std::os::raw::c_void,
+	);
 }
 extern "C" {
-    #[link_name = "\u{1}bw_BrowserWindow_getApp"]
-    pub fn cbw_BrowserWindow_getApp(bw: *mut cbw_BrowserWindow) -> *mut cbw_Application;
+	#[link_name = "\u{1}bw_BrowserWindow_getApp"]
+	pub fn cbw_BrowserWindow_getApp(bw: *mut cbw_BrowserWindow) -> *mut cbw_Application;
 }
 extern "C" {
-    #[link_name = "\u{1}bw_BrowserWindow_getUserData"]
-    pub fn cbw_BrowserWindow_getUserData(bw: *mut cbw_BrowserWindow)
-        -> *mut ::std::os::raw::c_void;
+	#[link_name = "\u{1}bw_BrowserWindow_getUserData"]
+	pub fn cbw_BrowserWindow_getUserData(bw: *mut cbw_BrowserWindow)
+		-> *mut ::std::os::raw::c_void;
 }
 extern "C" {
-    #[link_name = "\u{1}bw_BrowserWindow_getUrl"]
-    pub fn cbw_BrowserWindow_getUrl(bw: *mut cbw_BrowserWindow, url: *mut cbw_StrSlice) -> cBOOL;
+	#[link_name = "\u{1}bw_BrowserWindow_getUrl"]
+	pub fn cbw_BrowserWindow_getUrl(bw: *mut cbw_BrowserWindow, url: *mut cbw_StrSlice) -> cBOOL;
 }
 extern "C" {
-    #[link_name = "\u{1}bw_BrowserWindow_getWindow"]
-    pub fn cbw_BrowserWindow_getWindow(bw: *mut cbw_BrowserWindow) -> *mut cbw_Window;
+	#[link_name = "\u{1}bw_BrowserWindow_getWindow"]
+	pub fn cbw_BrowserWindow_getWindow(bw: *mut cbw_BrowserWindow) -> *mut cbw_Window;
 }
 extern "C" {
-    #[link_name = "\u{1}bw_BrowserWindow_navigate"]
-    pub fn cbw_BrowserWindow_navigate(bw: *mut cbw_BrowserWindow, url: cbw_CStrSlice) -> cbw_Err;
+	#[link_name = "\u{1}bw_BrowserWindow_navigate"]
+	pub fn cbw_BrowserWindow_navigate(bw: *mut cbw_BrowserWindow, url: cbw_CStrSlice) -> cbw_Err;
 }
 extern "C" {
-    #[doc = " Creates a new browser window"]
-    #[link_name = "\u{1}bw_BrowserWindow_new"]
-    pub fn cbw_BrowserWindow_new(
-        app: *mut cbw_Application,
-        parent: *const cbw_Window,
-        source: cbw_BrowserWindowSource,
-        _title: cbw_CStrSlice,
-        width: ::std::os::raw::c_int,
-        height: ::std::os::raw::c_int,
-        window_options: *const cbw_WindowOptions,
-        browser_window_options: *const cbw_BrowserWindowOptions,
-        handler: cbw_BrowserWindowHandlerFn,
-        user_data: *mut ::std::os::raw::c_void,
-        callback: cbw_BrowserWindowCreationCallbackFn,
-        callback_data: *mut ::std::os::raw::c_void,
-    );
+	#[doc = " Creates a new browser window"]
+	#[link_name = "\u{1}bw_BrowserWindow_new"]
+	pub fn cbw_BrowserWindow_new(
+		app: *mut cbw_Application, parent: *const cbw_Window, source: cbw_BrowserWindowSource,
+		_title: cbw_CStrSlice, width: ::std::os::raw::c_int, height: ::std::os::raw::c_int,
+		window_options: *const cbw_WindowOptions,
+		browser_window_options: *const cbw_BrowserWindowOptions,
+		handler: cbw_BrowserWindowHandlerFn, user_data: *mut ::std::os::raw::c_void,
+		callback: cbw_BrowserWindowCreationCallbackFn, callback_data: *mut ::std::os::raw::c_void,
+	);
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct cbw_CookieImpl {
-    pub handle_ptr: *mut ::std::os::raw::c_void,
-}
+pub struct cbw_CookieImpl {}
 #[test]
 fn bindgen_test_layout_cbw_CookieImpl() {
-    const UNINIT: ::std::mem::MaybeUninit<cbw_CookieImpl> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<cbw_CookieImpl>(),
-        8usize,
-        concat!("Size of: ", stringify!(cbw_CookieImpl))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cbw_CookieImpl>(),
-        8usize,
-        concat!("Alignment of ", stringify!(cbw_CookieImpl))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).handle_ptr) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_CookieImpl),
-            "::",
-            stringify!(handle_ptr)
-        )
-    );
+	assert_eq!(
+		::std::mem::size_of::<cbw_CookieImpl>(),
+		0usize,
+		concat!("Size of: ", stringify!(cbw_CookieImpl))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cbw_CookieImpl>(),
+		1usize,
+		concat!("Alignment of ", stringify!(cbw_CookieImpl))
+	);
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct cbw_CookieJarImpl {
-    pub handle_ptr: *mut ::std::os::raw::c_void,
-}
-#[test]
-fn bindgen_test_layout_cbw_CookieJarImpl() {
-    const UNINIT: ::std::mem::MaybeUninit<cbw_CookieJarImpl> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<cbw_CookieJarImpl>(),
-        8usize,
-        concat!("Size of: ", stringify!(cbw_CookieJarImpl))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cbw_CookieJarImpl>(),
-        8usize,
-        concat!("Alignment of ", stringify!(cbw_CookieJarImpl))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).handle_ptr) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_CookieJarImpl),
-            "::",
-            stringify!(handle_ptr)
-        )
-    );
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct cbw_CookieIteratorImpl {
-    pub index: usize,
-    pub visitor_ptr: *mut ::std::os::raw::c_void,
-}
+pub struct cbw_CookieIteratorImpl {}
 #[test]
 fn bindgen_test_layout_cbw_CookieIteratorImpl() {
-    const UNINIT: ::std::mem::MaybeUninit<cbw_CookieIteratorImpl> =
-        ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<cbw_CookieIteratorImpl>(),
-        16usize,
-        concat!("Size of: ", stringify!(cbw_CookieIteratorImpl))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cbw_CookieIteratorImpl>(),
-        8usize,
-        concat!("Alignment of ", stringify!(cbw_CookieIteratorImpl))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).index) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_CookieIteratorImpl),
-            "::",
-            stringify!(index)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).visitor_ptr) as usize - ptr as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_CookieIteratorImpl),
-            "::",
-            stringify!(visitor_ptr)
-        )
-    );
+	assert_eq!(
+		::std::mem::size_of::<cbw_CookieIteratorImpl>(),
+		0usize,
+		concat!("Size of: ", stringify!(cbw_CookieIteratorImpl))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cbw_CookieIteratorImpl>(),
+		1usize,
+		concat!("Alignment of ", stringify!(cbw_CookieIteratorImpl))
+	);
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct cbw_CookieJarImpl {}
+#[test]
+fn bindgen_test_layout_cbw_CookieJarImpl() {
+	assert_eq!(
+		::std::mem::size_of::<cbw_CookieJarImpl>(),
+		0usize,
+		concat!("Size of: ", stringify!(cbw_CookieJarImpl))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cbw_CookieJarImpl>(),
+		1usize,
+		concat!("Alignment of ", stringify!(cbw_CookieJarImpl))
+	);
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct cbw_Cookie {
-    pub impl_: cbw_CookieImpl,
+	pub impl_: cbw_CookieImpl,
 }
 #[test]
 fn bindgen_test_layout_cbw_Cookie() {
-    const UNINIT: ::std::mem::MaybeUninit<cbw_Cookie> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<cbw_Cookie>(),
-        8usize,
-        concat!("Size of: ", stringify!(cbw_Cookie))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cbw_Cookie>(),
-        8usize,
-        concat!("Alignment of ", stringify!(cbw_Cookie))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).impl_) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_Cookie),
-            "::",
-            stringify!(impl_)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<cbw_Cookie> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<cbw_Cookie>(),
+		0usize,
+		concat!("Size of: ", stringify!(cbw_Cookie))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cbw_Cookie>(),
+		1usize,
+		concat!("Alignment of ", stringify!(cbw_Cookie))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).impl_) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_Cookie),
+			"::",
+			stringify!(impl_)
+		)
+	);
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct cbw_CookieJar {
-    pub impl_: cbw_CookieJarImpl,
+	pub impl_: cbw_CookieJarImpl,
 }
 #[test]
 fn bindgen_test_layout_cbw_CookieJar() {
-    const UNINIT: ::std::mem::MaybeUninit<cbw_CookieJar> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<cbw_CookieJar>(),
-        8usize,
-        concat!("Size of: ", stringify!(cbw_CookieJar))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cbw_CookieJar>(),
-        8usize,
-        concat!("Alignment of ", stringify!(cbw_CookieJar))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).impl_) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_CookieJar),
-            "::",
-            stringify!(impl_)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<cbw_CookieJar> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<cbw_CookieJar>(),
+		0usize,
+		concat!("Size of: ", stringify!(cbw_CookieJar))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cbw_CookieJar>(),
+		1usize,
+		concat!("Alignment of ", stringify!(cbw_CookieJar))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).impl_) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_CookieJar),
+			"::",
+			stringify!(impl_)
+		)
+	);
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct cbw_CookieIterator {
-    pub impl_: cbw_CookieIteratorImpl,
+	pub impl_: cbw_CookieIteratorImpl,
 }
 #[test]
 fn bindgen_test_layout_cbw_CookieIterator() {
-    const UNINIT: ::std::mem::MaybeUninit<cbw_CookieIterator> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<cbw_CookieIterator>(),
-        16usize,
-        concat!("Size of: ", stringify!(cbw_CookieIterator))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<cbw_CookieIterator>(),
-        8usize,
-        concat!("Alignment of ", stringify!(cbw_CookieIterator))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).impl_) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(cbw_CookieIterator),
-            "::",
-            stringify!(impl_)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<cbw_CookieIterator> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<cbw_CookieIterator>(),
+		0usize,
+		concat!("Size of: ", stringify!(cbw_CookieIterator))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cbw_CookieIterator>(),
+		1usize,
+		concat!("Alignment of ", stringify!(cbw_CookieIterator))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).impl_) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_CookieIterator),
+			"::",
+			stringify!(impl_)
+		)
+	);
 }
 pub type cbw_CookieJarStorageCallbackFn = ::std::option::Option<
-    unsafe extern "C" fn(cj: *mut cbw_CookieJar, data: *mut ::std::os::raw::c_void, error: cbw_Err),
+	unsafe extern "C" fn(cj: *mut cbw_CookieJar, data: *mut ::std::os::raw::c_void, error: cbw_Err),
 >;
 pub type cbw_CookieIteratorNextCallbackFn = ::std::option::Option<
-    unsafe extern "C" fn(
-        ci: *mut cbw_CookieIterator,
-        data: *mut ::std::os::raw::c_void,
-        cookie: *mut cbw_Cookie,
-    ),
+	unsafe extern "C" fn(
+		ci: *mut cbw_CookieIterator,
+		data: *mut ::std::os::raw::c_void,
+		cookie: *mut cbw_Cookie,
+	),
 >;
 pub type cbw_CookieJarDeleteCallbackFn = ::std::option::Option<
-    unsafe extern "C" fn(
-        cj: *mut cbw_CookieJar,
-        data: *mut ::std::os::raw::c_void,
-        deleted: ::std::os::raw::c_uint,
-    ),
+	unsafe extern "C" fn(
+		cj: *mut cbw_CookieJar,
+		data: *mut ::std::os::raw::c_void,
+		deleted: ::std::os::raw::c_uint,
+	),
 >;
 extern "C" {
-    #[link_name = "\u{1}bw_Cookie_free"]
-    pub fn cbw_Cookie_free(cookie: *mut cbw_Cookie);
+	#[link_name = "\u{1}bw_Cookie_free"]
+	pub fn cbw_Cookie_free(cookie: *mut cbw_Cookie);
 }
 extern "C" {
-    #[link_name = "\u{1}bw_Cookie_new"]
-    pub fn cbw_Cookie_new(name: cbw_CStrSlice, value: cbw_CStrSlice) -> *mut cbw_Cookie;
+	#[link_name = "\u{1}bw_Cookie_new"]
+	pub fn cbw_Cookie_new(name: cbw_CStrSlice, value: cbw_CStrSlice) -> *mut cbw_Cookie;
 }
 extern "C" {
-    #[link_name = "\u{1}bw_Cookie_getCreationTime"]
-    pub fn cbw_Cookie_getCreationTime(cookie: *const cbw_Cookie) -> u64;
+	#[link_name = "\u{1}bw_Cookie_getCreationTime"]
+	pub fn cbw_Cookie_getCreationTime(cookie: *const cbw_Cookie) -> u64;
 }
 extern "C" {
-    #[link_name = "\u{1}bw_Cookie_setCreationTime"]
-    pub fn cbw_Cookie_setCreationTime(cookie: *mut cbw_Cookie, time: u64);
+	#[link_name = "\u{1}bw_Cookie_setCreationTime"]
+	pub fn cbw_Cookie_setCreationTime(cookie: *mut cbw_Cookie, time: u64);
 }
 extern "C" {
-    #[link_name = "\u{1}bw_Cookie_getDomain"]
-    pub fn cbw_Cookie_getDomain(cookie: *const cbw_Cookie, domain: *mut cbw_StrSlice) -> cBOOL;
+	#[link_name = "\u{1}bw_Cookie_getDomain"]
+	pub fn cbw_Cookie_getDomain(cookie: *const cbw_Cookie, domain: *mut cbw_StrSlice) -> cBOOL;
 }
 extern "C" {
-    #[link_name = "\u{1}bw_Cookie_setDomain"]
-    pub fn cbw_Cookie_setDomain(cookie: *mut cbw_Cookie, domain: cbw_CStrSlice);
+	#[link_name = "\u{1}bw_Cookie_setDomain"]
+	pub fn cbw_Cookie_setDomain(cookie: *mut cbw_Cookie, domain: cbw_CStrSlice);
 }
 extern "C" {
-    #[link_name = "\u{1}bw_Cookie_getExpires"]
-    pub fn cbw_Cookie_getExpires(cookie: *const cbw_Cookie) -> u64;
+	#[link_name = "\u{1}bw_Cookie_getExpires"]
+	pub fn cbw_Cookie_getExpires(cookie: *const cbw_Cookie) -> u64;
 }
 extern "C" {
-    #[link_name = "\u{1}bw_Cookie_setExpires"]
-    pub fn cbw_Cookie_setExpires(cookie: *mut cbw_Cookie, time: u64);
+	#[link_name = "\u{1}bw_Cookie_setExpires"]
+	pub fn cbw_Cookie_setExpires(cookie: *mut cbw_Cookie, time: u64);
 }
 extern "C" {
-    #[link_name = "\u{1}bw_Cookie_getName"]
-    pub fn cbw_Cookie_getName(cookie: *const cbw_Cookie, name: *mut cbw_StrSlice) -> cBOOL;
+	#[link_name = "\u{1}bw_Cookie_getName"]
+	pub fn cbw_Cookie_getName(cookie: *const cbw_Cookie, name: *mut cbw_StrSlice) -> cBOOL;
 }
 extern "C" {
-    #[link_name = "\u{1}bw_Cookie_setName"]
-    pub fn cbw_Cookie_setName(cookie: *mut cbw_Cookie, name: cbw_CStrSlice);
+	#[link_name = "\u{1}bw_Cookie_setName"]
+	pub fn cbw_Cookie_setName(cookie: *mut cbw_Cookie, name: cbw_CStrSlice);
 }
 extern "C" {
-    #[link_name = "\u{1}bw_Cookie_getPath"]
-    pub fn cbw_Cookie_getPath(cookie: *const cbw_Cookie, path: *mut cbw_StrSlice) -> cBOOL;
+	#[link_name = "\u{1}bw_Cookie_getPath"]
+	pub fn cbw_Cookie_getPath(cookie: *const cbw_Cookie, path: *mut cbw_StrSlice) -> cBOOL;
 }
 extern "C" {
-    #[link_name = "\u{1}bw_Cookie_setPath"]
-    pub fn cbw_Cookie_setPath(cookie: *mut cbw_Cookie, path: cbw_CStrSlice);
+	#[link_name = "\u{1}bw_Cookie_setPath"]
+	pub fn cbw_Cookie_setPath(cookie: *mut cbw_Cookie, path: cbw_CStrSlice);
 }
 extern "C" {
-    #[link_name = "\u{1}bw_Cookie_getValue"]
-    pub fn cbw_Cookie_getValue(cookie: *const cbw_Cookie, value: *mut cbw_StrSlice) -> cBOOL;
+	#[link_name = "\u{1}bw_Cookie_getValue"]
+	pub fn cbw_Cookie_getValue(cookie: *const cbw_Cookie, value: *mut cbw_StrSlice) -> cBOOL;
 }
 extern "C" {
-    #[link_name = "\u{1}bw_Cookie_setValue"]
-    pub fn cbw_Cookie_setValue(cookie: *mut cbw_Cookie, value: cbw_CStrSlice);
+	#[link_name = "\u{1}bw_Cookie_setValue"]
+	pub fn cbw_Cookie_setValue(cookie: *mut cbw_Cookie, value: cbw_CStrSlice);
 }
 extern "C" {
-    #[link_name = "\u{1}bw_Cookie_isHttpOnly"]
-    pub fn cbw_Cookie_isHttpOnly(cookie: *const cbw_Cookie) -> cBOOL;
+	#[link_name = "\u{1}bw_Cookie_isHttpOnly"]
+	pub fn cbw_Cookie_isHttpOnly(cookie: *const cbw_Cookie) -> cBOOL;
 }
 extern "C" {
-    #[link_name = "\u{1}bw_Cookie_makeHttpOnly"]
-    pub fn cbw_Cookie_makeHttpOnly(cookie: *mut cbw_Cookie);
+	#[link_name = "\u{1}bw_Cookie_makeHttpOnly"]
+	pub fn cbw_Cookie_makeHttpOnly(cookie: *mut cbw_Cookie);
 }
 extern "C" {
-    #[link_name = "\u{1}bw_Cookie_isSecure"]
-    pub fn cbw_Cookie_isSecure(cookie: *const cbw_Cookie) -> cBOOL;
+	#[link_name = "\u{1}bw_Cookie_isSecure"]
+	pub fn cbw_Cookie_isSecure(cookie: *const cbw_Cookie) -> cBOOL;
 }
 extern "C" {
-    #[link_name = "\u{1}bw_Cookie_makeSecure"]
-    pub fn cbw_Cookie_makeSecure(cookie: *mut cbw_Cookie);
+	#[link_name = "\u{1}bw_Cookie_makeSecure"]
+	pub fn cbw_Cookie_makeSecure(cookie: *mut cbw_Cookie);
 }
 extern "C" {
-    #[link_name = "\u{1}bw_CookieJar_delete"]
-    pub fn cbw_CookieJar_delete(
-        jar: *mut cbw_CookieJar,
-        url: cbw_CStrSlice,
-        name: cbw_CStrSlice,
-        cb: cbw_CookieJarDeleteCallbackFn,
-        cb_data: *mut ::std::os::raw::c_void,
-    );
+	#[link_name = "\u{1}bw_CookieJar_delete"]
+	pub fn cbw_CookieJar_delete(
+		jar: *mut cbw_CookieJar, url: cbw_CStrSlice, name: cbw_CStrSlice,
+		cb: cbw_CookieJarDeleteCallbackFn, cb_data: *mut ::std::os::raw::c_void,
+	);
 }
 extern "C" {
-    #[link_name = "\u{1}bw_CookieJar_free"]
-    pub fn cbw_CookieJar_free(jar: *mut cbw_CookieJar);
+	#[link_name = "\u{1}bw_CookieJar_free"]
+	pub fn cbw_CookieJar_free(jar: *mut cbw_CookieJar);
 }
 extern "C" {
-    #[link_name = "\u{1}bw_CookieJar_iterator"]
-    pub fn cbw_CookieJar_iterator(
-        jar: *mut cbw_CookieJar,
-        iterator: *mut *mut cbw_CookieIterator,
-        include_http_only: cBOOL,
-        url: cbw_CStrSlice,
-    );
+	#[link_name = "\u{1}bw_CookieJar_iterator"]
+	pub fn cbw_CookieJar_iterator(
+		jar: *mut cbw_CookieJar, iterator: *mut *mut cbw_CookieIterator, include_http_only: cBOOL,
+		url: cbw_CStrSlice,
+	);
 }
 extern "C" {
-    #[link_name = "\u{1}bw_CookieJar_iteratorAll"]
-    pub fn cbw_CookieJar_iteratorAll(
-        jar: *mut cbw_CookieJar,
-        iterator: *mut *mut cbw_CookieIterator,
-    );
+	#[link_name = "\u{1}bw_CookieJar_iteratorAll"]
+	pub fn cbw_CookieJar_iteratorAll(
+		jar: *mut cbw_CookieJar, iterator: *mut *mut cbw_CookieIterator,
+	);
 }
 extern "C" {
-    #[link_name = "\u{1}bw_CookieJar_newGlobal"]
-    pub fn cbw_CookieJar_newGlobal() -> *mut cbw_CookieJar;
+	#[link_name = "\u{1}bw_CookieJar_newGlobal"]
+	pub fn cbw_CookieJar_newGlobal() -> *mut cbw_CookieJar;
 }
 extern "C" {
-    #[link_name = "\u{1}bw_CookieJar_store"]
-    pub fn cbw_CookieJar_store(
-        jar: *mut cbw_CookieJar,
-        url: cbw_CStrSlice,
-        cookie: *const cbw_Cookie,
-        cb: cbw_CookieJarStorageCallbackFn,
-        cb_data: *mut ::std::os::raw::c_void,
-    ) -> cbw_Err;
+	#[link_name = "\u{1}bw_CookieJar_store"]
+	pub fn cbw_CookieJar_store(
+		jar: *mut cbw_CookieJar, url: cbw_CStrSlice, cookie: *const cbw_Cookie,
+		cb: cbw_CookieJarStorageCallbackFn, cb_data: *mut ::std::os::raw::c_void,
+	) -> cbw_Err;
 }
 extern "C" {
-    #[link_name = "\u{1}bw_CookieIterator_free"]
-    pub fn cbw_CookieIterator_free(iterator: *mut cbw_CookieIterator);
+	#[link_name = "\u{1}bw_CookieIterator_free"]
+	pub fn cbw_CookieIterator_free(iterator: *mut cbw_CookieIterator);
 }
 extern "C" {
-    #[link_name = "\u{1}bw_CookieIterator_next"]
-    pub fn cbw_CookieIterator_next(
-        iterator: *mut cbw_CookieIterator,
-        on_next: cbw_CookieIteratorNextCallbackFn,
-        cb_data: *mut ::std::os::raw::c_void,
-    ) -> cBOOL;
+	#[link_name = "\u{1}bw_CookieIterator_next"]
+	pub fn cbw_CookieIterator_next(
+		iterator: *mut cbw_CookieIterator, on_next: cbw_CookieIteratorNextCallbackFn,
+		cb_data: *mut ::std::os::raw::c_void,
+	) -> cBOOL;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct c__locale_data {
-    pub _address: u8,
+	pub _address: u8,
 }
 pub type c__builtin_va_list = [c__va_list_tag; 1usize];
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct c__va_list_tag {
-    pub gp_offset: ::std::os::raw::c_uint,
-    pub fp_offset: ::std::os::raw::c_uint,
-    pub overflow_arg_area: *mut ::std::os::raw::c_void,
-    pub reg_save_area: *mut ::std::os::raw::c_void,
+	pub gp_offset: ::std::os::raw::c_uint,
+	pub fp_offset: ::std::os::raw::c_uint,
+	pub overflow_arg_area: *mut ::std::os::raw::c_void,
+	pub reg_save_area: *mut ::std::os::raw::c_void,
 }
 #[test]
 fn bindgen_test_layout_c__va_list_tag() {
-    const UNINIT: ::std::mem::MaybeUninit<c__va_list_tag> = ::std::mem::MaybeUninit::uninit();
-    let ptr = UNINIT.as_ptr();
-    assert_eq!(
-        ::std::mem::size_of::<c__va_list_tag>(),
-        24usize,
-        concat!("Size of: ", stringify!(c__va_list_tag))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<c__va_list_tag>(),
-        8usize,
-        concat!("Alignment of ", stringify!(c__va_list_tag))
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).gp_offset) as usize - ptr as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__va_list_tag),
-            "::",
-            stringify!(gp_offset)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).fp_offset) as usize - ptr as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__va_list_tag),
-            "::",
-            stringify!(fp_offset)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).overflow_arg_area) as usize - ptr as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__va_list_tag),
-            "::",
-            stringify!(overflow_arg_area)
-        )
-    );
-    assert_eq!(
-        unsafe { ::std::ptr::addr_of!((*ptr).reg_save_area) as usize - ptr as usize },
-        16usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(c__va_list_tag),
-            "::",
-            stringify!(reg_save_area)
-        )
-    );
+	const UNINIT: ::std::mem::MaybeUninit<c__va_list_tag> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<c__va_list_tag>(),
+		24usize,
+		concat!("Size of: ", stringify!(c__va_list_tag))
+	);
+	assert_eq!(
+		::std::mem::align_of::<c__va_list_tag>(),
+		8usize,
+		concat!("Alignment of ", stringify!(c__va_list_tag))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).gp_offset) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__va_list_tag),
+			"::",
+			stringify!(gp_offset)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).fp_offset) as usize - ptr as usize },
+		4usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__va_list_tag),
+			"::",
+			stringify!(fp_offset)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).overflow_arg_area) as usize - ptr as usize },
+		8usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__va_list_tag),
+			"::",
+			stringify!(overflow_arg_area)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).reg_save_area) as usize - ptr as usize },
+		16usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(c__va_list_tag),
+			"::",
+			stringify!(reg_save_area)
+		)
+	);
 }
