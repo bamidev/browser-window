@@ -9,10 +9,8 @@ use std::{
 	task::{Context, Poll, Waker},
 };
 
-use crate::core::application::*;
-
 use super::application::{ApplicationHandle, HasAppHandle};
-
+use crate::core::application::*;
 
 /// The data that is sent to the GUI thread for `DelegateFuture`.
 struct DelegateData<'a, 'b, H, R> {

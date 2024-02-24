@@ -19,14 +19,13 @@ pub enum JsValue {
 	Other(String),
 }
 
-
 impl JsValue {
-	/// Gets the string of the `JsValue::String`, or otherwise just a normal string representation of the
-	/// value.
+	/// Gets the string of the `JsValue::String`, or otherwise just a normal
+	/// string representation of the value.
 	pub fn to_string_unenclosed(&self) -> Cow<'_, str> {
 		match self {
 			Self::String(s) => Cow::Borrowed(s),
-			other => Cow::Owned(other.to_string())
+			other => Cow::Owned(other.to_string()),
 		}
 	}
 }

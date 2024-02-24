@@ -1,6 +1,5 @@
 use std::{ops::DerefMut, path::PathBuf, pin::Pin, vec::Vec};
 
-
 #[cfg(feature = "threadsafe")]
 use unsafe_send_sync::UnsafeSend;
 
@@ -26,7 +25,8 @@ type BrowserJsInvocationHandler =
 	Box<dyn FnMut(BrowserWindowHandle, String, Vec<JsValue>) -> Pin<Box<dyn Future<Output = ()>>>>;
 #[cfg(feature = "threadsafe")]
 type BrowserJsInvocationHandler = Box<
-	dyn FnMut(BrowserWindowHandle, String, Vec<JsValue>) -> Pin<Box<dyn Future<Output = ()>>> + Send,
+	dyn FnMut(BrowserWindowHandle, String, Vec<JsValue>) -> Pin<Box<dyn Future<Output = ()>>>
+		+ Send,
 >;
 
 /// The data that is passed to the C FFI handler function
