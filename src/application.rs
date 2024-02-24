@@ -106,7 +106,7 @@ pub struct Application {
 /// This handle also allows you to dispatch code to be executed on the GUI
 /// thread from any other thread.
 #[cfg(feature = "threadsafe")]
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 pub struct ApplicationHandleThreaded {
 	pub(super) handle: ApplicationHandle,
 }
@@ -508,7 +508,7 @@ impl ApplicationHandleThreaded {
 		F: FnOnce(ApplicationHandle) + Send + 'a,
 	{
 		let data_ptr = Box::into_raw(Box::new(ApplicationDispatchSendData {
-			handle: self.handle,
+			handle: self.handle.clone(),
 			func: Box::new(func),
 		}));
 
@@ -526,7 +526,7 @@ impl ApplicationHandleThreaded {
 		F: FnOnce(ApplicationHandle) + Send + 'a,
 	{
 		let data_ptr = Box::into_raw(Box::new(ApplicationDispatchData {
-			handle: self.handle,
+			handle: self.handle.clone(),
 			func: Box::new(func),
 		}));
 
@@ -547,7 +547,7 @@ impl ApplicationHandleThreaded {
 		F: Future<Output = ()> + 'static,
 	{
 		self.dispatch(|handle| {
-			let future = func(handle);
+			let future = func(handle.clone());
 			handle.spawn(future);
 		})
 	}
@@ -605,9 +605,9 @@ fn dispatch_handler(_app: ApplicationImpl, _data: *mut ()) {
 }
 
 #[cfg(feature = "threadsafe")]
-unsafe fn dispatch_handler_send(_app: ApplicationImpl, _data: *mut ()) {
+fn dispatch_handler_send(_app: ApplicationImpl, _data: *mut ()) {
 	let data_ptr = _data as *mut ApplicationDispatchSendData<'static>;
-	let data = Box::from_raw(data_ptr);
+	let data = unsafe { Box::from_raw(data_ptr) };
 
 	(data.func)(data.handle.into());
 }

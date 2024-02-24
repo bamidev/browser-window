@@ -9,9 +9,10 @@ use std::{
 	task::{Context, Poll, Waker},
 };
 
-use browser_window_core::application::*;
+use crate::core::application::*;
 
 use super::application::{ApplicationHandle, HasAppHandle};
+
 
 /// The data that is sent to the GUI thread for `DelegateFuture`.
 struct DelegateData<'a, 'b, H, R> {
@@ -202,7 +203,7 @@ where
 		// While the result is not yet set, we can keep polling
 		if !self.started {
 			self.started = true;
-			let app_inner = self.app_handle.inner;
+			let app_inner = self.app_handle.inner.clone();
 
 			let succeeded = unsafe {
 				let data_ptr = Box::into_raw(Box::new(DelegateFutureData {
@@ -229,13 +230,13 @@ where
 	}
 }
 
-unsafe fn delegate_handler<H, R>(app: ApplicationImpl, _data: *mut ())
+fn delegate_handler<H, R>(app: ApplicationImpl, _data: *mut ())
 where
 	H: Clone + 'static,
 	R: 'static,
 {
 	let data_ptr = _data as *mut DelegateData<'static, 'static, H, R>;
-	let data = Box::from_raw(data_ptr); // Take ownership of the data struct
+	let data = unsafe { Box::from_raw(data_ptr) }; // Take ownership of the data struct
 
 	match *data {
 		DelegateData {
@@ -265,12 +266,12 @@ where
 }
 
 #[cfg(feature = "threadsafe")]
-unsafe fn delegate_async_handler<R>(app: ApplicationImpl, _data: *mut ())
+fn delegate_async_handler<R>(app: ApplicationImpl, _data: *mut ())
 where
 	R: Send,
 {
 	let data_ptr = _data as *mut DelegateFutureData<R>;
-	let data = Box::from_raw(data_ptr); // Take ownership of the data struct
+	let data = unsafe { Box::from_raw(data_ptr) }; // Take ownership of the data struct
 
 	match *data {
 		DelegateFutureData { inner, waker } => {

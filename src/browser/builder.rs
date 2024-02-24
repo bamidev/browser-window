@@ -26,7 +26,7 @@ type BrowserJsInvocationHandler =
 	Box<dyn FnMut(BrowserWindowHandle, String, Vec<JsValue>) -> Pin<Box<dyn Future<Output = ()>>>>;
 #[cfg(feature = "threadsafe")]
 type BrowserJsInvocationHandler = Box<
-	dyn FnMut(BrowserWindowHandle, String, Vec<String>) -> Pin<Box<dyn Future<Output = ()>>> + Send,
+	dyn FnMut(BrowserWindowHandle, String, Vec<JsValue>) -> Pin<Box<dyn Future<Output = ()>>> + Send,
 >;
 
 /// The data that is passed to the C FFI handler function
@@ -114,15 +114,6 @@ impl BrowserWindowBuilder {
 		self.dev_tools = enabled;
 		self
 	}
-
-	/*pub fn handler<H>( &mut self, mut handler: H ) -> &Self where
-		H: FnMut(BrowserWindowHandle, String, Vec<String>) + Send + 'static
-	{
-		self.handler = Some( Box::new( move |handle, cmd, args| Box::pin( async {
-			handler( handle, cmd, args );
-		} ) ) );
-		self
-	}*/
 
 	/// Creates an instance of a browser window builder.
 	///
@@ -305,19 +296,6 @@ fn browser_window_invoke_handler(inner_handle: BrowserWindowImpl, cmd: &str, arg
 		}
 	}
 }
-
-// This external C function will be given as the callback to the
-// bw_BrowserWindow_new function, to be invoked when the browser window has been
-// created
-/*unsafe extern "C" fn ffi_browser_window_created_callback( inner_handle: *mut bw_BrowserWindow, data: *mut c_void ) {
-
-	let data_ptr: *mut Box<dyn FnOnce( BrowserWindowHandle )> = mem::transmute( data );
-	let data = Box::from_raw( data_ptr );
-
-	let outer_handle = BrowserWindowHandle::new( inner_handle );
-
-	data( outer_handle )
-}*/
 
 fn browser_window_created_callback(inner_handle: BrowserWindowImpl, data: *mut ()) {
 	let data_ptr = data as *mut Box<dyn FnOnce(BrowserWindowHandle)>;

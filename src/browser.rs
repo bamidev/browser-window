@@ -128,6 +128,8 @@ impl BrowserWindowHandle {
 	/// Returns the application handle associated with this browser window.
 	pub fn app(&self) -> ApplicationHandle { ApplicationHandle::new(self.inner.window().app()) }
 
+	pub fn close(self) { self.inner.window().destroy() }
+
 	/// Executes the given javascript code and returns the output as a string.
 	/// If you don't need the result, see `exec_js`.
 	pub async fn eval_js(&self, js: &str) -> Result<JsValue, JsEvaluationError> {
@@ -233,7 +235,7 @@ impl BrowserWindowThreaded {
 	where
 		F: FnOnce(BrowserWindowHandle) + Send + 'a,
 	{
-		let handle = UnsafeSend::new(self.handle);
+		let handle = UnsafeSend::new(self.handle.clone());
 
 		// FIXME: It is more efficient to reimplement this for the browser window
 		self.app().dispatch(move |_| {
@@ -248,7 +250,7 @@ impl BrowserWindowThreaded {
 		C: FnOnce(BrowserWindowHandle) -> F + Send + 'a,
 		F: Future<Output = ()> + 'static,
 	{
-		let handle = UnsafeSend::new(self.handle);
+		let handle = UnsafeSend::new(self.handle.clone());
 
 		self.app().dispatch(move |a| {
 			a.spawn(func(handle.i));

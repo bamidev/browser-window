@@ -28,7 +28,7 @@ async fn execute_command(bw: BrowserWindowHandle, line: &str) {
 		Command::new("sh")
 				.arg("-c")
 				.arg( line )
-				.current_dir( working_dir )
+				//.current_dir( working_dir )
 				.stdout( Stdio::piped() )
 				.stderr( Stdio::piped() )
 				//.kill_on_drop(true)
@@ -78,7 +78,6 @@ where
 	true
 }
 
-// This example does not work with feature `threadsafe` enabled
 fn main() {
 	let settings = ApplicationSettings::default();
 	let application = match Application::initialize(&settings) {
@@ -105,7 +104,7 @@ fn main() {
 				}
 			}
 		})
-		.dev_tools(false)
+		.dev_tools(true)
 		.size(800, 600)
 		.title("Terminal Example");
 
@@ -125,7 +124,7 @@ fn main() {
 		{
 			Err(_) => bw.exec_js(
 				format!(
-					"setTimeout(() => {{ initialize({}) }}, 10000)",
+					"window.onload = () => {{ initialize({}) }}",
 					&working_dir_js
 				)
 				.as_str(),
