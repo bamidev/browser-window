@@ -30,8 +30,7 @@ If you want the exact same behavior of your app on all platforms, CEF is recomme
 is even a homebrew package for it on MacOS.
 
 *Con:*
-* Getting it on Windows requires you to compile it from source, although it may not even work. You
-might have better luck trying to cross-compile it from another OS.
+* Getting it on Windows requires you to compile WebkitGTK and GTK from source.
 
 ### Edge WebView2
 
