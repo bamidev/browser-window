@@ -1,11 +1,11 @@
-#[cfg(not(feature = "webkit"))]
+#[cfg(not(feature = "webkitgtk"))]
 mod c;
-#[cfg(feature = "webkit")]
+#[cfg(feature = "webkitgtk")]
 mod common;
 
-#[cfg(not(feature = "webkit"))]
+#[cfg(not(feature = "webkitgtk"))]
 pub use c::Error;
-#[cfg(feature = "webkit")]
+#[cfg(feature = "webkitgtk")]
 pub use common::Error;
 
 pub type Result<T> = std::result::Result<T, Error>;
