@@ -1,6 +1,6 @@
 [package]
 name = "browser-window"
-version = "0.9.2"
+version = "0.9.3"
 description = "A simple, async/await aware browser window."
 edition = "2018"
 authors = ["Bamidev"]
