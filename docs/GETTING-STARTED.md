@@ -84,9 +84,12 @@ cmake -DCMAKE_BUILD_TYPE=Debug .
 ```
 Keep in mind that currently, it seems that the CEF wrapper library misses some symbols in release mode. This can cause some linker errors when trying to compile against the Release binaries.
 
+*Note:* On Windows, you need to run it in a Visual Studio Developer Command Prompt, the regular
+won't work. Also, use the `-A x64` option if you intend to build it for 64bit Windows.
+
 #### Unix-like Systems
 
-After you have run `cmake`, you can just simply run `make`. This will build CEF.
+After you have run `cmake`, you can just simply run `make`. This will build the wrapper lib for CEF.
 
 #### Windows
 
