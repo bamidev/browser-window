@@ -36,12 +36,10 @@ minimum restrictions.
 
 ## Future Plans
 
-At the moment, there is a decent set of functionality available, but if something is lacking, please [submit an issue](https://github.com/bamilab/browser-window/issues), and I'll take a look at it.
-There are not a lot of functions exposed in the BrowserWindow object. If you need a feature that
-isn't there, let me know!
+At the moment, there is a decent set of functionality available, but if something is lacking, please [submit an issue](https://github.com/bamilab/browser-window/issues), and I might implement it if it the functionality is common enough.
 
-Otherwise, there are some things that are yet to come:
+Otherwise, here are some things that are yet to come:
 
-* Support for the Microsoft Edge WebView2 framework.
+* Support for the Edge WebView2 framework on Windows.
 * Events
-* Support for Webkit with Cocoa on MacOS.
+* Support for Webkit + Cocoa on MacOS.

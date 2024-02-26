@@ -1,16 +1,51 @@
 # Getting Started
 
-_BrowserWindow_ needs to be build with one of the following browser frameworks: [CEF](https://bitbucket.org/chromiumembedded/cef/wiki/Home) or [WebkitGTK](https://www.webkit.org/). They require the `cef` and `webkitgtk` features to be set. There is no default feature set.
-
-
+_BrowserWindow_ needs to be build with one of the following browser frameworks: [CEF](https://bitbucket.org/chromiumembedded/cef/wiki/Home) or [WebkitGTK](https://www.webkit.org/). They require either the `cef` or `webkitgtk` feature to be set.
 
 _Browser Window_ currently relies on [CEF3](https://bitbucket.org/chromiumembedded/cef/wiki/Home).
 You will also need [cmake](https://cmake.org/) to set up CEF.
 And on Windows, you will also need _Visual Studio_.
-You can download the free _Community_ version [here](https://visualstudio.microsoft.com/vs/).
 
 If you want to set up CEF by building it from source, take a look at [this](https://bitbucket.org/chromiumembedded/cef/wiki/MasterBuildQuickStart.md).
-However, it will take a lot of effort and time, memory & disk space for the compilation process.
+However, it will take a lot of effort, time, memory & disk space for the compilation process.
+
+## Picking the right browser framework
+
+Here are the pros and cons of each browser framework. Choose wisely:
+
+### CEF
+
+*Pros:*
+* Is available on all major platforms: Windows, MacOS, Linux (although MacOS support in _BrowserWindow_ needs some work).
+If you want the exact same behavior of your app on all platforms, CEF is recommended.
+* The cookie API is supported when using CEF in _BrowserWindow_.
+
+*Con:*
+* Can be a pain to set up correctly; requires a lot of files to be present for the executable, and needs the sandbox to have specific permissions.
+
+### WebkitGTK
+
+*Pros:*
+* Generally easily installed on anything but Windows; a lot of distros have a package for it. There
+is even a homebrew package for it on MacOS.
+
+*Con:*
+* Getting it on Windows requires you to compile it from source, although it may not even work. You
+might have better luck trying to cross-compile it from another OS.
+
+### Edge WebView2
+
+*Pro:*
+* Preinstalled on Windows 11
+* Can be statically linked to when using the `*-pc-windows-msvc` toolchain.
+
+*Cons:*
+* Currenty not yet working on _BrowserWindow_.
+* Not cross-platform at all.
+* When using the `*-pc-windows-gnu` toolchain, the framework can't be statically linked.
+* When shipping your application, you need to make sure that the end user has the WebView2 runtime.
+So then you need to not support older Windows versions, or maybe ship the WebView2 installer or DLL
+with your setup somehow.
 
 ## Set up Bindgen
 
