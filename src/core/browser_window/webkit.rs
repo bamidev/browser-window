@@ -3,7 +3,7 @@ use std::{
 	collections::HashMap,
 	ptr,
 	sync::{
-		atomic::{AtomicPtr, Ordering},
+		atomic::{AtomicBool, AtomicPtr, Ordering},
 		Arc,
 	},
 };
@@ -140,6 +140,7 @@ impl BrowserWindowExt for BrowserWindowImpl {
 		// FIXME: We need to call creation_callback, but pass an error to it, if the web
 		// view can not be loaded correctly.        Now we risk never notifying the
 		// future that is waiting on us.
+		let mut created = AtomicBool::new(false);
 		inner.connect_load_changed(move |i, e| {
 			if e == LoadEvent::Finished {
 				// Create the global JS function `invoke_extern`
@@ -157,7 +158,9 @@ impl BrowserWindowExt for BrowserWindowImpl {
 					},
 				);
 
-				creation_callback(this.clone(), callback_data);
+				if !created.swap(true, Ordering::Relaxed) {
+					creation_callback(this.clone(), callback_data);
+				}
 			}
 		});
 	}
