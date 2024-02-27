@@ -79,6 +79,12 @@ If that doesn't work, please [submit an issue](https://github.com/bamilab/browse
 
 ## Runtime Errors
 
+### My program executes, but it hangs at the start
+
+For some unknown reason, when you're using CEF on linux, this issue may sometimes happen.
+It may hang at where you're using `Application::initialize`.
+The source of this bug remains a mystery: https://www.magpcss.org/ceforum/viewtopic.php?f=6&t=19719
+
 ### Unable to initialize application
 
 ```
@@ -87,4 +93,5 @@ thread 'main' panicked at 'Unable to initialize application: c(bw) error: [1] un
 
 This may be because the library and resource files were not copied to your executable directory.
 If this is not done, your program will not get past `Application::initialize`.
-Execute `setup-cef-files.sh` or `setup-cef-files.bat`.
+Execute `setup-cef-files.sh` or `setup-cef-files.bat` if you're trying to run an example.
+Otherwise, check the content of these scripts to get an idea of what files need to be copied.

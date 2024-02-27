@@ -20,8 +20,10 @@ Here are the pros and cons of each browser framework. Choose wisely:
 If you want the exact same behavior of your app on all platforms, CEF is recommended.
 * The cookie API is supported when using CEF in _BrowserWindow_.
 
-*Con:*
+*Cons:*
 * Can be a pain to set up correctly; requires a lot of files to be present for the executable, and needs the sandbox to have specific permissions.
+* No option to link statically & generally not available in package managers, which forces you to
+ship the shared libraries with your application.
 
 ### WebkitGTK
 
@@ -29,26 +31,25 @@ If you want the exact same behavior of your app on all platforms, CEF is recomme
 * Generally easily installed on anything but Windows; a lot of distros have a package for it. There
 is even a homebrew package for it on MacOS.
 
-*Con:*
-* Getting it on Windows requires you to compile WebkitGTK and GTK from source.
+*Cons:*
+* Compiling WebkitGTK and GTK for Windows is not supported.
+* Static linking is not really supported for GTK.
 
 ### Edge WebView2
 
 *Pro:*
 * Preinstalled on Windows 11
 * Can be statically linked to when using the `*-pc-windows-msvc` toolchain.
+* Is easy to cross-compile for. (Needs some testing.)
 
 *Cons:*
 * Currenty not yet working on _BrowserWindow_.
 * Not cross-platform at all.
-* When using the `*-pc-windows-gnu` toolchain, the framework can't be statically linked.
-* When shipping your application, you need to make sure that the end user has the WebView2 runtime.
-So then you need to not support older Windows versions, or maybe ship the WebView2 installer or DLL
-with your setup somehow.
+* The framework is not open source. Might be problematic for those concerned about privacy.
 
 ## Set up Bindgen
 
-_BrowserWindow_ uses Bindgen,  which needs some things to be available on your system.
+_BrowserWindow_ uses Bindgen, which needs some things to be set up on your system.
 This is explained [here](https://rust-lang.github.io/rust-bindgen/requirements.html) pretty well.
 
 ## Set up WebkitGTK
