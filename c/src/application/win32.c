@@ -73,7 +73,7 @@ BOOL bw_ApplicationImpl_dispatchDelayed(bw_Application* app, bw_ApplicationDispa
 		return false;
 
 	// If we are on the right thread, just call `SendMessageTimeout`.
-	if (app->impl.thread_id == GetCurrentThreadId()) {;
+	if (app->impl.thread_id == GetCurrentThreadId()) {
 		bw_ApplicationWin32_setTimer(app, dispatch_data, milliseconds);
 	}
 	// Otherwise, post to the GUI thread first
@@ -88,7 +88,7 @@ BOOL bw_ApplicationImpl_dispatchDelayed(bw_Application* app, bw_ApplicationDispa
 		wrapper_data->data = (void*)delayed_data;
 
 		bw_ApplicationImpl_dispatch(app, wrapper_data);
-	};
+	}
 }
 
 void bw_ApplicationWin32_addToTimerMap(bw_Application* app, UINT_PTR timer_id, bw_ApplicationDispatchData* dispatch_data) {
@@ -173,7 +173,7 @@ bool bw_ApplicationWin32_removeFromTimerMap(bw_ApplicationTimerMapEntry* entry) 
 }
 
 void bw_ApplicationWin32_setTimer(bw_Application* app, bw_ApplicationDispatchData* dispatch_data, uint64_t delay) {
-	UINT_PTR timer_id = SetTimer(0, 0, delay, bw_ApplicationWin32_timerHandler);
+	UINT_PTR timer_id = SetTimer(0, 0, delay, (TIMERPROC)bw_ApplicationWin32_timerHandler);
 
 	bw_ApplicationWin32_addToTimerMap(app, timer_id, dispatch_data);
 }

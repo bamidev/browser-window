@@ -7,10 +7,10 @@ extern "C" {
 
 #ifdef BW_CEF
 #include "browser_window/cef.h"
+#elif defined(BW_EDGE)
+#include "browser_window/edge2.h"
 #else
-
 typedef struct {} bw_BrowserWindowImpl;
-
 #endif
 
 #include "application.h"

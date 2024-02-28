@@ -3,10 +3,6 @@
 
 #if defined(BW_CEF)
 #include "cef.h"
-#elif defined(BW_EDGE)
-#include "edge.h"
-#else
-#error Unsupported browser engine selected
 #endif
 
 #ifdef __cplusplus

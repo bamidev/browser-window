@@ -2,19 +2,24 @@
 #include "../browser_window.h"
 
 #include <wrl.h>
-#include <wil/com.h>
+//#include <wil/com.h>
 #include <WebView2.h>
+//#include <wil/com.h>
+//#include <wil/resource.h>
+//#include <wil/result.h>
+#include <winnt.h>
+#include <winrt/Windows.UI.Composition.h>
+#include <winrt/Windows.UI.ViewManagement.h>
 
 #include "../win32.h"
 #include "../window.h"
 
-#define DEFAULT_EDGE_LOCATION L"C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\84.0.522.52"
 
 #define ASSERT_ON_FAIL( HR_STATEMENT ) \
 	{ \
 		HRESULT r = (HR_STATEMENT); \
 		if ( r != 0 ) { \
-			BW_WIN32_ASSERT_HRESULT( r ); \
+			BW_WIN32_PANIC_HRESULT( r ); \
 		} \
 	}
 
@@ -32,10 +37,10 @@ void _bw_BrowserWindow_doCleanup( bw_BrowserWindow* bw ) {
 
 }
 
-void bw_BrowserWindow_eval_js( bw_BrowserWindow* bw, bw_CStrSlice _js, bw_BrowserWindowJsCallbackFn callback, void* cb_data ) {
+void bw_BrowserWindow_evalJs( bw_BrowserWindow* bw, bw_CStrSlice _js, bw_BrowserWindowJsCallbackFn callback, void* cb_data ) {
 	WCHAR* js = bw_win32_copyAsNewWstr( _js );
 
-	reinterpret_cast<ICoreWebView2*>(bw->inner.webview)->ExecuteScript( js, Callback<ICoreWebView2ExecuteScriptCompletedHandler>(
+	reinterpret_cast<ICoreWebView2*>(bw->impl.webview)->ExecuteScript( js, Callback<ICoreWebView2ExecuteScriptCompletedHandler>(
 		[bw, cb_data, callback]( HRESULT error_code, LPCWSTR result ) -> HRESULT {
 
 			if ( error_code != 0 ) {
@@ -56,7 +61,7 @@ void bw_BrowserWindow_eval_js( bw_BrowserWindow* bw, bw_CStrSlice _js, bw_Browse
 bw_Err bw_BrowserWindow_navigate( bw_BrowserWindow* bw, bw_CStrSlice _url ) {
 	WCHAR* url = bw_win32_copyAsNewWstr( _url );
 
-	HRESULT res = reinterpret_cast<ICoreWebView2*>(bw->inner.webview)->Navigate( url );
+	HRESULT res = reinterpret_cast<ICoreWebView2*>(bw->impl.webview)->Navigate( url );
 	if ( res != 0 )
 		return bw_win32_unhandledHresult( res );
 
@@ -66,26 +71,19 @@ bw_Err bw_BrowserWindow_navigate( bw_BrowserWindow* bw, bw_CStrSlice _url ) {
 }
 
 /// Creates a new browser window without any content
-bw_BrowserWindow* bw_BrowserWindow_new(
-	const bw_Application* app,
-	const bw_Window* parent,
+void bw_BrowserWindowImpl_new(
+	bw_BrowserWindow* browser_window,
 	bw_BrowserWindowSource source,
-	bw_CStrSlice title,
 	int width, int height,
-	const bw_WindowOptions* window_options,
-	const bw_BrowserWindowOptions* _options,
-	bw_BrowserWindowHandlerFn handler,
-	void* user_data
+	const bw_BrowserWindowOptions* browser_window_options,
+	bw_BrowserWindowCreationCallbackFn callback,
+	void* callback_data
 ) {
 	// The options are passed to callbacks that might run after the passed options live.
 	// So we copy them just to be sure...
-	bw_BrowserWindowOptions options = *_options;
+	bw_BrowserWindowOptions options = *browser_window_options;
 
-	bw_BrowserWindow* browser_window = new bw_BrowserWindow;
-	browser_window->window = bw_Window_new( app, parent, title, width, height, window_options, browser_window );
-	browser_window->handler = handler;
-	browser_window->user_data = user_data;
-	_bw_BrowserWindow_init_window_callbacks( browser_window );
+	//_bw_BrowserWindow_init_window_callbacks( browser_window );
 
 	// The pointer of source.data may not be valid anymore when a callback is fired.
 	WCHAR* source_data = bw_win32_copyAsNewWstr( source.data );
@@ -97,15 +95,15 @@ bw_BrowserWindow* bw_BrowserWindow_new(
 			[browser_window, options, source, source_data](HRESULT result, ICoreWebView2Environment* env) -> HRESULT {
 
 				// Create a CoreWebView2Controller and get the associated CoreWebView2 whose parent is the main window hWnd
-				HRESULT r = env->CreateCoreWebView2Controller( browser_window->window->inner.handle, Callback<ICoreWebView2CreateCoreWebView2ControllerCompletedHandler>(
+				HRESULT r = env->CreateCoreWebView2Controller( browser_window->window->impl.handle, Callback<ICoreWebView2CreateCoreWebView2ControllerCompletedHandler>(
 					[browser_window, options, source, source_data](HRESULT result, ICoreWebView2Controller* controller) -> HRESULT {
 						if (controller != nullptr) {
 
-							browser_window->inner.webview_controller = controller;
+							browser_window->impl.webview_controller = controller;
 
-							ASSERT_ON_FAIL( controller->get_CoreWebView2( reinterpret_cast<ICoreWebView2**>(&browser_window->inner.webview) ) );
+							ASSERT_ON_FAIL( controller->get_CoreWebView2( reinterpret_cast<ICoreWebView2**>(&browser_window->impl.webview) ) );
 
-							auto webview = reinterpret_cast<ICoreWebView2*>( browser_window->inner.webview );
+							auto webview = reinterpret_cast<ICoreWebView2*>( browser_window->impl.webview );
 
 							// Add a few settings for the webview
 							// The demo step is redundant since the values are the default settings
@@ -119,7 +117,7 @@ bw_BrowserWindow* bw_BrowserWindow_new(
 
 							// Resize WebView to fit the bounds of the parent window
 							RECT bounds;
-							GetClientRect(browser_window->window->inner.handle, &bounds);
+							GetClientRect(browser_window->window->impl.handle, &bounds);
 							ASSERT_ON_FAIL( controller->put_Bounds(bounds) );
 
 							// Navigate to the source provided
@@ -139,8 +137,8 @@ bw_BrowserWindow* bw_BrowserWindow_new(
 							//if ( browser_window->callbacks.on_loaded != 0 )
 							//	browser_window->callbacks.on_loaded( browser_window );
 
-							if ( !UpdateWindow( browser_window->window->inner.handle ) ) {
-								BW_WIN32_ASSERT_ERROR;
+							if ( !UpdateWindow( browser_window->window->impl.handle ) ) {
+								BW_WIN32_PANIC_LAST_ERROR;
 							}
 							fprintf(stderr,"Done!\n");
 
@@ -150,7 +148,7 @@ bw_BrowserWindow* bw_BrowserWindow_new(
 				).Get() );
 
 				if ( r != 0 ) {
-					BW_WIN32_ASSERT_HRESULT( r );
+					BW_WIN32_PANIC_HRESULT( r );
 				}
 
 				return S_OK;
@@ -161,13 +159,11 @@ bw_BrowserWindow* bw_BrowserWindow_new(
 	if ( result != 0 ) {
 
 		if ( result == __HRESULT_FROM_WIN32( ERROR_FILE_NOT_FOUND ) ) {
-			fprintf( stderr, "Microsoft Edge (chromium) installation not found!\n" );
+			fprintf( stderr, "Microsoft Edge WebView2 installation not found!\n" );
 			assert(0);
 		}
 		else {
-			BW_WIN32_ASSERT_HRESULT( result );
+			BW_WIN32_PANIC_HRESULT( result );
 		}
 	}
-
-	return browser_window;
 }

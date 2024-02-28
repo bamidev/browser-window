@@ -1,21 +1,19 @@
-#ifndef BW_BROWSER_WINDOW_WEBVIEW2_H
-#define BW_BROWSER_WINDOW_WEBVIEW2_H
+#ifndef BW_BROWSER_WINDOW_EDGE2_H
+#define BW_BROWSER_WINDOW_EDGE2_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 
-
-struct bw_BrowserWindowInner {
+typedef struct {
 	void* webview;	/* Type: ICoreWebView2 */
 	void* webview_controller;	/* Type: ICoreWebView2Controller */
-};
-
+} bw_BrowserWindowImpl;
 
 
 #ifdef __cplusplus
 } // extern "C"
 #endif
 
-#endif//BW_BROWSER_WINDOW_WEBVIEW2_H
+#endif//BW_BROWSER_WINDOW_EDGE2_H

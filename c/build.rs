@@ -13,6 +13,20 @@ use std::{
 #[derive(Debug)]
 struct BwBindgenCallbacks {}
 
+
+fn nuget_webview_dir() -> PathBuf {
+	let home_dir = PathBuf::from(env::var("USERPROFILE").unwrap());
+	let webview2_path = PathBuf::from(".nuget\\packages\\microsoft.web.webview2");
+	let nuget_package_path = home_dir.join(webview2_path);
+
+	for path in fs::read_dir(nuget_package_path).unwrap() {
+		if let Ok(entry) = path {
+			return entry.path();
+		}
+	}
+	panic!("Nuget package \"microsoft.web.webview\" is missing version directory.");
+}
+
 /// Prints all compiler commands to rerun if any file has changed within the
 /// given directory or a subdictory thereof.
 fn rerun_if_directory_changed<P>(_path: P)
@@ -122,7 +136,7 @@ fn main() {
 
 	let mut build = cc::Build::new();
 	let mut build_se = cc::Build::new(); // For seperate executable
-	let std_flag = if cfg!(feature = "cef") {
+	let std_flag = if cfg!(feature = "cef") || cfg!(feature = "edge") {
 		if target.contains("msvc") {
 			"/std:c++17"
 		} else {
@@ -246,7 +260,7 @@ fn main() {
 						&cef_path
 					);
 					println!("cargo:rustc-link-lib=static=libcef_dll_wrapper");
-					println!("cargo:rustc-link-lib=dylib={}", "libcef");
+					println!("cargo:rustc-link-lib=dylib=libcef");
 
 					build_se_lib_args.push(format!("/LIBPATH:{}", &cef_path).into());
 					build_se_lib_args
@@ -328,6 +342,41 @@ fn main() {
 			fs::copy(se_file, target_dir.join("browser-window-se.exe"))
 				.expect("unable to copy seperate executable");
 		}
+	}
+	/****************************************
+	 * Microsoft Edge WebView2 source files
+	 ****************************************/
+	else if cfg!(feature = "edge") {
+		let webview_dir = nuget_webview_dir();
+		let include_dir = webview_dir.join(PathBuf::from("build/native/include"));
+		let lib_dir = if cfg!(target_arch = "x86") {
+			webview_dir.join(PathBuf::from("build/native/x86"))
+		} else if cfg!(target_arch = "x86_64") {
+			webview_dir.join(PathBuf::from("build/native/x64"))
+		} else if cfg!(target_arch = "aarch64") {
+			webview_dir.join(PathBuf::from("build/nativ/arm64"))
+		} else {
+			panic!("Unsupported target architecture for Edge WebView2 framework.");
+		};
+
+		println!("cargo:rustc-link-search={}", lib_dir.display());
+		if cfg!(feature = "bundled") {
+			println!("cargo:rustc-link-lib=static=WebView2LoaderStatic");
+		} else {
+			println!("cargo:rustc-link-lib=static=WebView2Loader.dll");
+			println!("cargo:rustc-link-lib=dylib=WebView2Loader");
+		}
+
+		bgbuilder = bgbuilder
+			.clang_arg("-DBW_EDGE");
+
+		build
+			.define("BW_EDGE", None)
+			.include(include_dir)
+			.file("src/application/edge2.cpp")
+			.file("src/browser_window/edge2.cpp")
+			.file("src/cookie/unsupported.cpp")
+			.cpp(true);
 	}
 
 	/**************************************

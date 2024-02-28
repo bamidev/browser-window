@@ -10,6 +10,7 @@ categories = []
 repository = "https://github.com/bamilab/browser-window/tree/master/c"
 
 [features]
+bundled = []
 cef = []
 edge = []
 

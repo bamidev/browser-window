@@ -18,6 +18,11 @@ typedef bw_ApplicationDispatchFn bw_ApplicationReadyFn;
 // Import bw_ApplicationImpl and bw_ApplicationEngineImpl definitions
 #if defined(BW_WIN32)
 #include "application/win32.h"
+
+#if defined(BW_EDGE)
+#include "application/edge2.h"
+#endif
+
 #elif defined(BW_GTK)
 #include "application/gtk.h"
 #elif defined(BW_CEF_WINDOW)

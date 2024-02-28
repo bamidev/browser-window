@@ -191,7 +191,11 @@ impl CookieJarExt for CookieJarImpl {
 	fn global() -> Option<CookieJarImpl> {
 		let inner = unsafe { cbw_CookieJar_newGlobal() };
 
-		Some(CookieJarImpl { inner })
+		if inner != ptr::null_mut() {
+			Some(CookieJarImpl { inner })
+		} else {
+			None
+		}
 	}
 
 	fn iterator<'a>(&'a self, url: &str, include_http_only: bool) -> CookieIteratorImpl {

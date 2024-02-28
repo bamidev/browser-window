@@ -13,6 +13,7 @@ documentation = "https://docs.rs/browser-window/"
 repository = "https://github.com/bamidev/browser-window/"
 
 [features]
+bundled = ["browser-window-c/bundled"]
 cef = ["browser-window-c/cef"]
 edge = ["browser-window-c/edge"]
 gtk = []
