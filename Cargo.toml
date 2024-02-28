@@ -14,7 +14,7 @@ repository = "https://github.com/bamidev/browser-window/"
 
 [features]
 cef = ["browser-window-c/cef"]
-edge = []
+edge = ["browser-window-c/edge"]
 gtk = []
 webkitgtk = ["dep:gtk", "dep:javascriptcore-rs", "dep:webkit2gtk", "gtk"]
 threadsafe = []

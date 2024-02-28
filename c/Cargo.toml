@@ -11,6 +11,7 @@ repository = "https://github.com/bamilab/browser-window/tree/master/c"
 
 [features]
 cef = []
+edge = []
 
 [lib]
 name = "browser_window_c"
