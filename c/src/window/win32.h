@@ -2,14 +2,14 @@
 #define BW_WINDOW_WIN32_H
 
 #ifdef __cplusplus
-#error Not a C++ header file!
+extern "C" {
 #endif
 
 #include "../window.h"
 
 #include <stdbool.h>
 #define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
+#include <windows.h>
 
 
 
@@ -25,5 +25,8 @@ struct bw_WindowDispatchData {
 LRESULT CALLBACK bw_Window_proc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp);
 
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif//BW_WINDOW_WIN32_H

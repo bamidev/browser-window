@@ -59,7 +59,7 @@ WCHAR* bw_win32_copyAsNewWstr( bw_CStrSlice slice ) {
 
 	DWORD size = MultiByteToWideChar( CP_UTF8, 0, slice.data, (int)slice.len, 0, 0 );
 
-	WCHAR* str = calloc( size + 1, sizeof(WCHAR) );
+	WCHAR* str = (WCHAR*)calloc( size + 1, sizeof(WCHAR) );
 	if (str == 0) {
 		return 0;
 	}
@@ -71,7 +71,7 @@ WCHAR* bw_win32_copyAsNewWstr( bw_CStrSlice slice ) {
 }
 
 char* bw_win32_copyAsNewCstr( bw_CStrSlice str ) {
-	char* new_str = malloc( str.len + 1 );
+	char* new_str = (char*)malloc( str.len + 1 );
 
 	memcpy( new_str, str.data, str.len );
 	new_str[ str.len ] = '\0';
@@ -84,7 +84,7 @@ char* bw_win32_copyWstrAsNewCstr( const WCHAR* str ) {
 	size_t len = wcslen( str );
 	DWORD size_needed = WideCharToMultiByte( CP_UTF8, WC_COMPOSITECHECK | WC_DEFAULTCHAR | WC_NO_BEST_FIT_CHARS, str, (int)len, 0, 0, 0, 0 );
 
-	char* cstr = calloc( size_needed + 1, sizeof( char ) );
+	char* cstr = (char*)calloc( size_needed + 1, sizeof( char ) );
 	WideCharToMultiByte( CP_UTF8, WC_COMPOSITECHECK | WC_DEFAULTCHAR | WC_NO_BEST_FIT_CHARS, str, (int)len, cstr, size_needed, 0, 0 );
 	cstr[ size_needed ] = '\0';
 
@@ -121,28 +121,28 @@ bw_Err bw_win32_unhandledHresult( HRESULT hResult ) {
 	if ( FACILITY_WINDOWS == HRESULT_FACILITY( hResult ) )
 		hResult = HRESULT_CODE( hResult );
 
-		if( FormatMessageW(
-			FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-			NULL,
-			hResult,
-			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-			(LPWSTR)&message,
-			0, NULL ) != 0
-		) {
+	if( FormatMessageW(
+		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+		NULL,
+		hResult,
+		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		(LPWSTR)&message,
+		0, NULL ) != 0
+	) {
 
-			bw_Err error;
-			error.code = (bw_ErrCode)hResult;
-			error.data = message;
-			error.alloc_message = bw_win32_unhandledHresultMessage;
-			return error;
-		}
-		else {
-			bw_Err error;
-			error.code = (bw_ErrCode)hResult;
-			error.data = 0;	// No data is used here
-			error.alloc_message = bw_win32_unknownHresultMessage;
-			return error;
-		}
+		bw_Err error;
+		error.code = (bw_ErrCode)hResult;
+		error.data = message;
+		error.alloc_message = bw_win32_unhandledHresultMessage;
+		return error;
+	}
+	else {
+		bw_Err error;
+		error.code = (bw_ErrCode)hResult;
+		error.data = 0;	// No data is used here
+		error.alloc_message = bw_win32_unknownHresultMessage;
+		return error;
+	}
 }
 
 
@@ -150,7 +150,7 @@ char* bw_win32_unhandledHresultMessage( bw_ErrCode code, const void* data ) {
 
 	char* hresult_msg = bw_win32_copyWstrAsNewCstr( (WCHAR*)data );
 
-	char* message = calloc( strlen("Unhandled win32 hresult error [0x00000000]: ") + strlen( hresult_msg ) + 9, sizeof( char ) );
+	char* message = (char*)calloc( strlen("Unhandled win32 hresult error [0x00000000]: ") + strlen( hresult_msg ) + 9, sizeof( char ) );
 	sprintf( message, "Unhandled win32 hresult error [0x%x]: %s", code, hresult_msg );
 
 	free( hresult_msg );
@@ -160,7 +160,7 @@ char* bw_win32_unhandledHresultMessage( bw_ErrCode code, const void* data ) {
 char* bw_win32_unknownHresultMessage( bw_ErrCode code, const void* _ ) {
 	UNUSED(_);
 
-	char* message = calloc( strlen("Unknown win32 hresult error: 0x00000000") + 9, sizeof( char ) );
+	char* message = (char*)calloc( strlen("Unknown win32 hresult error: 0x00000000") + 9, sizeof( char ) );
 
 	sprintf( message, "Unknown win32 hresult error: 0x%x", code );
 

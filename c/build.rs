@@ -14,17 +14,38 @@ use std::{
 struct BwBindgenCallbacks {}
 
 
-fn nuget_webview_dir() -> PathBuf {
-	let home_dir = PathBuf::from(env::var("USERPROFILE").unwrap());
-	let webview2_path = PathBuf::from(".nuget\\packages\\microsoft.web.webview2");
-	let nuget_package_path = home_dir.join(webview2_path);
+fn nuget_package_dir(package_name: &str) -> Option<PathBuf> {
+	let nuget_path = match env::var("USERPROFILE") {
+		Err(e) => match env::var("NUGET_PATH") {
+			Ok(string) => PathBuf::from(string),
+			Err(e) => panic!("Couldn't find the Nuget path, please set environment variable NUGET_PATH.")
+		},
+		Ok(string) => PathBuf::from(format!("{}\\.nuget\\packages\\", string))
+	};
 
-	for path in fs::read_dir(nuget_package_path).unwrap() {
-		if let Ok(entry) = path {
-			return entry.path();
+	#[cfg(windows)]
+	{
+		let package_path = nuget_path.join(package_name);
+		for path in fs::read_dir(package_path).expect("package not found") {
+			if let Ok(entry) = path {
+				return Some(entry.path());
+			}
 		}
 	}
-	panic!("Nuget package \"microsoft.web.webview\" is missing version directory.");
+	#[cfg(not(windows))]
+	{
+		for path in fs::read_dir(nuget_path).expect("package not found") {
+			if let Ok(entry) = path {
+				if let Some(name) = entry.path().file_name() {
+					if name.to_string_lossy().starts_with(package_name) {
+						return Some(entry.path());
+					}
+				}
+			}
+		}
+	}
+
+	None
 }
 
 /// Prints all compiler commands to rerun if any file has changed within the
@@ -347,14 +368,14 @@ fn main() {
 	 * Microsoft Edge WebView2 source files
 	 ****************************************/
 	else if cfg!(feature = "edge") {
-		let webview_dir = nuget_webview_dir();
+		let webview_dir = nuget_package_dir("Microsoft.Web.WebView2").expect("Couldn't find Microsoft.Web.WebView2 Nuget package.");
 		let include_dir = webview_dir.join(PathBuf::from("build/native/include"));
 		let lib_dir = if cfg!(target_arch = "x86") {
 			webview_dir.join(PathBuf::from("build/native/x86"))
 		} else if cfg!(target_arch = "x86_64") {
 			webview_dir.join(PathBuf::from("build/native/x64"))
 		} else if cfg!(target_arch = "aarch64") {
-			webview_dir.join(PathBuf::from("build/nativ/arm64"))
+			webview_dir.join(PathBuf::from("build/native/arm64"))
 		} else {
 			panic!("Unsupported target architecture for Edge WebView2 framework.");
 		};
@@ -370,10 +391,16 @@ fn main() {
 		bgbuilder = bgbuilder
 			.clang_arg("-DBW_EDGE");
 
+		// Add the MinGW header files and libraries when available
+		if Path::new("/usr/share/mingw-w64/include/").exists() {
+			build.include("/usr/share/mingw-w64/include/");
+			build.include(PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap() + "/win32/include"));
+		}
+
 		build
 			.define("BW_EDGE", None)
 			.include(include_dir)
-			.file("src/application/edge2.cpp")
+			//.file("src/application/edge2.cpp")
 			.file("src/browser_window/edge2.cpp")
 			.file("src/cookie/unsupported.cpp")
 			.cpp(true);

@@ -206,25 +206,28 @@ LRESULT CALLBACK bw_Window_proc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 	bw_Window* window = (bw_Window*)GetWindowLongPtrW( hwnd, GWLP_USERDATA );
 
 	switch (msg) {
-	case WM_SIZE:
-		BW_ASSERT( window != 0, "Invalid window pointer during WM_SIZE" );
+		case WM_SIZE: {
+			BW_ASSERT( window != 0, "Invalid window pointer during WM_SIZE" );
 
-		RECT rect;
-		GetClientRect( window->impl.handle, &rect );
+			RECT rect;
+			GetClientRect( window->impl.handle, &rect );
 
-			unsigned int width = rect.right - rect.left;
-			unsigned int height = rect.bottom - rect.top;
+				unsigned int width = rect.right - rect.left;
+				unsigned int height = rect.bottom - rect.top;
 
-			if ( window->callbacks.on_resize != 0 )
-				window->callbacks.on_resize( window, width, height );
+				if ( window->callbacks.on_resize != 0 )
+					window->callbacks.on_resize( window, width, height );
 
-		break;
-	// When closing the window, only destroy it when it is ready for it to be destroyed
-	case WM_CLOSE:
-		bw_Window_triggerClose( window );
-		break;
-	default:
-		return DefWindowProcW(hwnd, msg, wp, lp);
+			break;
+		}
+		// When closing the window, only destroy it when it is ready for it to be destroyed
+		case WM_CLOSE: {
+			bw_Window_triggerClose( window );
+			break;
+		}
+		default: {
+			return DefWindowProcW(hwnd, msg, wp, lp);
+		}
 	}
 
 	return 0;

@@ -10,14 +10,13 @@
 
 #include <stdlib.h>
 #define WIN32_LEAN_AND_MEAN
-#include <WinDef.h>
-#include <Windows.h>
+#include <windef.h>
+#include <windows.h>
 
 #include "../win32.h"
 #include "../window/win32.h"
 
 #include <stdio.h>
-
 
 
 typedef struct {
@@ -35,7 +34,7 @@ void bw_ApplicationWin32_timerHandler(HWND _hwnd, UINT _, UINT_PTR nIDEvent, DWO
 
 
 
-PSLIST_HEADER timer_map = NULL;
+bw_ApplicationTimerMapEntry* timer_map = NULL;
 
 
 void bw_Application_assertCorrectThread( const bw_Application* app ) {
@@ -53,12 +52,12 @@ BOOL bw_ApplicationImpl_dispatch( bw_Application* app, bw_ApplicationDispatchDat
 	AcquireSRWLockShared( &app->impl.is_running_mtx );
 	bool result = app->is_running;
 	ReleaseSRWLockShared( &app->impl.is_running_mtx );
-	if ( result == false )
-		return false;
+	if ( result == FALSE )
+		return FALSE;
 
 	PostThreadMessageW( app->impl.thread_id, WM_APP, (WPARAM)NULL, (LPARAM)dispatch_data );
 
-	return true;
+	return TRUE;
 }
 
 BOOL bw_ApplicationImpl_dispatchDelayed(bw_Application* app, bw_ApplicationDispatchData* dispatch_data,  uint64_t milliseconds) {
@@ -69,8 +68,8 @@ BOOL bw_ApplicationImpl_dispatchDelayed(bw_Application* app, bw_ApplicationDispa
 	AcquireSRWLockShared( &app->impl.is_running_mtx );
 	bool result = app->is_running;
 	ReleaseSRWLockShared( &app->impl.is_running_mtx );
-	if ( result == false )
-		return false;
+	if ( result == FALSE )
+		return FALSE;
 
 	// If we are on the right thread, just call `SendMessageTimeout`.
 	if (app->impl.thread_id == GetCurrentThreadId()) {
@@ -89,6 +88,8 @@ BOOL bw_ApplicationImpl_dispatchDelayed(bw_Application* app, bw_ApplicationDispa
 
 		bw_ApplicationImpl_dispatch(app, wrapper_data);
 	}
+
+	return TRUE;
 }
 
 void bw_ApplicationWin32_addToTimerMap(bw_Application* app, UINT_PTR timer_id, bw_ApplicationDispatchData* dispatch_data) {
@@ -105,7 +106,7 @@ void bw_ApplicationWin32_addToTimerMap(bw_Application* app, UINT_PTR timer_id, b
 
 		// Skip all but last entry
 		while (entry->next != 0) {
-			entry = entry->next;
+			entry = (bw_ApplicationTimerMapEntry*)entry->next;
 		}
 
 		entry->next = new_entry;
@@ -118,7 +119,7 @@ void bw_ApplicationWin32_addToTimerMap(bw_Application* app, UINT_PTR timer_id, b
 void bw_ApplicationWin32_dispatchWrapper(bw_Application* app, void* _data) {
 	bw_ApplicationDispatchDelayedData* data = (bw_ApplicationDispatchDelayedData*)_data;
 	
-	bw_ApplicationWin32_setTimer(app, data->dispatch_data, data->delay);
+	bw_ApplicationWin32_setTimer(app, (bw_ApplicationDispatchData*)data->dispatch_data, data->delay);
 
 	free(data);
 }
@@ -140,7 +141,7 @@ void bw_ApplicationWin32_freeTimerMap() {
 	bw_ApplicationTimerMapEntry* entry = timer_map;
 
 	while (entry != 0) {
-		bw_ApplicationTimerMapEntry* next = entry->next;
+		bw_ApplicationTimerMapEntry* next = (bw_ApplicationTimerMapEntry*)entry->next;
 
 		KillTimer(NULL, entry->timer_id);
 		free(entry);
@@ -152,21 +153,21 @@ void bw_ApplicationWin32_freeTimerMap() {
 bool bw_ApplicationWin32_removeFromTimerMap(bw_ApplicationTimerMapEntry* entry) {
 	
 	if (timer_map == entry) {
-		timer_map = entry->next;
+		timer_map = (bw_ApplicationTimerMapEntry*)entry->next;
 		free(entry);
 		return true;
 	}
 
 	bw_ApplicationTimerMapEntry* prev = timer_map;
-	bw_ApplicationTimerMapEntry* i = prev->next;
+	bw_ApplicationTimerMapEntry* i = (bw_ApplicationTimerMapEntry*)prev->next;
 	while (i != 0) {
 		if (i == entry) {
-			prev = i->next;
+			prev = (bw_ApplicationTimerMapEntry*)i->next;
 			free(i);
 			return true;
 		}
 
-		i = i->next;
+		i = (bw_ApplicationTimerMapEntry*)i->next;
 	}
 
 	return false;
@@ -179,6 +180,8 @@ void bw_ApplicationWin32_setTimer(bw_Application* app, bw_ApplicationDispatchDat
 }
 
 void bw_ApplicationWin32_timerHandler(HWND hwnd, UINT _, UINT_PTR timer_id, DWORD _2) {
+	UNUSED(_);
+	UNUSED(_2);
 	KillTimer(hwnd, timer_id);
 
 	bw_ApplicationTimerMapEntry* entry = bw_ApplicationWin32_findInTimerMap(timer_id);
