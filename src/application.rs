@@ -81,6 +81,7 @@ use std::{
 	ffi::CString,
 	future::Future,
 	os::raw::c_int,
+	path::PathBuf,
 	pin::Pin,
 	ptr,
 	task::{Context, Poll, RawWaker, RawWakerVTable, Waker},
@@ -90,7 +91,6 @@ use std::{
 use futures_channel::oneshot;
 use lazy_static::lazy_static;
 
-pub use crate::core::application::ApplicationSettings;
 #[cfg(feature = "threadsafe")]
 use crate::delegate::*;
 use crate::{cookie::CookieJar, core::application::*, error};
@@ -131,6 +131,18 @@ struct ApplicationDispatchData<'a> {
 struct ApplicationDispatchSendData<'a> {
 	handle: ApplicationHandle,
 	func: Box<dyn FnOnce(ApplicationHandle) + Send + 'a>,
+}
+
+#[derive(Default)]
+pub struct ApplicationSettings {
+	/// CEF only: If set, the path of the seperate executable that gets compiled together with your
+	/// main executable. If not set, no seperate executable will be used.
+	pub engine_seperate_executable_path: Option<PathBuf>,
+	/// If set, this path will be where the browser framework will look for resources/assets.
+	/// If not set, it will default to the directory where the executable is located.
+	pub resource_dir: Option<PathBuf>,
+	/// CEF only: If set, will enable remote debugging at this port.
+	pub remote_debugging_port: Option<u16>,
 }
 
 // The trait to be implemented by all (user-level) handles that are able to
@@ -223,6 +235,21 @@ impl Application {
 
 impl Drop for Application {
 	fn drop(&mut self) { self.handle.inner.free() }
+}
+
+impl ApplicationSettings {
+
+	pub fn default_resource_path() -> PathBuf {
+		let mut path = env::current_exe().unwrap();
+		path.pop();
+
+		#[cfg(debug_assertions)]
+		{ path.pop(); path.pop(); }
+
+		path.push("resources");
+
+		path
+	}
 }
 
 impl Runtime {

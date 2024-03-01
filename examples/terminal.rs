@@ -79,7 +79,8 @@ where
 }
 
 fn main() {
-	let settings = ApplicationSettings::default();
+	let mut settings = ApplicationSettings::default();
+	settings.remote_debugging_port = Some(10000);
 	let application = match Application::initialize(&settings) {
 		Err(e) => panic!("Unable to initialize application: {}", e),
 		Ok(app) => app,

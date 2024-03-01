@@ -56,6 +56,9 @@ bw_Err bw_ApplicationEngineImpl_initialize( bw_ApplicationEngineImpl* impl, bw_A
 #endif
 
 	CefSettings app_settings;
+	if (settings->remote_debugging_port != 0) {
+		app_settings.remote_debugging_port = settings->remote_debugging_port;
+	}
 	CefRefPtr<CefApp> cef_app_handle( new AppHandler( app ) );
 
 	if (settings->engine_seperate_executable_path.len == 0) {

@@ -58,6 +58,7 @@ typedef struct {
 
 typedef struct {
 	bw_CStrSlice engine_seperate_executable_path;
+	uint16_t remote_debugging_port;
 	bw_CStrSlice resource_dir;
 } bw_ApplicationSettings;
 

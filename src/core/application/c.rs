@@ -5,6 +5,7 @@
 
 use std::{
 	os::raw::{c_char, c_int, c_void},
+	path::PathBuf,
 	ptr,
 	time::Duration,
 };
@@ -60,21 +61,24 @@ impl ApplicationExt for ApplicationImpl {
 	}
 
 	fn initialize(
-		argc: c_int, argv: *mut *mut c_char, _settings: &ApplicationSettings,
+		argc: c_int, argv: *mut *mut c_char, settings: &ApplicationSettings,
 	) -> Result<Self> {
-		let exec_path: &str = match _settings.engine_seperate_executable_path.as_ref() {
+		let exec_path: &str = match settings.engine_seperate_executable_path.as_ref() {
 			None => "",
 			Some(path) => path.to_str().unwrap(),
 		};
 
 		let c_settings = cbw_ApplicationSettings {
 			engine_seperate_executable_path: exec_path.into(),
-			resource_dir: _settings
+			resource_dir: settings
 				.resource_dir
 				.as_ref()
-				.unwrap_or(&"".to_owned())
-				.as_str()
+				.unwrap_or(&PathBuf::new())
+				.as_os_str()
+				.to_string_lossy()
+				.as_ref()
 				.into(),
+			remote_debugging_port: settings.remote_debugging_port.unwrap_or(0)
 		};
 
 		let mut c_handle: *mut cbw_Application = ptr::null_mut();

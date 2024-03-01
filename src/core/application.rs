@@ -5,7 +5,6 @@ pub mod gtk;
 
 use std::{
 	os::raw::{c_char, c_int},
-	path::PathBuf,
 	time::Duration,
 };
 
@@ -14,7 +13,8 @@ pub use c::ApplicationImpl;
 #[cfg(feature = "gtk")]
 pub use gtk::ApplicationImpl;
 
-use crate::error::Result;
+use crate::{application::ApplicationSettings, error::Result};
+
 
 pub trait ApplicationExt: Clone {
 	/// Asserts if not on the GUI thread
@@ -42,18 +42,4 @@ pub trait ApplicationExt: Clone {
 	/// Runs the main loop.
 	/// This blocks until the application is exitting.
 	fn run(&self, on_ready: fn(ApplicationImpl, *mut ()), data: *mut ()) -> i32;
-}
-
-pub struct ApplicationSettings {
-	pub engine_seperate_executable_path: Option<PathBuf>,
-	pub resource_dir: Option<String>,
-}
-
-impl Default for ApplicationSettings {
-	fn default() -> Self {
-		Self {
-			engine_seperate_executable_path: None,
-			resource_dir: None,
-		}
-	}
 }
