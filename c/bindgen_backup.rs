@@ -3073,6 +3073,7 @@ fn bindgen_test_layout_cbw_ApplicationDispatchData() {
 #[derive(Debug, Copy, Clone)]
 pub struct cbw_ApplicationSettings {
 	pub engine_seperate_executable_path: cbw_CStrSlice,
+	pub remote_debugging_port: u16,
 	pub resource_dir: cbw_CStrSlice,
 }
 #[test]
@@ -3082,7 +3083,7 @@ fn bindgen_test_layout_cbw_ApplicationSettings() {
 	let ptr = UNINIT.as_ptr();
 	assert_eq!(
 		::std::mem::size_of::<cbw_ApplicationSettings>(),
-		32usize,
+		40usize,
 		concat!("Size of: ", stringify!(cbw_ApplicationSettings))
 	);
 	assert_eq!(
@@ -3103,8 +3104,18 @@ fn bindgen_test_layout_cbw_ApplicationSettings() {
 		)
 	);
 	assert_eq!(
-		unsafe { ::std::ptr::addr_of!((*ptr).resource_dir) as usize - ptr as usize },
+		unsafe { ::std::ptr::addr_of!((*ptr).remote_debugging_port) as usize - ptr as usize },
 		16usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_ApplicationSettings),
+			"::",
+			stringify!(remote_debugging_port)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).resource_dir) as usize - ptr as usize },
+		24usize,
 		concat!(
 			"Offset of field: ",
 			stringify!(cbw_ApplicationSettings),
@@ -4848,50 +4859,93 @@ extern "C" {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct cbw_CookieImpl {}
+pub struct cbw_CookieImpl {
+	pub __: *mut ::std::os::raw::c_void,
+}
 #[test]
 fn bindgen_test_layout_cbw_CookieImpl() {
+	const UNINIT: ::std::mem::MaybeUninit<cbw_CookieImpl> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
 	assert_eq!(
 		::std::mem::size_of::<cbw_CookieImpl>(),
-		0usize,
+		8usize,
 		concat!("Size of: ", stringify!(cbw_CookieImpl))
 	);
 	assert_eq!(
 		::std::mem::align_of::<cbw_CookieImpl>(),
-		1usize,
+		8usize,
 		concat!("Alignment of ", stringify!(cbw_CookieImpl))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_CookieImpl),
+			"::",
+			stringify!(__)
+		)
 	);
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct cbw_CookieIteratorImpl {}
+pub struct cbw_CookieIteratorImpl {
+	pub __: *mut ::std::os::raw::c_void,
+}
 #[test]
 fn bindgen_test_layout_cbw_CookieIteratorImpl() {
+	const UNINIT: ::std::mem::MaybeUninit<cbw_CookieIteratorImpl> =
+		::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
 	assert_eq!(
 		::std::mem::size_of::<cbw_CookieIteratorImpl>(),
-		0usize,
+		8usize,
 		concat!("Size of: ", stringify!(cbw_CookieIteratorImpl))
 	);
 	assert_eq!(
 		::std::mem::align_of::<cbw_CookieIteratorImpl>(),
-		1usize,
+		8usize,
 		concat!("Alignment of ", stringify!(cbw_CookieIteratorImpl))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_CookieIteratorImpl),
+			"::",
+			stringify!(__)
+		)
 	);
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct cbw_CookieJarImpl {}
+pub struct cbw_CookieJarImpl {
+	pub __: *mut ::std::os::raw::c_void,
+}
 #[test]
 fn bindgen_test_layout_cbw_CookieJarImpl() {
+	const UNINIT: ::std::mem::MaybeUninit<cbw_CookieJarImpl> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
 	assert_eq!(
 		::std::mem::size_of::<cbw_CookieJarImpl>(),
-		0usize,
+		8usize,
 		concat!("Size of: ", stringify!(cbw_CookieJarImpl))
 	);
 	assert_eq!(
 		::std::mem::align_of::<cbw_CookieJarImpl>(),
-		1usize,
+		8usize,
 		concat!("Alignment of ", stringify!(cbw_CookieJarImpl))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_CookieJarImpl),
+			"::",
+			stringify!(__)
+		)
 	);
 }
 #[repr(C)]
@@ -4905,12 +4959,12 @@ fn bindgen_test_layout_cbw_Cookie() {
 	let ptr = UNINIT.as_ptr();
 	assert_eq!(
 		::std::mem::size_of::<cbw_Cookie>(),
-		0usize,
+		8usize,
 		concat!("Size of: ", stringify!(cbw_Cookie))
 	);
 	assert_eq!(
 		::std::mem::align_of::<cbw_Cookie>(),
-		1usize,
+		8usize,
 		concat!("Alignment of ", stringify!(cbw_Cookie))
 	);
 	assert_eq!(
@@ -4935,12 +4989,12 @@ fn bindgen_test_layout_cbw_CookieJar() {
 	let ptr = UNINIT.as_ptr();
 	assert_eq!(
 		::std::mem::size_of::<cbw_CookieJar>(),
-		0usize,
+		8usize,
 		concat!("Size of: ", stringify!(cbw_CookieJar))
 	);
 	assert_eq!(
 		::std::mem::align_of::<cbw_CookieJar>(),
-		1usize,
+		8usize,
 		concat!("Alignment of ", stringify!(cbw_CookieJar))
 	);
 	assert_eq!(
@@ -4965,12 +5019,12 @@ fn bindgen_test_layout_cbw_CookieIterator() {
 	let ptr = UNINIT.as_ptr();
 	assert_eq!(
 		::std::mem::size_of::<cbw_CookieIterator>(),
-		0usize,
+		8usize,
 		concat!("Size of: ", stringify!(cbw_CookieIterator))
 	);
 	assert_eq!(
 		::std::mem::align_of::<cbw_CookieIterator>(),
-		1usize,
+		8usize,
 		concat!("Alignment of ", stringify!(cbw_CookieIterator))
 	);
 	assert_eq!(
