@@ -32,25 +32,24 @@ public:
 	virtual CefRefPtr<CefLoadHandler> GetLoadHandler() override { return this; }
 
 	virtual void OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int httpStatusCode) override {
+		this->invokeCreationCallback(browser);
+	}
+
+	void invokeCreationCallback(CefRefPtr<CefBrowser> browser) {
 		std::optional<bw::BrowserInfo> bw_info_opt = bw::bw_handle_map.fetch(browser);
-		BW_ASSERT(bw_info_opt.has_value(), "Link between CEF's browser handle and our handle does not exist!\n");
-		auto bw_info = bw_info_opt.value();
-		auto callback_opt = bw_info.callback;
-		if (callback_opt.has_value()) {
-			auto value = callback_opt.value();
-			value.callback(bw_info.handle, value.data);
+		if (bw_info_opt.has_value()) {
+			auto bw_info = bw_info_opt.value();
+			auto callback_opt = bw_info.callback;
+			if (callback_opt.has_value()) {
+				auto value = callback_opt.value();
+				callback_opt.reset();
+				value.callback(bw_info.handle, value.data);
+			}
 		}
 	}
 
 	virtual void OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefLoadHandler::ErrorCode errorCode, const CefString& errorText, const CefString& failedUrl) override {
-		std::optional<bw::BrowserInfo> bw_info_opt = bw::bw_handle_map.fetch(browser);
-		BW_ASSERT(bw_info_opt.has_value(), "Link between CEF's browser handle and our handle does not exist!\n");
-		auto bw_info = bw_info_opt.value();
-		auto callback_opt = bw_info.callback;
-		if (callback_opt.has_value()) {
-			auto value = callback_opt.value();
-			value.callback(bw_info.handle, value.data);
-		}
+		this->invokeCreationCallback(browser);
 	}
 
 	virtual bool OnProcessMessageReceived(
@@ -86,12 +85,19 @@ protected:
 
 	static void externalInvocationHandlerFunc( bw_Application* app, void* data );
 
+	void OnBeforeClose(CefRefPtr<CefBrowser> browser) {
+		browser->GetHost()->CloseDevTools();
+	}
+
 	void onBrowserCreated(
 		CefRefPtr<CefBrowser> browser,
 		CefRefPtr<CefFrame>,
 		CefProcessId,
 		CefRefPtr<CefProcessMessage> msg
 	) {
+		// Don't do anything for 
+		if (browser->IsPopup()) { return; }
+
 		auto args = msg->GetArgumentList();
 
 		// Process message arguments
@@ -112,7 +118,7 @@ protected:
 
 		// Open dev-tools window
 		if ( dev_tools_enabled )
-			this->openDevTools( bw_handle, browser->GetHost() );
+			this->openDevTools(browser, bw_handle);
 	}
 
 	void onEvalJsResultReceived(
@@ -203,20 +209,16 @@ protected:
 		);
 	}
 
-	void openDevTools( bw_BrowserWindow* bw, const CefRefPtr<CefBrowserHost>& host ) {
-#ifdef BW_WIN32
-
-		CefRefPtr<CefClient> client;
-		CefBrowserSettings settings;
-		CefPoint point;
-
+	void openDevTools(CefRefPtr<CefBrowser> browser, bw_BrowserWindow* bw) {
 		CefWindowInfo info;
-		info.SetAsPopup( bw->window->impl.handle, "Dev Tools" );
-
-		host->ShowDevTools( info, client, settings, point );
+#ifdef BW_WIN32
+		info.SetAsPopup(browser, "Dev Tools" );
 #endif
+		//browser->GetHost()->ShowDevTools(info, this, CefBrowserSettings(), CefPoint());
 
-		// FIXME: Implement dev tools for non windows systems
+#ifndef NDEBUG
+		printf("Dev Tools are disabled for CEF in BrowserWindow, because it is broken.")
+#endif
 	}
 
 	IMPLEMENT_REFCOUNTING(ClientHandler);

@@ -24,7 +24,8 @@ public:
 	AppHandler( bw_Application* app ) : app(app) {}
 
 	virtual void OnBrowserCreated( CefRefPtr<CefBrowser> browser, CefRefPtr<CefDictionaryValue> extra_info ) override {
-
+		if (browser->IsPopup()) { return; }
+		
 		// Lets send the handle and callback data back to the browser process, where we can actually use them
 		auto msg = CefProcessMessage::Create( "on-browser-created" );
 		auto args = msg->GetArgumentList();
@@ -35,14 +36,12 @@ public:
 		args->SetBinary( 2, extra_info->GetBinary( "callback-data" ) );
 		args->SetBool( 3, extra_info->GetBool( "dev-tools" ) );
 
-		auto test = extra_info->GetBinary( "handle" );
-		void* ptr = 0;
-		test->GetData( &ptr, sizeof( ptr ), 0 );
-
 		browser->GetMainFrame()->SendProcessMessage( PID_BROWSER, msg );
 	}
 
 	virtual void OnContextCreated( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefV8Context> context ) override {
+		if (browser->IsPopup()) { return; }
+		
 		// Unused parameters
 		(void)(frame);
 
