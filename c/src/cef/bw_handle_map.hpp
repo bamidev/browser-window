@@ -44,10 +44,11 @@ namespace bw {
 		void store(CefRefPtr<CefBrowser> cef_handle, bw_BrowserWindow* our_handle, bw_BrowserWindowCreationCallbackFn callback, void* callback_data) {
 			BrowserInfo& bw_info = this->map[cef_handle->GetIdentifier()];
 			bw_info.handle = our_handle;
-			bw_info.callback = std::optional(OnCreateCallback {
+			OnCreateCallback occ = {
 				callback,
-				data: callback_data
-			});
+				callback_data
+			};
+			bw_info.callback = std::optional(occ);
 			this->mutex.unlock();
 		}
 
