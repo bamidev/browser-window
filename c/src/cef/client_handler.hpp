@@ -217,7 +217,7 @@ protected:
 		//browser->GetHost()->ShowDevTools(info, this, CefBrowserSettings(), CefPoint());
 
 #ifndef NDEBUG
-		printf("Dev Tools are disabled for CEF in BrowserWindow, because it is broken.\n");
+		printf("Dev Tools are disabled for CEF in BrowserWindow, because it is broken. Use remote debugging instead.\n");
 #endif
 	}
 
