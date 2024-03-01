@@ -212,12 +212,13 @@ protected:
 	void openDevTools(CefRefPtr<CefBrowser> browser, bw_BrowserWindow* bw) {
 		CefWindowInfo info;
 #ifdef BW_WIN32
-		info.SetAsPopup(browser, "Dev Tools" );
-#endif
+		//info.SetAsPopup(browser->GetWindowHandle(), "Dev Tools" );
+		browser->GetHost()->ShowDevTools(info, this, CefBrowserSettings(), CefPoint());
+#else
 		//browser->GetHost()->ShowDevTools(info, this, CefBrowserSettings(), CefPoint());
-
 #ifndef NDEBUG
 		printf("Dev Tools are disabled for CEF in BrowserWindow, because it is broken. Use remote debugging instead.\n");
+#endif
 #endif
 	}
 

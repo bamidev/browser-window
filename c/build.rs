@@ -190,6 +190,9 @@ fn main() {
 	 ******************************* */
 	if target.contains("windows") {
 		bgbuilder = bgbuilder.clang_arg("-DBW_WIN32");
+		if target.contains("msvc") {
+			build.flag("/MT");
+		}
 
 		// Win32 API
 		build
@@ -275,6 +278,8 @@ fn main() {
 				println!("cargo:rustc-link-search={}/libcef_dll_wrapper", &cef_path);
 				println!("cargo:rustc-link-search={}/Release", &cef_path);
 				if target.contains("msvc") {
+					build_se.flag("/MT");
+
 					println!("cargo:rustc-link-search={}", &cef_path);
 					println!(
 						"cargo:rustc-link-search={}/libcef_dll_wrapper/Release",

@@ -49,11 +49,6 @@ BOOL bw_ApplicationImpl_dispatch( bw_Application* app, bw_ApplicationDispatchDat
 	return TRUE;
 }
 
-void bw_ApplicationImpl_free( bw_ApplicationImpl* app ) {
-	UNUSED( app );
-	CefShutdown();
-}
-
 int bw_ApplicationImpl_run( bw_Application* app, bw_ApplicationImpl_ReadyHandlerData* ready_handler_data ) {
 	bw_Application_assertCorrectThread( app );
 

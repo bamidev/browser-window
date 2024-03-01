@@ -105,6 +105,10 @@ void bw_ApplicationEngineImpl_free( bw_ApplicationEngineImpl* app ) {
 	delete (CefRefPtr<CefClient>*)app->cef_client;
 }
 
+void bw_ApplicationImpl_free( bw_ApplicationImpl* app ) {
+
+}
+
 
 
 #ifdef CEF_X11

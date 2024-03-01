@@ -114,7 +114,8 @@ void bw_BrowserWindowCef_connectToWin32Window( bw_BrowserWindow* bw, CefWindowIn
 
 	RECT rect;
 	GetClientRect( bw->window->impl.handle, &rect );
-	info.SetAsChild( bw->window->impl.handle, rect );
+	CefRect crect(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
+	info.SetAsChild( bw->window->impl.handle, crect );
 }
 #endif
 
