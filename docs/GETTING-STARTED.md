@@ -18,7 +18,8 @@ Here are the pros and cons of each browser framework. Choose wisely:
 *Pros:*
 * Is available on all major platforms: Windows, MacOS, Linux (although MacOS support in _BrowserWindow_ needs some work).
 If you want the exact same behavior of your app on all platforms, CEF is recommended.
-* The cookie API is supported when using CEF in _BrowserWindow_.
+* The cookie API of _BrowserWindow_ is supported.
+* Is the only framework option which can be decently cross-compiled to Windows.
 
 *Cons:*
 * Can be a pain to set up correctly; requires a lot of files to be present for the executable, and needs the sandbox to have specific permissions.
@@ -40,7 +41,6 @@ is even a homebrew package for it on MacOS.
 *Pro:*
 * Preinstalled on Windows 11
 * Can be statically linked to when using the `*-pc-windows-msvc` toolchain.
-* Is easy to cross-compile for. (Needs some testing.)
 
 *Cons:*
 * Currenty not yet working on _BrowserWindow_.

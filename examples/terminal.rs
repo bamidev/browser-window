@@ -122,13 +122,7 @@ fn main() {
 			.eval_js(format!("initialize({})", &working_dir_js).as_str())
 			.await
 		{
-			Err(_) => bw.exec_js(
-				format!(
-					"window.onload = () => {{ initialize({}) }}",
-					&working_dir_js
-				)
-				.as_str(),
-			),
+			Err(e) => eprintln!("Javascript Error: {:?}", e),
 			Ok(_) => {}
 		};
 	});

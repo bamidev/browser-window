@@ -6,6 +6,7 @@
 #include <include/cef_v8.h>
 #include <string>
 #include <vector>
+#include <include/cef_load_handler.h>
 
 #include "bw_handle_map.hpp"
 #include "../application.h"
@@ -19,15 +20,37 @@ struct ExternalInvocationHandlerData {
 	std::vector<std::string> params;
 };
 
-class ClientHandler : public CefClient, public CefLifeSpanHandler {
+class ClientHandler : public CefClient, public CefLifeSpanHandler, public CefLoadHandler {
 
 	bw_Application* app;
 
 public:
 	ClientHandler( bw_Application* app ) : app(app) {}
 
-	virtual CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() override {
-		return this;
+	virtual CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() override { return this; }
+
+	virtual CefRefPtr<CefLoadHandler> GetLoadHandler() override { return this; }
+
+	virtual void OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int httpStatusCode) override {
+		std::optional<bw::BrowserInfo> bw_info_opt = bw::bw_handle_map.fetch(browser);
+		BW_ASSERT(bw_info_opt.has_value(), "Link between CEF's browser handle and our handle does not exist!\n");
+		auto bw_info = bw_info_opt.value();
+		auto callback_opt = bw_info.callback;
+		if (callback_opt.has_value()) {
+			auto value = callback_opt.value();
+			value.callback(bw_info.handle, value.data);
+		}
+	}
+
+	virtual void OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefLoadHandler::ErrorCode errorCode, const CefString& errorText, const CefString& failedUrl) override {
+		std::optional<bw::BrowserInfo> bw_info_opt = bw::bw_handle_map.fetch(browser);
+		BW_ASSERT(bw_info_opt.has_value(), "Link between CEF's browser handle and our handle does not exist!\n");
+		auto bw_info = bw_info_opt.value();
+		auto callback_opt = bw_info.callback;
+		if (callback_opt.has_value()) {
+			auto value = callback_opt.value();
+			value.callback(bw_info.handle, value.data);
+		}
 	}
 
 	virtual bool OnProcessMessageReceived(
@@ -47,7 +70,8 @@ public:
 			this->onInvokeHandlerReceived( browser, frame, source_process, message );
 			return true;
 		}
-		// The message to send data from within javascript to application code
+		// The OnBrowserCreated event is fired on another process, so we need to catch it here and
+		// update the bw_handle_map in this process.
 		else if ( message->GetName() == "on-browser-created" ) {
 			this->onBrowserCreated( browser, frame, source_process, message );
 			return true;
@@ -84,14 +108,11 @@ protected:
 		bw_handle->impl.cef_ptr = (void*)cef_ptr;
 
 		// Store a link with the cef browser handle and our handle in a global map
-		bw::bw_handle_map.store( *cef_ptr, bw_handle );
+		bw::bw_handle_map.store(*cef_ptr, bw_handle, callback, callback_data);
 
 		// Open dev-tools window
 		if ( dev_tools_enabled )
 			this->openDevTools( bw_handle, browser->GetHost() );
-
-		// Invoke the completion callback
-		callback( bw_handle, callback_data );
 	}
 
 	void onEvalJsResultReceived(
@@ -151,9 +172,9 @@ protected:
 		(void)(source_process);
 
 		// Obtain our browser window handle
-		std::optional<bw_BrowserWindow*> _bw_handle = bw::bw_handle_map.fetch( browser );
-		BW_ASSERT( _bw_handle.has_value(), "Link between CEF's browser handle and our handle does not exist!\n" );
-		bw_BrowserWindow* our_handle = *_bw_handle;
+		std::optional<bw::BrowserInfo> bw_info = bw::bw_handle_map.fetch(browser);
+		BW_ASSERT( bw_info.has_value(), "Link between CEF's browser handle and our handle does not exist!\n" );
+		bw_BrowserWindow* our_handle = bw_info.value().handle;
 
 		auto msg_args = msg->GetArgumentList();
 

@@ -2,4 +2,4 @@
 
 
 
-bw::BwHandleMap bw::bw_handle_map;
+bw::HandleMap bw::bw_handle_map;
