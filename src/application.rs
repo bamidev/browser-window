@@ -135,11 +135,13 @@ struct ApplicationDispatchSendData<'a> {
 
 #[derive(Default)]
 pub struct ApplicationSettings {
-	/// CEF only: If set, the path of the seperate executable that gets compiled together with your
-	/// main executable. If not set, no seperate executable will be used.
+	/// CEF only: If set, the path of the seperate executable that gets compiled
+	/// together with your main executable. If not set, no seperate executable
+	/// will be used.
 	pub engine_seperate_executable_path: Option<PathBuf>,
-	/// If set, this path will be where the browser framework will look for resources/assets.
-	/// If not set, it will default to the directory where the executable is located.
+	/// If set, this path will be where the browser framework will look for
+	/// resources/assets. If not set, it will default to the directory where the
+	/// executable is located.
 	pub resource_dir: Option<PathBuf>,
 	/// CEF only: If set, will enable remote debugging at this port.
 	pub remote_debugging_port: Option<u16>,
@@ -238,13 +240,15 @@ impl Drop for Application {
 }
 
 impl ApplicationSettings {
-
 	pub fn default_resource_path() -> PathBuf {
 		let mut path = env::current_exe().unwrap();
 		path.pop();
 
 		#[cfg(debug_assertions)]
-		{ path.pop(); path.pop(); }
+		{
+			path.pop();
+			path.pop();
+		}
 
 		path.push("resources");
 

@@ -78,7 +78,7 @@ impl ApplicationExt for ApplicationImpl {
 				.to_string_lossy()
 				.as_ref()
 				.into(),
-			remote_debugging_port: settings.remote_debugging_port.unwrap_or(0)
+			remote_debugging_port: settings.remote_debugging_port.unwrap_or(0),
 		};
 
 		let mut c_handle: *mut cbw_Application = ptr::null_mut();

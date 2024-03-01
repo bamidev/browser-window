@@ -13,14 +13,15 @@ use std::{
 #[derive(Debug)]
 struct BwBindgenCallbacks {}
 
-
 fn nuget_package_dir(package_name: &str) -> Option<PathBuf> {
 	let nuget_path = match env::var("USERPROFILE") {
 		Err(e) => match env::var("NUGET_PATH") {
 			Ok(string) => PathBuf::from(string),
-			Err(e) => panic!("Couldn't find the Nuget path, please set environment variable NUGET_PATH.")
+			Err(e) => {
+				panic!("Couldn't find the Nuget path, please set environment variable NUGET_PATH.")
+			}
 		},
-		Ok(string) => PathBuf::from(format!("{}\\.nuget\\packages\\", string))
+		Ok(string) => PathBuf::from(format!("{}\\.nuget\\packages\\", string)),
 	};
 
 	#[cfg(windows)]
@@ -173,7 +174,7 @@ fn main() {
 
 	/**************************************
 	 *	C header files for bindgen
-	 ******************************* */
+	 ****************************** */
 	let mut bgbuilder = bindgen::Builder::default()
 		.parse_callbacks(Box::new(BwBindgenCallbacks {}))
 		.clang_arg("-DBW_BINDGEN")
@@ -187,7 +188,7 @@ fn main() {
 
 	/**************************************
 	 *	The Platform source files
-	 ******************************* */
+	 ****************************** */
 	if target.contains("windows") {
 		bgbuilder = bgbuilder.clang_arg("-DBW_WIN32");
 		if target.contains("msvc") {
@@ -249,7 +250,7 @@ fn main() {
 
 	/**************************************
 	 *	The Browser Engine (CEF3) source files
-	 ******************************* */
+	 ****************************** */
 	if cfg!(feature = "cef") {
 		bgbuilder = bgbuilder.clang_arg("-DBW_CEF");
 
@@ -371,9 +372,10 @@ fn main() {
 	}
 	/****************************************
 	 * Microsoft Edge WebView2 source files
-	 ****************************************/
+	 ************************************** */
 	else if cfg!(feature = "edge") {
-		let webview_dir = nuget_package_dir("Microsoft.Web.WebView2").expect("Couldn't find Microsoft.Web.WebView2 Nuget package.");
+		let webview_dir = nuget_package_dir("Microsoft.Web.WebView2")
+			.expect("Couldn't find Microsoft.Web.WebView2 Nuget package.");
 		let include_dir = webview_dir.join(PathBuf::from("build/native/include"));
 		let lib_dir = if cfg!(target_arch = "x86") {
 			webview_dir.join(PathBuf::from("build/native/x86"))
@@ -393,13 +395,14 @@ fn main() {
 			println!("cargo:rustc-link-lib=dylib=WebView2Loader");
 		}
 
-		bgbuilder = bgbuilder
-			.clang_arg("-DBW_EDGE");
+		bgbuilder = bgbuilder.clang_arg("-DBW_EDGE");
 
 		// Add the MinGW header files and libraries when available
 		if Path::new("/usr/share/mingw-w64/include/").exists() {
 			build.include("/usr/share/mingw-w64/include/");
-			build.include(PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap() + "/win32/include"));
+			build.include(PathBuf::from(
+				env::var("CARGO_MANIFEST_DIR").unwrap() + "/win32/include",
+			));
 		}
 
 		build
@@ -413,7 +416,7 @@ fn main() {
 
 	/**************************************
 	 *	All other source files
-	 ******************************* */
+	 ****************************** */
 	build
 		.file("src/application/common.c")
 		.file("src/browser_window/common.c")

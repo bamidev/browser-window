@@ -15,7 +15,6 @@ pub use gtk::ApplicationImpl;
 
 use crate::{application::ApplicationSettings, error::Result};
 
-
 pub trait ApplicationExt: Clone {
 	/// Asserts if not on the GUI thread
 	fn assert_correct_thread(&self);
