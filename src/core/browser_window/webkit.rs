@@ -77,6 +77,8 @@ impl BrowserWindowExt for BrowserWindowImpl {
 		app.dispatch(dispatch_eval_js, Box::into_raw(dispatch_data) as _);
 	}
 
+	fn free(&self) {}
+
 	fn navigate(&self, uri: &str) { self.inner.load_uri(uri); }
 
 	fn new(
