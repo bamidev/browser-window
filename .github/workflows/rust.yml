@@ -16,9 +16,13 @@ jobs:
 
     steps:
     - name: Install WebkitGTK development files
-      run: sudo apt-get install -y libwebkit2gtk-4.1-dev xvfb
+      run: sudo apt-get install -y libwebkit2gtk-4.1-dev mingw-w64 xvfb
+    - name: Add x86_64-pc-windows-gnu target
+      run: rustup target add x86_64-pc-windows-gnu
     - uses: actions/checkout@v3
-    - name: Build
+    - name: Build with WebkitGTK
       run: cargo build --verbose --features webkitgtk
+    #- name: Build with Edge WebView2
+    #  run: cargo build --verbose --features edge2 --target=x86_64-pc-windows-gnu
     - name: Run tests
       run: RUST_BACKTRACE=full RUST_LOG=debug xvfb-run cargo test --verbose --features webkitgtk
