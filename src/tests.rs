@@ -17,6 +17,7 @@ fn tests() {
 	let settings = ApplicationSettings {
 		engine_seperate_executable_path: Some(exec_path),
 		resource_dir: None,
+		remote_debugging_port: None,
 	};
 
 	let app = Application::initialize(&settings).expect("unable to initialize application");
@@ -56,7 +57,7 @@ fn async_tests(application: &Application) {
 	let exit_code = runtime.run_async(|app| async move {
 		let _bw = async_basic(app.clone()).await;
 		#[cfg(not(feature = "webkitgtk"))]
-		async_cookies(app).await;
+		async_cookies(app.clone()).await;
 		//async_correct_parent_cleanup(app).await;
 		app.exit(0);
 	});
