@@ -10,7 +10,7 @@ extern "C" {
 
 
 
-struct bw_Application;
+typedef struct bw_Application bw_Application;
 typedef void (*bw_ApplicationDispatchFn)( struct bw_Application* app, void* data );
 typedef bw_ApplicationDispatchFn bw_ApplicationReadyFn;
 
@@ -24,6 +24,7 @@ typedef bw_ApplicationDispatchFn bw_ApplicationReadyFn;
 #include "application/gtk.h"
 #elif defined(BW_CEF_WINDOW)
 #include "application/cef_window.h"
+#else
 #define BW_OTHER_IMPL
 #endif
 

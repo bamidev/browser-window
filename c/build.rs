@@ -401,6 +401,9 @@ fn main() {
 			.file("src/window/win32.c")
 			.file("src/cookie/unsupported.c");
 	}
+	else {
+		build.file("src/application/other.c");
+	}
 
 	/**************************************
 	 *	All other source files
