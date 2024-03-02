@@ -1,13 +1,6 @@
 # Getting Started
 
-_BrowserWindow_ needs to be build with one of the following browser frameworks: [CEF](https://bitbucket.org/chromiumembedded/cef/wiki/Home) or [WebkitGTK](https://www.webkit.org/). They require either the `cef` or `webkitgtk` feature to be set.
-
-_Browser Window_ currently relies on [CEF3](https://bitbucket.org/chromiumembedded/cef/wiki/Home).
-You will also need [cmake](https://cmake.org/) to set up CEF.
-And on Windows, you will also need _Visual Studio_.
-
-If you want to set up CEF by building it from source, take a look at [this](https://bitbucket.org/chromiumembedded/cef/wiki/MasterBuildQuickStart.md).
-However, it will take a lot of effort, time, memory & disk space for the compilation process.
+_BrowserWindow_ needs to be build with one of the following browser frameworks: [CEF](https://bitbucket.org/chromiumembedded/cef/wiki/Home), [WebkitGTK](https://www.webkit.org/) or [Edge WebView2](https://developer.microsoft.com/en-us/microsoft-edge/webview2/?form=MA13LH). They require either the `cef`, `webkitgtk` or `edge2` feature to be set.
 
 ## Picking the right browser framework
 
@@ -21,9 +14,8 @@ If you want the exact same behavior of your app on all platforms, CEF is recomme
 * The cookie API of _BrowserWindow_ is supported.
 
 *Cons:*
-* Can be a pain to set up correctly; requires a lot of files to be present for the executable, and needs the sandbox to have specific permissions.
-* No option to link statically & generally not available in package managers, which forces you to
-ship the shared libraries with your application.
+* Can be a pain to set up correctly; requires a lot of files to be present for the executable.
+* No option to link statically & generally not available in package managers.
 
 ### WebkitGTK
 
@@ -32,8 +24,8 @@ ship the shared libraries with your application.
 is even a homebrew package for it on MacOS.
 
 *Cons:*
-* Compiling WebkitGTK and GTK for Windows is not supported.
-* Static linking is not really supported for GTK.
+* Compiling WebkitGTK or GTK for Windows is not supported.
+* Static linking is also not really supported for GTK.
 
 ### Edge WebView2
 
@@ -44,7 +36,7 @@ is even a homebrew package for it on MacOS.
 
 *Cons:*
 * Not cross-platform at all.
-* The framework is not open source. Might be problematic for those concerned about privacy.
+* The framework is not open source, which might be problematic for those concerned about privacy.
 
 ## Set up Bindgen
 
@@ -60,14 +52,35 @@ make sure that `pkg-config` is set up to find all the headers & binaries.
 
 `apt install libwebkit2gtk-4.1-dev`
 
+## Set up Edge WebView2
+
+If you're going to use the Microsoft Edge WebView2 framework, you need to make sure that the runtime
+is installed on your system.
+
+### Some notes on cross-compilation
+
+Cross compilation to the `*-pc-windows-gnu` target works. Just make sure that MinGW is set up to
+find the headers of the win32 API.
+
+Moreover, you need to ship the executable together with the WebView2Loader.dll file.
+It can be obtained on non-Windows systems, by installing nuget, and obtaining it with:
+
+`nuget install Microsoft.Web.WebView2`
+
+It will be installed in the current working directory, and then the .dll file can be located at
+`Microsoft.Web.WebView2.*/build/native/<arch>`.
+
 ## Set up CEF
 
 Keep in mind when you're going to use CEF, that _BrowserWindow_ is written to work for a specific version of CEF, and CEF does release new major versions fairly often. Therefore, it is recommended to
-obtain the version that _BrowserWindow_ supports, which currently is v121. Use other versions at
+obtain the version that _BrowserWindow_ supports, which currently is v122. Use other versions at
 your own risk.
 
 CEF isn't generally available in package managers, so it needs to be set up manually. Luckily, there are binaries avaiable. You can also build it from source, but that is a whole other beast and it is
 not covered by this guide.
+
+If you want to set up CEF by building it from source, take a look at [this](https://bitbucket.org/chromiumembedded/cef/wiki/MasterBuildQuickStart.md).
+However, it will take a lot of effort, time, memory & disk space for the compilation process.
 
 ### Download & Extract
 
@@ -83,9 +96,6 @@ To do this, first run _cmake_ by running this on the command line from within th
 cmake -DCMAKE_BUILD_TYPE=Debug .
 ```
 Keep in mind that currently, it seems that the CEF wrapper library misses some symbols in release mode. This can cause some linker errors when trying to compile against the Release binaries.
-
-*Note:* On Windows, you need to run it in a Visual Studio Developer Command Prompt, the regular
-won't work. Also, use the `-A x64` option if you intend to build it for 64bit Windows.
 
 #### Unix-like Systems
 
