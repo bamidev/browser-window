@@ -4,11 +4,19 @@ use webview2::Environment;
 use winapi::{shared::windef, um::winuser};
 
 use super::{super::window::WindowImpl, *};
+use crate::prelude::{ApplicationExt, WindowExt};
 
 
 #[derive(Clone)]
 pub struct BrowserWindowImpl {
 	inner: *mut cbw_BrowserWindow,
+}
+
+struct EvalJsCallbackData {
+	handle: BrowserWindowImpl,
+	code: String,
+	callback: EvalJsCallbackFn,
+	data: *mut (),
 }
 
 /// An error that may occur when evaluating or executing JavaScript code.
@@ -47,7 +55,14 @@ impl BrowserWindowExt for BrowserWindowImpl {
 	}
 
 	fn eval_js_threadsafe(&self, js: &str, callback: EvalJsCallbackFn, callback_data: *mut ()) {
-		todo!();
+		let app = self.window().app();
+		let dispatch_data = Box::new(EvalJsCallbackData {
+			handle: self.clone(),
+			code: js.to_owned(),
+			callback,
+			data: callback_data,
+		});
+		app.dispatch(dispatch_eval_js, Box::into_raw(dispatch_data) as _);
 	}
 
 	fn free(&self) {
@@ -59,7 +74,7 @@ impl BrowserWindowExt for BrowserWindowImpl {
 	}
 
 	fn navigate(&self, uri: &str) {
-		todo!();
+		self.webview().navigate(uri);
 	}
 
 	fn new(
@@ -153,6 +168,20 @@ impl BrowserWindowExt for BrowserWindowImpl {
 			}
 		}
 	}
+}
+
+
+fn dispatch_eval_js(_app: ApplicationImpl, dispatch_data: *mut ()) {
+	let data_ptr = dispatch_data as *mut EvalJsCallbackData;
+	let data = unsafe { Box::from_raw(data_ptr) };
+
+	let callback = data.callback.clone();
+	let handle = data.handle.clone();
+	let callback_data = data.data.clone();
+	handle.clone().webview().execute_script(&data.code, move |result| {
+		callback(handle, callback_data, Ok(JsValue::Other(result)));
+		Ok(())
+	});
 }
 
 unsafe extern "C" fn ffi_handler(
