@@ -6,8 +6,7 @@ extern "C" {
 #endif
 
 #include <assert.h>
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
+#include <windef.h>
 
 #include "err.h"
 #include "string.h"

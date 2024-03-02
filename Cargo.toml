@@ -13,9 +13,8 @@ documentation = "https://docs.rs/browser-window/"
 repository = "https://github.com/bamidev/browser-window/"
 
 [features]
-bundled = ["browser-window-c/bundled"]
 cef = ["browser-window-c/cef"]
-edge = ["browser-window-c/edge"]
+edge2 = ["dep:webview2", "dep:winapi", "browser-window-c/edge2"]
 gtk = []
 webkitgtk = ["dep:gtk", "dep:javascriptcore-rs", "dep:webkit2gtk", "gtk"]
 threadsafe = []
@@ -41,6 +40,8 @@ lazy_static = "1"
 num-bigfloat = "1"
 unsafe-send-sync = "^0.1"
 webkit2gtk = { version = "2.0", optional = true, features = ["v2_40"] }
+webview2 = { version = "0.1", optional = true }
+winapi = { version = "0.3", optional = true }
 
 
 [dev-dependencies]

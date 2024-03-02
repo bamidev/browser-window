@@ -16,10 +16,11 @@ typedef bw_ApplicationDispatchFn bw_ApplicationReadyFn;
 
 
 // Import bw_ApplicationImpl and bw_ApplicationEngineImpl definitions
+#ifndef BW_BINDGEN
 #if defined(BW_WIN32)
 #include "application/win32.h"
 
-#if defined(BW_EDGE)
+#if defined(BW_EDGE2)
 #include "application/edge2.h"
 #endif
 
@@ -29,6 +30,11 @@ typedef bw_ApplicationDispatchFn bw_ApplicationReadyFn;
 #include "application/cef_window.h"
 #include "application/cef.h"
 #else
+#define BW_OTHER
+#endif
+#endif
+
+#if defined(BW_OTHER) || defined(BW_BINDGEN)
 typedef struct {} bw_ApplicationImpl;
 typedef struct {} bw_ApplicationEngineImpl;
 #endif

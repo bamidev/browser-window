@@ -40,9 +40,9 @@ is even a homebrew package for it on MacOS.
 *Pro:*
 * Preinstalled on Windows 11
 * Can be statically linked to when using the `*-pc-windows-msvc` toolchain.
+* Can be used to cross-compile for Windows.
 
 *Cons:*
-* Currenty not yet working on _BrowserWindow_.
 * Not cross-platform at all.
 * The framework is not open source. Might be problematic for those concerned about privacy.
 

@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <wchar.h>
 
+#include <windows.h>
+
 #pragma comment(lib, "User32.lib")
 #pragma comment(lib, "OleAut32.lib")
 

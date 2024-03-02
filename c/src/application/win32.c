@@ -9,12 +9,10 @@
 #include "impl.h"
 
 #include <stdlib.h>
-#define WIN32_LEAN_AND_MEAN
-#include <windef.h>
 #include <windows.h>
 
 #include "../win32.h"
-#include "../window/win32.h"
+#include "../window.h"
 
 #include <stdio.h>
 
@@ -27,11 +25,11 @@ typedef struct {
 } bw_ApplicationTimerMapEntry;
 
 
-
 void bw_ApplicationWin32_dispatchWrapper(bw_Application* app, void* _data);
 void bw_ApplicationWin32_setTimer(bw_Application* app, bw_ApplicationDispatchData* dispatch_data, uint64_t delay);
 void bw_ApplicationWin32_timerHandler(HWND _hwnd, UINT _, UINT_PTR nIDEvent, DWORD _2);
 
+LRESULT CALLBACK bw_Window_proc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp);
 
 
 bw_ApplicationTimerMapEntry* timer_map = NULL;
@@ -137,6 +135,8 @@ bw_ApplicationTimerMapEntry* bw_ApplicationWin32_findInTimerMap(UINT_PTR timer_i
 	return entry;
 }
 
+void bw_ApplicationImpl_free(bw_ApplicationImpl*) {}
+
 void bw_ApplicationWin32_freeTimerMap() {
 	bw_ApplicationTimerMapEntry* entry = timer_map;
 
@@ -198,7 +198,6 @@ void bw_ApplicationWin32_timerHandler(HWND hwnd, UINT _, UINT_PTR timer_id, DWOR
 
 
 int bw_ApplicationImpl_run( bw_Application* app, bw_ApplicationImpl_ReadyHandlerData* ready_handler_data ) {
-
 	MSG msg;
 	BOOL res;
 	int exit_code = 0;

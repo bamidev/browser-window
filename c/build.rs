@@ -158,7 +158,7 @@ fn main() {
 
 	let mut build = cc::Build::new();
 	let mut build_se = cc::Build::new(); // For seperate executable
-	let std_flag = if cfg!(feature = "cef") || cfg!(feature = "edge") {
+	let std_flag = if cfg!(feature = "cef") {
 		if target.contains("msvc") {
 			"/std:c++17"
 		} else {
@@ -174,7 +174,7 @@ fn main() {
 
 	/**************************************
 	 *	C header files for bindgen
-	 ****************************** */
+	 *************************** */
 	let mut bgbuilder = bindgen::Builder::default()
 		.parse_callbacks(Box::new(BwBindgenCallbacks {}))
 		.clang_arg("-DBW_BINDGEN")
@@ -188,9 +188,9 @@ fn main() {
 
 	/**************************************
 	 *	The Platform source files
-	 ****************************** */
+	 *************************** */
 	if target.contains("windows") {
-		bgbuilder = bgbuilder.clang_arg("-DBW_WIN32");
+		//bgbuilder = bgbuilder.clang_arg("-DBW_WIN32");
 		if target.contains("msvc") {
 			build.flag("/MT");
 		}
@@ -248,9 +248,9 @@ fn main() {
 		build_se.define("BW_CEF_WINDOW", None);
 	}
 
-	/**************************************
-	 *	The Browser Engine (CEF3) source files
-	 ****************************** */
+	/*******************************************
+	 *	The Browser Engine (CEF3) source files *
+	 *************************************** */
 	if cfg!(feature = "cef") {
 		bgbuilder = bgbuilder.clang_arg("-DBW_CEF");
 
@@ -373,57 +373,45 @@ fn main() {
 	/****************************************
 	 * Microsoft Edge WebView2 source files
 	 ************************************** */
-	else if cfg!(feature = "edge") {
-		let webview_dir = nuget_package_dir("Microsoft.Web.WebView2")
-			.expect("Couldn't find Microsoft.Web.WebView2 Nuget package.");
-		let include_dir = webview_dir.join(PathBuf::from("build/native/include"));
-		let lib_dir = if cfg!(target_arch = "x86") {
-			webview_dir.join(PathBuf::from("build/native/x86"))
-		} else if cfg!(target_arch = "x86_64") {
-			webview_dir.join(PathBuf::from("build/native/x64"))
-		} else if cfg!(target_arch = "aarch64") {
-			webview_dir.join(PathBuf::from("build/native/arm64"))
-		} else {
-			panic!("Unsupported target architecture for Edge WebView2 framework.");
-		};
-
-		println!("cargo:rustc-link-search={}", lib_dir.display());
-		if cfg!(feature = "bundled") {
-			println!("cargo:rustc-link-lib=static=WebView2LoaderStatic");
-		} else {
-			println!("cargo:rustc-link-lib=static=WebView2Loader.dll");
-			println!("cargo:rustc-link-lib=dylib=WebView2Loader");
-		}
-
-		bgbuilder = bgbuilder.clang_arg("-DBW_EDGE");
+	else if cfg!(feature = "edge2") {
 
 		// Add the MinGW header files and libraries when available
 		if Path::new("/usr/share/mingw-w64/include/").exists() {
-			build.include("/usr/share/mingw-w64/include/");
+			//bgbuilder = bgbuilder.clang_arg("-I/lib/gcc/x86_64-w64-mingw32/12-win32/include");
 			build.include(PathBuf::from(
 				env::var("CARGO_MANIFEST_DIR").unwrap() + "/win32/include",
 			));
+			
+			bgbuilder = bgbuilder
+				//.clang_arg("--target=x86_64-pc-windows-gnu")
+				.clang_arg("-I/usr/lib/gcc/x86_64-w64-mingw32/12-win32/include");
 		}
 
+		bgbuilder = bgbuilder.clang_args(&[
+			"-DBW_WIN32",
+			"-DBW_EDGE2"
+		]);
+
 		build
-			.define("BW_EDGE", None)
-			.include(include_dir)
-			//.file("src/application/edge2.cpp")
-			.file("src/browser_window/edge2.cpp")
-			.file("src/cookie/unsupported.cpp")
-			.cpp(true);
+			.define("BW_EDGE2", None)
+			//.include(include_dir)
+			.file("src/application/edge2.c")
+			.file("src/application/win32.c")
+			.file("src/browser_window/edge2.c")
+			.file("src/window/win32.c")
+			.file("src/cookie/unsupported.c");
 	}
 
 	/**************************************
 	 *	All other source files
-	 ****************************** */
+	 *************************** */
 	build
 		.file("src/application/common.c")
 		.file("src/browser_window/common.c")
 		.file("src/err.c")
 		.file("src/string.c")
 		.file("src/window/common.c")
-		.flag(std_flag)
+		//.flag(std_flag)
 		.compile("browser-window-c");
 
 	// Let bindgen generate the bindings

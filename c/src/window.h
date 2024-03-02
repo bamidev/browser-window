@@ -9,18 +9,6 @@ extern "C" {
 #include "common.h"
 #include "string.h"
 
-#if defined(BW_WIN32)
-#include "win32/window.h"	// TODO: Make this "window/win32.h"
-#elif defined(BW_GTK)
-#include "window/gtk.h"
-#elif defined(BW_CEF_WINDOW)
-#include "window/cef.h"
-
-// The definition of bw_WindowImpl is not required within Rust code.
-#else
-typedef struct {} bw_WindowImpl;
-#endif
-
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -49,6 +37,16 @@ typedef struct bw_WindowOptions {
 typedef void (*bw_WindowDispatchFn)( bw_Window* window, void* data );
 typedef struct bw_WindowDispatchData bw_WindowDispatchData;
 
+
+#if defined(BW_WIN32)
+#include "window/win32.h"
+#elif defined(BW_GTK)
+#include "window/gtk.h"
+#elif defined(BW_CEF_WINDOW)
+#include "window/cef.h"
+#else
+typedef struct {} bw_WindowImpl;
+#endif
 
 
 struct bw_Window {

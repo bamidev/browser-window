@@ -1,0 +1,174 @@
+use std::borrow::Cow;
+
+use webview2::Environment;
+use winapi::{shared::windef, um::winuser};
+
+use super::{super::window::WindowImpl, *};
+
+
+#[derive(Clone)]
+pub struct BrowserWindowImpl {
+	inner: *mut cbw_BrowserWindow,
+}
+
+/// An error that may occur when evaluating or executing JavaScript code.
+pub type JsEvaluationError = ();
+
+struct UserData {
+	func: ExternalInvocationHandlerFn,
+	data: *mut (),
+}
+
+impl BrowserWindowImpl {
+	fn controller(&self) -> &webview2::Controller {
+		unsafe {
+			let ptr = (*self.inner).impl_.controller as *const webview2::Controller;
+			&*ptr
+		}
+	}
+
+	fn webview(&self) -> &webview2::WebView {
+		unsafe {
+			let ptr = (*self.inner).impl_.webview as *const webview2::WebView;
+			&*ptr
+		}
+	}
+}
+
+impl BrowserWindowExt for BrowserWindowImpl {
+	fn cookie_jar(&self) -> Option<CookieJarImpl> { None }
+
+	fn eval_js(&self, js: &str, callback: EvalJsCallbackFn, callback_data: *mut ()) {
+		let this = self.clone();
+		self.webview().execute_script(js, move |result| {
+			callback(this, callback_data, Ok(JsValue::Other(result)));
+			Ok(())
+		});
+	}
+
+	fn eval_js_threadsafe(&self, js: &str, callback: EvalJsCallbackFn, callback_data: *mut ()) {
+		todo!();
+	}
+
+	fn free(&self) {
+		unsafe {
+			Box::<UserData>::from_raw((*self.inner).user_data as _);
+			Box::<webview2::Controller>::from_raw((*self.inner).impl_.controller as _);
+			Box::<webview2::WebView>::from_raw((*self.inner).impl_.webview as _);
+		}
+	}
+
+	fn navigate(&self, uri: &str) {
+		todo!();
+	}
+
+	fn new(
+		app: ApplicationImpl, parent: WindowImpl, source: Source, title: &str, width: Option<u32>,
+		height: Option<u32>, window_options: &WindowOptions,
+		browser_window_options: &BrowserWindowOptions, handler: ExternalInvocationHandlerFn,
+		user_data: *mut (), creation_callback: CreationCallbackFn, callback_data: *mut (),
+	) {
+		// Create window
+		let user_data = Box::new(UserData {
+			func: handler,
+			data: user_data,
+		});
+		let bw_inner = unsafe {
+			cbw_BrowserWindow_new(
+				app.inner,
+				parent.inner,
+				title.into(),
+				width.unwrap_or(0) as _,
+				height.unwrap_or(0) as _,
+				window_options as _,
+				Some(ffi_handler),
+				Box::into_raw(user_data) as _,
+			)
+		};
+
+		let hwnd = unsafe { (*(*bw_inner).window).impl_.handle as windef::HWND };
+		let options = browser_window_options.clone();
+		Environment::builder()
+			.build(move |renv| {
+				let env = renv.expect("environment error");
+				env.create_controller(hwnd, move |rcon| {
+					let controller = Box::new(rcon.expect("controller error"));
+					let webview =
+						Box::new(controller.get_webview().expect("unable to get webview"));
+
+					let settings = webview.get_settings().expect("unable to get settings");
+					settings.put_is_script_enabled(true);
+					settings.put_are_default_script_dialogs_enabled(true);
+					settings.put_is_web_message_enabled(true);
+					settings.put_are_dev_tools_enabled(options.dev_tools > 0);
+
+					let mut rect = windef::RECT {
+						left: 0,
+						top: 0,
+						right: 0,
+						bottom: 0,
+					};
+					unsafe { winuser::GetClientRect(hwnd, &mut rect) };
+					controller.put_bounds(rect);
+
+					match source {
+						Source::Url(url) => webview.navigate(&url),
+						Source::Html(content) => webview.navigate_to_string(&content),
+						Source::File(_file) =>
+							panic!("File sources are not supported at the moment."),
+					};
+
+					unsafe {
+						(*bw_inner).impl_.controller = Box::into_raw(controller) as _;
+						(*bw_inner).impl_.webview = Box::into_raw(webview) as _;
+					}
+					let handle = BrowserWindowImpl { inner: bw_inner };
+					creation_callback(handle, callback_data);
+					Ok(())
+				});
+				Ok(())
+			})
+			.unwrap();
+	}
+
+	fn user_data(&self) -> *mut () {
+		let c_user_data_ptr: *mut UserData = unsafe { (*self.inner).user_data as _ };
+
+		// The actual user data pointer is stored within the `UserData` struct that is
+		// stored within the C handle
+		unsafe { (*c_user_data_ptr).data }
+	}
+
+	fn url(&self) -> Cow<'_, str> {
+		self.webview()
+			.get_source()
+			.expect("unable to get source")
+			.into()
+	}
+
+	fn window(&self) -> WindowImpl {
+		unsafe {
+			WindowImpl {
+				inner: (*self.inner).window,
+			}
+		}
+	}
+}
+
+unsafe extern "C" fn ffi_handler(
+	bw: *mut cbw_BrowserWindow, cmd: cbw_CStrSlice, args: *mut cbw_CStrSlice, arg_count: usize,
+) {
+	let handle = BrowserWindowImpl { inner: bw };
+
+	let data_ptr = (*bw).user_data as *mut UserData;
+	let data = &mut *data_ptr;
+
+	// Convert the command and args to a String and `Vec<&str>`
+	let cmd_string: &str = cmd.into();
+	let mut args_vec: Vec<JsValue> = Vec::with_capacity(arg_count as usize);
+	for i in 0..arg_count {
+		args_vec.push(JsValue::Other((*args.add(i as usize)).into()));
+	}
+
+	(data.func)(handle, cmd_string, args_vec);
+}

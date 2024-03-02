@@ -8,6 +8,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <windef.h>
+#include <windows.h>
+
 
 
 typedef struct {
@@ -20,7 +23,6 @@ typedef struct {
 // Returns whether or not the window still has children, that haven't been dropped.
 bool _bw_Window_hasUndroppedChildren( const bw_Window* window );
 BOOL CALLBACK _bw_Window_isDroppedCheck( HWND handle, LPARAM lparam );*/
-LRESULT CALLBACK bw_Window_proc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp);
 void bw_WindowWin32_calculatePositionCentered( int width, int height, int* x, int* y );
 
 

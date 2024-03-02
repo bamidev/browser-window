@@ -55,4 +55,4 @@ bw_Err bw_CookieJar_store(bw_CookieJar* jar, bw_CStrSlice url, const bw_Cookie* 
 
 void bw_CookieIterator_free(bw_CookieIterator* iterator) {}
 
-extern "C" BOOL bw_CookieIterator_next(bw_CookieIterator* iterator, bw_CookieIteratorNextCallbackFn on_next, void* cb_data) { return FALSE; }
+BOOL bw_CookieIterator_next(bw_CookieIterator* iterator, bw_CookieIteratorNextCallbackFn on_next, void* cb_data) { return FALSE; }

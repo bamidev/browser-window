@@ -31,6 +31,7 @@ struct UserData {
 	data: *mut (),
 }
 
+
 impl BrowserWindowExt for BrowserWindowImpl {
 	fn cookie_jar(&self) -> Option<CookieJarImpl> {
 		let inner = unsafe { cbw_CookieJar_newGlobal() };
@@ -71,6 +72,12 @@ impl BrowserWindowExt for BrowserWindowImpl {
 				Some(ffi_eval_js_callback_handler),
 				data_ptr as _,
 			)
+		}
+	}
+
+	fn free(&self) {
+		unsafe {
+			Box::<UserData>::from_raw((*self.inner).user_data as _);
 		}
 	}
 
@@ -127,20 +134,26 @@ impl BrowserWindowExt for BrowserWindowImpl {
 		};
 
 		unsafe {
-			cbw_BrowserWindow_new(
+			let browser = cbw_BrowserWindow_new(
 				app.inner,
 				parent.inner,
-				source2,
 				title.into(),
 				w,
 				h,
 				window_options as _,
-				browser_window_options as _,
 				Some(ffi_handler),
+				// FIXME: user_data is leaked into memory.
 				Box::into_raw(user_data) as _,
+			);
+			cbw_BrowserWindow_create(
+				browser,
+				w,
+				h,
+				source2,
+				browser_window_options as _,
 				Some(ffi_creation_callback_handler),
 				Box::into_raw(callback_data) as _,
-			)
+			);
 		};
 	}
 
@@ -199,7 +212,9 @@ impl fmt::Display for JsEvaluationError {
  * handlers. * *************************************************************
  * ************************************************ */
 
-unsafe extern "C" fn ffi_creation_callback_handler(bw: *mut cbw_BrowserWindow, _data: *mut c_void) {
+pub(super) unsafe extern "C" fn ffi_creation_callback_handler(
+	bw: *mut cbw_BrowserWindow, _data: *mut c_void,
+) {
 	let data_ptr = _data as *mut CreationCallbackData;
 	let data = Box::from_raw(data_ptr);
 

@@ -5,12 +5,17 @@
 extern "C" {
 #endif
 
-#include "../window.h"
-
 #include <stdbool.h>
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
 
+// Some definitions as defined in windef.h:
+// https://learn.microsoft.com/en-us/windows/win32/winprog/windows-data-types
+// Because including windef.h with MinGW can cause some issues
+typedef unsigned char BYTE;
+typedef unsigned long DWORD;
+
+
+typedef struct bw_Window bw_Window;
+typedef void (*bw_WindowDispatchFn)( bw_Window* window, void* data );
 
 
 struct bw_WindowDispatchData {
@@ -20,9 +25,11 @@ struct bw_WindowDispatchData {
 
 };
 
-
-
-LRESULT CALLBACK bw_Window_proc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp);
+typedef struct {
+	void* handle;
+	DWORD style;
+	BYTE opacity;
+} bw_WindowImpl;
 
 
 #ifdef __cplusplus

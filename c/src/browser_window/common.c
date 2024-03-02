@@ -34,18 +34,14 @@ bw_Window* bw_BrowserWindow_getWindow( bw_BrowserWindow* bw ) {
     return bw->window;
 }
 
-void bw_BrowserWindow_new(
+bw_BrowserWindow* bw_BrowserWindow_new(
 	bw_Application* app,
 	const bw_Window* parent,
-	bw_BrowserWindowSource source,
 	bw_CStrSlice title,
 	int width, int height,
 	const bw_WindowOptions* window_options,
-	const bw_BrowserWindowOptions* browser_window_options,
 	bw_BrowserWindowHandlerFn handler,	/// A function that gets invoked when javascript the appropriate call is made in javascript.
-	void* user_data,	// The data that will be passed to the above handler function and the creation-callback when they are invoked.
-	bw_BrowserWindowCreationCallbackFn callback,	// A function that gets invoked when the browser window has been created.
-	void* callback_data	// Data that will be passed to the creation callback
+	void* user_data	// The data that will be passed to the above handler function and the creation-callback when they are invoked.
 ) {
 	bw_Application_assertCorrectThread( app );
 
@@ -54,10 +50,19 @@ void bw_BrowserWindow_new(
 	browser->window->callbacks.do_cleanup = bw_BrowserWindowImpl_doCleanup;
 	browser->external_handler = handler;
 	browser->user_data = user_data;
+	return browser;
+}
 
-
+void bw_BrowserWindow_create(
+	bw_BrowserWindow* bw,
+	int width, int height,
+	bw_BrowserWindowSource source,
+	const bw_BrowserWindowOptions* browser_window_options,
+	bw_BrowserWindowCreationCallbackFn callback,	// A function that gets invoked when the browser window has been created.
+	void* callback_data	// Data that will be passed to the creation callback
+) {
 	bw_BrowserWindowImpl_new(
-		browser,
+		bw,
 		source,
 		width,
 		height,
@@ -68,5 +73,5 @@ void bw_BrowserWindow_new(
 
 	// bw_BrowserWindowImpl_onResize depends on browser->impl being initialized already.
 	// Therefore we initialize this event after everything
-	browser->window->callbacks.on_resize = bw_BrowserWindowImpl_onResize;
+	bw->window->callbacks.on_resize = bw_BrowserWindowImpl_onResize;
 }

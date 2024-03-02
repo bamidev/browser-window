@@ -10,9 +10,8 @@ categories = []
 repository = "https://github.com/bamilab/browser-window/tree/master/c"
 
 [features]
-bundled = []
 cef = []
-edge = []
+edge2 = []
 
 [lib]
 name = "browser_window_c"

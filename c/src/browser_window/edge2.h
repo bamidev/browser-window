@@ -8,7 +8,7 @@ extern "C" {
 
 typedef struct {
 	void* webview;	/* Type: ICoreWebView2 */
-	void* webview_controller;	/* Type: ICoreWebView2Controller */
+	void* controller;	/* Type: ICoreWebView2Controller */
 } bw_BrowserWindowImpl;
 
 

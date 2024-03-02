@@ -1,13 +1,17 @@
-#[cfg(not(feature = "gtk"))]
-mod c;
+#[cfg(not(any(feature = "gtk", feature = "edge2")))]
+pub mod c;
+#[cfg(feature = "edge2")]
+mod edge2;
 #[cfg(feature = "gtk")]
 mod webkit;
 
 use std::borrow::Cow;
 
 use browser_window_c::*;
-#[cfg(not(feature = "gtk"))]
+#[cfg(not(any(feature = "gtk", feature = "edge2")))]
 pub use c::{BrowserWindowImpl, JsEvaluationError};
+#[cfg(feature = "edge2")]
+pub use edge2::{BrowserWindowImpl, JsEvaluationError};
 #[cfg(feature = "gtk")]
 pub use webkit::{BrowserWindowImpl, JsEvaluationError};
 
@@ -34,6 +38,8 @@ pub trait BrowserWindowExt: Clone {
 
 	/// Like `eval_js`, except it can be called from any thread.
 	fn eval_js_threadsafe(&self, js: &str, callback: EvalJsCallbackFn, callback_data: *mut ());
+
+	fn free(&self);
 
 	/// Causes the browser to navigate to the given URI.
 	fn navigate(&self, uri: &str);

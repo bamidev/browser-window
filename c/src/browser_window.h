@@ -7,7 +7,7 @@ extern "C" {
 
 #ifdef BW_CEF
 #include "browser_window/cef.h"
-#elif defined(BW_EDGE)
+#elif defined(BW_EDGE2)
 #include "browser_window/edge2.h"
 #else
 typedef struct {} bw_BrowserWindowImpl;
@@ -71,17 +71,25 @@ bw_Window* bw_BrowserWindow_getWindow( bw_BrowserWindow* bw );
 
 bw_Err bw_BrowserWindow_navigate( bw_BrowserWindow* bw, bw_CStrSlice url );
 
-/// Creates a new browser window
-void bw_BrowserWindow_new(
+/// Allocates a browser window and creates the window for it.
+/// Call `bw_BrowserWindow_create` on it to add the actual browser framework to this window.
+bw_BrowserWindow* bw_BrowserWindow_new(
 	bw_Application* app,
 	const bw_Window* parent,
-	bw_BrowserWindowSource source,
-	bw_CStrSlice _title,
+	bw_CStrSlice title,
 	int width, int height,
 	const bw_WindowOptions* window_options,
-	const bw_BrowserWindowOptions* browser_window_options,
 	bw_BrowserWindowHandlerFn handler,	/// A function that gets invoked when javascript the appropriate call is made in javascript.
-	void* user_data,	// The data that will be passed to the above handler function and the creation-callback when they are invoked.
+	void* user_data	// The data that will be passed to the above handler function and the creation-callback when they are invoked.
+);
+
+/// Adds the browser framework to the browser window.
+/// Should be called right after `bw_BrowserWindow_new`.
+void bw_BrowserWindow_create(
+	bw_BrowserWindow* bw,
+	int width, int height,
+	bw_BrowserWindowSource source,
+	const bw_BrowserWindowOptions* browser_window_options,
 	bw_BrowserWindowCreationCallbackFn callback,	// A function that gets invoked when the browser window has been created.
 	void* callback_data	// Data that will be passed to the creation callback
 );
