@@ -1,21 +1,13 @@
 use std::env;
 
 fn main() {
-	// For the MSVC compiler, it seems that (at least with VS2022) the
-	// browser-window-c crate gets compiled with the x86 target. Not sure how to
-	// prevent that, but adding the browser-window-c static lib to the linker at
-	// least shows a meaningful error message.
+	// For the MSVC compiler, it seems that sometimes linking errors occur, as a
+	// result of compiling browser-window-c for a different architecture then the
+	// main package. Adding browser-window-c.lib to the linker manually, at least
+	// causes a meaningful error to be shown.
 	let target = env::var("TARGET").unwrap();
 	if target.ends_with("msvc") {
 		println!("cargo:rustc-link-lib=static=browser-window-c");
-
-		if target.starts_with("x86_64") {
-			println!(
-				"cargo:warning=There seems to be a bug in rust/cargo when compiling with MSVC for \
-				 x86_64. If compiling for x86_64 doesn't work, try using target \
-				 `i686-pc-windows-msvc` instead."
-			);
-		}
 	}
 
 	// Make sure one of the browser frameworks is actually selected.
