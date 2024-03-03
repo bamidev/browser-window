@@ -259,10 +259,8 @@ unsafe fn ffi_eval_js_callback_result(
 	// Construct a result value depending on whether the result or error parameters
 	// are set
 	let result_val: Result<JsValue, JsEvaluationError> = if error.is_null() {
-		let result_str = CStr::from_ptr(result)
-			.to_string_lossy()
-			.to_string();
-		
+		let result_str = CStr::from_ptr(result).to_string_lossy().to_string();
+
 		// Parse the string
 		Ok(JsValue::from_string(&result_str))
 	} else {

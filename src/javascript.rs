@@ -34,12 +34,12 @@ impl JsValue {
 		if string.len() == 0 {
 			return Self::Other(String::new());
 		}
-		
+
 		// If the symbol starts with a digit, interpret it as a (positive) number
-		if "0123456789".contains(|c| c == string.chars().nth(0).unwrap()) { println!("XXXXXXXXXXXXXXXX");
+		if "0123456789".contains(|c| c == string.chars().nth(0).unwrap()) {
 			return match BigFloat::from_str(string) {
 				Err(e) => Self::Other(format!("unable to parse number: {}", string)),
-				Ok(f) => Self::Number(f)
+				Ok(f) => Self::Number(f),
 			};
 		}
 		if string == "null" {
@@ -55,18 +55,18 @@ impl JsValue {
 			return Self::Boolean(false);
 		}
 		if string.chars().nth(0) == Some('\"') && string.chars().last() == Some('\"') {
-			return Self::String(string[1..(string.len()-1)].to_string())
+			return Self::String(string[1..(string.len() - 1)].to_string());
 		}
 		if string.chars().nth(0) == Some('[') && string.chars().last() == Some(']') {
 			let mut array = Vec::new();
-			for part in string[1..(string.len()-1)].split(',') {
+			for part in string[1..(string.len() - 1)].split(',') {
 				array.push(Self::from_string(part));
 			}
 			return Self::Array(array);
 		}
 		if string.chars().nth(0) == Some('{') && string.chars().last() == Some('}') {
 			let mut map = HashMap::new();
-			for part in string[1..(string.len()-1)].split(',') {
+			for part in string[1..(string.len() - 1)].split(',') {
 				if let Some((key, value)) = part.split_once(':') {
 					map.insert(key.to_string(), Self::from_string(value));
 				}
