@@ -44,7 +44,6 @@ impl BrowserWindowExt for BrowserWindowImpl {
 			callback,
 			data: callback_data,
 		});
-
 		let data_ptr = Box::into_raw(data);
 
 		unsafe {
@@ -246,7 +245,7 @@ unsafe extern "C" fn ffi_handler(
 	let cmd_string: &str = cmd.into();
 	let mut args_vec: Vec<JsValue> = Vec::with_capacity(arg_count as usize);
 	for i in 0..arg_count {
-		args_vec.push(JsValue::Other((*args.add(i as usize)).into()));
+		args_vec.push(JsValue::from_string((*args.add(i as usize)).into()));
 	}
 
 	(data.func)(handle, cmd_string, args_vec);
@@ -262,9 +261,10 @@ unsafe fn ffi_eval_js_callback_result(
 	let result_val: Result<JsValue, JsEvaluationError> = if error.is_null() {
 		let result_str = CStr::from_ptr(result)
 			.to_string_lossy()
-			.to_owned()
 			.to_string();
-		Ok(JsValue::Other(result_str))
+		
+		// Parse the string
+		Ok(JsValue::from_string(&result_str))
 	} else {
 		Err(JsEvaluationError::new(error))
 	};

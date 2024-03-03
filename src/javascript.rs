@@ -1,10 +1,10 @@
-use std::{borrow::Cow, collections::HashMap, fmt};
+use std::{borrow::Cow, collections::HashMap, fmt, str::FromStr};
 
 use json::JsonValue;
 pub use num_bigfloat::BigFloat;
 
 /// A JavaScript value.
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum JsValue {
 	Array(Vec<JsValue>),
 	Boolean(bool),
@@ -28,6 +28,53 @@ impl JsValue {
 			Err(_) => JsValue::Other(string.to_string()),
 			Ok(value) => Self::_from_json(value),
 		}
+	}
+
+	pub fn from_string(string: &str) -> Self {
+		if string.len() == 0 {
+			return Self::Other(String::new());
+		}
+		
+		// If the symbol starts with a digit, interpret it as a (positive) number
+		if "0123456789".contains(|c| c == string.chars().nth(0).unwrap()) { println!("XXXXXXXXXXXXXXXX");
+			return match BigFloat::from_str(string) {
+				Err(e) => Self::Other(format!("unable to parse number: {}", string)),
+				Ok(f) => Self::Number(f)
+			};
+		}
+		if string == "null" {
+			return Self::Null;
+		}
+		if string == "undefined" {
+			return Self::Undefined;
+		}
+		if string == "true" {
+			return Self::Boolean(true);
+		}
+		if string == "false" {
+			return Self::Boolean(false);
+		}
+		if string.chars().nth(0) == Some('\"') && string.chars().last() == Some('\"') {
+			return Self::String(string[1..(string.len()-1)].to_string())
+		}
+		if string.chars().nth(0) == Some('[') && string.chars().last() == Some(']') {
+			let mut array = Vec::new();
+			for part in string[1..(string.len()-1)].split(',') {
+				array.push(Self::from_string(part));
+			}
+			return Self::Array(array);
+		}
+		if string.chars().nth(0) == Some('{') && string.chars().last() == Some('}') {
+			let mut map = HashMap::new();
+			for part in string[1..(string.len()-1)].split(',') {
+				if let Some((key, value)) = part.split_once(':') {
+					map.insert(key.to_string(), Self::from_string(value));
+				}
+			}
+			return Self::Object(map);
+		}
+
+		Self::Other(string.to_string())
 	}
 
 	fn _from_json(value: JsonValue) -> Self {

@@ -1,6 +1,9 @@
 #ifndef BW_CEF_V8_TO_STRING_HPP
 #define BW_CEF_V8_TO_STRING_HPP
 
+#include <string>
+#include <vector>
+
 
 class V8ToString {
 public:
@@ -18,8 +21,13 @@ public:
 			return "null";
 
 		// If string
-		if ( val->IsString() )
-			return val->GetStringValue();
+		if ( val->IsString() ) {
+			std::string string = "\"";
+			// TODO: Escape the string value:
+			string += val->GetStringValue();
+			string += "\"";
+			return string;
+		}
 
 		// If boolean
 		if ( val->IsBool() )
@@ -37,24 +45,44 @@ public:
 		if ( val->IsDouble() )
 			return intoString( val->GetDoubleValue() );
 
-		// If object (unsupported)
-		if ( val->IsObject() )
-			return "[object]";
+		// If array
+		if ( val->IsArray() ) {
+			std::string string = "[";
+			for (int i = 0; i < val->GetArrayLength(); i++) {
+				if (i != 0) {
+					string += ",";
+				}
+				string += convert(val->GetValue(i));
+			}
+			string += "]";
+			return string;
+		}
 
-		// If array (unsupported)
-		if ( val->IsArray() )
-			return "[array]";
+		// If object
+		if ( val->IsObject() ) {
+			std::vector<CefString> keys;
+			val->GetKeys(keys);
+			std::string string = "{";
+			for (size_t i = 0; i < keys.size(); i++) {
+				std::string key = keys[i];
+				if (i != 0) {
+					string += ",";
+				}
+				string += key + ":" + convert(val->GetValue(i)).ToString();
+			}
+			string += "}";
+			return string;
+		}
 
-			// If array (unsupported)
 		if ( val->IsDate() )
-			return "[date]";
+			return "date";
 
 		// If exception (unsupported)
 		if ( val->IsFunction() )
-			return "[function]";
+			return "function";
 
 		// If type is not accounted for, return this string:
-		return "[unknown type]";
+		return "unknown type";
 	}
 
 protected:

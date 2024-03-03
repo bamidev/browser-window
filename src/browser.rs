@@ -132,6 +132,11 @@ impl BrowserWindowHandle {
 
 	/// Executes the given javascript code and returns the output as a string.
 	/// If you don't need the result, see `exec_js`.
+	///
+	/// There may be some discrepancies in what JS values are being returned for
+	/// the same code in different browser engines, or how accurate they are.
+	/// For example, Edge WebView2 doesn't return `JsValue::Undefined`, it uses
+	/// `JsValue::Null` instead.
 	pub async fn eval_js(&self, js: &str) -> Result<JsValue, JsEvaluationError> {
 		//
 		let (tx, rx) = oneshot::channel();

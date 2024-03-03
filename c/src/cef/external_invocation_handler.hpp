@@ -38,9 +38,12 @@ namespace bw {
 				size_t index = 0;
 				for ( auto it = arguments.begin(); it != arguments.end(); it++, index++ ) {
 
-					CefString string = V8ToString::convert(*it);
-
-					msg_args->SetString( index, string );
+					if (index == 0) {
+						msg_args->SetString(0, (*it)->GetStringValue());
+					} else {
+						CefString string = V8ToString::convert(*it);
+						msg_args->SetString( index, string );
+					}
 				}
 
 				this->cef_browser->GetMainFrame()->SendProcessMessage( PID_BROWSER, msg );
