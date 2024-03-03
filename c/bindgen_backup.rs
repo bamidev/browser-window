@@ -4300,22 +4300,6 @@ fn bindgen_test_layout_cbw_Pos2D() {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct cbw_WindowImpl {}
-#[test]
-fn bindgen_test_layout_cbw_WindowImpl() {
-	assert_eq!(
-		::std::mem::size_of::<cbw_WindowImpl>(),
-		0usize,
-		concat!("Size of: ", stringify!(cbw_WindowImpl))
-	);
-	assert_eq!(
-		::std::mem::align_of::<cbw_WindowImpl>(),
-		1usize,
-		concat!("Alignment of ", stringify!(cbw_WindowImpl))
-	);
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct cbw_WindowCallbacks {
 	#[doc = " Fired just before the window gets destroyed and freed from memory.\n Should be implemented to free the user data provided to the window."]
 	pub do_cleanup: ::std::option::Option<unsafe extern "C" fn(arg1: *mut cbw_Window)>,
@@ -4446,6 +4430,22 @@ pub type cbw_WindowDispatchFn = ::std::option::Option<
 #[derive(Debug, Copy, Clone)]
 pub struct cbw_WindowDispatchData {
 	_unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct cbw_WindowImpl {}
+#[test]
+fn bindgen_test_layout_cbw_WindowImpl() {
+	assert_eq!(
+		::std::mem::size_of::<cbw_WindowImpl>(),
+		0usize,
+		concat!("Size of: ", stringify!(cbw_WindowImpl))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cbw_WindowImpl>(),
+		1usize,
+		concat!("Alignment of ", stringify!(cbw_WindowImpl))
+	);
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -4846,14 +4846,21 @@ extern "C" {
 	pub fn cbw_BrowserWindow_navigate(bw: *mut cbw_BrowserWindow, url: cbw_CStrSlice) -> cbw_Err;
 }
 extern "C" {
-	#[doc = " Creates a new browser window"]
+	#[doc = " Allocates a browser window and creates the window for it.\n Call `bw_BrowserWindow_create` on it to add the actual browser framework to this window."]
 	#[link_name = "\u{1}bw_BrowserWindow_new"]
 	pub fn cbw_BrowserWindow_new(
-		app: *mut cbw_Application, parent: *const cbw_Window, source: cbw_BrowserWindowSource,
-		_title: cbw_CStrSlice, width: ::std::os::raw::c_int, height: ::std::os::raw::c_int,
-		window_options: *const cbw_WindowOptions,
-		browser_window_options: *const cbw_BrowserWindowOptions,
-		handler: cbw_BrowserWindowHandlerFn, user_data: *mut ::std::os::raw::c_void,
+		app: *mut cbw_Application, parent: *const cbw_Window, title: cbw_CStrSlice,
+		width: ::std::os::raw::c_int, height: ::std::os::raw::c_int,
+		window_options: *const cbw_WindowOptions, handler: cbw_BrowserWindowHandlerFn,
+		user_data: *mut ::std::os::raw::c_void,
+	) -> *mut cbw_BrowserWindow;
+}
+extern "C" {
+	#[doc = " Adds the browser framework to the browser window.\n Should be called right after `bw_BrowserWindow_new`."]
+	#[link_name = "\u{1}bw_BrowserWindow_create"]
+	pub fn cbw_BrowserWindow_create(
+		bw: *mut cbw_BrowserWindow, width: ::std::os::raw::c_int, height: ::std::os::raw::c_int,
+		source: cbw_BrowserWindowSource, browser_window_options: *const cbw_BrowserWindowOptions,
 		callback: cbw_BrowserWindowCreationCallbackFn, callback_data: *mut ::std::os::raw::c_void,
 	);
 }

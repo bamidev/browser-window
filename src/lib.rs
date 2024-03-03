@@ -1,10 +1,11 @@
-//! _Browser Window_ is a Rust crate that allows you to utilize a browser engine
-//! to build graphical interfaces. The idea is similar to Electron.js.
+//! _BrowserWindow_ is a Rust crate that allows you to utilize a browser engine
+//! to build graphical interfaces, similar to Electron.js.
 //! You create your user interface with HTML, CSS and JavaScript.
 //! Then, you can communicate information to JavaScript and back to Rust.
 //!
-//! Pick the underlying browser framework by setting feature `webkitgtk` or
-//! `cef`. For more info on how to them up, check [this guide](https://github.com/bamidev/browser-window/tree/master/docs/GETTING-STARTED.md).
+//! Pick the underlying browser framework by setting feature `cef`, `webkitgtk`
+//! or `edge2`. For more info on which on you should choose and how to set them
+//! up, check [this guide](https://github.com/bamidev/browser-window/tree/master/docs/GETTING-STARTED.md).
 
 //! # Getting Started
 //! To start building apps with Browser Window, take a quick look at the
