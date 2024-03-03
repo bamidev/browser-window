@@ -49,7 +49,7 @@ impl BrowserWindowExt for BrowserWindowImpl {
 	fn eval_js(&self, js: &str, callback: EvalJsCallbackFn, callback_data: *mut ()) {
 		let this = self.clone();
 		self.webview().execute_script(js, move |result| {
-			callback(this, callback_data, Ok(JsValue::Other(result)));
+			callback(this, callback_data, Ok(JsValue::from_json(&result)));
 			Ok(())
 		});
 	}
@@ -111,6 +111,10 @@ impl BrowserWindowExt for BrowserWindowImpl {
 					controller.put_is_visible(true);
 					let webview =
 						Box::new(controller.get_webview().expect("unable to get webview"));
+					unsafe {
+						(*bw_inner).impl_.controller = Box::into_raw(controller.clone()) as _;
+						(*bw_inner).impl_.webview = Box::into_raw(webview.clone()) as _;
+					}
 
 					let settings = webview.get_settings().expect("unable to get settings");
 					settings.put_is_script_enabled(true);
@@ -137,12 +141,52 @@ impl BrowserWindowExt for BrowserWindowImpl {
 					};
 					result.expect("unable to navigate to source");
 
-					unsafe {
-						(*bw_inner).impl_.controller = Box::into_raw(controller) as _;
-						(*bw_inner).impl_.webview = Box::into_raw(webview) as _;
-					}
-					let handle = BrowserWindowImpl { inner: bw_inner };
-					creation_callback(handle, callback_data);
+					// Register the message handler
+					webview
+						.add_web_message_received(move |w, msg| {
+							let string = msg
+								.get_web_message_as_json()
+								.expect("unable to get web message as json");
+
+							let handle = BrowserWindowImpl { inner: bw_inner };
+							if string == "\"__bw_loaded\"" {
+								// Once the `ìnvoke_extern` function exists, invoke the creation
+								// callback.
+								creation_callback(handle, callback_data);
+							} else {
+								match JsValue::from_json(&string) {
+									JsValue::Array(args) => {
+										let command = args[0].to_string_unenclosed();
+										let command_args = args[1..].to_vec();
+										handler(handle, &command, command_args);
+									}
+									_ => panic!(
+										"unexpected JavaScript value received from Edge WebView2"
+									),
+								}
+							}
+
+							Ok(())
+						})
+						.expect("unable to register message handler");
+
+					webview.execute_script(
+						r#"
+						function invoke_extern(...args) {
+							window.chrome.webview.postMessage([].slice.call(args));
+						}
+
+						addEventListener("DOMContentLoaded", (e) => {
+							window.chrome.webview.postMessage("__bw_loaded");
+						});
+					"#,
+						move |_| Ok(()),
+					);
+
+					// TODO: Register the DOM content-loaded event.
+					// At the moment, we're using a workaround by sending a message from JS because
+					// the webview2 crate doesn't wrap it (yet).
+
 					Ok(())
 				});
 				Ok(())
@@ -186,7 +230,7 @@ fn dispatch_eval_js(_app: ApplicationImpl, dispatch_data: *mut ()) {
 		.clone()
 		.webview()
 		.execute_script(&data.code, move |result| {
-			callback(handle, callback_data, Ok(JsValue::Other(result)));
+			callback(handle, callback_data, Ok(JsValue::from_json(&result)));
 			Ok(())
 		});
 }

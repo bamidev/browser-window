@@ -1,5 +1,6 @@
 use std::{borrow::Cow, collections::HashMap, fmt};
 
+use json::JsonValue;
 pub use num_bigfloat::BigFloat;
 
 /// A JavaScript value.
@@ -20,6 +21,48 @@ pub enum JsValue {
 }
 
 impl JsValue {
+	/// Parses the given JSON string into a `JsValue`. If parsing failed, the
+	/// string is returned as a `JsValue::Other`.
+	pub fn from_json(string: &str) -> Self {
+		match json::parse(string) {
+			Err(_) => JsValue::Other(string.to_string()),
+			Ok(value) => Self::_from_json(value),
+		}
+	}
+
+	fn _from_json(value: JsonValue) -> Self {
+		match value {
+			JsonValue::Null => Self::Null,
+			JsonValue::Short(s) => Self::String(s.to_string()),
+			JsonValue::String(s) => {
+				println!("S '{}'", s);
+				Self::String(s)
+			}
+			JsonValue::Number(n) => {
+				let (sign, mantissa, exponent) = n.as_parts();
+
+				let big: BigFloat = mantissa.into();
+				for i in 0..exponent {
+					big.mul(&10.into());
+				}
+				if !sign {
+					big.inv_sign();
+				}
+				Self::Number(big)
+			}
+			JsonValue::Boolean(b) => Self::Boolean(b),
+			JsonValue::Object(o) => {
+				let mut map = HashMap::with_capacity(o.len());
+				for (key, value) in o.iter() {
+					map.insert(key.to_string(), Self::_from_json(value.clone()));
+				}
+				Self::Object(map)
+			}
+			JsonValue::Array(a) =>
+				Self::Array(a.into_iter().map(|i| Self::_from_json(i)).collect()),
+		}
+	}
+
 	/// Gets the string of the `JsValue::String`, or otherwise just a normal
 	/// string representation of the value.
 	pub fn to_string_unenclosed(&self) -> Cow<'_, str> {
