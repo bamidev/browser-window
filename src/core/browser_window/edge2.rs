@@ -149,23 +149,16 @@ impl BrowserWindowExt for BrowserWindowImpl {
 								.expect("unable to get web message as json");
 
 							let handle = BrowserWindowImpl { inner: bw_inner };
-							if string == "\"__bw_loaded\"" {
-								// Once the `ìnvoke_extern` function exists, invoke the creation
-								// callback.
-								creation_callback(handle, callback_data);
-							} else {
-								match JsValue::from_json(&string) {
-									JsValue::Array(args) => {
-										let command = args[0].to_string_unenclosed();
-										let command_args = args[1..].to_vec();
-										handler(handle, &command, command_args);
-									}
-									_ => panic!(
-										"unexpected JavaScript value received from Edge WebView2"
-									),
+							match JsValue::from_json(&string) {
+								JsValue::Array(args) => {
+									let command = args[0].to_string_unenclosed();
+									let command_args = args[1..].to_vec();
+									handler(handle, &command, command_args);
 								}
+								_ => panic!(
+									"unexpected JavaScript value received from Edge WebView2"
+								),
 							}
-
 							Ok(())
 						})
 						.expect("unable to register message handler");
@@ -175,17 +168,15 @@ impl BrowserWindowExt for BrowserWindowImpl {
 						function invoke_extern(...args) {
 							window.chrome.webview.postMessage([].slice.call(args));
 						}
-
-						addEventListener("DOMContentLoaded", (e) => {
-							window.chrome.webview.postMessage("__bw_loaded");
-						});
 					"#,
 						move |_| Ok(()),
 					);
 
-					// TODO: Register the DOM content-loaded event.
-					// At the moment, we're using a workaround by sending a message from JS because
-					// the webview2 crate doesn't wrap it (yet).
+					webview.add_navigation_completed(move |wv, e| {
+						let handle = BrowserWindowImpl { inner: bw_inner };
+						creation_callback(handle, callback_data);
+						Ok(())
+					});
 
 					Ok(())
 				});
