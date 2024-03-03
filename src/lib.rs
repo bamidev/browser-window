@@ -13,8 +13,10 @@
 //!
 //! For more detailed example code, see [this example code](https://github.com/bamidev/browser-window/tree/master/examples).
 //!
+//! Or, for a very simple example of a browser frame, [look at this](https://github.com/bamidev/stonenet/blob/dev/desktop/src/main.rs).
+//!
 //! # Thread safety
-//! To use the threadsafe version of _Browser Window_, enable feature
+//! To use the threadsafe version of _BrowserWindow_, enable feature
 //! `threadsafe`.
 
 mod core;

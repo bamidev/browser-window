@@ -63,7 +63,7 @@ Cross compilation to the `*-pc-windows-gnu` target works. Just make sure that Mi
 find the headers of the win32 API.
 
 Moreover, you need to ship the executable together with the WebView2Loader.dll file.
-It can be obtained on non-Windows systems, by installing nuget, and obtaining it with:
+It can be obtained on non-Windows systems, by installing nuget, and downloading it with:
 
 `nuget install Microsoft.Web.WebView2`
 
