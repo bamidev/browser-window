@@ -40,7 +40,10 @@ function onExecutionEnded() {
 }
 
 function onOutputReceived( output ) {
-	$('body').append( output )
+	let span = document.createElement("span")
+	span.innerText = output
+
+	document.body.appendChild( span )
 }
 
 function onErrorOutputReceived( output ) {
