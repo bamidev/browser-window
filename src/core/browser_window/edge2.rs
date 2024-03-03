@@ -124,12 +124,18 @@ impl BrowserWindowExt for BrowserWindowImpl {
 					unsafe { winuser::GetClientRect(hwnd, &mut rect) };
 					controller.put_bounds(rect);
 
-					match source {
+					let result = match source {
 						Source::Url(url) => webview.navigate(&url),
 						Source::Html(content) => webview.navigate_to_string(&content),
-						Source::File(_file) =>
-							panic!("File sources are not supported at the moment."),
+						Source::File(path) => {
+							let file_uri = "file://".to_string() + path.to_string_lossy().as_ref();
+							webview.navigate(&file_uri)
+						}
 					};
+					result.expect("unable to navigate to source");
+
+					// Update the window because otherwise the webview doesn't show up
+					unsafe { winuser::UpdateWindow(hwnd); }
 
 					unsafe {
 						(*bw_inner).impl_.controller = Box::into_raw(controller) as _;
