@@ -106,6 +106,9 @@ impl BrowserWindowExt for BrowserWindowImpl {
 				let env = renv.expect("environment error");
 				env.create_controller(hwnd, move |rcon| {
 					let controller = Box::new(rcon.expect("controller error"));
+					// This line is necessary because the webview doesn't show otherwise, if the
+					// window hasn't been shown yet.
+					controller.put_is_visible(true);
 					let webview =
 						Box::new(controller.get_webview().expect("unable to get webview"));
 
@@ -128,14 +131,11 @@ impl BrowserWindowExt for BrowserWindowImpl {
 						Source::Url(url) => webview.navigate(&url),
 						Source::Html(content) => webview.navigate_to_string(&content),
 						Source::File(path) => {
-							let file_uri = "file://".to_string() + path.to_string_lossy().as_ref();
+							let file_uri = path.to_string_lossy();
 							webview.navigate(&file_uri)
 						}
 					};
 					result.expect("unable to navigate to source");
-
-					// Update the window because otherwise the webview doesn't show up
-					unsafe { winuser::UpdateWindow(hwnd); }
 
 					unsafe {
 						(*bw_inner).impl_.controller = Box::into_raw(controller) as _;
