@@ -9,9 +9,7 @@
 extern "C" {
 #endif
 
-#include <synchapi.h>
-#include <windef.h>
-#include <winuser.h>
+#include <windows.h>
 
 
 

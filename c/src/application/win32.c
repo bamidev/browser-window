@@ -135,7 +135,7 @@ bw_ApplicationTimerMapEntry* bw_ApplicationWin32_findInTimerMap(UINT_PTR timer_i
 	return entry;
 }
 
-void bw_ApplicationImpl_free(bw_ApplicationImpl*) {}
+void bw_ApplicationImpl_free(bw_ApplicationImpl* app) {}
 
 void bw_ApplicationWin32_freeTimerMap() {
 	bw_ApplicationTimerMapEntry* entry = timer_map;
@@ -174,7 +174,7 @@ bool bw_ApplicationWin32_removeFromTimerMap(bw_ApplicationTimerMapEntry* entry) 
 }
 
 void bw_ApplicationWin32_setTimer(bw_Application* app, bw_ApplicationDispatchData* dispatch_data, uint64_t delay) {
-	UINT_PTR timer_id = SetTimer(0, 0, delay, (TIMERPROC)bw_ApplicationWin32_timerHandler);
+	UINT_PTR timer_id = SetTimer(0, 0, (UINT)delay, (TIMERPROC)bw_ApplicationWin32_timerHandler);
 
 	bw_ApplicationWin32_addToTimerMap(app, timer_id, dispatch_data);
 }

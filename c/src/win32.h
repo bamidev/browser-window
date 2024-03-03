@@ -6,11 +6,18 @@ extern "C" {
 #endif
 
 #include <assert.h>
-#include <windef.h>
 
 #include "err.h"
 #include "string.h"
 
+
+// Some definitions as defined in windef.h:
+// https://learn.microsoft.com/en-us/windows/win32/winprog/windows-data-types
+// Because including windef.h with MinGW can cause some issues
+typedef unsigned char BYTE;
+typedef unsigned long DWORD;
+typedef long HRESULT;
+typedef wchar_t WCHAR;
 
 
 #define BW_WIN32_PANIC_LAST_ERROR \

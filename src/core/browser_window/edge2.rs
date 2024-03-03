@@ -73,9 +73,7 @@ impl BrowserWindowExt for BrowserWindowImpl {
 		}
 	}
 
-	fn navigate(&self, uri: &str) {
-		self.webview().navigate(uri);
-	}
+	fn navigate(&self, uri: &str) { self.webview().navigate(uri); }
 
 	fn new(
 		app: ApplicationImpl, parent: WindowImpl, source: Source, title: &str, width: Option<u32>,
@@ -178,10 +176,13 @@ fn dispatch_eval_js(_app: ApplicationImpl, dispatch_data: *mut ()) {
 	let callback = data.callback.clone();
 	let handle = data.handle.clone();
 	let callback_data = data.data.clone();
-	handle.clone().webview().execute_script(&data.code, move |result| {
-		callback(handle, callback_data, Ok(JsValue::Other(result)));
-		Ok(())
-	});
+	handle
+		.clone()
+		.webview()
+		.execute_script(&data.code, move |result| {
+			callback(handle, callback_data, Ok(JsValue::Other(result)));
+			Ok(())
+		});
 }
 
 unsafe extern "C" fn ffi_handler(

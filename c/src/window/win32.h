@@ -5,13 +5,8 @@
 extern "C" {
 #endif
 
+#include "../win32.h"
 #include <stdbool.h>
-
-// Some definitions as defined in windef.h:
-// https://learn.microsoft.com/en-us/windows/win32/winprog/windows-data-types
-// Because including windef.h with MinGW can cause some issues
-typedef unsigned char BYTE;
-typedef unsigned long DWORD;
 
 
 typedef struct bw_Window bw_Window;
