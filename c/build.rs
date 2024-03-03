@@ -13,42 +13,6 @@ use std::{
 #[derive(Debug)]
 struct BwBindgenCallbacks {}
 
-fn nuget_package_dir(package_name: &str) -> Option<PathBuf> {
-	let nuget_path = match env::var("USERPROFILE") {
-		Err(e) => match env::var("NUGET_PATH") {
-			Ok(string) => PathBuf::from(string),
-			Err(e) => {
-				panic!("Couldn't find the Nuget path, please set environment variable NUGET_PATH.")
-			}
-		},
-		Ok(string) => PathBuf::from(format!("{}\\.nuget\\packages\\", string)),
-	};
-
-	#[cfg(windows)]
-	{
-		let package_path = nuget_path.join(package_name);
-		for path in fs::read_dir(package_path).expect("package not found") {
-			if let Ok(entry) = path {
-				return Some(entry.path());
-			}
-		}
-	}
-	#[cfg(not(windows))]
-	{
-		for path in fs::read_dir(nuget_path).expect("package not found") {
-			if let Ok(entry) = path {
-				if let Some(name) = entry.path().file_name() {
-					if name.to_string_lossy().starts_with(package_name) {
-						return Some(entry.path());
-					}
-				}
-			}
-		}
-	}
-
-	None
-}
-
 /// Prints all compiler commands to rerun if any file has changed within the
 /// given directory or a subdictory thereof.
 fn rerun_if_directory_changed<P>(_path: P)
@@ -174,7 +138,7 @@ fn main() {
 
 	/**************************************
 	 *	C header files for bindgen
-	 *************************** */
+	 ************************* */
 	let mut bgbuilder = bindgen::Builder::default()
 		.parse_callbacks(Box::new(BwBindgenCallbacks {}))
 		.clang_arg("-DBW_BINDGEN")
@@ -188,7 +152,7 @@ fn main() {
 
 	/**************************************
 	 *	The Platform source files
-	 *************************** */
+	 ************************* */
 	if target.contains("windows") {
 		//bgbuilder = bgbuilder.clang_arg("-DBW_WIN32");
 		if target.contains("msvc") {
@@ -250,7 +214,7 @@ fn main() {
 
 	/*******************************************
 	 *	The Browser Engine (CEF3) source files *
-	 *************************************** */
+	 ************************************* */
 	if cfg!(feature = "cef") {
 		bgbuilder = bgbuilder.clang_arg("-DBW_CEF");
 
@@ -407,7 +371,7 @@ fn main() {
 
 	/**************************************
 	 *	All other source files
-	 *************************** */
+	 ************************* */
 	build
 		.file("src/application/common.c")
 		.file("src/browser_window/common.c")
