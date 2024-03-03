@@ -1,6 +1,6 @@
 [package]
 name = "browser-window-c"
-version = "0.2.0"
+version = "0.2.1"
 description = "Browser framework functionality for BrowserWindow written in C/C++."
 edition = "2018"
 authors = ["Bamidev"]
