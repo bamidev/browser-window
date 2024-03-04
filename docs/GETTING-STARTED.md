@@ -20,11 +20,11 @@ If you want the exact same behavior of your app on all platforms, CEF is recomme
 ### WebkitGTK
 
 *Pros:*
-* Generally easily installed on anything but Windows; a lot of distros have a package for it. There
-is even a homebrew package for it on MacOS.
+* Generally easily installed on Unix-like systems; a lot of linux distros have a package for it.
 
 *Cons:*
 * Compiling WebkitGTK or GTK for Windows is not supported.
+* Homebrew package for WebkitGTK seems to be unmaintained.
 * Static linking is also not really supported for GTK.
 
 ### Edge WebView2
