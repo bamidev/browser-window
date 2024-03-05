@@ -178,6 +178,7 @@ pub const cWINT_MIN: u32 = 0;
 pub const cWINT_MAX: u32 = 4294967295;
 pub const c_ASSERT_H: u32 = 1;
 pub const c_STDIO_H: u32 = 1;
+pub const c__GNUC_VA_LIST: u32 = 1;
 pub const c_____fpos_t_defined: u32 = 1;
 pub const c____mbstate_t_defined: u32 = 1;
 pub const c_____fpos64_t_defined: u32 = 1;
@@ -202,9 +203,9 @@ pub const cTMP_MAX: u32 = 238328;
 pub const cFILENAME_MAX: u32 = 4096;
 pub const cL_ctermid: u32 = 9;
 pub const cFOPEN_MAX: u32 = 16;
-pub const c__bool_true_false_are_defined: u32 = 1;
 pub const ctrue: u32 = 1;
 pub const cfalse: u32 = 0;
+pub const c__bool_true_false_are_defined: u32 = 1;
 pub type cBOOL = ::std::os::raw::c_int;
 pub type cwchar_t = ::std::os::raw::c_int;
 #[repr(C)]
@@ -3200,6 +3201,50 @@ fn bindgen_test_layout_cbw_BrowserWindowImpl() {
 		concat!("Alignment of ", stringify!(cbw_BrowserWindowImpl))
 	);
 }
+pub type cbw_EventCallbackFn = ::std::option::Option<
+	unsafe extern "C" fn(arg: *mut ::std::os::raw::c_void, event_data: *mut ::std::os::raw::c_void),
+>;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct cbw_Event {
+	pub callback: cbw_EventCallbackFn,
+	pub data: *mut ::std::os::raw::c_void,
+}
+#[test]
+fn bindgen_test_layout_cbw_Event() {
+	const UNINIT: ::std::mem::MaybeUninit<cbw_Event> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<cbw_Event>(),
+		16usize,
+		concat!("Size of: ", stringify!(cbw_Event))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cbw_Event>(),
+		8usize,
+		concat!("Alignment of ", stringify!(cbw_Event))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).callback) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_Event),
+			"::",
+			stringify!(callback)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).data) as usize - ptr as usize },
+		8usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_Event),
+			"::",
+			stringify!(data)
+		)
+	);
+}
 extern "C" {
 	#[link_name = "\u{1}__assert_fail"]
 	pub fn c__assert_fail(
@@ -3221,6 +3266,7 @@ extern "C" {
 		__line: ::std::os::raw::c_int,
 	) -> !;
 }
+pub type cva_list = c__builtin_va_list;
 pub type c__gnuc_va_list = c__builtin_va_list;
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -3745,7 +3791,6 @@ fn bindgen_test_layout_c_IO_FILE() {
 		)
 	);
 }
-pub type cva_list = c__gnuc_va_list;
 pub type cfpos_t = c__fpos_t;
 extern "C" {
 	#[link_name = "\u{1}stdin"]
@@ -4655,6 +4700,48 @@ pub type cbw_BrowserWindowJsCallbackFn = ::std::option::Option<
 >;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
+pub struct cbw_BrowserWindowEvents {
+	pub on_navigation_start: cbw_Event,
+	pub on_navigation_end: cbw_Event,
+}
+#[test]
+fn bindgen_test_layout_cbw_BrowserWindowEvents() {
+	const UNINIT: ::std::mem::MaybeUninit<cbw_BrowserWindowEvents> =
+		::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<cbw_BrowserWindowEvents>(),
+		32usize,
+		concat!("Size of: ", stringify!(cbw_BrowserWindowEvents))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cbw_BrowserWindowEvents>(),
+		8usize,
+		concat!("Alignment of ", stringify!(cbw_BrowserWindowEvents))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).on_navigation_start) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_BrowserWindowEvents),
+			"::",
+			stringify!(on_navigation_start)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).on_navigation_end) as usize - ptr as usize },
+		16usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_BrowserWindowEvents),
+			"::",
+			stringify!(on_navigation_end)
+		)
+	);
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
 pub struct cbw_BrowserWindowOptions {
 	pub dev_tools: cBOOL,
 	pub resource_path: cbw_CStrSlice,
@@ -4744,6 +4831,7 @@ pub struct cbw_BrowserWindow {
 	pub external_handler: cbw_BrowserWindowHandlerFn,
 	pub user_data: *mut ::std::os::raw::c_void,
 	pub impl_: cbw_BrowserWindowImpl,
+	pub events: cbw_BrowserWindowEvents,
 }
 #[test]
 fn bindgen_test_layout_cbw_BrowserWindow() {
@@ -4751,7 +4839,7 @@ fn bindgen_test_layout_cbw_BrowserWindow() {
 	let ptr = UNINIT.as_ptr();
 	assert_eq!(
 		::std::mem::size_of::<cbw_BrowserWindow>(),
-		24usize,
+		56usize,
 		concat!("Size of: ", stringify!(cbw_BrowserWindow))
 	);
 	assert_eq!(
@@ -4797,6 +4885,16 @@ fn bindgen_test_layout_cbw_BrowserWindow() {
 			stringify!(cbw_BrowserWindow),
 			"::",
 			stringify!(impl_)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).events) as usize - ptr as usize },
+		24usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_BrowserWindow),
+			"::",
+			stringify!(events)
 		)
 	);
 }
@@ -4863,322 +4961,6 @@ extern "C" {
 		source: cbw_BrowserWindowSource, browser_window_options: *const cbw_BrowserWindowOptions,
 		callback: cbw_BrowserWindowCreationCallbackFn, callback_data: *mut ::std::os::raw::c_void,
 	);
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct cbw_CookieImpl {
-	pub __: *mut ::std::os::raw::c_void,
-}
-#[test]
-fn bindgen_test_layout_cbw_CookieImpl() {
-	const UNINIT: ::std::mem::MaybeUninit<cbw_CookieImpl> = ::std::mem::MaybeUninit::uninit();
-	let ptr = UNINIT.as_ptr();
-	assert_eq!(
-		::std::mem::size_of::<cbw_CookieImpl>(),
-		8usize,
-		concat!("Size of: ", stringify!(cbw_CookieImpl))
-	);
-	assert_eq!(
-		::std::mem::align_of::<cbw_CookieImpl>(),
-		8usize,
-		concat!("Alignment of ", stringify!(cbw_CookieImpl))
-	);
-	assert_eq!(
-		unsafe { ::std::ptr::addr_of!((*ptr).__) as usize - ptr as usize },
-		0usize,
-		concat!(
-			"Offset of field: ",
-			stringify!(cbw_CookieImpl),
-			"::",
-			stringify!(__)
-		)
-	);
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct cbw_CookieIteratorImpl {
-	pub __: *mut ::std::os::raw::c_void,
-}
-#[test]
-fn bindgen_test_layout_cbw_CookieIteratorImpl() {
-	const UNINIT: ::std::mem::MaybeUninit<cbw_CookieIteratorImpl> =
-		::std::mem::MaybeUninit::uninit();
-	let ptr = UNINIT.as_ptr();
-	assert_eq!(
-		::std::mem::size_of::<cbw_CookieIteratorImpl>(),
-		8usize,
-		concat!("Size of: ", stringify!(cbw_CookieIteratorImpl))
-	);
-	assert_eq!(
-		::std::mem::align_of::<cbw_CookieIteratorImpl>(),
-		8usize,
-		concat!("Alignment of ", stringify!(cbw_CookieIteratorImpl))
-	);
-	assert_eq!(
-		unsafe { ::std::ptr::addr_of!((*ptr).__) as usize - ptr as usize },
-		0usize,
-		concat!(
-			"Offset of field: ",
-			stringify!(cbw_CookieIteratorImpl),
-			"::",
-			stringify!(__)
-		)
-	);
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct cbw_CookieJarImpl {
-	pub __: *mut ::std::os::raw::c_void,
-}
-#[test]
-fn bindgen_test_layout_cbw_CookieJarImpl() {
-	const UNINIT: ::std::mem::MaybeUninit<cbw_CookieJarImpl> = ::std::mem::MaybeUninit::uninit();
-	let ptr = UNINIT.as_ptr();
-	assert_eq!(
-		::std::mem::size_of::<cbw_CookieJarImpl>(),
-		8usize,
-		concat!("Size of: ", stringify!(cbw_CookieJarImpl))
-	);
-	assert_eq!(
-		::std::mem::align_of::<cbw_CookieJarImpl>(),
-		8usize,
-		concat!("Alignment of ", stringify!(cbw_CookieJarImpl))
-	);
-	assert_eq!(
-		unsafe { ::std::ptr::addr_of!((*ptr).__) as usize - ptr as usize },
-		0usize,
-		concat!(
-			"Offset of field: ",
-			stringify!(cbw_CookieJarImpl),
-			"::",
-			stringify!(__)
-		)
-	);
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct cbw_Cookie {
-	pub impl_: cbw_CookieImpl,
-}
-#[test]
-fn bindgen_test_layout_cbw_Cookie() {
-	const UNINIT: ::std::mem::MaybeUninit<cbw_Cookie> = ::std::mem::MaybeUninit::uninit();
-	let ptr = UNINIT.as_ptr();
-	assert_eq!(
-		::std::mem::size_of::<cbw_Cookie>(),
-		8usize,
-		concat!("Size of: ", stringify!(cbw_Cookie))
-	);
-	assert_eq!(
-		::std::mem::align_of::<cbw_Cookie>(),
-		8usize,
-		concat!("Alignment of ", stringify!(cbw_Cookie))
-	);
-	assert_eq!(
-		unsafe { ::std::ptr::addr_of!((*ptr).impl_) as usize - ptr as usize },
-		0usize,
-		concat!(
-			"Offset of field: ",
-			stringify!(cbw_Cookie),
-			"::",
-			stringify!(impl_)
-		)
-	);
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct cbw_CookieJar {
-	pub impl_: cbw_CookieJarImpl,
-}
-#[test]
-fn bindgen_test_layout_cbw_CookieJar() {
-	const UNINIT: ::std::mem::MaybeUninit<cbw_CookieJar> = ::std::mem::MaybeUninit::uninit();
-	let ptr = UNINIT.as_ptr();
-	assert_eq!(
-		::std::mem::size_of::<cbw_CookieJar>(),
-		8usize,
-		concat!("Size of: ", stringify!(cbw_CookieJar))
-	);
-	assert_eq!(
-		::std::mem::align_of::<cbw_CookieJar>(),
-		8usize,
-		concat!("Alignment of ", stringify!(cbw_CookieJar))
-	);
-	assert_eq!(
-		unsafe { ::std::ptr::addr_of!((*ptr).impl_) as usize - ptr as usize },
-		0usize,
-		concat!(
-			"Offset of field: ",
-			stringify!(cbw_CookieJar),
-			"::",
-			stringify!(impl_)
-		)
-	);
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct cbw_CookieIterator {
-	pub impl_: cbw_CookieIteratorImpl,
-}
-#[test]
-fn bindgen_test_layout_cbw_CookieIterator() {
-	const UNINIT: ::std::mem::MaybeUninit<cbw_CookieIterator> = ::std::mem::MaybeUninit::uninit();
-	let ptr = UNINIT.as_ptr();
-	assert_eq!(
-		::std::mem::size_of::<cbw_CookieIterator>(),
-		8usize,
-		concat!("Size of: ", stringify!(cbw_CookieIterator))
-	);
-	assert_eq!(
-		::std::mem::align_of::<cbw_CookieIterator>(),
-		8usize,
-		concat!("Alignment of ", stringify!(cbw_CookieIterator))
-	);
-	assert_eq!(
-		unsafe { ::std::ptr::addr_of!((*ptr).impl_) as usize - ptr as usize },
-		0usize,
-		concat!(
-			"Offset of field: ",
-			stringify!(cbw_CookieIterator),
-			"::",
-			stringify!(impl_)
-		)
-	);
-}
-pub type cbw_CookieJarStorageCallbackFn = ::std::option::Option<
-	unsafe extern "C" fn(cj: *mut cbw_CookieJar, data: *mut ::std::os::raw::c_void, error: cbw_Err),
->;
-pub type cbw_CookieIteratorNextCallbackFn = ::std::option::Option<
-	unsafe extern "C" fn(
-		ci: *mut cbw_CookieIterator,
-		data: *mut ::std::os::raw::c_void,
-		cookie: *mut cbw_Cookie,
-	),
->;
-pub type cbw_CookieJarDeleteCallbackFn = ::std::option::Option<
-	unsafe extern "C" fn(
-		cj: *mut cbw_CookieJar,
-		data: *mut ::std::os::raw::c_void,
-		deleted: ::std::os::raw::c_uint,
-	),
->;
-extern "C" {
-	#[link_name = "\u{1}bw_Cookie_free"]
-	pub fn cbw_Cookie_free(cookie: *mut cbw_Cookie);
-}
-extern "C" {
-	#[link_name = "\u{1}bw_Cookie_new"]
-	pub fn cbw_Cookie_new(name: cbw_CStrSlice, value: cbw_CStrSlice) -> *mut cbw_Cookie;
-}
-extern "C" {
-	#[link_name = "\u{1}bw_Cookie_getCreationTime"]
-	pub fn cbw_Cookie_getCreationTime(cookie: *const cbw_Cookie) -> u64;
-}
-extern "C" {
-	#[link_name = "\u{1}bw_Cookie_setCreationTime"]
-	pub fn cbw_Cookie_setCreationTime(cookie: *mut cbw_Cookie, time: u64);
-}
-extern "C" {
-	#[link_name = "\u{1}bw_Cookie_getDomain"]
-	pub fn cbw_Cookie_getDomain(cookie: *const cbw_Cookie, domain: *mut cbw_StrSlice) -> cBOOL;
-}
-extern "C" {
-	#[link_name = "\u{1}bw_Cookie_setDomain"]
-	pub fn cbw_Cookie_setDomain(cookie: *mut cbw_Cookie, domain: cbw_CStrSlice);
-}
-extern "C" {
-	#[link_name = "\u{1}bw_Cookie_getExpires"]
-	pub fn cbw_Cookie_getExpires(cookie: *const cbw_Cookie) -> u64;
-}
-extern "C" {
-	#[link_name = "\u{1}bw_Cookie_setExpires"]
-	pub fn cbw_Cookie_setExpires(cookie: *mut cbw_Cookie, time: u64);
-}
-extern "C" {
-	#[link_name = "\u{1}bw_Cookie_getName"]
-	pub fn cbw_Cookie_getName(cookie: *const cbw_Cookie, name: *mut cbw_StrSlice) -> cBOOL;
-}
-extern "C" {
-	#[link_name = "\u{1}bw_Cookie_setName"]
-	pub fn cbw_Cookie_setName(cookie: *mut cbw_Cookie, name: cbw_CStrSlice);
-}
-extern "C" {
-	#[link_name = "\u{1}bw_Cookie_getPath"]
-	pub fn cbw_Cookie_getPath(cookie: *const cbw_Cookie, path: *mut cbw_StrSlice) -> cBOOL;
-}
-extern "C" {
-	#[link_name = "\u{1}bw_Cookie_setPath"]
-	pub fn cbw_Cookie_setPath(cookie: *mut cbw_Cookie, path: cbw_CStrSlice);
-}
-extern "C" {
-	#[link_name = "\u{1}bw_Cookie_getValue"]
-	pub fn cbw_Cookie_getValue(cookie: *const cbw_Cookie, value: *mut cbw_StrSlice) -> cBOOL;
-}
-extern "C" {
-	#[link_name = "\u{1}bw_Cookie_setValue"]
-	pub fn cbw_Cookie_setValue(cookie: *mut cbw_Cookie, value: cbw_CStrSlice);
-}
-extern "C" {
-	#[link_name = "\u{1}bw_Cookie_isHttpOnly"]
-	pub fn cbw_Cookie_isHttpOnly(cookie: *const cbw_Cookie) -> cBOOL;
-}
-extern "C" {
-	#[link_name = "\u{1}bw_Cookie_makeHttpOnly"]
-	pub fn cbw_Cookie_makeHttpOnly(cookie: *mut cbw_Cookie);
-}
-extern "C" {
-	#[link_name = "\u{1}bw_Cookie_isSecure"]
-	pub fn cbw_Cookie_isSecure(cookie: *const cbw_Cookie) -> cBOOL;
-}
-extern "C" {
-	#[link_name = "\u{1}bw_Cookie_makeSecure"]
-	pub fn cbw_Cookie_makeSecure(cookie: *mut cbw_Cookie);
-}
-extern "C" {
-	#[link_name = "\u{1}bw_CookieJar_delete"]
-	pub fn cbw_CookieJar_delete(
-		jar: *mut cbw_CookieJar, url: cbw_CStrSlice, name: cbw_CStrSlice,
-		cb: cbw_CookieJarDeleteCallbackFn, cb_data: *mut ::std::os::raw::c_void,
-	);
-}
-extern "C" {
-	#[link_name = "\u{1}bw_CookieJar_free"]
-	pub fn cbw_CookieJar_free(jar: *mut cbw_CookieJar);
-}
-extern "C" {
-	#[link_name = "\u{1}bw_CookieJar_iterator"]
-	pub fn cbw_CookieJar_iterator(
-		jar: *mut cbw_CookieJar, iterator: *mut *mut cbw_CookieIterator, include_http_only: cBOOL,
-		url: cbw_CStrSlice,
-	);
-}
-extern "C" {
-	#[link_name = "\u{1}bw_CookieJar_iteratorAll"]
-	pub fn cbw_CookieJar_iteratorAll(
-		jar: *mut cbw_CookieJar, iterator: *mut *mut cbw_CookieIterator,
-	);
-}
-extern "C" {
-	#[link_name = "\u{1}bw_CookieJar_newGlobal"]
-	pub fn cbw_CookieJar_newGlobal() -> *mut cbw_CookieJar;
-}
-extern "C" {
-	#[link_name = "\u{1}bw_CookieJar_store"]
-	pub fn cbw_CookieJar_store(
-		jar: *mut cbw_CookieJar, url: cbw_CStrSlice, cookie: *const cbw_Cookie,
-		cb: cbw_CookieJarStorageCallbackFn, cb_data: *mut ::std::os::raw::c_void,
-	) -> cbw_Err;
-}
-extern "C" {
-	#[link_name = "\u{1}bw_CookieIterator_free"]
-	pub fn cbw_CookieIterator_free(iterator: *mut cbw_CookieIterator);
-}
-extern "C" {
-	#[link_name = "\u{1}bw_CookieIterator_next"]
-	pub fn cbw_CookieIterator_next(
-		iterator: *mut cbw_CookieIterator, on_next: cbw_CookieIteratorNextCallbackFn,
-		cb_data: *mut ::std::os::raw::c_void,
-	) -> cBOOL;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]

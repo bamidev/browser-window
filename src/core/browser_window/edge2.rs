@@ -7,7 +7,6 @@ use super::{super::window::WindowImpl, *};
 use crate::prelude::{ApplicationExt, WindowExt};
 
 
-#[derive(Clone)]
 pub struct BrowserWindowImpl {
 	inner: *mut cbw_BrowserWindow,
 }
@@ -208,6 +207,8 @@ impl BrowserWindowExt for BrowserWindowImpl {
 		}
 	}
 }
+
+impl BrowserWindowEventExt for BrowserWindowImpl {}
 
 
 fn dispatch_eval_js(_app: ApplicationImpl, dispatch_data: *mut ()) {

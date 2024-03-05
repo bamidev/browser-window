@@ -50,6 +50,7 @@ bw_BrowserWindow* bw_BrowserWindow_new(
 	browser->window->callbacks.do_cleanup = bw_BrowserWindowImpl_doCleanup;
 	browser->external_handler = handler;
 	browser->user_data = user_data;
+	memset(&browser->events, 0, sizeof(bw_BrowserWindowEvents));
 	return browser;
 }
 

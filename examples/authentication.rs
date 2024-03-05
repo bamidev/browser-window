@@ -3,7 +3,7 @@
 
 use std::time::Duration;
 
-use browser_window::{application::*, browser::*, prelude::*};
+use browser_window::{application::*, browser::*, event::EventExt, prelude::*};
 
 fn main() {
 	let application =
@@ -17,6 +17,10 @@ fn main() {
 		bwb.size(800, 600);
 		bwb.title("Log in to Github");
 		let bw = bwb.build(app.clone()).await;
+
+		bw.on_navigate().register_async(|arg| async move {
+			println!("ASD");
+		});
 
 		bw.show();
 

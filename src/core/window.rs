@@ -10,17 +10,18 @@ pub use gtk::WindowImpl;
 
 use crate::prelude::*;
 
-pub trait WindowExt: Clone + Default {
+
+pub trait WindowExt {
 	fn app(&self) -> ApplicationImpl;
 
 	fn destroy(&self);
 	fn drop(&self);
 
-	fn get_content_dimensions(&self) -> Dims2D;
-	fn get_opacity(&self) -> u8;
-	fn get_position(&self) -> Pos2D;
-	fn get_title(&self) -> String;
-	fn get_window_dimensions(&self) -> Dims2D;
+	fn content_dimensions(&self) -> Dims2D;
+	fn opacity(&self) -> u8;
+	fn position(&self) -> Pos2D;
+	fn title(&self) -> String;
+	fn window_dimensions(&self) -> Dims2D;
 
 	fn hide(&self);
 

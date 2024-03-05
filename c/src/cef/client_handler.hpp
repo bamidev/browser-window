@@ -2,13 +2,16 @@
 #define BW_CEF_CLIENT_HANDLER_H
 
 #include <include/cef_client.h>
+#include <include/cef_download_handler.h>
 #include <include/cef_life_span_handler.h>
+#include <include/cef_load_handler.h>
+#include <include/cef_request_handler.h>
 #include <include/cef_v8.h>
 #include <string>
 #include <vector>
-#include <include/cef_load_handler.h>
 
 #include "bw_handle_map.hpp"
+#include "util.hpp"
 #include "../application.h"
 #include "../common.h"
 
@@ -20,22 +23,23 @@ struct ExternalInvocationHandlerData {
 	std::vector<std::string> params;
 };
 
-class ClientHandler : public CefClient, public CefLifeSpanHandler, public CefLoadHandler {
+class ClientHandler : public CefClient, public CefDisplayHandler, public CefRequestHandler, public CefLifeSpanHandler, public CefLoadHandler {
 
 	bw_Application* app;
 
 public:
 	ClientHandler( bw_Application* app ) : app(app) {}
 
-	virtual CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() override { return this; }
-
-	virtual CefRefPtr<CefLoadHandler> GetLoadHandler() override { return this; }
+	CefRefPtr<CefDisplayHandler> GetDisplayHandler() override { return this; }
+	CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() override { return this; }
+	CefRefPtr<CefLoadHandler> GetLoadHandler() override { return this; }
+	CefRefPtr<CefRequestHandler> GetRequestHandler() override { return this; }
 
 	virtual void OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int httpStatusCode) override {
-		this->invokeCreationCallback(browser);
+		this->invokeCreationCallback(browser, (CefLoadHandler::ErrorCode)0, "");
 	}
 
-	void invokeCreationCallback(CefRefPtr<CefBrowser> browser) {
+	void invokeCreationCallback(CefRefPtr<CefBrowser> browser, CefLoadHandler::ErrorCode errorCode, const CefString& errorText) {
 		std::optional<bw::BrowserInfo> bw_info_opt = bw::bw_handle_map.fetch(browser);
 		if (bw_info_opt.has_value()) {
 			auto bw_info = bw_info_opt.value();
@@ -45,11 +49,52 @@ public:
 				callback_opt.reset();
 				value.callback(bw_info.handle, value.data);
 			}
+
+			if (errorCode == 0) {
+				BW_ERR_DECLARE_SUCCESS(error);
+				bw_Event_fire(&bw_info.handle->events.on_navigation_end, (void*)&error);
+				bw_Err_free(&error);
+			} else {
+				bw_Err error = bw_Err_new_with_msg(errorCode, errorText.ToString().c_str());
+				bw_Event_fire(&bw_info.handle->events.on_navigation_end, (void*)&error);
+				bw_Err_free(&error);
+			}
 		}
 	}
 
 	virtual void OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefLoadHandler::ErrorCode errorCode, const CefString& errorText, const CefString& failedUrl) override {
-		this->invokeCreationCallback(browser);
+		this->invokeCreationCallback(browser, errorCode, errorText);
+	}
+
+	virtual void OnLoadStart(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefLoadHandler::TransitionType transition_type ) override {
+		std::optional<bw::BrowserInfo> bw_info_opt = bw::bw_handle_map.fetch(browser);
+		if (bw_info_opt.has_value()) {
+			auto bw_info = bw_info_opt.value();
+			bw_CStrSlice slice = { 0, 0 };
+			bw_Event_fire(&bw_info.handle->events.on_navigation_start, (void*)&slice);
+		}
+	}
+
+	virtual void OnTitleChange(CefRefPtr<CefBrowser> browser, const CefString& title) override {
+		std::optional<bw::BrowserInfo> bw_info_opt = bw::bw_handle_map.fetch(browser);
+		if (bw_info_opt.has_value()) {
+			auto bw_info = bw_info_opt.value();
+			bw_CStrSlice slice = bw_cef_copyToCStrSlice(title);
+			bw_Event_fire(&bw_info.handle->events.on_page_title_changed, (void*)&slice);
+			bw_string_freeC(slice);
+		}
+	}
+
+	virtual bool OnTooltip(CefRefPtr<CefBrowser> browser, CefString& tooltip) override {
+		std::optional<bw::BrowserInfo> bw_info_opt = bw::bw_handle_map.fetch(browser);
+		if (bw_info_opt.has_value()) {
+			auto bw_info = bw_info_opt.value();
+			bw_StrSlice slice = bw_cef_copyToStrSlice(tooltip);
+			BOOL result = bw_Event_fire(&bw_info.handle->events.on_tooltip, (void*)&slice);
+			bw_string_free(slice);
+			return result;
+		}
+		return false;
 	}
 
 	virtual bool OnProcessMessageReceived(

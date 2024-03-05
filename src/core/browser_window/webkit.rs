@@ -1,7 +1,6 @@
 use std::{
 	borrow::Cow,
 	collections::HashMap,
-	ptr,
 	sync::{
 		atomic::{AtomicBool, AtomicPtr, Ordering},
 		Arc,
@@ -10,16 +9,16 @@ use std::{
 
 use gtk::{
 	gio::Cancellable,
-	glib::{error::ErrorDomain, CastNone, IsA},
-	prelude::{ContainerExt, WidgetExt, WindowExtManual},
+	glib::CastNone,
+	prelude::{ContainerExt, WidgetExt},
 };
-use javascriptcore::{Value, ValueExt};
+use javascriptcore::ValueExt;
 use webkit2gtk::{LoadEvent, Settings, SettingsExt, UserContentManagerExt, WebViewExt};
 
 use super::{super::window::WindowImpl, *};
 use crate::prelude::{ApplicationExt, WindowExt};
 
-#[derive(Clone)]
+
 pub struct BrowserWindowImpl {
 	inner: webkit2gtk::WebView,
 	user_data: Arc<AtomicPtr<()>>,
@@ -179,6 +178,9 @@ impl BrowserWindowExt for BrowserWindowImpl {
 
 	fn window(&self) -> WindowImpl { WindowImpl(self.inner.toplevel().and_dynamic_cast().unwrap()) }
 }
+
+impl BrowserWindowEventExt for BrowserWindowImpl {}
+
 
 fn transform_js_value(v: javascriptcore::Value) -> JsValue {
 	if v.is_array() {

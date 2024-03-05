@@ -7,7 +7,7 @@ use std::{
 use browser_window::{application::*, browser::*, prelude::*};
 use serde_json;
 
-async fn execute_command(bw: BrowserWindowHandle, line: &str) {
+async fn execute_command(bw: &BrowserWindowHandle, line: &str) {
 	let working_dir = bw
 		.eval_js("working_dir")
 		.await
@@ -94,7 +94,7 @@ fn main() {
 		html_file.push("examples/resources/terminal.html");
 
 		let mut bwb = BrowserWindowBuilder::new(Source::File(html_file));
-		bwb.async_handler(|handle, cmd, args| async move {
+		/*bwb.async_handler(async move |handle, cmd, args| {
 			match cmd.as_str() {
 				"exec" => {
 					let cmd_line = &args[0];
@@ -105,15 +105,15 @@ fn main() {
 					eprintln!("Received unsupported command: {}", other);
 				}
 			}
-		})
-		.dev_tools(true)
-		.size(800, 600)
-		.title("Terminal Example");
+		})*/
+		bwb.dev_tools(true);
+		bwb.size(800, 600);
+		bwb.title("Terminal Example");
 
 		let bw = bwb.build(app).await;
 
-		bw.opacity().set(224);
-		bw.show();
+		bw.window().set_opacity(224);
+		bw.window().show();
 
 		// Initialize the script with our working directory.
 		// Make sure that it is initializes whether document has been loaded already or

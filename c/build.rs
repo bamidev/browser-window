@@ -147,6 +147,7 @@ fn main() {
 		.header("src/cookie.h")
 		.header("src/common.h")
 		.header("src/err.h")
+		.header("src/event.h")
 		.header("src/string.h")
 		.header("src/window.h");
 
@@ -376,6 +377,7 @@ fn main() {
 		.file("src/application/common.c")
 		.file("src/browser_window/common.c")
 		.file("src/err.c")
+		.file("src/event.c")
 		.file("src/string.c")
 		.file("src/window/common.c")
 		//.flag(std_flag)

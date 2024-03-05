@@ -64,15 +64,15 @@ impl WindowExt for WindowImpl {
 
 	fn drop(&self) { unsafe { cbw_Window_drop(self.inner) } }
 
-	fn get_content_dimensions(&self) -> Dims2D {
+	fn content_dimensions(&self) -> Dims2D {
 		unsafe { cbw_Window_getContentDimensions(self.inner) }
 	}
 
-	fn get_opacity(&self) -> u8 { unsafe { cbw_Window_getOpacity(self.inner) } }
+	fn opacity(&self) -> u8 { unsafe { cbw_Window_getOpacity(self.inner) } }
 
-	fn get_position(&self) -> Pos2D { unsafe { cbw_Window_getPosition(self.inner) } }
+	fn position(&self) -> Pos2D { unsafe { cbw_Window_getPosition(self.inner) } }
 
-	fn get_title(&self) -> String {
+	fn title(&self) -> String {
 		// First obtain string size
 		let mut buf: *mut c_char = ptr::null_mut();
 		let buf_len = unsafe { cbw_Window_getTitle(self.inner, &mut buf) };
@@ -88,7 +88,7 @@ impl WindowExt for WindowImpl {
 		slice.into()
 	}
 
-	fn get_window_dimensions(&self) -> Dims2D {
+	fn window_dimensions(&self) -> Dims2D {
 		unsafe { cbw_Window_getWindowDimensions(self.inner) }
 	}
 

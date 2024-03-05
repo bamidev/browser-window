@@ -11,6 +11,7 @@ use crate::{
 };
 
 /// The type of content to display in a browser window
+#[derive(Clone)]
 pub enum Source {
 	/// Displays the given HTML code in the browser.
 	Html(String),
@@ -22,10 +23,10 @@ pub enum Source {
 
 #[cfg(not(feature = "threadsafe"))]
 type BrowserJsInvocationHandler =
-	Box<dyn FnMut(BrowserWindowHandle, String, Vec<JsValue>) -> Pin<Box<dyn Future<Output = ()>>>>;
+	Box<dyn FnMut(&BrowserWindowHandle, String, Vec<JsValue>) -> Pin<Box<dyn Future<Output = ()>>>>;
 #[cfg(feature = "threadsafe")]
 type BrowserJsInvocationHandler = Box<
-	dyn FnMut(BrowserWindowHandle, String, Vec<JsValue>) -> Pin<Box<dyn Future<Output = ()>>>
+	dyn FnMut(&BrowserWindowHandle, String, Vec<JsValue>) -> Pin<Box<dyn Future<Output = ()>>>
 		+ Send,
 >;
 
@@ -55,9 +56,9 @@ impl BrowserWindowBuilder {
 	/// The closure's second parameter specifies a command name.
 	/// The closure's third parameter specifies an array of string arguments.
 	#[cfg(not(feature = "threadsafe"))]
-	pub fn async_handler<H, F>(&mut self, mut handler: H) -> &mut Self
+	pub fn async_handler<'a, H, F>(&'a mut self, mut handler: H) -> &mut Self
 	where
-		H: FnMut(BrowserWindowHandle, String, Vec<JsValue>) -> F + 'static,
+		H: FnMut(&BrowserWindowHandle, String, Vec<JsValue>) -> F + 'static,
 		F: Future<Output = ()> + 'static,
 	{
 		self.handler = Some(Box::new(move |handle, cmd, args| {
@@ -72,7 +73,7 @@ impl BrowserWindowBuilder {
 	#[cfg(feature = "threadsafe")]
 	pub fn async_handler<H, F>(&mut self, mut handler: H) -> &mut Self
 	where
-		H: FnMut(BrowserWindowHandle, String, Vec<JsValue>) -> F + Send + 'static,
+		H: FnMut(&BrowserWindowHandle, String, Vec<JsValue>) -> F + Send + 'static,
 		F: Future<Output = ()> + 'static,
 	{
 		self.handler = Some(Box::new(move |handle, cmd, args| {
@@ -161,7 +162,7 @@ impl BrowserWindowBuilder {
 				// Parent
 				let parent_handle = match window.parent {
 					None => WindowImpl::default(),
-					Some(p) => p.i.inner,
+					Some(p) => p.i,
 				};
 
 				// Title
@@ -265,17 +266,17 @@ fn browser_window_invoke_handler(inner_handle: BrowserWindowImpl, cmd: &str, arg
 		BrowserUserData { handler } => {
 			let outer_handle = BrowserWindowHandle::new(inner_handle);
 
-			let future = handler(outer_handle.clone(), cmd.into(), args);
+			let future = handler(&outer_handle, cmd.into(), args);
 			outer_handle.app().spawn(future);
 		}
 	}
 }
 
 fn browser_window_created_callback(inner_handle: BrowserWindowImpl, data: *mut ()) {
-	let data_ptr = data as *mut Box<dyn FnOnce(BrowserWindowHandle)>;
+	let data_ptr = data as *mut Box<dyn FnOnce(&BrowserWindowHandle)>;
 	let func = unsafe { Box::from_raw(data_ptr) };
 
 	let outer_handle = BrowserWindowHandle::new(inner_handle);
 
-	func(outer_handle)
+	func(&outer_handle)
 }

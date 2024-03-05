@@ -20,8 +20,6 @@
 //! `threadsafe`.
 
 mod core;
-#[macro_use]
-mod prop;
 #[cfg(test)]
 mod tests;
 
@@ -38,4 +36,3 @@ pub mod window;
 mod delegate;
 #[cfg(feature = "threadsafe")]
 pub use delegate::{DelegateError, DelegateFuture, DelegateFutureFuture};
-pub use prop::Property;

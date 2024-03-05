@@ -2,90 +2,42 @@
 
 mod builder;
 
+use super::prelude::*;
+
 pub use builder::WindowBuilder;
+pub use super::core::window::WindowExt;
 
-use super::{event::Event, prelude::*};
 
-pub type StandardWindowEvent = Event<'static, WindowHandle>;
 
 /// A handle that exposes all windowing functionality.
-#[derive(Clone)]
-pub struct WindowHandle {
-	pub(super) inner: WindowImpl,
-}
-
-#[derive(Default)]
-pub(crate) struct WindowEvents {
-	pub on_close: StandardWindowEvent,
-	pub on_destroy: StandardWindowEvent,
-	pub on_resize: Event<'static, WindowResizeEventArgs>,
-}
-
-pub struct WindowResizeEventArgs {
-	handle: WindowHandle,
-	new_size: Dims2D,
-}
+pub struct WindowHandle(
+	pub(super) WindowImpl,
+);
 
 pub trait OwnedWindow {
-	fn window_handle(&self) -> WindowHandle;
+	fn window_handle(&self) -> &WindowHandle;
 }
 
 impl WindowHandle {
-	impl_prop! { pub content_dimensions: ContentDimensions }
-
-	impl_prop! { pub opacity: Opacity }
-
-	impl_prop! { pub position: Position }
-
-	impl_prop! { pub title: Title }
-
-	impl_prop! { pub window_dimensions: WindowDimensions }
-
-	/// Make the window invisible to the user.
-	pub fn hide(&self) { self.inner.hide() }
-
-	pub(super) fn new(inner: WindowImpl) -> Self { Self { inner } }
-
-	/// Make the window visible to the user.
-	pub fn show(&self) { self.inner.show() }
-}
-
-prop! { /// Gets or sets the width and height of the content of the window.
-	ContentDimensions<Dims2D>( this: WindowHandle ) {
-		get => this.inner.get_content_dimensions().into(),
-		set(val) => this.inner.set_content_dimensions( val.into() )
+	pub(crate) unsafe fn clone(&self) -> Self {
+		Self (self.0.clone())
 	}
-}
 
-prop! { /// Gets or sets the opacity of the window.
-		/// An opacity of 255 means the window is invisible.
-		/// An opacity of 0 means the window is completely visible.
-		/// Anything in between makes the window transparent.
-		///
-		/// This feature only works on Windows.
-	Opacity<u8>( this: WindowHandle ) {
-		get => this.inner.get_opacity(),
-		set(val) => this.inner.set_opacity( val )
-	}
-}
+	pub(super) fn new(inner: WindowImpl) -> Self { Self(inner) }
 
-prop! { /// Gets or sets the current position of the window.
-	Position<Pos2D>( this: WindowHandle ) {
-		get => this.inner.get_position(),
-		set(val) => this.inner.set_position( val )
-	}
-}
+	pub fn content_dimensions(&self) -> Dims2D { self.0.content_dimensions() }
+	pub fn opacity(&self) -> u8 { self.0.opacity() }
+	pub fn position(&self) -> Pos2D { self.0.position() }
+	pub fn title(&self) -> String { self.0.title() }
+	pub fn window_dimensions(&self) -> Dims2D { self.0.window_dimensions() }
 
-prop! { /// Gets or sets the title of the window.
-	pub Title<String, &str>( this: WindowHandle ) {
-		get => this.inner.get_title(),
-		set(val) => this.inner.set_title( val ).into()
-	}
-}
+	pub fn hide(&self) { self.0.hide(); }
 
-prop! { /// Gets or sets the current window size including its border and titlebar.
-	WindowDimensions<Dims2D>( this: WindowHandle ) {
-		get => this.inner.get_window_dimensions().into(),
-		set(val) => this.inner.set_window_dimensions( val.into() )
-	}
+	pub fn set_content_dimensions(&self, dimensions: Dims2D) { self.0.set_content_dimensions(dimensions); }
+	pub fn set_opacity(&self, opacity: u8) { self.0.set_opacity(opacity); }
+	pub fn set_position(&self, position: Pos2D) { self.0.set_position(position); }
+	pub fn set_title(&self, title: &str) { self.0.set_title(title); }
+	pub fn set_window_dimensions(&self, dimensions: Dims2D) { self.0.set_window_dimensions(dimensions); }
+
+	pub fn show(&self) { self.0.show(); }
 }

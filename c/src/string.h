@@ -33,6 +33,7 @@ char* bw_string_copyAsNewCstr( bw_CStrSlice str );
 /// Frees the string allocated with any of the functions of this module.
 void bw_string_freeCstr( char* str );
 void bw_string_free(bw_StrSlice str);
+void bw_string_freeC(bw_CStrSlice str);
 
 
 

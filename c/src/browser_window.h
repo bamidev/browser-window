@@ -14,6 +14,7 @@ typedef struct {} bw_BrowserWindowImpl;
 #endif
 
 #include "application.h"
+#include "event.h"
 #include "err.h"
 #include "string.h"
 #include "window.h"
@@ -31,6 +32,12 @@ typedef void (*bw_BrowserWindowHandlerFn)( bw_BrowserWindow* window, bw_CStrSlic
 typedef void (*bw_BrowserWindowJsCallbackFn)( bw_BrowserWindow* window, void* user_data, const char* result, const bw_Err* err );
 
 
+typedef struct {
+	bw_Event on_page_title_changed;
+	bw_Event on_navigation_start;
+	bw_Event on_navigation_end;
+	bw_Event on_tooltip;
+} bw_BrowserWindowEvents;
 
 typedef struct bw_BrowserWindowOptions {
 	BOOL dev_tools;
@@ -49,6 +56,7 @@ struct bw_BrowserWindow {
 	bw_BrowserWindowHandlerFn external_handler;
 	void* user_data;
 	bw_BrowserWindowImpl impl;
+	bw_BrowserWindowEvents events;
 };
 
 

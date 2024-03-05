@@ -89,7 +89,7 @@ impl JsValue {
 				let (sign, mantissa, exponent) = n.as_parts();
 
 				let big: BigFloat = mantissa.into();
-				for i in 0..exponent {
+				for _i in 0..exponent {
 					big.mul(&10.into());
 				}
 				if !sign {

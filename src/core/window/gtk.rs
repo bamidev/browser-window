@@ -1,6 +1,6 @@
 use std::sync::{atomic::AtomicI32, Arc};
 
-use gtk::prelude::{GtkWindowExt, WidgetExt, WindowExtManual};
+use gtk::prelude::{GtkWindowExt, WidgetExt};
 
 use super::{WindowExt, WindowOptions};
 use crate::{core::application::ApplicationImpl, prelude::*};

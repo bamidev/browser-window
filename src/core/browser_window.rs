@@ -16,11 +16,16 @@ pub use edge2::{BrowserWindowImpl, JsEvaluationError};
 pub use webkit::{BrowserWindowImpl, JsEvaluationError};
 
 use super::{
+	super::event::*,
 	application::ApplicationImpl,
 	cookie::CookieJarImpl,
 	window::{WindowImpl, WindowOptions},
 };
-use crate::{browser::Source, prelude::JsValue};
+use crate::{browser::*, prelude::JsValue};
+
+
+pub type BrowserWindowEventHandler<'a, A> = EventHandler<'a, BrowserWindowHandle, A>;
+pub type BrowserWindowEventHandlerCallback<'a, A> = EventHandlerCallback<'a, BrowserWindowHandle, A>;
 
 pub type BrowserWindowOptions = cbw_BrowserWindowOptions;
 
@@ -29,7 +34,14 @@ pub type EvalJsCallbackFn =
 	fn(bw: BrowserWindowImpl, data: *mut (), result: Result<JsValue, JsEvaluationError>);
 pub type ExternalInvocationHandlerFn = fn(bw: BrowserWindowImpl, cmd: &str, args: Vec<JsValue>);
 
-pub trait BrowserWindowExt: Clone {
+pub trait BrowserWindowEventExt {
+	fn on_page_title_changed<'a>(&self, handle: &'a BrowserWindowHandle) -> PageTitleChangedEvent<'a> { unimplemented!(); }
+	fn on_navigation_end<'a>(&self, handle: &'a BrowserWindowHandle) -> NavigationEndEvent<'a> { unimplemented!(); }
+	fn on_navigation_start<'a>(&self, handle: &'a BrowserWindowHandle) -> NavigationStartEvent<'a> { unimplemented!(); }
+	fn on_tooltip<'a>(&self, handle: &'a BrowserWindowHandle) -> TooltipEvent<'a> { unimplemented!(); }
+}
+
+pub trait BrowserWindowExt: BrowserWindowEventExt {
 	fn cookie_jar(&self) -> Option<CookieJarImpl>;
 
 	/// Executes the given JavaScript string.
@@ -43,32 +55,6 @@ pub trait BrowserWindowExt: Clone {
 
 	/// Causes the browser to navigate to the given URI.
 	fn navigate(&self, uri: &str);
-
-	/// Creates a new browser window asynchronously.
-	/// The `BrowserWindowImpl` handle to the new browser window will be passed
-	/// via a callback.
-	///
-	/// # Arguments
-	/// `app` - The application handle
-	/// `parent` - An handle for another window that this window will be a child
-	/// of. Use WindowImpl::default() for no parent. `source` - The content that
-	/// will be displayed by the browser. `title` - The title that the window
-	/// will have. `width` - The width of the window.
-	/// `height` - The height of the window.
-	/// `window_options` - Options for the window.
-	/// `browser_window_options` - Some extra browser related options.
-	/// `handler` - A handler function that can be invoked from within
-	/// JavaScript code. `user_data` - Could be set to point to some extra data
-	/// that this browser window will store. `creation_callback` - Will be
-	/// invoked when the browser window is created. It provided the
-	/// `BrowserWindowImpl` handle. `callback_data` - The data that will be
-	/// provided to the `creation_callback`.
-	fn new(
-		app: ApplicationImpl, parent: WindowImpl, source: Source, title: &str, width: Option<u32>,
-		height: Option<u32>, window_options: &WindowOptions,
-		browser_window_options: &BrowserWindowOptions, handler: ExternalInvocationHandlerFn,
-		user_data: *mut (), creation_callback: CreationCallbackFn, callback_data: *mut (),
-	);
 
 	fn user_data(&self) -> *mut ();
 

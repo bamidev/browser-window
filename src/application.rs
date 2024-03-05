@@ -77,15 +77,7 @@ fn main() {
 #[cfg(feature = "threadsafe")]
 use std::ops::Deref;
 use std::{
-	env,
-	ffi::CString,
-	future::Future,
-	os::raw::c_int,
-	path::PathBuf,
-	pin::Pin,
-	ptr,
-	task::{Context, Poll, RawWaker, RawWakerVTable, Waker},
-	time::Duration,
+	env, ffi::CString, future::Future, marker::PhantomData, os::raw::c_int, path::PathBuf, pin::Pin, ptr, task::{Context, Poll, RawWaker, RawWakerVTable, Waker}, time::Duration
 };
 
 use futures_channel::oneshot;
@@ -151,7 +143,7 @@ pub struct ApplicationSettings {
 // return an ApplicationHandle. Like: Application, ApplicationAsync,
 // BrowserWindow, BrowserWindowAsync
 pub trait HasAppHandle {
-	fn app_handle(&self) -> ApplicationHandle;
+	fn app_handle(&self) -> &ApplicationHandle;
 }
 
 /// The runtime to run the application with.
@@ -230,7 +222,7 @@ impl Application {
 	/// Creates a `Runtime` from which you can run the application.
 	pub fn start(&self) -> Runtime {
 		Runtime {
-			handle: self.handle.clone(),
+			handle: unsafe { self.handle.clone() },
 		}
 	}
 }
@@ -298,7 +290,7 @@ impl Runtime {
 		H: FnOnce(ApplicationHandle),
 	{
 		return self._run(|handle| {
-			let result = on_ready(handle.clone());
+			let result = on_ready(unsafe { handle.clone() });
 			handle.inner.mark_as_done();
 
 			result
@@ -321,7 +313,7 @@ impl Runtime {
 	{
 		self._run(|handle| {
 			self.spawn(async move {
-				func(handle.clone()).await;
+				func(unsafe { handle.clone() }).await;
 				handle.inner.mark_as_done();
 			});
 		})
@@ -334,7 +326,7 @@ impl Runtime {
 	{
 		// Data for the waker.
 		let waker_data = Box::into_raw(Box::new(WakerData {
-			handle: self.handle.clone(),
+			handle: unsafe { self.handle.clone() },
 			future: Box::pin(future),
 		}));
 
@@ -370,6 +362,12 @@ impl ApplicationHandle {
 	/// framework supports it. Currently, only CEF supports cookies.
 	pub fn cookie_jar(&self) -> Option<CookieJar> { CookieJar::global() }
 
+	pub(crate) unsafe fn clone(&self) -> Self {
+		Self {
+			inner: self.inner.clone()
+		}
+	}
+
 	/// Causes the `Runtime` to terminate.
 	/// The `Runtime`'s [`Runtime::run`] or spawn command will return the exit
 	/// code provided. This will mean that not all tasks might complete.
@@ -392,7 +390,7 @@ impl ApplicationHandle {
 	{
 		// Data for the waker.
 		let waker_data = Box::into_raw(Box::new(WakerData {
-			handle: self.clone(),
+			handle: unsafe { self.clone() },
 			future: Box::pin(future),
 		}));
 
@@ -409,7 +407,7 @@ impl ApplicationHandle {
 		F: FnOnce(ApplicationHandle) + 'a,
 	{
 		let data_ptr = Box::into_raw(Box::new(ApplicationDispatchData {
-			handle: self.app_handle(),
+			handle: unsafe { self.app_handle().clone() },
 			func: Box::new(func),
 		}));
 
@@ -627,7 +625,7 @@ impl Deref for ApplicationHandleThreaded {
 }
 
 impl HasAppHandle for ApplicationHandle {
-	fn app_handle(&self) -> ApplicationHandle { self.clone() }
+	fn app_handle(&self) -> &ApplicationHandle { &self }
 }
 
 fn dispatch_handler(_app: ApplicationImpl, _data: *mut ()) {

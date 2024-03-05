@@ -17,9 +17,10 @@ use crate::delegate::*;
 use crate::{
 	application::*,
 	core::{
-		browser_window::{BrowserWindowExt, BrowserWindowImpl, JsEvaluationError},
+		browser_window::{BrowserWindowEventExt, BrowserWindowExt, BrowserWindowImpl, JsEvaluationError},
 		window::WindowExt,
 	},
+	decl_event,
 	prelude::*,
 	window::*,
 };
@@ -28,16 +29,17 @@ mod builder;
 
 pub use builder::{BrowserWindowBuilder, Source};
 
+
 /// The future that dispatches a closure on the GUI thread.
 #[cfg(feature = "threadsafe")]
 pub type BrowserDelegateFuture<'a, R> = DelegateFuture<'a, BrowserWindowHandle, R>;
 
 /// An owned browser window handle.
-/// When this handle goes out of scope, its resource get scheduled for cleanup.
-// If the user closes the window, this handle remains valid.
-// Also, if you lose this handle, window destruction and cleanup is only done
-// when the user actually closes it. So you don't have to worry about lifetimes
-// and/or propper destruction of the window either.
+/// When this handle goes out of scope, its resources will get scheduled for cleanup.
+/// The resources will only ever be cleaned up whenever both this handle has gone out of scope,
+/// and when the window has actually been closed by the user.
+/// If the window has been closed by the user but this handle still exists, the window is actually just been closed.
+/// It can be reshown by calling `show` on this handle.
 pub struct BrowserWindow {
 	pub(super) handle: BrowserWindowHandle,
 	_not_send: PhantomData<Rc<()>>,
@@ -83,14 +85,19 @@ pub struct BrowserWindowThreaded {
 unsafe impl Sync for BrowserWindowThreaded {}
 
 /// This is a handle to an existing browser window.
-#[derive(Clone)]
 pub struct BrowserWindowHandle {
 	pub(super) inner: BrowserWindowImpl,
+	app: ApplicationHandle,
 	window: WindowHandle,
 }
 
+decl_event!(NavigationEndEvent);
+decl_event!(NavigationStartEvent);
+decl_event!(PageTitleChangedEvent);
+decl_event!(TooltipEvent);
+
 pub trait OwnedBrowserWindow: OwnedWindow {
-	fn browser_handle(&self) -> BrowserWindowHandle;
+	fn browser_handle(&self) -> &BrowserWindowHandle;
 }
 
 impl BrowserWindow {
@@ -100,6 +107,8 @@ impl BrowserWindow {
 			_not_send: PhantomData,
 		}
 	}
+
+	pub fn handle(&self) -> &BrowserWindowHandle { &self.handle }
 }
 
 impl Deref for BrowserWindow {
@@ -113,15 +122,15 @@ impl Drop for BrowserWindow {
 }
 
 impl HasAppHandle for BrowserWindow {
-	fn app_handle(&self) -> ApplicationHandle { self.handle.app_handle() }
+	fn app_handle(&self) -> &ApplicationHandle { &self.app }
 }
 
 impl OwnedWindow for BrowserWindow {
-	fn window_handle(&self) -> WindowHandle { self.handle.window() }
+	fn window_handle(&self) -> &WindowHandle { &self.window }
 }
 
 impl OwnedBrowserWindow for BrowserWindow {
-	fn browser_handle(&self) -> BrowserWindowHandle { self.handle.clone() }
+	fn browser_handle(&self) -> &BrowserWindowHandle { &self.handle }
 }
 
 impl BrowserWindowHandle {
@@ -129,6 +138,14 @@ impl BrowserWindowHandle {
 	pub fn app(&self) -> ApplicationHandle { ApplicationHandle::new(self.inner.window().app()) }
 
 	pub fn close(self) { self.inner.window().destroy() }
+
+	pub(crate) unsafe fn clone(&self) -> Self {
+		Self {
+			app: self.app.clone(),
+			window: self.window.clone(),
+			inner: self.inner.clone()
+		}
+	}
 
 	/// Executes the given javascript code and returns the output as a string.
 	/// If you don't need the result, see `exec_js`.
@@ -178,7 +195,7 @@ impl BrowserWindowHandle {
 
 	pub fn url<'a>(&'a self) -> Cow<'a, str> { self.inner.url() }
 
-	pub fn window(&self) -> WindowHandle { WindowHandle::new(self.inner.window()) }
+	pub fn window(&self) -> &WindowHandle { &self.window }
 }
 
 #[cfg(feature = "threadsafe")]
@@ -267,36 +284,43 @@ impl BrowserWindowThreaded {
 
 #[cfg(feature = "threadsafe")]
 impl HasAppHandle for BrowserWindowThreaded {
-	fn app_handle(&self) -> ApplicationHandle { self.handle.app_handle() }
+	fn app_handle(&self) -> &ApplicationHandle { &self.handle }
 }
 
 #[cfg(feature = "threadsafe")]
 impl OwnedWindow for BrowserWindowThreaded {
-	fn window_handle(&self) -> WindowHandle { self.handle.window() }
+	fn window_handle(&self) -> &WindowHandle { &self.handle }
 }
 
 #[cfg(feature = "threadsafe")]
 impl OwnedBrowserWindow for BrowserWindowThreaded {
-	fn browser_handle(&self) -> BrowserWindowHandle { self.handle.clone() }
+	fn browser_handle(&self) -> &BrowserWindowHandle { &self.handle }
 }
 
 impl BrowserWindowHandle {
-	fn new(inner_handle: BrowserWindowImpl) -> Self {
+	pub(crate) fn new(inner_handle: BrowserWindowImpl) -> Self {
 		Self {
+			app: ApplicationHandle::new(inner_handle.window().app()),
 			window: WindowHandle::new(inner_handle.window()),
 			inner: inner_handle,
 		}
 	}
+
+	pub fn on_page_title_changed(&self) -> PageTitleChangedEvent<'_> { self.inner.on_page_title_changed(self) }
+	pub fn on_navigation_end(&self) -> NavigationEndEvent<'_> { self.inner.on_navigation_end(self) }
+	pub fn on_navigation_start(&self) -> NavigationStartEvent<'_> { self.inner.on_navigation_start(self) }
+	pub fn on_tooltip(&self) -> TooltipEvent<'_> { self.inner.on_tooltip(self) }
 }
 
 impl Deref for BrowserWindowHandle {
 	type Target = WindowHandle;
 
+
 	fn deref(&self) -> &Self::Target { &self.window }
 }
 
 impl HasAppHandle for BrowserWindowHandle {
-	fn app_handle(&self) -> ApplicationHandle { ApplicationHandle::new(self.inner.window().app()) }
+	fn app_handle(&self) -> &ApplicationHandle { &self.app }
 }
 
 fn eval_js_callback<H>(
