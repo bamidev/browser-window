@@ -1,9 +1,9 @@
-use std::{error::Error, ffi::CStr, fmt, mem::MaybeUninit, os::raw::*, ptr};
+use std::{error::Error as StdError, ffi::CStr, fmt, mem::MaybeUninit, os::raw::*, ptr};
 use std::{slice, str};
 
 use browser_window_c::*;
 
-use super::{super::window::WindowImpl, *};
+use super::{super::{error::Error, window::WindowImpl}, *};
 
 use crate::{def_browser_event, def_event, event::EventHandlerCallback};
 
@@ -232,7 +232,7 @@ impl BrowserWindowEventExt for BrowserWindowImpl {
 }
 
 def_browser_event_c!(NavigationStartEvent<(), ()> => no_converter => on_navigation_start);
-def_browser_event_c!(NavigationEndEvent<(), ()> => no_converter => on_navigation_end);
+def_browser_event_c!(NavigationEndEvent<cbw_Err, Error> => error_converter => on_navigation_end);
 def_browser_event_c!(PageTitleChangedEvent<cbw_CStrSlice, &str> => str_converter => on_page_title_changed);
 def_browser_event_c!(TooltipEvent<cbw_StrSlice, &mut str> => str_mut_converter => on_tooltip);
 
@@ -246,8 +246,8 @@ impl JsEvaluationError {
 	}
 }
 
-impl Error for JsEvaluationError {
-	fn source(&self) -> Option<&(dyn Error + 'static)> { None }
+impl StdError for JsEvaluationError {
+	fn source(&self) -> Option<&(dyn StdError + 'static)> { None }
 }
 
 impl fmt::Display for JsEvaluationError {
@@ -338,6 +338,11 @@ unsafe extern "C" fn ffi_browser_window_event_callback<C, A>(handler_data: *mut 
 }
 
 unsafe fn no_converter(input: &()) -> () { () }
+
+unsafe fn error_converter(input: &cbw_Err) -> Error {
+	let err2 = input.clone();
+	Error::from(err2)
+}
 
 unsafe fn str_converter(input: &cbw_CStrSlice) -> &'static str {
 	str::from_utf8_unchecked(slice::from_raw_parts(input.data as *const u8, input.len) as _)
