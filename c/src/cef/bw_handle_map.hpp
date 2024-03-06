@@ -54,16 +54,16 @@ namespace bw {
 
 		// Fetches a bw_BrowserWindow handle from a cef handle.
 		// Returns an optional bw_BrowserWindow pointer.
-		std::optional<BrowserInfo> fetch( CefRefPtr<CefBrowser> cef_handle ) {
+		std::optional<BrowserInfo*> fetch( CefRefPtr<CefBrowser> cef_handle ) {
 			this->mutex.lock();
 				auto it = this->map.find( cef_handle->GetIdentifier() );
 
 				// If not found return nothing
 				if ( it == this->map.end() )
-					return std::optional<BrowserInfo>();
+					return std::optional<BrowserInfo*>();
 
 				// If found:
-				std::optional<BrowserInfo> result( (*it).second );
+				std::optional<BrowserInfo*> result(&(*it).second);
 			this->mutex.unlock();
 
 			return result;

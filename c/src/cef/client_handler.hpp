@@ -36,14 +36,14 @@ public:
 	}
 
 	void invokeCreationCallback(CefRefPtr<CefBrowser> browser) {
-		std::optional<bw::BrowserInfo> bw_info_opt = bw::bw_handle_map.fetch(browser);
+		std::optional<bw::BrowserInfo*> bw_info_opt = bw::bw_handle_map.fetch(browser);
 		if (bw_info_opt.has_value()) {
 			auto bw_info = bw_info_opt.value();
-			auto callback_opt = bw_info.callback;
-			if (callback_opt.has_value()) {
-				auto value = callback_opt.value();
-				callback_opt.reset();
-				value.callback(bw_info.handle, value.data);
+			auto callback_opt = &bw_info->callback;
+			if (callback_opt->has_value()) {printf("invokeCreationCallback callback_opt.has-value %i\n", browser->GetIdentifier());
+				auto value = callback_opt->value();
+				callback_opt->reset();
+				value.callback(bw_info->handle, value.data);printf("invokeCreationCallback callback_opt.has-value2 %i\n", callback_opt->has_value());
 			}
 		}
 	}
@@ -178,9 +178,9 @@ protected:
 		(void)(source_process);
 
 		// Obtain our browser window handle
-		std::optional<bw::BrowserInfo> bw_info = bw::bw_handle_map.fetch(browser);
+		std::optional<bw::BrowserInfo*> bw_info = bw::bw_handle_map.fetch(browser);
 		BW_ASSERT( bw_info.has_value(), "Link between CEF's browser handle and our handle does not exist!\n" );
-		bw_BrowserWindow* our_handle = bw_info.value().handle;
+		bw_BrowserWindow* our_handle = bw_info.value()->handle;
 
 		auto msg_args = msg->GetArgumentList();
 
