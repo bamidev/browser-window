@@ -232,7 +232,7 @@ impl BrowserWindowEventExt for BrowserWindowImpl {
 }
 
 def_browser_event_c!(NavigationStartEvent<(), ()> => no_converter => on_navigation_start);
-def_browser_event_c!(NavigationEndEvent<cbw_Err, Error> => error_converter => on_navigation_end);
+def_browser_event_c!(NavigationEndEvent<cbw_Err, Result<(), Error>> => error_converter => on_navigation_end);
 def_browser_event_c!(PageTitleChangedEvent<cbw_CStrSlice, &str> => str_converter => on_page_title_changed);
 def_browser_event_c!(TooltipEvent<cbw_StrSlice, &mut str> => str_mut_converter => on_tooltip);
 
@@ -324,8 +324,9 @@ unsafe fn ffi_eval_js_callback_result(
 	(handle, result_val)
 }
 
-unsafe extern "C" fn ffi_browser_window_event_callback<C, A>(handler_data: *mut c_void, arg_ptr: *mut c_void) -> i32 { println!("ffi_browser_window_event_callback");
+unsafe extern "C" fn ffi_browser_window_event_callback<C, A>(handler_data: *mut c_void, arg_ptr: *mut c_void) -> i32 {
 	let event_data_ptr = handler_data as *mut EventData<'static, C, A>;
+	println!("X2: {:p} {:p}", handler_data, event_data_ptr);
 	let event_data = &mut *event_data_ptr;
 	let arg_ptr2 = arg_ptr as *mut C;
 	let carg = &*arg_ptr2;
@@ -333,18 +334,23 @@ unsafe extern "C" fn ffi_browser_window_event_callback<C, A>(handler_data: *mut 
 	// Convert C type to Rust type
 	let rarg = (event_data.converter)(carg);
 
-	(event_data.handler)(&event_data.handle, &rarg);
+	let future = (event_data.handler)(&event_data.handle, &rarg);
+	event_data.handle.app().spawn(future);
 	return 0;
 }
 
 unsafe fn no_converter(input: &()) -> () { () }
 
-unsafe fn error_converter(input: &cbw_Err) -> Error {
-	let err2 = input.clone();
-	Error::from(err2)
+unsafe fn error_converter(input: &cbw_Err) -> Result<(), Error> {
+	if input.code == 0 {
+		Ok(())
+	} else {
+		let err2 = input.clone();
+		Err(Error::from(err2))
+	}
 }
 
-unsafe fn str_converter(input: &cbw_CStrSlice) -> &'static str {
+unsafe fn str_converter(input: &cbw_CStrSlice) -> &'static str { 
 	str::from_utf8_unchecked(slice::from_raw_parts(input.data as *const u8, input.len) as _)
 }
 

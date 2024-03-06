@@ -39,13 +39,8 @@ public:
 		this->invokeCreationCallback(browser, (CefLoadHandler::ErrorCode)0, "");
 	}
 
-<<<<<<< HEAD
 	void invokeCreationCallback(CefRefPtr<CefBrowser> browser, CefLoadHandler::ErrorCode errorCode, const CefString& errorText) {
-		std::optional<bw::BrowserInfo> bw_info_opt = bw::bw_handle_map.fetch(browser);
-=======
-	void invokeCreationCallback(CefRefPtr<CefBrowser> browser) {
 		std::optional<bw::BrowserInfo*> bw_info_opt = bw::bw_handle_map.fetch(browser);
->>>>>>> master
 		if (bw_info_opt.has_value()) {
 			auto bw_info = bw_info_opt.value();
 			auto callback_opt = &bw_info->callback;
@@ -57,11 +52,11 @@ public:
 
 			if (errorCode == 0) {
 				BW_ERR_DECLARE_SUCCESS(error);
-				bw_Event_fire(&bw_info.handle->events.on_navigation_end, (void*)&error);
+				bw_Event_fire(&bw_info->handle->events.on_navigation_end, (void*)&error);
 				bw_Err_free(&error);
 			} else {
 				bw_Err error = bw_Err_new_with_msg(errorCode, errorText.ToString().c_str());
-				bw_Event_fire(&bw_info.handle->events.on_navigation_end, (void*)&error);
+				bw_Event_fire(&bw_info->handle->events.on_navigation_end, (void*)&error);
 				bw_Err_free(&error);
 			}
 		}
@@ -72,30 +67,30 @@ public:
 	}
 
 	virtual void OnLoadStart(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefLoadHandler::TransitionType transition_type ) override {
-		std::optional<bw::BrowserInfo> bw_info_opt = bw::bw_handle_map.fetch(browser);
+		std::optional<bw::BrowserInfo*> bw_info_opt = bw::bw_handle_map.fetch(browser);
 		if (bw_info_opt.has_value()) {
 			auto bw_info = bw_info_opt.value();
 			bw_CStrSlice slice = { 0, 0 };
-			bw_Event_fire(&bw_info.handle->events.on_navigation_start, (void*)&slice);
+			bw_Event_fire(&bw_info->handle->events.on_navigation_start, (void*)&slice);
 		}
 	}
 
 	virtual void OnTitleChange(CefRefPtr<CefBrowser> browser, const CefString& title) override {
-		std::optional<bw::BrowserInfo> bw_info_opt = bw::bw_handle_map.fetch(browser);
+		std::optional<bw::BrowserInfo*> bw_info_opt = bw::bw_handle_map.fetch(browser);
 		if (bw_info_opt.has_value()) {
 			auto bw_info = bw_info_opt.value();
 			bw_CStrSlice slice = bw_cef_copyToCStrSlice(title);
-			bw_Event_fire(&bw_info.handle->events.on_page_title_changed, (void*)&slice);
+			bw_Event_fire(&bw_info->handle->events.on_page_title_changed, (void*)&slice);
 			bw_string_freeC(slice);
 		}
 	}
 
 	virtual bool OnTooltip(CefRefPtr<CefBrowser> browser, CefString& tooltip) override {
-		std::optional<bw::BrowserInfo> bw_info_opt = bw::bw_handle_map.fetch(browser);
+		std::optional<bw::BrowserInfo*> bw_info_opt = bw::bw_handle_map.fetch(browser);
 		if (bw_info_opt.has_value()) {
 			auto bw_info = bw_info_opt.value();
 			bw_StrSlice slice = bw_cef_copyToStrSlice(tooltip);
-			BOOL result = bw_Event_fire(&bw_info.handle->events.on_tooltip, (void*)&slice);
+			BOOL result = bw_Event_fire(&bw_info->handle->events.on_tooltip, (void*)&slice);
 			bw_string_free(slice);
 			return result;
 		}
