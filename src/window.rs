@@ -14,7 +14,7 @@ pub struct WindowHandle(
 	pub(super) WindowImpl,
 );
 
-pub trait OwnedWindow {
+pub trait HasWindowHandle {
 	fn window_handle(&self) -> &WindowHandle;
 }
 

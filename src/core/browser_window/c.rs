@@ -1,11 +1,11 @@
-use std::{error::Error as StdError, ffi::CStr, fmt, mem::MaybeUninit, os::raw::*, ptr};
+use std::{error::Error as StdError, ffi::CStr, fmt, mem::MaybeUninit, os::raw::*};
 use std::{slice, str};
 
 use browser_window_c::*;
 
 use super::{super::{error::Error, window::WindowImpl}, *};
 
-use crate::{def_browser_event, def_event, event::EventHandlerCallback};
+use crate::{def_browser_event, def_event};
 
 
 #[derive(Clone)]

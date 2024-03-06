@@ -52,36 +52,6 @@ pub struct BrowserWindowBuilder {
 }
 
 impl BrowserWindowBuilder {
-	/// Configure a closure that can be invoked from within JavaScript.
-	/// The closure's second parameter specifies a command name.
-	/// The closure's third parameter specifies an array of string arguments.
-	#[cfg(not(feature = "threadsafe"))]
-	pub fn async_handler<'a, H, F>(&'a mut self, mut handler: H) -> &mut Self
-	where
-		H: FnMut(&BrowserWindowHandle, String, Vec<JsValue>) -> F + 'static,
-		F: Future<Output = ()> + 'static,
-	{
-		self.handler = Some(Box::new(move |handle, cmd, args| {
-			Box::pin(handler(handle, cmd, args))
-		}));
-		self
-	}
-
-	/// Configure a closure that can be invoked from within JavaScript.
-	/// The closure's second parameter specifies a command name.
-	/// The closure's third parameter specifies an array of string arguments.
-	#[cfg(feature = "threadsafe")]
-	pub fn async_handler<H, F>(&mut self, mut handler: H) -> &mut Self
-	where
-		H: FnMut(&BrowserWindowHandle, String, Vec<JsValue>) -> F + Send + 'static,
-		F: Future<Output = ()> + 'static,
-	{
-		self.handler = Some(Box::new(move |handle, cmd, args| {
-			Box::pin(handler(handle, cmd, args))
-		}));
-		self
-	}
-
 	/// Sets whether or not an extra window with developer tools will be opened
 	/// together with this browser. When in debug mode the default is `true`.
 	/// When in release mode the default is `false`.
@@ -131,8 +101,8 @@ impl BrowserWindowBuilder {
 	/// * `app` - An (thread-safe) application handle.
 	#[cfg(feature = "threadsafe")]
 	pub async fn build_threaded(
-		self, app: ApplicationHandleThreaded,
-	) -> Result<BrowserWindowThreaded, DelegateError> {
+		self, app: ApplicationHandle,
+	) -> Result<BrowserWindow, DelegateError> {
 		let (tx, rx) = oneshot::channel::<UnsafeSend<BrowserWindowHandle>>();
 
 		// We need to dispatch the spawning of the browser to the GUI thread
@@ -145,7 +115,7 @@ impl BrowserWindowBuilder {
 		})
 		.await?;
 
-		Ok(BrowserWindowThreaded::new(rx.await.unwrap().i))
+		Ok(BrowserWindow::new(rx.await.unwrap().i))
 	}
 
 	fn _build<H>(self, app: ApplicationHandle, on_created: H)

@@ -79,7 +79,7 @@ impl WindowBuilder {
 	/// This could be a reference to a `Browser` or `BrowserThreaded` handle.
 	pub fn parent<W>(&mut self, bw: &W)
 	where
-		W: OwnedWindow,
+		W: HasWindowHandle,
 	{
 		self.parent = Some(UnsafeSend::new(bw.window_handle().0.clone()));
 	}
