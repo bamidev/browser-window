@@ -25,12 +25,12 @@ mod tests;
 
 pub mod application;
 pub mod browser;
-pub(crate) mod rc;
 pub mod cookie;
 pub mod error;
 pub mod event;
 pub mod javascript;
 pub mod prelude;
+pub(crate) mod rc;
 pub mod window;
 
 #[cfg(feature = "threadsafe")]

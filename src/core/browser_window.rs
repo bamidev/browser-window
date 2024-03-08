@@ -24,7 +24,8 @@ use super::{
 use crate::{browser::*, prelude::JsValue, rc::Weak};
 
 
-//pub type BrowserWindowEventHandler<'a, A> = EventHandler<'a, BrowserWindowHandle, A>;
+//pub type BrowserWindowEventHandler<'a, A> = EventHandler<'a,
+// BrowserWindowHandle, A>;
 
 pub type BrowserWindowOptions = cbw_BrowserWindowOptions;
 
@@ -33,11 +34,43 @@ pub type EvalJsCallbackFn =
 	fn(bw: BrowserWindowImpl, data: *mut (), result: Result<JsValue, JsEvaluationError>);
 
 pub trait BrowserWindowEventExt {
-	fn on_message(&self, _handle: Weak<BrowserWindowOwner>) -> MessageEvent { unimplemented!(); }
-	fn on_navigation_end(&self, _handle: Weak<BrowserWindowOwner>) -> NavigationEndEvent { unimplemented!(); }
-	fn on_navigation_start(&self, _handle: Weak<BrowserWindowOwner>) -> NavigationStartEvent { unimplemented!(); }
-	fn on_page_title_changed(&self, _handle: Weak<BrowserWindowOwner>) -> PageTitleChangedEvent { unimplemented!(); }
-	fn on_tooltip(&self, _handle: Weak<BrowserWindowOwner>) -> TooltipEvent { unimplemented!(); }
+	fn on_address_changed(&self, _handle: Weak<BrowserWindowOwner>) -> AddressChangedEvent {
+		unimplemented!();
+	}
+	fn on_console_message(&self, _handle: Weak<BrowserWindowOwner>) -> ConsoleMessageEvent {
+		unimplemented!();
+	}
+	fn on_favicon_changed(&self, _handle: Weak<BrowserWindowOwner>) -> FaviconChangedEvent {
+		unimplemented!();
+	}
+	fn on_fullscreen_mode_changed(
+		&self, _handle: Weak<BrowserWindowOwner>,
+	) -> FullscreenModeChangedEvent {
+		unimplemented!();
+	}
+	fn on_loading_progress_changed(
+		&self, _handle: Weak<BrowserWindowOwner>,
+	) -> LoadingProgressChangedEvent {
+		unimplemented!();
+	}
+	fn on_message(&self, _handle: Weak<BrowserWindowOwner>) -> MessageEvent {
+		unimplemented!();
+	}
+	fn on_navigation_end(&self, _handle: Weak<BrowserWindowOwner>) -> NavigationEndEvent {
+		unimplemented!();
+	}
+	fn on_navigation_start(&self, _handle: Weak<BrowserWindowOwner>) -> NavigationStartEvent {
+		unimplemented!();
+	}
+	fn on_page_title_changed(&self, _handle: Weak<BrowserWindowOwner>) -> PageTitleChangedEvent {
+		unimplemented!();
+	}
+	fn on_status_message(&self, _handle: Weak<BrowserWindowOwner>) -> StatusMessageEvent {
+		unimplemented!();
+	}
+	fn on_tooltip(&self, _handle: Weak<BrowserWindowOwner>) -> TooltipEvent {
+		unimplemented!();
+	}
 }
 
 pub trait BrowserWindowExt: BrowserWindowEventExt {

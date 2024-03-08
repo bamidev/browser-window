@@ -4,11 +4,13 @@ use std::{boxed::Box, future::Future, pin::Pin};
 
 
 #[cfg(not(feature = "threadsafe"))]
-pub type EventHandlerAsyncCallback<O, A> = dyn FnMut(O, &A) -> Pin<Box<dyn Future<Output = ()> + 'static>> + 'static;
+pub type EventHandlerAsyncCallback<O, A> =
+	dyn FnMut(O, &A) -> Pin<Box<dyn Future<Output = ()> + 'static>> + 'static;
 #[cfg(not(feature = "threadsafe"))]
 pub type EventHandlerSyncCallback<H, A> = dyn FnMut(&H, &A) + 'static;
 #[cfg(feature = "threadsafe")]
-pub type EventHandlerAsyncCallback<H, A> = dyn FnMut(O, &A) -> Pin<Box<dyn Future<Output = ()> + 'static>> + Send + 'static;
+pub type EventHandlerAsyncCallback<H, A> =
+	dyn FnMut(O, &A) -> Pin<Box<dyn Future<Output = ()> + 'static>> + Send + 'static;
 #[cfg(feature = "threadsafe")]
 pub type EventHandlerSyncCallback<O, A> = dyn FnMut(&H, &A) + Send + 'static;
 
@@ -19,8 +21,8 @@ pub enum EventHandler<H, O, A> {
 }
 
 
-/// An `Event` can be registered to with a regular closure or an 'async enclosure'.
-/// All events are implemented for CEF.
+/// An `Event` can be registered to with a regular closure or an 'async
+/// enclosure'. All events are implemented for CEF.
 /// If an event is not implemented for another browser framework, it will simply
 /// never be invoked. If an event _is_ supported by another browser framework,
 /// it should say so in its documentation.
@@ -71,7 +73,10 @@ pub trait EventExt<H, O, A> {
 }
 
 
-impl<H, O, A, T> EventExt<H, O, A> for T where T: Event<H, O, A> {
+impl<H, O, A, T> EventExt<H, O, A> for T
+where
+	T: Event<H, O, A>,
+{
 	#[cfg(not(feature = "threadsafe"))]
 	fn register<X>(&mut self, mut handler: X)
 	where
@@ -98,7 +103,9 @@ impl<H, O, A, T> EventExt<H, O, A> for T where T: Event<H, O, A> {
 		X: FnMut(O, &A) -> F + 'static,
 		F: Future<Output = ()> + 'static,
 	{
-		self.register_handler(EventHandler::Async(Box::new(move |h, args| Box::pin(handler(h, args)))));
+		self.register_handler(EventHandler::Async(Box::new(move |h, args| {
+			Box::pin(handler(h, args))
+		})));
 	}
 
 	#[cfg(feature = "threadsafe")]
@@ -107,7 +114,9 @@ impl<H, O, A, T> EventExt<H, O, A> for T where T: Event<H, O, A> {
 		X: FnMut(O, &A) -> F + Send + 'static,
 		F: Future<Output = ()> + 'static,
 	{
-		self.register_handler(EventHandler::Async(Box::new(move |h, args| Box::pin(handler(h, args)))));
+		self.register_handler(EventHandler::Async(Box::new(move |h, args| {
+			Box::pin(handler(h, args))
+		})));
 	}
 }
 
@@ -115,28 +124,24 @@ impl<H, O, A, T> EventExt<H, O, A> for T where T: Event<H, O, A> {
 #[doc(hidden)]
 #[macro_export]
 macro_rules! decl_event {
-	( $name:ident<$owner:ty> ) => {
+	($name:ident < $owner:ty >) => {
 		pub struct $name {
 			pub(crate) owner: crate::rc::Weak<$owner>,
 		}
 
 		impl $name {
 			#[allow(dead_code)]
-			pub(crate) fn new(owner: crate::rc::Weak<$owner>) -> Self {
-				Self {
-					owner,
-				}
-			}
+			pub(crate) fn new(owner: crate::rc::Weak<$owner>) -> Self { Self { owner } }
 		}
-	}
+	};
 }
 
 #[doc(hidden)]
 #[macro_export]
 macro_rules! decl_browser_event {
-	( $name:ident ) => {
+	($name:ident) => {
 		decl_event!($name<BrowserWindowOwner>);
-	}
+	};
 }
 
 #[doc(hidden)]

@@ -23,7 +23,14 @@ struct ExternalInvocationHandlerData {
 	std::vector<std::string> params;
 };
 
-class ClientHandler : public CefClient, public CefDisplayHandler, public CefRequestHandler, public CefLifeSpanHandler, public CefLoadHandler {
+class ClientHandler :
+	public CefClient,
+	public CefDisplayHandler,
+	public CefDownloadHandler,
+	public CefRequestHandler,
+	public CefLifeSpanHandler,
+	public CefLoadHandler
+{
 
 	bw_Application* app;
 
@@ -31,9 +38,47 @@ public:
 	ClientHandler( bw_Application* app ) : app(app) {}
 
 	CefRefPtr<CefDisplayHandler> GetDisplayHandler() override { return this; }
+	CefRefPtr<CefDownloadHandler> GetDownloadHandler() override { return this; }
 	CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() override { return this; }
 	CefRefPtr<CefLoadHandler> GetLoadHandler() override { return this; }
 	CefRefPtr<CefRequestHandler> GetRequestHandler() override { return this; }
+
+	void OnAddressChange(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& url) override {
+		std::optional<bw::BrowserInfo*> bw_info_opt = bw::bw_handle_map.fetch(browser);
+		if (bw_info_opt.has_value()) {
+			bw_CStrSlice slice = bw_cef_copyToCStrSlice(url);
+			auto bw_info = bw_info_opt.value();
+			bw_Event_fire(&bw_info->handle->events.on_address_changed, (void*)&slice);
+			bw_string_freeC(slice);
+		}
+	}
+
+	void OnBeforeDownload(CefRefPtr<CefBrowser> browser, CefRefPtr<CefDownloadItem> download_item, const CefString& suggested_name, CefRefPtr<CefBeforeDownloadCallback> callback ) {
+
+	}
+
+	bool OnConsoleMessage( CefRefPtr< CefBrowser > browser, cef_log_severity_t level, const CefString& message, const CefString& source, int line ) override {
+		std::optional<bw::BrowserInfo*> bw_info_opt = bw::bw_handle_map.fetch(browser);
+		if (bw_info_opt.has_value()) {
+			bw_CStrSlice slice = bw_cef_copyToCStrSlice(message);
+			auto bw_info = bw_info_opt.value();
+			bw_Event_fire(&bw_info->handle->events.on_console_message, (void*)&slice);
+			bw_string_freeC(slice);
+		}
+		return false;
+	}
+
+	void OnFaviconURLChange( CefRefPtr< CefBrowser > browser, const std::vector< CefString >& icon_urls ) override {
+
+	}
+
+	void OnFullscreenModeChange(CefRefPtr<CefBrowser> browser, bool fullscreen) override {
+		std::optional<bw::BrowserInfo*> bw_info_opt = bw::bw_handle_map.fetch(browser);
+		if (bw_info_opt.has_value()) {
+			auto bw_info = bw_info_opt.value();
+			bw_Event_fire(&bw_info->handle->events.on_fullscreen_mode_changed, (void*)&fullscreen);
+		}
+	}
 
 	virtual void OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int httpStatusCode) override {
 		BW_ERR_DECLARE_SUCCESS(error);
@@ -82,6 +127,24 @@ public:
 			auto bw_info = bw_info_opt.value();
 			bw_CStrSlice slice = { 0, 0 };
 			bw_Event_fire(&bw_info->handle->events.on_navigation_start, (void*)&slice);
+		}
+	}
+
+	void OnLoadingProgressChange(CefRefPtr<CefBrowser> browser, double progress) override {
+		std::optional<bw::BrowserInfo*> bw_info_opt = bw::bw_handle_map.fetch(browser);
+		if (bw_info_opt.has_value()) {
+			auto bw_info = bw_info_opt.value();
+			bw_Event_fire(&bw_info->handle->events.on_loading_progress_changed, (void*)&progress);
+		}
+	}
+
+	void OnStatusMessage(CefRefPtr<CefBrowser> browser, const CefString& value) {
+		std::optional<bw::BrowserInfo*> bw_info_opt = bw::bw_handle_map.fetch(browser);
+		if (bw_info_opt.has_value()) {
+			bw_CStrSlice slice = bw_cef_copyToCStrSlice(value);
+			auto bw_info = bw_info_opt.value();
+			bw_Event_fire(&bw_info->handle->events.on_status_message, (void*)&slice);
+			bw_string_freeC(slice);
 		}
 	}
 

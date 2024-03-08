@@ -1,6 +1,3 @@
-
-
-
 #[cfg(not(feature = "threadsafe"))]
 pub(crate) type Weak<T> = std::rc::Weak<T>;
 #[cfg(feature = "threadsafe")]

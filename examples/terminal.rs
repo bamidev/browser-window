@@ -101,7 +101,8 @@ fn main() {
 		let bw = bwb.build(app).await;
 
 		bw.on_message().register_async(|bw, e| {
-			// e.cmd is a &str that lives as long as the closure does, but not as long as the future does.
+			// e.cmd is a &str that lives as long as the closure does, but not as long as
+			// the future does.
 			let cmd = e.cmd.to_string();
 			let args = e.args.clone();
 

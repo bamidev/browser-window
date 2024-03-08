@@ -77,7 +77,15 @@ fn main() {
 #[cfg(feature = "threadsafe")]
 use std::ops::Deref;
 use std::{
-	env, ffi::CString, future::Future, os::raw::c_int, path::PathBuf, pin::Pin, ptr, task::{Context, Poll, RawWaker, RawWakerVTable, Waker}, time::Duration
+	env,
+	ffi::CString,
+	future::Future,
+	os::raw::c_int,
+	path::PathBuf,
+	pin::Pin,
+	ptr,
+	task::{Context, Poll, RawWaker, RawWakerVTable, Waker},
+	time::Duration,
 };
 
 use futures_channel::oneshot;
@@ -364,7 +372,7 @@ impl ApplicationHandle {
 
 	pub(crate) unsafe fn clone(&self) -> Self {
 		Self {
-			inner: self.inner.clone()
+			inner: self.inner.clone(),
 		}
 	}
 

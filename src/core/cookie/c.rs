@@ -12,13 +12,13 @@ use browser_window_c::*;
 
 use super::*;
 
-pub struct CookieImpl (pub(crate) *mut cbw_Cookie);
+pub struct CookieImpl(pub(crate) *mut cbw_Cookie);
 
 pub struct CookieMutImpl(CookieImpl);
 
-pub struct CookieJarImpl (pub(crate) *mut cbw_CookieJar);
+pub struct CookieJarImpl(pub(crate) *mut cbw_CookieJar);
 
-pub struct CookieIteratorImpl (pub(crate) *mut cbw_CookieIterator);
+pub struct CookieIteratorImpl(pub(crate) *mut cbw_CookieIterator);
 
 struct CookieStorageCallbackData {
 	callback: CookieStorageCallbackFn,
@@ -55,7 +55,7 @@ impl CookieExt for CookieImpl {
 	fn domain<'a>(&'a self) -> Cow<'a, str> {
 		let slice;
 		let owned;
-		unsafe { 
+		unsafe {
 			let mut slice_uninit: MaybeUninit<cbw_StrSlice> = MaybeUninit::uninit();
 			owned = cbw_Cookie_getDomain(self.0, slice_uninit.as_mut_ptr());
 			slice = slice_uninit.assume_init();
@@ -80,7 +80,7 @@ impl CookieExt for CookieImpl {
 	fn name<'a>(&'a self) -> Cow<'a, str> {
 		let slice;
 		let owned;
-		unsafe { 
+		unsafe {
 			let mut slice_uninit: MaybeUninit<cbw_StrSlice> = MaybeUninit::uninit();
 			owned = cbw_Cookie_getName(self.0, slice_uninit.as_mut_ptr());
 			slice = slice_uninit.assume_init();
@@ -102,9 +102,10 @@ impl CookieExt for CookieImpl {
 		Self(inner)
 	}
 
-	fn path<'a>(&'a self) -> Cow<'a, str> {let slice;
+	fn path<'a>(&'a self) -> Cow<'a, str> {
+		let slice;
 		let owned;
-		unsafe { 
+		unsafe {
 			let mut slice_uninit: MaybeUninit<cbw_StrSlice> = MaybeUninit::uninit();
 			owned = cbw_Cookie_getPath(self.0, slice_uninit.as_mut_ptr());
 			slice = slice_uninit.assume_init();
@@ -123,7 +124,7 @@ impl CookieExt for CookieImpl {
 	fn value<'a>(&'a self) -> Cow<'a, str> {
 		let slice;
 		let owned;
-		unsafe { 
+		unsafe {
 			let mut slice_uninit: MaybeUninit<cbw_StrSlice> = MaybeUninit::uninit();
 			owned = cbw_Cookie_getValue(self.0, slice_uninit.as_mut_ptr());
 			slice = slice_uninit.assume_init();
@@ -173,9 +174,7 @@ impl CookieExt for CookieImpl {
 
 	fn set_path(&mut self, path: &str) { unsafe { cbw_Cookie_setPath(self.0, path.into()) }; }
 
-	fn set_value(&mut self, value: &str) {
-		unsafe { cbw_Cookie_setValue(self.0, value.into()) };
-	}
+	fn set_value(&mut self, value: &str) { unsafe { cbw_Cookie_setValue(self.0, value.into()) }; }
 }
 
 impl CookieJarExt for CookieJarImpl {
@@ -211,7 +210,7 @@ impl CookieJarExt for CookieJarImpl {
 	}
 
 	fn iterator<'a>(&'a self, url: &str, include_http_only: bool) -> CookieIteratorImpl {
-		unsafe { 
+		unsafe {
 			let mut iterator: *mut cbw_CookieIterator = ptr::null_mut();
 			cbw_CookieJar_iterator(
 				self.0,
@@ -219,7 +218,7 @@ impl CookieJarExt for CookieJarImpl {
 				if include_http_only { 1 } else { 0 },
 				url.into(),
 			);
-			
+
 			return CookieIteratorImpl(iterator);
 		}
 	}
@@ -277,11 +276,7 @@ impl CookieIteratorExt for CookieIteratorImpl {
 		}));
 
 		let success = unsafe {
-			cbw_CookieIterator_next(
-				self.0,
-				Some(ffi_cookie_iterator_next_handler),
-				data as _,
-			)
+			cbw_CookieIterator_next(self.0, Some(ffi_cookie_iterator_next_handler), data as _)
 		};
 
 		return success > 0;

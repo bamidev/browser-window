@@ -32,10 +32,16 @@ typedef void (*bw_BrowserWindowJsCallbackFn)( bw_BrowserWindow* window, void* us
 
 
 typedef struct {
+	bw_Event on_address_changed;
+	bw_Event on_console_message;
+	bw_Event on_favicon_changed;
+	bw_Event on_fullscreen_mode_changed;
+	bw_Event on_loading_progress_changed;
 	bw_Event on_message;
-	bw_Event on_page_title_changed;
 	bw_Event on_navigation_start;
 	bw_Event on_navigation_end;
+	bw_Event on_page_title_changed;
+	bw_Event on_status_message;
 	bw_Event on_tooltip;
 } bw_BrowserWindowEvents;
 

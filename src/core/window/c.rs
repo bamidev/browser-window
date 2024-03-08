@@ -28,16 +28,7 @@ impl WindowImpl {
 			Some(x) => x as i32,
 		};
 
-		let handle = unsafe {
-			cbw_Window_new(
-				app.inner,
-				parent.inner,
-				str_slice,
-				w,
-				h,
-				options,
-			)
-		};
+		let handle = unsafe { cbw_Window_new(app.inner, parent.inner, str_slice, w, h, options) };
 
 		// Return
 		Self { inner: handle }
@@ -87,9 +78,7 @@ impl WindowExt for WindowImpl {
 		slice.into()
 	}
 
-	fn window_dimensions(&self) -> Dims2D {
-		unsafe { cbw_Window_getWindowDimensions(self.inner) }
-	}
+	fn window_dimensions(&self) -> Dims2D { unsafe { cbw_Window_getWindowDimensions(self.inner) } }
 
 	fn hide(&self) { unsafe { cbw_Window_hide(self.inner) } }
 
@@ -109,7 +98,9 @@ impl WindowExt for WindowImpl {
 	}
 
 	fn set_user_data(&self, user_data: *mut ()) {
-		unsafe { (*self.inner).user_data = user_data as _; }
+		unsafe {
+			(*self.inner).user_data = user_data as _;
+		}
 	}
 
 	fn set_window_dimensions(&self, dimensions: Dims2D) {

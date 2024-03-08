@@ -105,15 +105,18 @@ impl BrowserWindowBuilder {
 		})
 		.await?;
 
-		Ok(BrowserWindowThreaded::new(Self::prepare_handle(rx.await.unwrap())))
+		Ok(BrowserWindowThreaded::new(Self::prepare_handle(
+			rx.await.unwrap(),
+		)))
 	}
 
 	fn prepare_handle(handle: BrowserWindowHandle) -> Rc<BrowserWindowOwner> {
-		// Put a reference counted handle in the user data of the window, so that there exists 'ownership' for as long as the window actually lives.
+		// Put a reference counted handle in the user data of the window, so that there
+		// exists 'ownership' for as long as the window actually lives.
 		let owner = BrowserWindowOwner(handle);
 		let rc_handle = Rc::new(owner);
 		let user_data = Box::into_raw(Box::new(BrowserUserData {
-			_handle: rc_handle.clone()
+			_handle: rc_handle.clone(),
 		}));
 		rc_handle.0.window().0.set_user_data(user_data as _);
 

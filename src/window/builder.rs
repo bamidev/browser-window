@@ -18,12 +18,9 @@ pub struct WindowBuilder {
 pub type WindowOptions = cbw_WindowOptions;
 
 impl WindowBuilder {
-
 	/// Sets whether or not the window has borders.
 	/// Default is true.
-	pub fn borders(&mut self, value: bool) {
-		self.borders = value;
-	}
+	pub fn borders(&mut self, value: bool) { self.borders = value; }
 
 	// TODO: Create a Window struct that can be created with this method.
 	#[allow(dead_code)]
@@ -58,15 +55,11 @@ impl WindowBuilder {
 	}
 
 	/// Sets the height that the browser window will be created with initially
-	pub fn height(&mut self, height: u32) {
-		self.height = Some(height);
-	}
+	pub fn height(&mut self, height: u32) { self.height = Some(height); }
 
 	/// Sets whether or not the window has a minimize button on the title bar
 	/// Default is true
-	pub fn minimizable(&mut self, value: bool) {
-		self.minimizable = value;
-	}
+	pub fn minimizable(&mut self, value: bool) { self.minimizable = value; }
 
 	/// Configure a parent window.
 	/// When a parent window closes, this browser window will close as well.
@@ -97,18 +90,12 @@ impl WindowBuilder {
 	}
 
 	/// Sets the title of the window.
-	pub fn title<S: Into<String>>(&mut self, title: S) {
-		self.title = Some(title.into());
-	}
+	pub fn title<S: Into<String>>(&mut self, title: S) { self.title = Some(title.into()); }
 
 	/// Sets the width that the browser window will be created with initially.
-	pub fn width(&mut self, width: u32) {
-		self.width = Some(width);
-	}
+	pub fn width(&mut self, width: u32) { self.width = Some(width); }
 
 	/// Sets whether or not the window will be resizable.
 	/// Default is true.
-	pub fn resizable(&mut self, resizable: bool) {
-		self.resizable = resizable;
-	}
+	pub fn resizable(&mut self, resizable: bool) { self.resizable = resizable; }
 }

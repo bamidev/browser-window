@@ -17,11 +17,12 @@ use crate::delegate::*;
 use crate::{
 	application::*,
 	core::{
-		browser_window::{BrowserWindowEventExt, BrowserWindowExt, BrowserWindowImpl, JsEvaluationError},
+		browser_window::{
+			BrowserWindowEventExt, BrowserWindowExt, BrowserWindowImpl, JsEvaluationError,
+		},
 		window::WindowExt,
 	},
-	decl_browser_event,
-	decl_event,
+	decl_browser_event, decl_event,
 	event::EventHandler,
 	prelude::*,
 	rc::Rc,
@@ -38,15 +39,16 @@ pub use builder::{BrowserWindowBuilder, Source};
 pub type BrowserDelegateFuture<'a, R> = DelegateFuture<'a, BrowserWindowHandle, R>;
 
 /// An owned browser window handle.
-/// When this handle goes out of scope, its resources will get scheduled for cleanup.
-/// The resources will only ever be cleaned up whenever both this handle has gone out of scope,
-/// and when the window has actually been closed by the user.
-/// If the window has been closed by the user but this handle still exists, the window is actually just been closed.
-/// It can be reshown by calling `show` on this handle.
-pub struct BrowserWindowOwner (pub(super) BrowserWindowHandle);
-pub struct BrowserWindow(pub Rc<BrowserWindowOwner>);
+/// When this handle goes out of scope, its resources will get scheduled for
+/// cleanup. The resources will only ever be cleaned up whenever both this
+/// handle has gone out of scope, and when the window has actually been closed
+/// by the user. If the window has been closed by the user but this handle still
+/// exists, the window is actually just been closed. It can be reshown by
+/// calling `show` on this handle.
+pub struct BrowserWindowOwner(pub(super) BrowserWindowHandle);
+pub struct BrowserWindow(pub(super) Rc<BrowserWindowOwner>);
 #[cfg(feature = "threadsafe")]
-pub struct BrowserWindowThreaded (BrowserWindow);
+pub struct BrowserWindowThreaded(BrowserWindow);
 #[cfg(feature = "threadsafe")]
 unsafe impl Sync for BrowserWindowThreaded {}
 
@@ -94,57 +96,156 @@ pub struct BrowserWindowHandle {
 
 pub struct MessageEventArgs<'a> {
 	pub cmd: &'a str,
-	pub args: Vec<JsValue>
+	pub args: Vec<JsValue>,
 }
-
-decl_browser_event!(MessageEvent);
-decl_browser_event!(NavigationEndEvent);
-decl_browser_event!(NavigationStartEvent);
-decl_browser_event!(PageTitleChangedEvent);
-decl_browser_event!(TooltipEvent);
 
 pub trait HasBrowserWindowHandle: HasWindowHandle {
 	fn browser_handle(&self) -> &BrowserWindowHandle;
 }
 
-/*impl BrowserWindow {
-	fn new(handle: BrowserWindowHandle) -> Self { Self(Rc::new(BrowserWindowOwner(handle))) }
 
-	pub fn handle(&self) -> &BrowserWindowHandle { &self.0.0 }
+decl_browser_event!(AddressChangedEvent);
+decl_browser_event!(AuthCredentialsEvent);
+decl_browser_event!(CertificateErrorEvent);
+decl_browser_event!(ConsoleMessageEvent);
+decl_browser_event!(DownloadProgressEvent);
+decl_browser_event!(DownloadStartedEvent);
+decl_browser_event!(FaviconChangedEvent);
+decl_browser_event!(FileDialogEvent);
+decl_browser_event!(FullscreenModeChangedEvent);
+decl_browser_event!(KeyPressEvent);
+decl_browser_event!(KeyPressedEvent);
+decl_browser_event!(LoadingProgressChangedEvent);
+decl_browser_event!(MessageEvent);
+decl_browser_event!(NavigationEndEvent);
+decl_browser_event!(NavigationStartEvent);
+decl_browser_event!(PageTitleChangedEvent);
+decl_browser_event!(ScrollOffsetChangedEvent);
+decl_browser_event!(SelectClientCertificateEvent);
+decl_browser_event!(StartDraggingEvent);
+decl_browser_event!(StatusMessageEvent);
+decl_browser_event!(TooltipEvent);
+decl_browser_event!(TextSelectionChangedEvent);
+
+
+impl BrowserWindow {
+	/// Whenver the address URI changes
+	pub fn on_address_changed(&self) -> AddressChangedEvent {
+		self.0.0.inner.on_address_changed(Rc::downgrade(&self.0))
+	}
+
+	/// When a console message is printend.
+	pub fn on_console_message(&self) -> ConsoleMessageEvent {
+		self.0.0.inner.on_console_message(Rc::downgrade(&self.0))
+	}
+
+	/// Whenever the browser goes into or out of full screen mode.
+	pub fn on_fullscreen_mode_changed(&self) -> FullscreenModeChangedEvent {
+		self.0
+			.0
+			.inner
+			.on_fullscreen_mode_changed(Rc::downgrade(&self.0))
+	}
+
+	/// Loading progress updates
+	pub fn on_loading_progress_changed(&self) -> LoadingProgressChangedEvent {
+		self.0
+			.0
+			.inner
+			.on_loading_progress_changed(Rc::downgrade(&self.0))
+	}
+
+	/// The event that will fire whenever `invoke_extern` is called with JS on
+	/// the client side.
+	pub fn on_message(&self) -> MessageEvent { self.0.0.inner.on_message(Rc::downgrade(&self.0)) }
+
+	/// Whenever navigation has finished and the page has loaded.
+	pub fn on_navigation_end(&self) -> NavigationEndEvent {
+		self.0.0.inner.on_navigation_end(Rc::downgrade(&self.0))
+	}
+
+	/// Whenever navigation to a new link happens.
+	pub fn on_navigation_start(&self) -> NavigationStartEvent {
+		self.0.0.inner.on_navigation_start(Rc::downgrade(&self.0))
+	}
+
+	/// Whenver the page title changes.
+	pub fn on_page_title_changed(&self) -> PageTitleChangedEvent {
+		self.0.0.inner.on_page_title_changed(Rc::downgrade(&self.0))
+	}
+
+	pub fn on_status_message(&self) -> StatusMessageEvent {
+		self.0.0.inner.on_status_message(Rc::downgrade(&self.0))
+	}
+
+	/// Whenever the browser is about to show a tooltip
+	pub fn on_tooltip(&self) -> TooltipEvent { self.0.0.inner.on_tooltip(Rc::downgrade(&self.0)) }
+
+	/// Not implemented yet.
+	pub fn on_auth_credentials(&self) -> AuthCredentialsEvent {
+		unimplemented!();
+	}
+
+	/// Not implemented yet.
+	pub fn on_certificate_error(&self) -> CertificateErrorEvent {
+		unimplemented!();
+	}
+
+	/// Not implemented yet.
+	pub fn on_download_progress(&self) -> DownloadProgressEvent {
+		unimplemented!();
+	}
+
+	/// Not implemented yet.
+	pub fn on_download_started(&self) -> DownloadStartedEvent {
+		unimplemented!();
+	}
+
+	/// Not implemented yet.
+	pub fn on_favicon_changed(&self) -> FaviconChangedEvent {
+		unimplemented!();
+	}
+
+	/// Not implemented yet.
+	pub fn on_file_dialog(&self) -> FileDialogEvent {
+		unimplemented!();
+	}
+
+	/// Not implemented yet.
+	pub fn on_key_press(&self) -> KeyPressEvent {
+		unimplemented!();
+	}
+
+	/// Not implemented yet.
+	pub fn on_key_pressed(&self) -> KeyPressedEvent {
+		unimplemented!();
+	}
+
+	/// Not implemented yet.
+	pub fn on_scroll_offset_changed(&self) -> ScrollOffsetChangedEvent {
+		unimplemented!();
+	}
+
+	/// Not implemented yet.
+	pub fn on_select_client_certificate(&self) -> SelectClientCertificateEvent {
+		unimplemented!();
+	}
+
+	/// Not implemented yet.
+	pub fn on_start_dragging(&self) -> StartDraggingEvent {
+		unimplemented!();
+	}
+
+	/// Not implemented yet.
+	pub fn on_text_selection_changed(&self) -> TextSelectionChangedEvent {
+		unimplemented!();
+	}
 }
 
 impl Deref for BrowserWindow {
 	type Target = BrowserWindowHandle;
 
 	fn deref(&self) -> &Self::Target { &self.0.0 }
-}*/
-
-/*impl HasAppHandle for BrowserWindow {
-	fn app_handle(&self) -> &ApplicationHandle { &self.app }
-}
-
-impl HasWindowHandle for BrowserWindow {
-	fn window_handle(&self) -> &WindowHandle { &self.window }
-}
-
-impl HasBrowserWindowHandle for BrowserWindow {
-	fn browser_handle(&self) -> &BrowserWindowHandle { &self.0 }
-}*/
-
-impl BrowserWindow {
-	pub fn on_message(&self) -> MessageEvent { self.0.0.inner.on_message(Rc::downgrade(&self.0)) }
-	pub fn on_navigation_end(&self) -> NavigationEndEvent { self.0.0.inner.on_navigation_end(Rc::downgrade(&self.0)) }
-	pub fn on_navigation_start(&self) -> NavigationStartEvent { self.0.0.inner.on_navigation_start(Rc::downgrade(&self.0)) }
-	pub fn on_page_title_changed(&self) -> PageTitleChangedEvent { self.0.0.inner.on_page_title_changed(Rc::downgrade(&self.0)) }
-	pub fn on_tooltip(&self) -> TooltipEvent { self.0.0.inner.on_tooltip(Rc::downgrade(&self.0)) }
-}
-
-impl Deref for BrowserWindow {
-	type Target = BrowserWindowHandle;
-
-	fn deref(&self) -> &Self::Target {
-		&self.0.0
-	}
 }
 
 // Core browser window functions
@@ -153,7 +254,8 @@ impl BrowserWindowHandle {
 	pub fn app(&self) -> ApplicationHandle { ApplicationHandle::new(self.inner.window().app()) }
 
 	pub fn close(self) {
-		// The window isn't actually destroyed until the reference count of the owner reaches 0.
+		// The window isn't actually destroyed until the reference count of the owner
+		// reaches 0.
 		self.inner.window().hide();
 	}
 
@@ -323,9 +425,7 @@ impl BrowserWindowOwner {
 impl Deref for BrowserWindowOwner {
 	type Target = BrowserWindowHandle;
 
-	fn deref(&self) -> &Self::Target {
-		&self.0
-	}
+	fn deref(&self) -> &Self::Target { &self.0 }
 }
 
 impl Drop for BrowserWindowOwner {
