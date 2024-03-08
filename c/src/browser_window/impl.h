@@ -7,7 +7,7 @@ extern "C" {
 
 
 
-void bw_BrowserWindowImpl_doCleanup( bw_Window* bw );
+void bw_BrowserWindowImpl_free(bw_BrowserWindow* bw);
 
 // Should be implemented by the underlying browser engine to create a new browser and invoke the callback.
 void bw_BrowserWindowImpl_new(

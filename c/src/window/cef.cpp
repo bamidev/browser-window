@@ -65,7 +65,7 @@ public:
 	void OnWindowDestroyed( CefRefPtr<CefWindow> window ) override {
 		UNUSED( window );
 
-		bw_Window_triggerClose(this->window);
+		bw_Window_freeUserData(this->window);
 	}
 
 protected:
@@ -106,7 +106,9 @@ bw_WindowImpl bw_WindowImpl_new(
 }
 
 void bw_WindowImpl_destroy( bw_WindowImpl* window ) {
-	delete (CefRefPtr<CefWindow>*)window->handle_ptr;
+	auto window_ptr = (CefRefPtr<CefWindow>*)window->handle_ptr;
+	(*window_ptr)->Close();
+	delete window_ptr;
 }
 
 void bw_WindowImpl_hide( bw_WindowImpl* window ) {

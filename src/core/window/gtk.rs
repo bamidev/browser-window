@@ -49,7 +49,7 @@ impl WindowExt for WindowImpl {
 
 	fn destroy(&self) { self.0.close(); }
 
-	fn drop(&self) {}
+	fn free(&self) {}
 
 	fn get_content_dimensions(&self) -> Dims2D {
 		unimplemented!();

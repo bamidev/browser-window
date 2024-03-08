@@ -36,34 +36,44 @@ public:
 	CefRefPtr<CefRequestHandler> GetRequestHandler() override { return this; }
 
 	virtual void OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int httpStatusCode) override {
-		this->invokeCreationCallback(browser, (CefLoadHandler::ErrorCode)0, "");
+		BW_ERR_DECLARE_SUCCESS(error);
+		this->invokeCreationCallback(browser, error);
 	}
 
-	void invokeCreationCallback(CefRefPtr<CefBrowser> browser, CefLoadHandler::ErrorCode errorCode, const CefString& errorText) {
+	bw_Err convertLoadResult(CefLoadHandler::ErrorCode errorCode, const CefString& errorText) {
+		if (errorCode == 0) {
+			BW_ERR_DECLARE_SUCCESS(error);
+			return error;
+		} else {
+			bw_Err error = bw_Err_new_with_msg(errorCode, errorText.ToString().c_str());
+			return error;
+		}
+	}
+
+	void invokeCreationCallback(CefRefPtr<CefBrowser> browser, bw_Err error) {
 		std::optional<bw::BrowserInfo*> bw_info_opt = bw::bw_handle_map.fetch(browser);
+
 		if (bw_info_opt.has_value()) {
 			auto bw_info = bw_info_opt.value();
 			auto callback_opt = &bw_info->callback;
-			if (callback_opt->has_value()) {printf("invokeCreationCallback callback_opt.has-value %i\n", browser->GetIdentifier());
+			if (callback_opt->has_value()) {
 				auto value = callback_opt->value();
 				callback_opt->reset();
-				value.callback(bw_info->handle, value.data);printf("invokeCreationCallback callback_opt.has-value2 %i\n", callback_opt->has_value());
+				value.callback(bw_info->handle, value.data);
 			}
 
-			if (errorCode == 0) {
-				BW_ERR_DECLARE_SUCCESS(error);
-				bw_Event_fire(&bw_info->handle->events.on_navigation_end, (void*)&error);
-				bw_Err_free(&error);
-			} else {
-				bw_Err error = bw_Err_new_with_msg(errorCode, errorText.ToString().c_str());
-				bw_Event_fire(&bw_info->handle->events.on_navigation_end, (void*)&error);
-				bw_Err_free(&error);
-			}
+			bw_Event_fire(&bw_info->handle->events.on_navigation_end, (void*)&error);
+			bw_Err_free(&error);
+		} else {
+#ifndef NDEBUG
+			printf("Unable to obtain browser info for browser.\n");
+#endif
 		}
 	}
 
 	virtual void OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefLoadHandler::ErrorCode errorCode, const CefString& errorText, const CefString& failedUrl) override {
-		this->invokeCreationCallback(browser, errorCode, errorText);
+		bw_Err error = this->convertLoadResult(errorCode, errorText);
+		this->invokeCreationCallback(browser, error);
 	}
 
 	virtual void OnLoadStart(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefLoadHandler::TransitionType transition_type ) override {
@@ -114,12 +124,6 @@ public:
 			this->onInvokeHandlerReceived( browser, frame, source_process, message );
 			return true;
 		}
-		// The OnBrowserCreated event is fired on another process, so we need to catch it here and
-		// update the bw_handle_map in this process.
-		else if ( message->GetName() == "on-browser-created" ) {
-			this->onBrowserCreated( browser, frame, source_process, message );
-			return true;
-		}
 		else
 			fprintf(stderr, "Unknown process message received: %s\n", message->GetName().ToString().c_str() );
 
@@ -129,42 +133,6 @@ public:
 protected:
 
 	static void externalInvocationHandlerFunc( bw_Application* app, void* data );
-
-	void OnBeforeClose(CefRefPtr<CefBrowser> browser) {
-		browser->GetHost()->CloseDevTools();
-	}
-
-	void onBrowserCreated(
-		CefRefPtr<CefBrowser> browser,
-		CefRefPtr<CefFrame>,
-		CefProcessId,
-		CefRefPtr<CefProcessMessage> msg
-	) {
-		// Don't do anything for 
-		if (browser->IsPopup()) { return; }
-
-		auto args = msg->GetArgumentList();
-
-		// Process message arguments
-		bw_BrowserWindow* bw_handle;
-		args->GetBinary( 0 )->GetData( (void*)&bw_handle, sizeof( bw_handle ), 0 );
-		bw_BrowserWindowCreationCallbackFn callback;
-		args->GetBinary( 1 )->GetData( (void*)&callback, sizeof( callback ), 0 );
-		void* callback_data;
-		args->GetBinary( 2 )->GetData( (void*)&callback_data, sizeof( callback_data ), 0 );
-		bool dev_tools_enabled = args->GetBool( 3 );
-
-		// Make a copy on the heap to store in our handle
-		CefRefPtr<CefBrowser>* cef_ptr = new CefRefPtr<CefBrowser>( browser );
-		bw_handle->impl.cef_ptr = (void*)cef_ptr;
-
-		// Store a link with the cef browser handle and our handle in a global map
-		bw::bw_handle_map.store(*cef_ptr, bw_handle, callback, callback_data);
-
-		// Open dev-tools window
-		if ( dev_tools_enabled )
-			this->openDevTools(browser, bw_handle);
-	}
 
 	void onEvalJsResultReceived(
 		CefRefPtr<CefBrowser> browser,
@@ -252,19 +220,6 @@ protected:
 			externalInvocationHandlerFunc,
 			dispatch_data
 		);
-	}
-
-	void openDevTools(CefRefPtr<CefBrowser> browser, bw_BrowserWindow* bw) {
-		CefWindowInfo info;
-#ifdef BW_WIN32
-		//info.SetAsPopup(browser->GetWindowHandle(), "Dev Tools" );
-		browser->GetHost()->ShowDevTools(info, this, CefBrowserSettings(), CefPoint());
-#else
-		//browser->GetHost()->ShowDevTools(info, this, CefBrowserSettings(), CefPoint());
-#ifndef NDEBUG
-		printf("Dev Tools are disabled for CEF in BrowserWindow, because it is broken. Use remote debugging instead.\n");
-#endif
-#endif
 	}
 
 	IMPLEMENT_REFCOUNTING(ClientHandler);

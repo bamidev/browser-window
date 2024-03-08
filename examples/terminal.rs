@@ -7,7 +7,7 @@ use std::{
 use browser_window::{application::*, browser::*, prelude::*};
 use serde_json;
 
-async fn execute_command(bw: &BrowserWindowHandle, line: &str) {
+async fn execute_command(bw: BrowserWindow, line: &str) {
 	let working_dir = bw
 		.eval_js("working_dir")
 		.await
@@ -94,24 +94,31 @@ fn main() {
 		html_file.push("examples/resources/terminal.html");
 
 		let mut bwb = BrowserWindowBuilder::new(Source::File(html_file));
-		/*bwb.async_handler(async move |handle, cmd, args| {
-			match cmd.as_str() {
-				"exec" => {
-					let cmd_line = &args[0];
-
-					execute_command(handle, &cmd_line.to_string_unenclosed()).await;
-				}
-				other => {
-					eprintln!("Received unsupported command: {}", other);
-				}
-			}
-		})*/
 		bwb.dev_tools(true);
 		bwb.size(800, 600);
 		bwb.title("Terminal Example");
 
 		let bw = bwb.build(app).await;
 
+		bw.on_message().register_async(|bw, e| {
+			// e.cmd is a &str that lives as long as the closure does, but not as long as the future does.
+			let cmd = e.cmd.to_string();
+			let args = e.args.clone();
+
+			async move {
+				match cmd.as_str() {
+					"exec" => {
+						// The whole command line is passed one string value.
+						let cmd_line = &args[0];
+
+						execute_command(bw, &cmd_line.to_string_unenclosed()).await;
+					}
+					other => {
+						eprintln!("Received unsupported command: {}", other);
+					}
+				}
+			}
+		});
 		bw.window().set_opacity(224);
 		bw.window().show();
 

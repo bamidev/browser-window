@@ -24,10 +24,10 @@ void ClientHandler::externalInvocationHandlerFunc( bw_Application* app, void* _d
 	}
 
 	// Fire!
-	data->bw->external_handler(
-		data->bw,
+	bw_BrowserWindowMessageArgs args = {
 		cmd_str_slice,
-		params_slices.data(),
-		params_slices.size()
-	);
+		params_slices.size(),
+		&params_slices[0]
+	};
+	bw_Event_fire(&data->bw->events.on_message, (void*)&args);
 }

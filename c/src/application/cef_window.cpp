@@ -67,6 +67,6 @@ bw_ApplicationImpl bw_ApplicationImpl_initialize( bw_Application* app, int argc,
 	UNUSED( argv );
 	UNUSED( settings );
 
-	bw_ApplicationImpl impl;
+	bw_ApplicationImpl impl = { 0 };
 	return impl;
 }

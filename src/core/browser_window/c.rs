@@ -1,11 +1,13 @@
-use std::{error::Error as StdError, ffi::CStr, fmt, mem::MaybeUninit, os::raw::*};
+use std::{error::Error as StdError, ffi::CStr, fmt, mem::MaybeUninit, os::raw::*, ptr};
 use std::{slice, str};
 
 use browser_window_c::*;
 
 use super::{super::{error::Error, window::WindowImpl}, *};
 
-use crate::{def_browser_event, def_event};
+use crate::rc::Rc;
+
+use crate::{def_browser_event, def_event, rc::Weak};
 
 
 #[derive(Clone)]
@@ -30,14 +32,13 @@ pub struct JsEvaluationError {
 	                  * the JS error */
 }
 
-struct UserData {
-	func: ExternalInvocationHandlerFn,
-	data: *mut (),
+struct BrowserWindowUserData {
+	_owner: Rc<BrowserWindowOwner>
 }
 
-struct EventData<'a, C, A> {
-	handle: BrowserWindowHandle,
-	handler: BrowserWindowEventHandler<'a, A>,
+struct EventData<C, A> {
+	owner: Weak<BrowserWindowOwner>,
+	handler: BrowserWindowEventHandler<A>,
 	converter: unsafe fn(&C) -> A
 }
 
@@ -47,23 +48,25 @@ struct EventData<'a, C, A> {
 macro_rules! def_browser_event_c {
 	($name:ident<$carg_type:ty, $rarg_type:ty> => $converter:ident => $c_event_name:ident) => {
 		def_browser_event!($name<$rarg_type>(&mut self, handler) {
-			let c_ptr = unsafe { &mut *self.handle.inner.inner };
-			// Free the previous event data if overwriting
-			if c_ptr.events.$c_event_name.callback.is_some() {
-				unsafe { let _ = Box::from_raw(c_ptr.events.$c_event_name.data as *mut EventData<'static, $carg_type, $rarg_type>); }
+			if let Some(upgraded) = self.owner.upgrade() {
+				let c_ptr = unsafe { &mut *upgraded.0.inner.inner };
+				// Free the previous event data if overwriting
+				if c_ptr.events.$c_event_name.callback.is_some() {
+					unsafe { let _ = Box::from_raw(c_ptr.events.$c_event_name.data as *mut EventData<$carg_type, $rarg_type>); }
+				}
+				
+				// Store the new event data
+				let event_data = EventData::<$carg_type, $rarg_type> {
+					owner: self.owner.clone(),
+					handler,
+					converter: $converter,
+				};
+				let event_data_ptr = Box::into_raw(Box::new(event_data));
+				c_ptr.events.$c_event_name = cbw_Event {
+					callback: Some(ffi_browser_window_event_callback::<$carg_type, $rarg_type>),
+					data: event_data_ptr as _
+				};
 			}
-			
-			// Store the new event data
-			let event_data = EventData::<$carg_type, $rarg_type> {
-				handle: unsafe { self.handle.clone() },
-				handler,
-				converter: $converter,
-			};
-			let event_data_ptr = Box::into_raw(Box::new(event_data));
-			c_ptr.events.$c_event_name = cbw_Event {
-				callback: Some(ffi_browser_window_event_callback::<$carg_type, $rarg_type>),
-				data: event_data_ptr as _
-			};
 		});
 	}
 }
@@ -73,7 +76,7 @@ impl BrowserWindowExt for BrowserWindowImpl {
 	fn cookie_jar(&self) -> Option<CookieJarImpl> {
 		let inner = unsafe { cbw_CookieJar_newGlobal() };
 
-		Some(CookieJarImpl { inner })
+		Some(CookieJarImpl(inner))
 	}
 
 	fn eval_js(&self, js: &str, callback: EvalJsCallbackFn, callback_data: *mut ()) {
@@ -111,25 +114,18 @@ impl BrowserWindowExt for BrowserWindowImpl {
 		}
 	}
 
-	fn free(&self) {
-		unsafe {
-			let _ = Box::<UserData>::from_raw((*self.inner).user_data as _);
-		}
-	}
+	fn free(&self) { unsafe { cbw_BrowserWindow_free(self.inner) } }
 
 	fn navigate(&self, uri: &str) { unsafe { cbw_BrowserWindow_navigate(self.inner, uri.into()) }; }
 
-	fn user_data(&self) -> *mut () {
-		let c_user_data_ptr: *mut UserData = unsafe { (*self.inner).user_data as _ };
-
-		// The actual user data pointer is stored within the `UserData` struct that is
-		// stored within the C handle
-		unsafe { (*c_user_data_ptr).data }
-	}
-
 	fn url<'a>(&'a self) -> Cow<'a, str> {
-		let mut slice: cbw_StrSlice = unsafe { MaybeUninit::uninit().assume_init() };
-		let owned = unsafe { cbw_BrowserWindow_getUrl(self.inner, &mut slice) };
+		let owned;
+		let slice;
+		unsafe {
+			let mut slice_uninit: MaybeUninit<cbw_StrSlice> = MaybeUninit::uninit();
+			owned = cbw_BrowserWindow_getUrl(self.inner, slice_uninit.as_mut_ptr());
+			slice = slice_uninit.assume_init();
+		}
 
 		if owned > 0 {
 			let url: String = slice.into();
@@ -152,8 +148,8 @@ impl BrowserWindowImpl {
 	pub(crate) fn new(
 		app: ApplicationImpl, parent: WindowImpl, source: Source, title: &str, width: Option<u32>,
 		height: Option<u32>, window_options: &WindowOptions,
-		browser_window_options: &BrowserWindowOptions, handler: ExternalInvocationHandlerFn,
-		_user_data: *mut (), creation_callback: CreationCallbackFn, _callback_data: *mut (),
+		browser_window_options: &BrowserWindowOptions, creation_callback: CreationCallbackFn,
+		_callback_data: *mut (),
 	) {
 		// Convert width and height to -1 if unspecified.
 		// Also convert to c_int as required by the C interface.
@@ -167,10 +163,6 @@ impl BrowserWindowImpl {
 		};
 
 		// Wrap the callback functions so that they invoke our Rust functions from C
-		let user_data = Box::new(UserData {
-			func: handler,
-			data: _user_data,
-		});
 		let callback_data = Box::new(CreationCallbackData {
 			func: creation_callback,
 			data: _callback_data,
@@ -206,10 +198,7 @@ impl BrowserWindowImpl {
 				title.into(),
 				w,
 				h,
-				window_options as _,
-				Some(ffi_handler),
-				// FIXME: user_data is leaked into memory.
-				Box::into_raw(user_data) as _,
+				window_options as _
 			);
 			cbw_BrowserWindow_create(
 				browser,
@@ -222,15 +211,24 @@ impl BrowserWindowImpl {
 			);
 		};
 	}
+
+	fn free_user_data(user_data: *mut c_void) {
+		let ptr = user_data as *mut BrowserWindowUserData;
+		unsafe { let _ = Box::from_raw(ptr); }
+	}
 }
 
 impl BrowserWindowEventExt for BrowserWindowImpl {
-	fn on_page_title_changed<'a>(&self, handle: &'a BrowserWindowHandle) -> PageTitleChangedEvent<'a> {println!("register on_page_title_changed");  PageTitleChangedEvent::new(handle) }
-	fn on_navigation_end<'a>(&self, handle: &'a BrowserWindowHandle) -> NavigationEndEvent<'a> { NavigationEndEvent::new(handle) }
-	fn on_navigation_start<'a>(&self, handle: &'a BrowserWindowHandle) -> NavigationStartEvent<'a> { NavigationStartEvent::new(handle) }
-	fn on_tooltip<'a>(&self, handle: &'a BrowserWindowHandle) -> TooltipEvent<'a> { TooltipEvent::new(handle) }
+	fn on_message(&self, handle: Weak<BrowserWindowOwner>) -> MessageEvent {
+		MessageEvent::new(handle)
+	}
+	fn on_navigation_end(&self, handle: Weak<BrowserWindowOwner>) -> NavigationEndEvent { NavigationEndEvent::new(handle) }
+	fn on_navigation_start(&self, handle: Weak<BrowserWindowOwner>) -> NavigationStartEvent { NavigationStartEvent::new(handle) }
+	fn on_page_title_changed(&self, handle: Weak<BrowserWindowOwner>) -> PageTitleChangedEvent { PageTitleChangedEvent::new(handle) }
+	fn on_tooltip(&self, handle: Weak<BrowserWindowOwner>) -> TooltipEvent { TooltipEvent::new(handle) }
 }
 
+def_browser_event_c!(MessageEvent<cbw_BrowserWindowMessageArgs, MessageEventArgs<'static>> => message_args_converter => on_message);
 def_browser_event_c!(NavigationStartEvent<(), ()> => no_converter => on_navigation_start);
 def_browser_event_c!(NavigationEndEvent<cbw_Err, Result<(), Error>> => error_converter => on_navigation_end);
 def_browser_event_c!(PageTitleChangedEvent<cbw_CStrSlice, &str> => str_converter => on_page_title_changed);
@@ -284,24 +282,6 @@ unsafe extern "C" fn ffi_eval_js_callback_handler(
 	(data.callback)(handle, data.data, result);
 }
 
-unsafe extern "C" fn ffi_handler(
-	bw: *mut cbw_BrowserWindow, cmd: cbw_CStrSlice, args: *mut cbw_CStrSlice, arg_count: usize,
-) {
-	let handle = BrowserWindowImpl { inner: bw };
-
-	let data_ptr = (*bw).user_data as *mut UserData;
-	let data = &mut *data_ptr;
-
-	// Convert the command and args to a String and `Vec<&str>`
-	let cmd_string: &str = cmd.into();
-	let mut args_vec: Vec<JsValue> = Vec::with_capacity(arg_count as usize);
-	for i in 0..arg_count {
-		args_vec.push(JsValue::from_string((*args.add(i as usize)).into()));
-	}
-
-	(data.func)(handle, cmd_string, args_vec);
-}
-
 /// Processes the result received from the C function, and returns it in a Rust
 /// Result.
 unsafe fn ffi_eval_js_callback_result(
@@ -325,8 +305,7 @@ unsafe fn ffi_eval_js_callback_result(
 }
 
 unsafe extern "C" fn ffi_browser_window_event_callback<C, A>(handler_data: *mut c_void, arg_ptr: *mut c_void) -> i32 {
-	let event_data_ptr = handler_data as *mut EventData<'static, C, A>;
-	println!("X2: {:p} {:p}", handler_data, event_data_ptr);
+	let event_data_ptr = handler_data as *mut EventData<C, A>;
 	let event_data = &mut *event_data_ptr;
 	let arg_ptr2 = arg_ptr as *mut C;
 	let carg = &*arg_ptr2;
@@ -334,12 +313,22 @@ unsafe extern "C" fn ffi_browser_window_event_callback<C, A>(handler_data: *mut 
 	// Convert C type to Rust type
 	let rarg = (event_data.converter)(carg);
 
-	let future = (event_data.handler)(&event_data.handle, &rarg);
-	event_data.handle.app().spawn(future);
+	// Run the event handler
+	let rc_handle = event_data.owner.upgrade().expect("browser window handle is gone");
+	match &mut event_data.handler {
+		EventHandler::Sync(callback) => {
+			(callback)(&*rc_handle, &rarg);
+		}
+		EventHandler::Async(callback) => {
+			let app = rc_handle.0.app();
+			let future = (callback)(BrowserWindow(rc_handle.clone()), &rarg);
+			app.spawn(future);
+		}
+	}
 	return 0;
 }
 
-unsafe fn no_converter(input: &()) -> () { () }
+unsafe fn no_converter(_input: &()) -> () { () }
 
 unsafe fn error_converter(input: &cbw_Err) -> Result<(), Error> {
 	if input.code == 0 {
@@ -356,4 +345,30 @@ unsafe fn str_converter(input: &cbw_CStrSlice) -> &'static str {
 
 unsafe fn str_mut_converter(input: &cbw_StrSlice) -> &'static mut str {
 	str::from_utf8_unchecked_mut(slice::from_raw_parts_mut(input.data as *mut u8, input.len) as _)
+}
+
+unsafe fn message_args_converter(input: &cbw_BrowserWindowMessageArgs) -> MessageEventArgs<'static> {
+	// Convert the command and args to a String and `Vec<&str>`
+	let cmd_string = str::from_utf8_unchecked(slice::from_raw_parts(input.cmd.data as *const u8, input.cmd.len));
+	let mut args_vec: Vec<JsValue> = Vec::with_capacity(input.arg_count as usize);
+	for i in 0..input.arg_count {
+		args_vec.push(JsValue::from_string((*input.args.add(i as usize)).into()));
+	}
+	
+	MessageEventArgs {
+		cmd: cmd_string,
+		args: args_vec
+	}
+}
+
+#[allow(non_snake_case)]
+#[no_mangle]
+extern "C" fn bw_Window_freeUserData(w: *mut c_void) {
+	let w_ptr = w as *mut cbw_Window;
+	unsafe {
+		if (*w_ptr).user_data != ptr::null_mut() {
+			BrowserWindowImpl::free_user_data((*w_ptr).user_data);
+			(*w_ptr).user_data = ptr::null_mut();
+		}
+	}
 }

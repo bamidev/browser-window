@@ -22,6 +22,7 @@ struct bw_WindowDispatchData {
 
 typedef struct {
 	void* handle;
+	BOOL closed;
 	DWORD style;
 	BYTE opacity;
 } bw_WindowImpl;

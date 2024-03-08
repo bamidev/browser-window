@@ -59,7 +59,6 @@ CefWindowInfo _bw_BrowserWindow_windowInfo( bw_Window* window, int width, int he
 
 
 void bw_BrowserWindow_evalJs( bw_BrowserWindow* bw, bw_CStrSlice js, bw_BrowserWindowJsCallbackFn cb, void* user_data ) {
-
 	// Wrap the JS code within a temporary function and execute it, and convert the return value to a string
 	// This allows executing JS code that isn't terminated with a semicolon, and does the javascript value string conversion inside JS.
 	std::string _code = "(function () { return ";
@@ -132,17 +131,14 @@ void bw_BrowserWindowCef_connectToWindow( bw_BrowserWindow* bw, CefWindowInfo& i
 #endif
 }
 
-void bw_BrowserWindowImpl_doCleanup( bw_Window* window ) {
-
-	auto bw_ptr = (bw_BrowserWindow*)window->user_data;
-
+void bw_BrowserWindowImpl_free(bw_BrowserWindow* bw) {
 	// Remove the link between our bw_BrowserWindow handle and the CefBrowser handle
-	CefRefPtr<CefBrowser>* cef_ptr = (CefRefPtr<CefBrowser>*)bw_ptr->impl.cef_ptr;
+	CefRefPtr<CefBrowser>* cef_ptr = (CefRefPtr<CefBrowser>*)bw->impl.cef_ptr;
 	bw::bw_handle_map.drop( *cef_ptr );
 
 	// Delete the CefBrowser pointer that we have stored in our bw_BrowserWindow handle
 	delete cef_ptr;
-	delete bw_ptr->impl.resource_path;
+	delete bw->impl.resource_path;
 }
 
 bw_Err bw_BrowserWindow_navigate( bw_BrowserWindow* bw, bw_CStrSlice url ) {
@@ -187,7 +183,7 @@ void bw_BrowserWindowImpl_new(
 	bw_BrowserWindowImpl bw;
 	bw.cef_ptr = 0;
 	bw.resource_path = 0;
-
+	
 	// Store the resource path if set
 	if ( browser_window_options->resource_path.len != 0 ) {
 		bw.resource_path = new char[ browser_window_options->resource_path.len + 1 ];
@@ -205,16 +201,26 @@ void bw_BrowserWindowImpl_new(
 	// Create the browser
 	CefRefPtr<CefClient>* cef_client = (CefRefPtr<CefClient>*)browser->window->app->engine_impl.cef_client;
 #ifndef BW_CEF_WINDOW
-	bool success = CefBrowserHost::CreateBrowser( info, *cef_client, source_string, settings, dict, nullptr );
+	auto cef_browser = CefBrowserHost::CreateBrowserSync( info, *cef_client, source_string, settings, dict, nullptr );
 	BW_ASSERT( success, "CefBrowserHost::CreateBrowser failed!\n" );
 #else
-	// CefBrowserHoset::CreateBrowser doesn't work well with Cefwindow, so we use the CefBrowserView
+	// CefBrowserHost::CreateBrowser doesn't work well with Cef's own window layer, so we use the CefBrowserView
 	CefRefPtr<CefBrowserView> browser_view = CefBrowserView::CreateBrowserView( *cef_client, source_string, settings, dict, nullptr, nullptr );
 	CefRefPtr<CefWindow>* window = (CefRefPtr<CefWindow>*)browser->window->impl.handle_ptr;
 	(*window)->AddChildView(browser_view);
+	// Calling GetBrowser before AddChildView causes a segfault.
+	auto cef_browser = browser_view->GetBrowser();
 #endif
 
+	bw::bw_handle_map.store(cef_browser, browser, callback, callback_data);
+	CefRefPtr<CefBrowser>* cef_ptr = new CefRefPtr<CefBrowser>( cef_browser );
+	bw.cef_ptr = (void*)cef_ptr;
 	browser->impl = bw;
+
+	if (browser_window_options->dev_tools)
+#ifndef NDEBUG
+		printf("Dev Tools are disabled for CEF in BrowserWindow, because it is broken. Please use remote debugging instead.\n");
+#endif
 }
 
 void bw_BrowserWindowCef_sendJsToRendererProcess(

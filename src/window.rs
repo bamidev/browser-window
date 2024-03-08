@@ -19,9 +19,6 @@ pub trait HasWindowHandle {
 }
 
 impl WindowHandle {
-	pub(crate) unsafe fn clone(&self) -> Self {
-		Self (self.0.clone())
-	}
 
 	pub(super) fn new(inner: WindowImpl) -> Self { Self(inner) }
 
@@ -31,6 +28,10 @@ impl WindowHandle {
 	pub fn title(&self) -> String { self.0.title() }
 	pub fn window_dimensions(&self) -> Dims2D { self.0.window_dimensions() }
 
+	/// Hides the window.
+	/// Keep in mind that hiding the window is not the same as closing it.
+	/// Hiding the window will keep it's resources alive.
+	/// If the window is hidden, and all window handles are gone, the memory is effectively leaked.
 	pub fn hide(&self) { self.0.hide(); }
 
 	pub fn set_content_dimensions(&self, dimensions: Dims2D) { self.0.set_content_dimensions(dimensions); }
@@ -39,5 +40,8 @@ impl WindowHandle {
 	pub fn set_title(&self, title: &str) { self.0.set_title(title); }
 	pub fn set_window_dimensions(&self, dimensions: Dims2D) { self.0.set_window_dimensions(dimensions); }
 
+	/// Shows a window if it was hidden.
+	/// Windows that were just created are hidden to start.
+	/// This method is necessary to show it to the user.
 	pub fn show(&self) { self.0.show(); }
 }

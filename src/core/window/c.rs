@@ -15,7 +15,7 @@ pub struct WindowImpl {
 impl WindowImpl {
 	pub fn new(
 		app: ApplicationImpl, parent: Self, title: &str, width: Option<u32>, height: Option<u32>,
-		options: &WindowOptions, user_data: *mut (),
+		options: &WindowOptions,
 	) -> Self {
 		let str_slice: cbw_CStrSlice = title.into();
 
@@ -36,7 +36,6 @@ impl WindowImpl {
 				w,
 				h,
 				options,
-				user_data as _,
 			)
 		};
 
@@ -60,9 +59,9 @@ impl WindowExt for WindowImpl {
 		}
 	}
 
-	fn destroy(&self) { unsafe { cbw_Window_destroy(self.inner) } }
+	fn close(&self) { unsafe { cbw_Window_close(self.inner) } }
 
-	fn drop(&self) { unsafe { cbw_Window_drop(self.inner) } }
+	fn free(&self) { unsafe { cbw_Window_free(self.inner) } }
 
 	fn content_dimensions(&self) -> Dims2D {
 		unsafe { cbw_Window_getContentDimensions(self.inner) }
@@ -107,6 +106,10 @@ impl WindowExt for WindowImpl {
 	fn set_title(&self, title: &str) {
 		let slice: cbw_CStrSlice = title.into();
 		unsafe { cbw_Window_setTitle(self.inner, slice) };
+	}
+
+	fn set_user_data(&self, user_data: *mut ()) {
+		unsafe { (*self.inner).user_data = user_data as _; }
 	}
 
 	fn set_window_dimensions(&self, dimensions: Dims2D) {

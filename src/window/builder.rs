@@ -14,8 +14,6 @@ pub struct WindowBuilder {
 	pub(crate) width: Option<u32>,
 }
 
-struct WindowUserData {}
-
 #[allow(dead_code)]
 pub type WindowOptions = cbw_WindowOptions;
 
@@ -43,9 +41,6 @@ impl WindowBuilder {
 			resizable: self.resizable,
 		};
 
-		// Put event data into a user data pointer
-		let user_data = Box::new(WindowUserData {});
-
 		// Unwrap the parent ffi handle
 		let parent_impl_handle = match self.parent {
 			None => WindowImpl::default(),
@@ -59,7 +54,6 @@ impl WindowBuilder {
 			self.width as _,
 			self.height as _,
 			&window_options,
-			Box::into_raw(user_data) as _,
 		);
 	}
 

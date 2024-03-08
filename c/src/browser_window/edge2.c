@@ -2,7 +2,7 @@
 #include "impl.h"
 
 
-void bw_BrowserWindowImpl_doCleanup( bw_Window* window ) {}
+void bw_BrowserWindowImpl_free( bw_Window* window ) {}
 
 void bw_BrowserWindowImpl_new(
 	bw_BrowserWindow* browser,

@@ -18,9 +18,16 @@ fn main() {
 		bwb.title("Log in to Github");
 		let bw = bwb.build(app.clone()).await;
 
-		bw.on_navigate().register_async(|arg| async move {
-			println!("ASD");
+		bw.on_navigation_start().register(|h, arg| {
+			println!("on_navigation_start");
 		});
+		bw.on_navigation_end().register(|h, result| {
+			println!("on_navigation_end {:?}", result);
+		});
+		bw.on_page_title_changed().register(|h, result| {
+			println!("on_page_title_changed {:?}", result);
+		});
+
 
 		bw.show();
 

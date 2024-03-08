@@ -14,8 +14,8 @@ use crate::prelude::*;
 pub trait WindowExt {
 	fn app(&self) -> ApplicationImpl;
 
-	fn destroy(&self);
-	fn drop(&self);
+	fn close(&self);
+	fn free(&self);
 
 	fn content_dimensions(&self) -> Dims2D;
 	fn opacity(&self) -> u8;
@@ -29,6 +29,7 @@ pub trait WindowExt {
 	fn set_opacity(&self, opacity: u8);
 	fn set_position(&self, position: Pos2D);
 	fn set_title(&self, title: &str);
+	fn set_user_data(&self, user_data: *mut ());
 	fn set_window_dimensions(&self, dimensions: Dims2D);
 
 	fn show(&self);

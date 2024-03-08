@@ -21,24 +21,23 @@ use super::{
 	cookie::CookieJarImpl,
 	window::{WindowImpl, WindowOptions},
 };
-use crate::{browser::*, prelude::JsValue};
+use crate::{browser::*, prelude::JsValue, rc::Weak};
 
 
-pub type BrowserWindowEventHandler<'a, A> = EventHandler<'a, BrowserWindowHandle, A>;
-pub type BrowserWindowEventHandlerCallback<'a, A> = EventHandlerCallback<'a, BrowserWindowHandle, A>;
+//pub type BrowserWindowEventHandler<'a, A> = EventHandler<'a, BrowserWindowHandle, A>;
 
 pub type BrowserWindowOptions = cbw_BrowserWindowOptions;
 
 pub type CreationCallbackFn = fn(bw: BrowserWindowImpl, data: *mut ());
 pub type EvalJsCallbackFn =
 	fn(bw: BrowserWindowImpl, data: *mut (), result: Result<JsValue, JsEvaluationError>);
-pub type ExternalInvocationHandlerFn = fn(bw: BrowserWindowImpl, cmd: &str, args: Vec<JsValue>);
 
 pub trait BrowserWindowEventExt {
-	fn on_page_title_changed<'a>(&self, handle: &'a BrowserWindowHandle) -> PageTitleChangedEvent<'a> { unimplemented!(); }
-	fn on_navigation_end<'a>(&self, handle: &'a BrowserWindowHandle) -> NavigationEndEvent<'a> { unimplemented!(); }
-	fn on_navigation_start<'a>(&self, handle: &'a BrowserWindowHandle) -> NavigationStartEvent<'a> { unimplemented!(); }
-	fn on_tooltip<'a>(&self, handle: &'a BrowserWindowHandle) -> TooltipEvent<'a> { unimplemented!(); }
+	fn on_message(&self, _handle: Weak<BrowserWindowOwner>) -> MessageEvent { unimplemented!(); }
+	fn on_navigation_end(&self, _handle: Weak<BrowserWindowOwner>) -> NavigationEndEvent { unimplemented!(); }
+	fn on_navigation_start(&self, _handle: Weak<BrowserWindowOwner>) -> NavigationStartEvent { unimplemented!(); }
+	fn on_page_title_changed(&self, _handle: Weak<BrowserWindowOwner>) -> PageTitleChangedEvent { unimplemented!(); }
+	fn on_tooltip(&self, _handle: Weak<BrowserWindowOwner>) -> TooltipEvent { unimplemented!(); }
 }
 
 pub trait BrowserWindowExt: BrowserWindowEventExt {
@@ -55,8 +54,6 @@ pub trait BrowserWindowExt: BrowserWindowEventExt {
 
 	/// Causes the browser to navigate to the given URI.
 	fn navigate(&self, uri: &str);
-
-	fn user_data(&self) -> *mut ();
 
 	fn url<'a>(&'a self) -> Cow<'a, str>;
 

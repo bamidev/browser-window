@@ -6,7 +6,7 @@
 //! `BrowserWindow`, but the methods of `WindowHandle` are not displayed.
 //! Be sure to check them out [here](../window/struct.WindowHandle.html).
 
-use std::{borrow::Cow, future::Future, marker::PhantomData, ops::Deref};
+use std::{borrow::Cow, ops::Deref};
 
 use futures_channel::oneshot;
 #[cfg(feature = "threadsafe")]
@@ -20,7 +20,9 @@ use crate::{
 		browser_window::{BrowserWindowEventExt, BrowserWindowExt, BrowserWindowImpl, JsEvaluationError},
 		window::WindowExt,
 	},
+	decl_browser_event,
 	decl_event,
+	event::EventHandler,
 	prelude::*,
 	rc::Rc,
 	window::*,
@@ -41,8 +43,12 @@ pub type BrowserDelegateFuture<'a, R> = DelegateFuture<'a, BrowserWindowHandle, 
 /// and when the window has actually been closed by the user.
 /// If the window has been closed by the user but this handle still exists, the window is actually just been closed.
 /// It can be reshown by calling `show` on this handle.
-pub(super) struct BrowserWindowOwner (pub(super) BrowserWindowHandle);
-pub struct BrowserWindow (pub(super) Rc<BrowserWindowOwner>);
+pub struct BrowserWindowOwner (pub(super) BrowserWindowHandle);
+pub struct BrowserWindow(pub Rc<BrowserWindowOwner>);
+#[cfg(feature = "threadsafe")]
+pub struct BrowserWindowThreaded (BrowserWindow);
+#[cfg(feature = "threadsafe")]
+unsafe impl Sync for BrowserWindowThreaded {}
 
 /// **Note:** Only available with feature `threadsafe` enabled.
 ///
@@ -77,6 +83,8 @@ pub struct BrowserWindow (pub(super) Rc<BrowserWindowOwner>);
 /// }
 /// ```
 
+pub type BrowserWindowEventHandler<A> = EventHandler<BrowserWindowHandle, BrowserWindow, A>;
+
 /// This is a handle to an existing browser window.
 pub struct BrowserWindowHandle {
 	pub(super) inner: BrowserWindowImpl,
@@ -84,16 +92,22 @@ pub struct BrowserWindowHandle {
 	window: WindowHandle,
 }
 
-decl_event!(NavigationEndEvent);
-decl_event!(NavigationStartEvent);
-decl_event!(PageTitleChangedEvent);
-decl_event!(TooltipEvent);
+pub struct MessageEventArgs<'a> {
+	pub cmd: &'a str,
+	pub args: Vec<JsValue>
+}
+
+decl_browser_event!(MessageEvent);
+decl_browser_event!(NavigationEndEvent);
+decl_browser_event!(NavigationStartEvent);
+decl_browser_event!(PageTitleChangedEvent);
+decl_browser_event!(TooltipEvent);
 
 pub trait HasBrowserWindowHandle: HasWindowHandle {
 	fn browser_handle(&self) -> &BrowserWindowHandle;
 }
 
-impl BrowserWindow {
+/*impl BrowserWindow {
 	fn new(handle: BrowserWindowHandle) -> Self { Self(Rc::new(BrowserWindowOwner(handle))) }
 
 	pub fn handle(&self) -> &BrowserWindowHandle { &self.0.0 }
@@ -103,9 +117,9 @@ impl Deref for BrowserWindow {
 	type Target = BrowserWindowHandle;
 
 	fn deref(&self) -> &Self::Target { &self.0.0 }
-}
+}*/
 
-impl HasAppHandle for BrowserWindow {
+/*impl HasAppHandle for BrowserWindow {
 	fn app_handle(&self) -> &ApplicationHandle { &self.app }
 }
 
@@ -114,7 +128,23 @@ impl HasWindowHandle for BrowserWindow {
 }
 
 impl HasBrowserWindowHandle for BrowserWindow {
-	fn browser_handle(&self) -> &BrowserWindowHandle { &self.0.0 }
+	fn browser_handle(&self) -> &BrowserWindowHandle { &self.0 }
+}*/
+
+impl BrowserWindow {
+	pub fn on_message(&self) -> MessageEvent { self.0.0.inner.on_message(Rc::downgrade(&self.0)) }
+	pub fn on_navigation_end(&self) -> NavigationEndEvent { self.0.0.inner.on_navigation_end(Rc::downgrade(&self.0)) }
+	pub fn on_navigation_start(&self) -> NavigationStartEvent { self.0.0.inner.on_navigation_start(Rc::downgrade(&self.0)) }
+	pub fn on_page_title_changed(&self) -> PageTitleChangedEvent { self.0.0.inner.on_page_title_changed(Rc::downgrade(&self.0)) }
+	pub fn on_tooltip(&self) -> TooltipEvent { self.0.0.inner.on_tooltip(Rc::downgrade(&self.0)) }
+}
+
+impl Deref for BrowserWindow {
+	type Target = BrowserWindowHandle;
+
+	fn deref(&self) -> &Self::Target {
+		&self.0.0
+	}
 }
 
 // Core browser window functions
@@ -122,14 +152,9 @@ impl BrowserWindowHandle {
 	/// Returns the application handle associated with this browser window.
 	pub fn app(&self) -> ApplicationHandle { ApplicationHandle::new(self.inner.window().app()) }
 
-	pub fn close(self) { self.inner.window().destroy() }
-
-	pub(crate) unsafe fn clone(&self) -> Self {
-		Self {
-			app: self.app.clone(),
-			window: self.window.clone(),
-			inner: self.inner.clone()
-		}
+	pub fn close(self) {
+		// The window isn't actually destroyed until the reference count of the owner reaches 0.
+		self.inner.window().hide();
 	}
 
 	/// Executes the given javascript code and returns the output as a string.
@@ -185,7 +210,14 @@ impl BrowserWindowHandle {
 
 // Functions to reach the UI thread
 #[cfg(feature = "threadsafe")]
-impl BrowserWindow {
+impl BrowserWindowThreaded {
+	/// The thread-safe application handle associated with this browser window.
+	pub fn app(&self) -> ApplicationHandleThreaded {
+		ApplicationHandleThreaded::from_core_handle(self.handle.inner.window().app())
+	}
+
+	/// Closes the browser.
+	pub fn close(self) -> bool { self.dispatch(|bw| bw.close()) }
 
 	/// Executes the given closure within the GUI thread, and return the value
 	/// that the closure returned. Also see `ApplicationThreaded::delegate`.
@@ -269,11 +301,6 @@ impl BrowserWindowHandle {
 			inner: inner_handle,
 		}
 	}
-
-	pub fn on_page_title_changed(&self) -> PageTitleChangedEvent<'_> { self.inner.on_page_title_changed(self) }
-	pub fn on_navigation_end(&self) -> NavigationEndEvent<'_> { self.inner.on_navigation_end(self) }
-	pub fn on_navigation_start(&self) -> NavigationStartEvent<'_> { self.inner.on_navigation_start(self) }
-	pub fn on_tooltip(&self) -> TooltipEvent<'_> { self.inner.on_tooltip(self) }
 }
 
 impl Deref for BrowserWindowHandle {
@@ -286,9 +313,29 @@ impl HasAppHandle for BrowserWindowHandle {
 	fn app_handle(&self) -> &ApplicationHandle { &self.app }
 }
 
+impl BrowserWindowOwner {
+	fn cleanup(handle: &BrowserWindowHandle) {
+		handle.inner.free();
+		handle.inner.window().free();
+	}
+}
+
+impl Deref for BrowserWindowOwner {
+	type Target = BrowserWindowHandle;
+
+	fn deref(&self) -> &Self::Target {
+		&self.0
+	}
+}
+
 impl Drop for BrowserWindowOwner {
 	fn drop(&mut self) {
-		self.0.0.drop();
+		#[cfg(not(feature = "threadsafe"))]
+		Self::cleanup(&self.0);
+		#[cfg(feature = "threadsafe")]
+		self.app().dispatch(|bw| {
+			Self::cleanup(bw);
+		});
 	}
 }
 

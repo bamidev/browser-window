@@ -1,4 +1,4 @@
-use std::{ops::DerefMut, path::PathBuf, pin::Pin, vec::Vec};
+use std::{ops::DerefMut, path::PathBuf};
 
 #[cfg(feature = "threadsafe")]
 use unsafe_send_sync::UnsafeSend;
@@ -7,6 +7,7 @@ use crate::{
 	application::ApplicationHandle,
 	browser::*,
 	core::{browser_window::*, window::*},
+	rc::Rc,
 	window::WindowBuilder,
 };
 
@@ -21,18 +22,9 @@ pub enum Source {
 	Url(String),
 }
 
-#[cfg(not(feature = "threadsafe"))]
-type BrowserJsInvocationHandler =
-	Box<dyn FnMut(&BrowserWindowHandle, String, Vec<JsValue>) -> Pin<Box<dyn Future<Output = ()>>>>;
-#[cfg(feature = "threadsafe")]
-type BrowserJsInvocationHandler = Box<
-	dyn FnMut(&BrowserWindowHandle, String, Vec<JsValue>) -> Pin<Box<dyn Future<Output = ()>>>
-		+ Send,
->;
-
 /// The data that is passed to the C FFI handler function
 struct BrowserUserData {
-	handler: BrowserJsInvocationHandler,
+	_handle: Rc<BrowserWindowOwner>,
 }
 
 /// Used to create a [`BrowserWindow`] or [`BrowserWindowThreaded`] instance,
@@ -46,7 +38,6 @@ struct BrowserUserData {
 /// ```
 pub struct BrowserWindowBuilder {
 	dev_tools: bool,
-	handler: Option<BrowserJsInvocationHandler>,
 	source: Source,
 	window: WindowBuilder,
 }
@@ -68,7 +59,6 @@ impl BrowserWindowBuilder {
 		Self {
 			dev_tools: false,
 			source,
-			handler: None,
 			window: WindowBuilder::new(),
 		}
 	}
@@ -86,7 +76,7 @@ impl BrowserWindowBuilder {
 			}
 		});
 
-		BrowserWindow::new(rx.await.unwrap())
+		BrowserWindow(Self::prepare_handle(rx.await.unwrap()))
 	}
 
 	/// Creates the browser window.
@@ -102,7 +92,7 @@ impl BrowserWindowBuilder {
 	#[cfg(feature = "threadsafe")]
 	pub async fn build_threaded(
 		self, app: ApplicationHandle,
-	) -> Result<BrowserWindow, DelegateError> {
+	) -> Result<BrowserWindowThreaded, DelegateError> {
 		let (tx, rx) = oneshot::channel::<UnsafeSend<BrowserWindowHandle>>();
 
 		// We need to dispatch the spawning of the browser to the GUI thread
@@ -115,7 +105,19 @@ impl BrowserWindowBuilder {
 		})
 		.await?;
 
-		Ok(BrowserWindow::new(rx.await.unwrap().i))
+		Ok(BrowserWindowThreaded::new(Self::prepare_handle(rx.await.unwrap())))
+	}
+
+	fn prepare_handle(handle: BrowserWindowHandle) -> Rc<BrowserWindowOwner> {
+		// Put a reference counted handle in the user data of the window, so that there exists 'ownership' for as long as the window actually lives.
+		let owner = BrowserWindowOwner(handle);
+		let rc_handle = Rc::new(owner);
+		let user_data = Box::into_raw(Box::new(BrowserUserData {
+			_handle: rc_handle.clone()
+		}));
+		rc_handle.0.window().0.set_user_data(user_data as _);
+
+		rc_handle
 	}
 
 	fn _build<H>(self, app: ApplicationHandle, on_created: H)
@@ -125,7 +127,6 @@ impl BrowserWindowBuilder {
 		match self {
 			Self {
 				source,
-				handler,
 				dev_tools,
 				window,
 			} => {
@@ -141,13 +142,6 @@ impl BrowserWindowBuilder {
 					Some(t) => t.as_str().into(),
 				};
 
-				// Handler callback data
-				let user_data = Box::into_raw(Box::new(BrowserUserData {
-					handler: match handler {
-						Some(f) => f,
-						None => Box::new(|_, _, _| Box::pin(async {})),
-					},
-				}));
 				let callback_data: *mut Box<dyn FnOnce(BrowserWindowHandle)> =
 					Box::into_raw(Box::new(Box::new(on_created)));
 
@@ -171,8 +165,6 @@ impl BrowserWindowBuilder {
 					window.height,
 					&window_options,
 					&other_options,
-					browser_window_invoke_handler,
-					user_data as _,
 					browser_window_created_callback,
 					callback_data as _,
 				);
@@ -191,62 +183,11 @@ impl DerefMut for BrowserWindowBuilder {
 	fn deref_mut(&mut self) -> &mut Self::Target { &mut self.window }
 }
 
-/// The data that is passed to the creation callback function
-//type BrowserCreationCallbackData<'a> = Box<dyn FnOnce( BrowserHandle ) + 'a>;
-
-/// Takes the arguments received from the C FFI handler callback, and converts
-/// it to a vector of strings
-/*fn args_to_vec( args: *const cbw_CStrSlice, args_count: usize ) -> Vec<String> {
-
-	let mut vec = Vec::with_capacity( args_count );
-
-	for i in 0..args_count {
-		let str_arg: String = unsafe { *args.offset(i as _) }.into();
-
-		vec.push( str_arg );
-	}
-
-	vec
-}*/
-
-/// This external C function will be invoked by the underlying implementation
-/// browser-window when it is invoked in JavaScript
-/*unsafe extern "C" fn ffi_window_invoke_handler( inner_handle: *mut bw_BrowserWindow, _command: bw_CStrSlice, _args: *mut bw_CStrSlice, args_count: u64 ) {
-
-	let data_ptr: *mut BrowserUserData = mem::transmute( bw_BrowserWindow_getUserData( inner_handle ) );
-	let data: &mut BrowserUserData = &mut *data_ptr;
-
-	match data {
-		BrowserUserData{ handler } => {
-			let outer_handle = BrowserWindowHandle::new( inner_handle );
-
-			let args = args_to_vec( _args, args_count as _ );
-
-			let future = handler( outer_handle, _command.into(), args );
-			outer_handle.app().spawn( future );
-		}
-	}
-}*/
-
-fn browser_window_invoke_handler(inner_handle: BrowserWindowImpl, cmd: &str, args: Vec<JsValue>) {
-	let data_ptr: *mut BrowserUserData = inner_handle.user_data() as _;
-	let data = unsafe { &mut *data_ptr };
-
-	match data {
-		BrowserUserData { handler } => {
-			let outer_handle = BrowserWindowHandle::new(inner_handle);
-
-			let future = handler(&outer_handle, cmd.into(), args);
-			outer_handle.app().spawn(future);
-		}
-	}
-}
-
 fn browser_window_created_callback(inner_handle: BrowserWindowImpl, data: *mut ()) {
 	let data_ptr = data as *mut Box<dyn FnOnce(&BrowserWindowHandle)>;
 	let func = unsafe { Box::from_raw(data_ptr) };
 
-	let outer_handle = BrowserWindowHandle::new(inner_handle);
+	let rust_handle = BrowserWindowHandle::new(inner_handle);
 
-	func(&outer_handle)
+	func(&rust_handle);
 }
