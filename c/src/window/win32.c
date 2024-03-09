@@ -231,6 +231,7 @@ LRESULT CALLBACK bw_Window_proc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 				bw_Window_freeUserData(window);
 				window->user_data = NULL;
 			}
+			ShowWindow(hwnd, SW_HIDE);
 			break;
 		}
 		// Triggered when DestroyWindow is called, which is the only way for us to programmatically close the window.

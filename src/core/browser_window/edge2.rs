@@ -182,11 +182,13 @@ impl BrowserWindowEventExt for BrowserWindowImpl {
 
 
 def_browser_event!(MessageEvent<MessageEventArgs<'static>>(&mut self, handler) {
-	if let Some(this) = self.owner.upgrade() {
-		// Register the message handler
-		let this2 = this.clone();
-		let h = Rc::new(Cell::new(handler));
-		this.inner.webview().add_web_message_received(move |_, msg| {
+	
+	// Register the message handler
+	let owner = self.owner.clone();
+	let h = Rc::new(Cell::new(handler));
+	let inner = &owner.upgrade().unwrap().inner;
+	inner.webview().add_web_message_received(move |_, msg| {
+		if let Some(this) = owner.upgrade() {
 			let string = msg
 				.get_web_message_as_json()
 				.expect("unable to get web message as json");
@@ -208,18 +210,18 @@ def_browser_event!(MessageEvent<MessageEventArgs<'static>>(&mut self, handler) {
 			};
 			match unsafe { &mut *h.as_ptr() } {
 				EventHandler::Sync(callback) => {
-					(callback)(&*this2, &e);
+					(callback)(&*this, &e);
 				}
 				EventHandler::Async(callback) => {
-					let app = this2.0.app();
-					let future = (callback)(BrowserWindow(this2.clone()), &e);
+					let app = this.0.app();
+					let future = (callback)(BrowserWindow(this.clone()), &e);
 					app.spawn(future);
 				}
 			}
-			Ok(())
-		})
-		.expect("unable to register message handler");
-	}
+		}
+		Ok(())
+	})
+	.expect("unable to register message handler");
 });
 
 
@@ -243,7 +245,7 @@ fn dispatch_eval_js(_app: ApplicationImpl, dispatch_data: *mut ()) {
 #[allow(non_snake_case)]
 #[no_mangle]
 extern "C" fn bw_Window_freeUserData(w: *mut c_void) {
-	let w_ptr = w as *mut cbw_Window;
+	let w_ptr = w as *mut cbw_Window; println!("bw_Window_freeUserData");
 	unsafe {
 		if (*w_ptr).user_data != ptr::null_mut() {
 			BrowserWindowImpl::free_user_data((*w_ptr).user_data as _);
