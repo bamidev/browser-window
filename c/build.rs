@@ -296,6 +296,7 @@ fn main() {
 			.file("src/cef/exception.cpp")
 			.file("src/cef/util.cpp")
 			.define("BW_CEF", None)
+			.flag(std_flag)
 			.cpp(true);
 
 		// Build the seperate executable and copy it to target/debug (or target/release)

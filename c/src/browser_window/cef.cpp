@@ -112,9 +112,9 @@ void bw_BrowserWindowCef_connectToGtkWindow( bw_BrowserWindow* bw, CefWindowInfo
 void bw_BrowserWindowCef_connectToWin32Window( bw_BrowserWindow* bw, CefWindowInfo& info, int width, int height ) {
 
 	RECT rect;
-	GetClientRect( bw->window->impl.handle, &rect );
+	GetClientRect((HWND)bw->window->impl.handle, &rect);
 	CefRect crect(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
-	info.SetAsChild( bw->window->impl.handle, crect );
+	info.SetAsChild((HWND)bw->window->impl.handle, crect);
 }
 #endif
 
@@ -202,7 +202,6 @@ void bw_BrowserWindowImpl_new(
 	CefRefPtr<CefClient>* cef_client = (CefRefPtr<CefClient>*)browser->window->app->engine_impl.cef_client;
 #ifndef BW_CEF_WINDOW
 	auto cef_browser = CefBrowserHost::CreateBrowserSync( info, *cef_client, source_string, settings, dict, nullptr );
-	BW_ASSERT( success, "CefBrowserHost::CreateBrowser failed!\n" );
 #else
 	// CefBrowserHost::CreateBrowser doesn't work well with Cef's own window layer, so we use the CefBrowserView
 	CefRefPtr<CefBrowserView> browser_view = CefBrowserView::CreateBrowserView( *cef_client, source_string, settings, dict, nullptr, nullptr );

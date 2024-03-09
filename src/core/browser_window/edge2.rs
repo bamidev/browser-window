@@ -207,11 +207,11 @@ def_browser_event!(MessageEvent<MessageEventArgs>(&mut self, handler) {
 			};
 			match unsafe { &mut *h.as_ptr() } {
 				EventHandler::Sync(callback) => {
-					(callback)(&*this, &e);
+					(callback)(&*this, e);
 				}
 				EventHandler::Async(callback) => {
 					let app = this.0.app();
-					let future = (callback)(BrowserWindow(this.clone()), &e);
+					let future = (callback)(BrowserWindow(this.clone()), e);
 					app.spawn(future);
 				}
 			}

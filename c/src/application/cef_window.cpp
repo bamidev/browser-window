@@ -37,6 +37,10 @@ BOOL bw_ApplicationImpl_dispatchDelayed(bw_Application* app, bw_ApplicationDispa
 	return TRUE;
 }
 
+void bw_ApplicationImpl_free( bw_ApplicationImpl* app ) {
+
+}
+
 void bw_ApplicationImpl_dispatchHandler( bw_Application* app, bw_ApplicationDispatchData* data ) {
 	data->func( app, data->data );
 }
