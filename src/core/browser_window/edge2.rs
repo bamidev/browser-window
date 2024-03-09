@@ -149,11 +149,28 @@ impl BrowserWindowExt for BrowserWindowImpl {
 								.expect("unable to get web message as json");
 
 							let handle = BrowserWindowImpl { inner: bw_inner };
+<<<<<<< HEAD
 							match JsValue::from_json(&string) {
 								JsValue::Array(args) => {
 									let command = args[0].to_string_unenclosed();
 									let command_args = args[1..].to_vec();
 									handler(handle, &command, command_args);
+=======
+							if string == "\"__bw_loaded\"" {
+								// Once the `ìnvoke_extern` function exists, invoke the creation
+								// callback.
+								//creation_callback(handle, callback_data);
+							} else {
+								match JsValue::from_json(&string) {
+									JsValue::Array(args) => {
+										let command = args[0].to_string_unenclosed();
+										let command_args = args[1..].to_vec();
+										handler(handle, &command, command_args);
+									}
+									_ => panic!(
+										"unexpected JavaScript value received from Edge WebView2"
+									),
+>>>>>>> 714e2a7 (Call creation callback on navigation end.)
 								}
 								_ => panic!(
 									"unexpected JavaScript value received from Edge WebView2"
@@ -173,6 +190,12 @@ impl BrowserWindowExt for BrowserWindowImpl {
 					);
 
 					webview.add_navigation_completed(move |wv, e| {
+						let handle = BrowserWindowImpl { inner: bw_inner };
+						creation_callback(handle, callback_data);
+						Ok(())
+					});
+
+					webview.add_navigation_completed(move |_, _| {
 						let handle = BrowserWindowImpl { inner: bw_inner };
 						creation_callback(handle, callback_data);
 						Ok(())
