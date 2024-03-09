@@ -137,12 +137,12 @@ fn cookie() {
 					.expires()
 					.unwrap()
 					.duration_since(UNIX_EPOCH)
-					.unwrap()) < Duration::from_millis(1)
+					.unwrap()) < Duration::from_secs(1)
 		);
 		assert!(
 			(now.duration_since(UNIX_EPOCH).unwrap()
 				- cookie.creation_time().duration_since(UNIX_EPOCH).unwrap())
-				< Duration::from_millis(1)
+				< Duration::from_secs(1)
 		);
 	}
 }

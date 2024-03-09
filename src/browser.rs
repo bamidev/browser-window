@@ -60,7 +60,7 @@ unsafe impl Sync for BrowserWindowThreaded {}
 /// **Note:** Only available with feature `threadsafe` enabled.
 ///
 /// A thread-safe handle to a browser window.
-/// It allows you to dispatch code to the GUI thread and obtain manipulate the
+/// It allows you to dispatch code to the GUI thread and thereby manipulate the
 /// browser window from any thread. To do this, you will need to use the
 /// functions `dispatch`, `dispatch_async`, `delegate` and `delegate_async`.
 ///
@@ -70,7 +70,7 @@ unsafe impl Sync for BrowserWindowThreaded {}
 /// ```
 /// use browser_window::{application::*, browser::*};
 ///
-/// async fn get_cookies(app: ApplicationHandleThreaded) -> String {
+/// async fn get_cookies(app: &ApplicationHandleThreaded) -> String {
 /// 	let mut builder =
 /// 		BrowserWindowBuilder::new(Source::Url("https://www.duckduckgo.com/".into()));
 /// 	builder.title("test");
@@ -86,7 +86,7 @@ unsafe impl Sync for BrowserWindowThreaded {}
 /// 		.await
 /// 		.unwrap();
 ///
-/// 	result.unwrap()
+/// 	result.unwrap().to_string()
 /// }
 /// ```
 
