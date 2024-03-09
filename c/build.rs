@@ -185,23 +185,6 @@ fn main() {
 		}
 	}
 
-	else if cfg!(feature = "edge2") {
-		//bgbuilder = bgbuilder.clang_arg("-DBW_WIN32");
-		
-
-		// Win32 API
-		build
-			.file("src/win32.c")
-			.file("src/application/win32.c")
-			.file("src/window/win32.c")
-			.define("BW_WIN32", None)
-			.define("_CRT_SECURE_NO_WARNINGS", None); // Disable sprintf_s warnings. sprintf_s tends to cause segfaults anyway...
-
-		build_se
-			.define("BW_WIN32", None)
-			.define("_CRT_SECURE_NO_WARNINGS", None);
-	}
-
 	/*******************************************
 	 *	The Browser Engine (CEF3) source files *
 	 ************************************* */
@@ -334,6 +317,16 @@ fn main() {
 	 * Microsoft Edge WebView2 source files
 	 ************************************** */
 	else if cfg!(feature = "edge2") {
+		bgbuilder = bgbuilder.clang_arg("-DBW_WIN32").clang_arg("-DBW_EDGE2");
+
+		// Win32 API
+		build
+			.file("src/win32.c")
+			.file("src/application/win32.c")
+			.file("src/window/win32.c")
+			.define("BW_WIN32", None)
+			.define("BW_EDGE2", None)
+			.define("_CRT_SECURE_NO_WARNINGS", None); // Disable sprintf_s warnings. sprintf_s tends to cause segfaults anyway...
 
 		// Add the MinGW header files and libraries when available
 		if Path::new("/usr/share/mingw-w64/include/").exists() {
@@ -353,6 +346,7 @@ fn main() {
 		]);
 
 		build
+			.define("BW_WIN32", None)
 			.define("BW_EDGE2", None)
 			//.include(include_dir)
 			.file("src/application/edge2.c")
