@@ -221,8 +221,7 @@ LRESULT CALLBACK bw_Window_proc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 				unsigned int width = rect.right - rect.left;
 				unsigned int height = rect.bottom - rect.top;
 
-				if ( window->callbacks.on_resize != 0 )
-					bw_BrowserWindowImpl_onResize( window, width, height );
+				bw_BrowserWindowImpl_onResize( window, width, height );
 
 			break;
 		}

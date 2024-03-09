@@ -7,6 +7,7 @@ use super::{super::window::WindowImpl, *};
 use crate::prelude::{ApplicationExt, WindowExt};
 
 
+#[derive(Clone)]
 pub struct BrowserWindowImpl {
 	inner: *mut cbw_BrowserWindow,
 }
@@ -21,10 +22,6 @@ struct EvalJsCallbackData {
 /// An error that may occur when evaluating or executing JavaScript code.
 pub type JsEvaluationError = ();
 
-struct UserData {
-	func: ExternalInvocationHandlerFn,
-	data: *mut (),
-}
 
 impl BrowserWindowImpl {
 	fn controller(&self) -> &webview2::Controller {
@@ -77,8 +74,7 @@ impl BrowserWindowExt for BrowserWindowImpl {
 	fn new(
 		app: ApplicationImpl, parent: WindowImpl, source: Source, title: &str, width: Option<u32>,
 		height: Option<u32>, window_options: &WindowOptions,
-		browser_window_options: &BrowserWindowOptions, handler: ExternalInvocationHandlerFn,
-		user_data: *mut (), creation_callback: CreationCallbackFn, callback_data: *mut (),
+		browser_window_options: &BrowserWindowOptions, creation_callback: CreationCallbackFn, callback_data: *mut (),
 	) {
 		// Create window
 		let user_data = Box::new(UserData {
@@ -93,8 +89,6 @@ impl BrowserWindowExt for BrowserWindowImpl {
 				width.unwrap_or(0) as _,
 				height.unwrap_or(0) as _,
 				window_options as _,
-				Some(ffi_handler),
-				Box::into_raw(user_data) as _,
 			)
 		};
 
@@ -139,28 +133,6 @@ impl BrowserWindowExt for BrowserWindowImpl {
 						}
 					};
 					result.expect("unable to navigate to source");
-
-					// Register the message handler
-					webview
-						.add_web_message_received(move |w, msg| {
-							let string = msg
-								.get_web_message_as_json()
-								.expect("unable to get web message as json");
-
-							let handle = BrowserWindowImpl { inner: bw_inner };
-							match JsValue::from_json(&string) {
-								JsValue::Array(args) => {
-									let command = args[0].to_string_unenclosed();
-									let command_args = args[1..].to_vec();
-									handler(handle, &command, command_args);
-								}
-								_ => panic!(
-									"unexpected JavaScript value received from Edge WebView2"
-								),
-							}
-							Ok(())
-						})
-						.expect("unable to register message handler");
 
 					webview.execute_script(
 						r#"
@@ -208,7 +180,50 @@ impl BrowserWindowExt for BrowserWindowImpl {
 	}
 }
 
-impl BrowserWindowEventExt for BrowserWindowImpl {}
+impl BrowserWindowEventExt for BrowserWindowImpl {
+	fn on_message(&self, handle: Weak<BrowserWindowOwner>) -> MessageEvent { MessageEvent::new(handle) }
+}
+
+def_browser_event!(MessageEvent<MessageEventArgs<'static>>(&mut self, handler) {
+	if let Some(this) = self.owner.upgrade() {
+		// Register the message handler
+		let this2 = self.clone();
+		webview.add_web_message_received(move |w, msg| {
+			let string = msg
+				.get_web_message_as_json()
+				.expect("unable to get web message as json");
+
+			let handle = BrowserWindowImpl { inner: bw_inner };
+			let(command, args) = match JsValue::from_json(&string) {
+				JsValue::Array(args) => {
+					let command = args[0].to_string_unenclosed();
+					let command_args = args[1..].to_vec();
+					(command, command_args)
+				}
+				_ => panic!(
+					"unexpected JavaScript value received from Edge WebView2"
+				),
+			}
+
+			let e = MessageEventArgs {
+				cmd: unsafe { &*(command.as_ref() as *const str) },
+				args
+			};
+			match unsafe { &mut *h.as_ptr() } {
+				EventHandler::Sync(callback) => {
+					(callback)(&*this2, &e);
+				}
+				EventHandler::Async(callback) => {
+					let app = this2.0.app();
+					let future = (callback)(BrowserWindow(this2.clone()), &e);
+					app.spawn(future);
+				}
+			}
+			Ok(())
+		})
+		.expect("unable to register message handler");
+	}
+});
 
 
 fn dispatch_eval_js(_app: ApplicationImpl, dispatch_data: *mut ()) {
@@ -227,7 +242,7 @@ fn dispatch_eval_js(_app: ApplicationImpl, dispatch_data: *mut ()) {
 		});
 }
 
-unsafe extern "C" fn ffi_handler(
+/*unsafe extern "C" fn ffi_handler(
 	bw: *mut cbw_BrowserWindow, cmd: cbw_CStrSlice, args: *mut cbw_CStrSlice, arg_count: usize,
 ) {
 	let handle = BrowserWindowImpl { inner: bw };
@@ -243,4 +258,4 @@ unsafe extern "C" fn ffi_handler(
 	}
 
 	(data.func)(handle, cmd_string, args_vec);
-}
+}*/

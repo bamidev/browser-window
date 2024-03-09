@@ -6,7 +6,7 @@ extern "C" {
 #endif
 
 #include "../win32.h"
-#include <stdbool.h>
+#include "../bool.h"
 
 
 typedef struct bw_Window bw_Window;
