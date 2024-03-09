@@ -5,7 +5,8 @@
 
 
 void bw_BrowserWindow_free( bw_BrowserWindow* bw ) {
-	bw_BrowserWindowImpl_free(bw);
+	bw_BrowserWindowImpl_clean(&bw->impl);
+	free(bw);
 }
 
 bw_Application* bw_BrowserWindow_getApp( bw_BrowserWindow* bw ) {

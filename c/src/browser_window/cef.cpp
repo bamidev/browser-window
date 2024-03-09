@@ -131,14 +131,14 @@ void bw_BrowserWindowCef_connectToWindow( bw_BrowserWindow* bw, CefWindowInfo& i
 #endif
 }
 
-void bw_BrowserWindowImpl_free(bw_BrowserWindow* bw) {
+void bw_BrowserWindowImpl_clean(bw_BrowserWindowImpl* bw) {
 	// Remove the link between our bw_BrowserWindow handle and the CefBrowser handle
-	CefRefPtr<CefBrowser>* cef_ptr = (CefRefPtr<CefBrowser>*)bw->impl.cef_ptr;
+	CefRefPtr<CefBrowser>* cef_ptr = (CefRefPtr<CefBrowser>*)bw->cef_ptr;
 	bw::bw_handle_map.drop( *cef_ptr );
 
 	// Delete the CefBrowser pointer that we have stored in our bw_BrowserWindow handle
 	delete cef_ptr;
-	delete bw->impl.resource_path;
+	delete bw->resource_path;
 }
 
 bw_Err bw_BrowserWindow_navigate( bw_BrowserWindow* bw, bw_CStrSlice url ) {

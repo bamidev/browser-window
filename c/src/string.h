@@ -5,8 +5,15 @@
 extern "C" {
 #endif
 
+#ifndef BW_BINDGEN
 #include <stddef.h>
-
+#else
+#ifdef BW_WIN32
+typedef unsigned long long size_t;
+#else
+#include <stddef.h>
+#endif
+#endif
 
 
 /// A 'string slice'

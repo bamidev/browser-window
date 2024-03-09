@@ -277,18 +277,6 @@ BOOL CALLBACK _bw_Window_closeChild( HWND handle, LPARAM _window ) {
 		// Read the class name for the win32 handle
 		wchar_t class_name[11];
 		int class_name_len = GetClassNameW( handle, class_name, 11 );
-
-		// Check if this handle is of class bw-window,
-		//  if it is, we know that the enum_window handle is valid.
-		wchar_t* bw_class = L"bw-window";
-		if ( class_name_len == 9 && memcmp( class_name, bw_class, 9*sizeof(wchar_t) ) == 0 ) {
-
-			// If this is a child window, close it
-			if ( enum_window->parent == window ) {
-				bw_Window_triggerClose( enum_window );
-			}
-		}
-
 	}
 
 	return true;

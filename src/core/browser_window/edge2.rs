@@ -1,10 +1,19 @@
-use std::borrow::Cow;
+use std::{
+	borrow::Cow,
+	cell::Cell,
+	ffi::c_void,
+	ptr
+};
 
 use webview2::Environment;
 use winapi::{shared::windef, um::winuser};
 
 use super::{super::window::WindowImpl, *};
-use crate::prelude::{ApplicationExt, WindowExt};
+use crate::{
+	def_browser_event,
+	def_event,
+	prelude::{ApplicationExt, WindowExt}
+};
 
 
 #[derive(Clone)]
@@ -63,7 +72,6 @@ impl BrowserWindowExt for BrowserWindowImpl {
 
 	fn free(&self) {
 		unsafe {
-			Box::<UserData>::from_raw((*self.inner).user_data as _);
 			Box::<webview2::Controller>::from_raw((*self.inner).impl_.controller as _);
 			Box::<webview2::WebView>::from_raw((*self.inner).impl_.webview as _);
 		}
@@ -77,10 +85,6 @@ impl BrowserWindowExt for BrowserWindowImpl {
 		browser_window_options: &BrowserWindowOptions, creation_callback: CreationCallbackFn, callback_data: *mut (),
 	) {
 		// Create window
-		let user_data = Box::new(UserData {
-			func: handler,
-			data: user_data,
-		});
 		let bw_inner = unsafe {
 			cbw_BrowserWindow_new(
 				app.inner,
@@ -156,14 +160,6 @@ impl BrowserWindowExt for BrowserWindowImpl {
 			.unwrap();
 	}
 
-	fn user_data(&self) -> *mut () {
-		let c_user_data_ptr: *mut UserData = unsafe { (*self.inner).user_data as _ };
-
-		// The actual user data pointer is stored within the `UserData` struct that is
-		// stored within the C handle
-		unsafe { (*c_user_data_ptr).data }
-	}
-
 	fn url(&self) -> Cow<'_, str> {
 		self.webview()
 			.get_source()
@@ -184,30 +180,31 @@ impl BrowserWindowEventExt for BrowserWindowImpl {
 	fn on_message(&self, handle: Weak<BrowserWindowOwner>) -> MessageEvent { MessageEvent::new(handle) }
 }
 
+
 def_browser_event!(MessageEvent<MessageEventArgs<'static>>(&mut self, handler) {
 	if let Some(this) = self.owner.upgrade() {
 		// Register the message handler
-		let this2 = self.clone();
-		webview.add_web_message_received(move |w, msg| {
+		let this2 = this.clone();
+		let h = Rc::new(Cell::new(handler));
+		this.inner.webview().add_web_message_received(move |_, msg| {
 			let string = msg
 				.get_web_message_as_json()
 				.expect("unable to get web message as json");
 
-			let handle = BrowserWindowImpl { inner: bw_inner };
-			let(command, args) = match JsValue::from_json(&string) {
+			let(command, args2) = match JsValue::from_json(&string) {
 				JsValue::Array(args) => {
-					let command = args[0].to_string_unenclosed();
+					let command = args[0].to_string_unenclosed().to_string();
 					let command_args = args[1..].to_vec();
 					(command, command_args)
 				}
 				_ => panic!(
 					"unexpected JavaScript value received from Edge WebView2"
 				),
-			}
+			};
 
 			let e = MessageEventArgs {
 				cmd: unsafe { &*(command.as_ref() as *const str) },
-				args
+				args: args2
 			};
 			match unsafe { &mut *h.as_ptr() } {
 				EventHandler::Sync(callback) => {
@@ -242,20 +239,15 @@ fn dispatch_eval_js(_app: ApplicationImpl, dispatch_data: *mut ()) {
 		});
 }
 
-/*unsafe extern "C" fn ffi_handler(
-	bw: *mut cbw_BrowserWindow, cmd: cbw_CStrSlice, args: *mut cbw_CStrSlice, arg_count: usize,
-) {
-	let handle = BrowserWindowImpl { inner: bw };
 
-	let data_ptr = (*bw).user_data as *mut UserData;
-	let data = &mut *data_ptr;
-
-	// Convert the command and args to a String and `Vec<&str>`
-	let cmd_string: &str = cmd.into();
-	let mut args_vec: Vec<JsValue> = Vec::with_capacity(arg_count as usize);
-	for i in 0..arg_count {
-		args_vec.push(JsValue::Other((*args.add(i as usize)).into()));
+#[allow(non_snake_case)]
+#[no_mangle]
+extern "C" fn bw_Window_freeUserData(w: *mut c_void) {
+	let w_ptr = w as *mut cbw_Window;
+	unsafe {
+		if (*w_ptr).user_data != ptr::null_mut() {
+			BrowserWindowImpl::free_user_data((*w_ptr).user_data as _);
+			(*w_ptr).user_data = ptr::null_mut();
+		}
 	}
-
-	(data.func)(handle, cmd_string, args_vec);
-}*/
+}
