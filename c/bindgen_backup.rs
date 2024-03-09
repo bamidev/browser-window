@@ -349,6 +349,10 @@ extern "C" {
 	#[link_name = "\u{1}bw_string_free"]
 	pub fn cbw_string_free(str_: cbw_StrSlice);
 }
+extern "C" {
+	#[link_name = "\u{1}bw_string_freeC"]
+	pub fn cbw_string_freeC(str_: cbw_CStrSlice);
+}
 pub type cbw_ApplicationDispatchFn = ::std::option::Option<
 	unsafe extern "C" fn(app: *mut cbw_Application, data: *mut ::std::os::raw::c_void),
 >;
@@ -3202,7 +3206,10 @@ fn bindgen_test_layout_cbw_BrowserWindowImpl() {
 	);
 }
 pub type cbw_EventCallbackFn = ::std::option::Option<
-	unsafe extern "C" fn(arg: *mut ::std::os::raw::c_void, event_data: *mut ::std::os::raw::c_void),
+	unsafe extern "C" fn(
+		arg: *mut ::std::os::raw::c_void,
+		event_data: *mut ::std::os::raw::c_void,
+	) -> cBOOL,
 >;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -3244,6 +3251,10 @@ fn bindgen_test_layout_cbw_Event() {
 			stringify!(data)
 		)
 	);
+}
+extern "C" {
+	#[link_name = "\u{1}bw_Event_fire"]
+	pub fn cbw_Event_fire(event: *mut cbw_Event, data: *mut ::std::os::raw::c_void) -> cBOOL;
 }
 extern "C" {
 	#[link_name = "\u{1}__assert_fail"]
@@ -4345,79 +4356,6 @@ fn bindgen_test_layout_cbw_Pos2D() {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct cbw_WindowCallbacks {
-	#[doc = " Fired just before the window gets destroyed and freed from memory.\n Should be implemented to free the user data provided to the window."]
-	pub do_cleanup: ::std::option::Option<unsafe extern "C" fn(arg1: *mut cbw_Window)>,
-	#[doc = " Fired when the window has been closed, either by the user or programmatically."]
-	pub on_close: ::std::option::Option<unsafe extern "C" fn(arg1: *const cbw_Window)>,
-	#[doc = " Fired when a window has finished loading"]
-	pub on_loaded: ::std::option::Option<unsafe extern "C" fn(arg1: *const cbw_Window)>,
-	#[doc = " Fired when a window is resizing"]
-	pub on_resize: ::std::option::Option<
-		unsafe extern "C" fn(
-			arg1: *const cbw_Window,
-			width: ::std::os::raw::c_uint,
-			height: ::std::os::raw::c_uint,
-		),
-	>,
-}
-#[test]
-fn bindgen_test_layout_cbw_WindowCallbacks() {
-	const UNINIT: ::std::mem::MaybeUninit<cbw_WindowCallbacks> = ::std::mem::MaybeUninit::uninit();
-	let ptr = UNINIT.as_ptr();
-	assert_eq!(
-		::std::mem::size_of::<cbw_WindowCallbacks>(),
-		32usize,
-		concat!("Size of: ", stringify!(cbw_WindowCallbacks))
-	);
-	assert_eq!(
-		::std::mem::align_of::<cbw_WindowCallbacks>(),
-		8usize,
-		concat!("Alignment of ", stringify!(cbw_WindowCallbacks))
-	);
-	assert_eq!(
-		unsafe { ::std::ptr::addr_of!((*ptr).do_cleanup) as usize - ptr as usize },
-		0usize,
-		concat!(
-			"Offset of field: ",
-			stringify!(cbw_WindowCallbacks),
-			"::",
-			stringify!(do_cleanup)
-		)
-	);
-	assert_eq!(
-		unsafe { ::std::ptr::addr_of!((*ptr).on_close) as usize - ptr as usize },
-		8usize,
-		concat!(
-			"Offset of field: ",
-			stringify!(cbw_WindowCallbacks),
-			"::",
-			stringify!(on_close)
-		)
-	);
-	assert_eq!(
-		unsafe { ::std::ptr::addr_of!((*ptr).on_loaded) as usize - ptr as usize },
-		16usize,
-		concat!(
-			"Offset of field: ",
-			stringify!(cbw_WindowCallbacks),
-			"::",
-			stringify!(on_loaded)
-		)
-	);
-	assert_eq!(
-		unsafe { ::std::ptr::addr_of!((*ptr).on_resize) as usize - ptr as usize },
-		24usize,
-		concat!(
-			"Offset of field: ",
-			stringify!(cbw_WindowCallbacks),
-			"::",
-			stringify!(on_resize)
-		)
-	);
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct cbw_WindowOptions {
 	pub borders: bool,
 	pub minimizable: bool,
@@ -4499,7 +4437,6 @@ pub struct cbw_Window {
 	pub parent: *const cbw_Window,
 	pub closed: bool,
 	pub dropped: bool,
-	pub callbacks: cbw_WindowCallbacks,
 	pub user_data: *mut ::std::os::raw::c_void,
 	pub impl_: cbw_WindowImpl,
 }
@@ -4509,7 +4446,7 @@ fn bindgen_test_layout_cbw_Window() {
 	let ptr = UNINIT.as_ptr();
 	assert_eq!(
 		::std::mem::size_of::<cbw_Window>(),
-		64usize,
+		32usize,
 		concat!("Size of: ", stringify!(cbw_Window))
 	);
 	assert_eq!(
@@ -4558,18 +4495,8 @@ fn bindgen_test_layout_cbw_Window() {
 		)
 	);
 	assert_eq!(
-		unsafe { ::std::ptr::addr_of!((*ptr).callbacks) as usize - ptr as usize },
-		24usize,
-		concat!(
-			"Offset of field: ",
-			stringify!(cbw_Window),
-			"::",
-			stringify!(callbacks)
-		)
-	);
-	assert_eq!(
 		unsafe { ::std::ptr::addr_of!((*ptr).user_data) as usize - ptr as usize },
-		56usize,
+		24usize,
 		concat!(
 			"Offset of field: ",
 			stringify!(cbw_Window),
@@ -4579,7 +4506,7 @@ fn bindgen_test_layout_cbw_Window() {
 	);
 	assert_eq!(
 		unsafe { ::std::ptr::addr_of!((*ptr).impl_) as usize - ptr as usize },
-		64usize,
+		32usize,
 		concat!(
 			"Offset of field: ",
 			stringify!(cbw_Window),
@@ -4589,14 +4516,19 @@ fn bindgen_test_layout_cbw_Window() {
 	);
 }
 extern "C" {
-	#[doc = " Destroy the window, releasing all resources it holds.\n After this call, the handle is considered invalid."]
-	#[link_name = "\u{1}bw_Window_destroy"]
-	pub fn cbw_Window_destroy(window: *mut cbw_Window);
+	#[doc = " Hides the window and frees the user data"]
+	#[link_name = "\u{1}bw_Window_close"]
+	pub fn cbw_Window_close(window: *mut cbw_Window);
 }
 extern "C" {
-	#[doc = " Invalidates the window handle.\n The window will get destroyed when it is deemed possible."]
-	#[link_name = "\u{1}bw_Window_drop"]
-	pub fn cbw_Window_drop(window: *mut cbw_Window);
+	#[doc = " Invalidates the window handle."]
+	#[link_name = "\u{1}bw_Window_free"]
+	pub fn cbw_Window_free(window: *mut cbw_Window);
+}
+extern "C" {
+	#[doc = " Frees the user data that was attached to this window."]
+	#[link_name = "\u{1}bw_Window_freeUserData"]
+	pub fn cbw_Window_freeUserData(window: *mut cbw_Window);
 }
 extern "C" {
 	#[doc = " Gets the width and height of the usable area inside the window."]
@@ -4640,7 +4572,7 @@ extern "C" {
 	pub fn cbw_Window_new(
 		app: *mut cbw_Application, parent: *const cbw_Window, _title: cbw_CStrSlice,
 		width: ::std::os::raw::c_int, height: ::std::os::raw::c_int,
-		options: *const cbw_WindowOptions, user_data: *mut ::std::os::raw::c_void,
+		options: *const cbw_WindowOptions,
 	) -> *mut cbw_Window;
 }
 extern "C" {
@@ -4654,6 +4586,10 @@ extern "C" {
 extern "C" {
 	#[link_name = "\u{1}bw_Window_setPosition"]
 	pub fn cbw_Window_setPosition(window: *mut cbw_Window, position: cbw_Pos2D);
+}
+extern "C" {
+	#[link_name = "\u{1}bw_Window_setUserData"]
+	pub fn cbw_Window_setUserData(bw: *mut cbw_Window, user_data: *mut ::std::os::raw::c_void);
 }
 extern "C" {
 	#[doc = " Applies the given title;"]
@@ -4701,8 +4637,17 @@ pub type cbw_BrowserWindowJsCallbackFn = ::std::option::Option<
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct cbw_BrowserWindowEvents {
+	pub on_address_changed: cbw_Event,
+	pub on_console_message: cbw_Event,
+	pub on_favicon_changed: cbw_Event,
+	pub on_fullscreen_mode_changed: cbw_Event,
+	pub on_loading_progress_changed: cbw_Event,
+	pub on_message: cbw_Event,
 	pub on_navigation_start: cbw_Event,
 	pub on_navigation_end: cbw_Event,
+	pub on_page_title_changed: cbw_Event,
+	pub on_status_message: cbw_Event,
+	pub on_tooltip: cbw_Event,
 }
 #[test]
 fn bindgen_test_layout_cbw_BrowserWindowEvents() {
@@ -4711,7 +4656,7 @@ fn bindgen_test_layout_cbw_BrowserWindowEvents() {
 	let ptr = UNINIT.as_ptr();
 	assert_eq!(
 		::std::mem::size_of::<cbw_BrowserWindowEvents>(),
-		32usize,
+		176usize,
 		concat!("Size of: ", stringify!(cbw_BrowserWindowEvents))
 	);
 	assert_eq!(
@@ -4720,8 +4665,68 @@ fn bindgen_test_layout_cbw_BrowserWindowEvents() {
 		concat!("Alignment of ", stringify!(cbw_BrowserWindowEvents))
 	);
 	assert_eq!(
-		unsafe { ::std::ptr::addr_of!((*ptr).on_navigation_start) as usize - ptr as usize },
+		unsafe { ::std::ptr::addr_of!((*ptr).on_address_changed) as usize - ptr as usize },
 		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_BrowserWindowEvents),
+			"::",
+			stringify!(on_address_changed)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).on_console_message) as usize - ptr as usize },
+		16usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_BrowserWindowEvents),
+			"::",
+			stringify!(on_console_message)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).on_favicon_changed) as usize - ptr as usize },
+		32usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_BrowserWindowEvents),
+			"::",
+			stringify!(on_favicon_changed)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).on_fullscreen_mode_changed) as usize - ptr as usize },
+		48usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_BrowserWindowEvents),
+			"::",
+			stringify!(on_fullscreen_mode_changed)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).on_loading_progress_changed) as usize - ptr as usize },
+		64usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_BrowserWindowEvents),
+			"::",
+			stringify!(on_loading_progress_changed)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).on_message) as usize - ptr as usize },
+		80usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_BrowserWindowEvents),
+			"::",
+			stringify!(on_message)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).on_navigation_start) as usize - ptr as usize },
+		96usize,
 		concat!(
 			"Offset of field: ",
 			stringify!(cbw_BrowserWindowEvents),
@@ -4731,12 +4736,96 @@ fn bindgen_test_layout_cbw_BrowserWindowEvents() {
 	);
 	assert_eq!(
 		unsafe { ::std::ptr::addr_of!((*ptr).on_navigation_end) as usize - ptr as usize },
-		16usize,
+		112usize,
 		concat!(
 			"Offset of field: ",
 			stringify!(cbw_BrowserWindowEvents),
 			"::",
 			stringify!(on_navigation_end)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).on_page_title_changed) as usize - ptr as usize },
+		128usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_BrowserWindowEvents),
+			"::",
+			stringify!(on_page_title_changed)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).on_status_message) as usize - ptr as usize },
+		144usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_BrowserWindowEvents),
+			"::",
+			stringify!(on_status_message)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).on_tooltip) as usize - ptr as usize },
+		160usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_BrowserWindowEvents),
+			"::",
+			stringify!(on_tooltip)
+		)
+	);
+}
+#[doc = " `cmd` is always a string. The arguments are JS values in the form of a string."]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct cbw_BrowserWindowMessageArgs {
+	pub cmd: cbw_CStrSlice,
+	pub arg_count: usize,
+	pub args: *mut cbw_CStrSlice,
+}
+#[test]
+fn bindgen_test_layout_cbw_BrowserWindowMessageArgs() {
+	const UNINIT: ::std::mem::MaybeUninit<cbw_BrowserWindowMessageArgs> =
+		::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<cbw_BrowserWindowMessageArgs>(),
+		32usize,
+		concat!("Size of: ", stringify!(cbw_BrowserWindowMessageArgs))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cbw_BrowserWindowMessageArgs>(),
+		8usize,
+		concat!("Alignment of ", stringify!(cbw_BrowserWindowMessageArgs))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).cmd) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_BrowserWindowMessageArgs),
+			"::",
+			stringify!(cmd)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).arg_count) as usize - ptr as usize },
+		16usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_BrowserWindowMessageArgs),
+			"::",
+			stringify!(arg_count)
+		)
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).args) as usize - ptr as usize },
+		24usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_BrowserWindowMessageArgs),
+			"::",
+			stringify!(args)
 		)
 	);
 }
@@ -4828,8 +4917,6 @@ fn bindgen_test_layout_cbw_BrowserWindowSource() {
 #[derive(Debug, Copy, Clone)]
 pub struct cbw_BrowserWindow {
 	pub window: *mut cbw_Window,
-	pub external_handler: cbw_BrowserWindowHandlerFn,
-	pub user_data: *mut ::std::os::raw::c_void,
 	pub impl_: cbw_BrowserWindowImpl,
 	pub events: cbw_BrowserWindowEvents,
 }
@@ -4839,7 +4926,7 @@ fn bindgen_test_layout_cbw_BrowserWindow() {
 	let ptr = UNINIT.as_ptr();
 	assert_eq!(
 		::std::mem::size_of::<cbw_BrowserWindow>(),
-		56usize,
+		184usize,
 		concat!("Size of: ", stringify!(cbw_BrowserWindow))
 	);
 	assert_eq!(
@@ -4858,28 +4945,8 @@ fn bindgen_test_layout_cbw_BrowserWindow() {
 		)
 	);
 	assert_eq!(
-		unsafe { ::std::ptr::addr_of!((*ptr).external_handler) as usize - ptr as usize },
-		8usize,
-		concat!(
-			"Offset of field: ",
-			stringify!(cbw_BrowserWindow),
-			"::",
-			stringify!(external_handler)
-		)
-	);
-	assert_eq!(
-		unsafe { ::std::ptr::addr_of!((*ptr).user_data) as usize - ptr as usize },
-		16usize,
-		concat!(
-			"Offset of field: ",
-			stringify!(cbw_BrowserWindow),
-			"::",
-			stringify!(user_data)
-		)
-	);
-	assert_eq!(
 		unsafe { ::std::ptr::addr_of!((*ptr).impl_) as usize - ptr as usize },
-		24usize,
+		8usize,
 		concat!(
 			"Offset of field: ",
 			stringify!(cbw_BrowserWindow),
@@ -4889,7 +4956,7 @@ fn bindgen_test_layout_cbw_BrowserWindow() {
 	);
 	assert_eq!(
 		unsafe { ::std::ptr::addr_of!((*ptr).events) as usize - ptr as usize },
-		24usize,
+		8usize,
 		concat!(
 			"Offset of field: ",
 			stringify!(cbw_BrowserWindow),
@@ -4897,15 +4964,6 @@ fn bindgen_test_layout_cbw_BrowserWindow() {
 			stringify!(events)
 		)
 	);
-}
-extern "C" {
-	#[link_name = "\u{1}bw_BrowserWindow_destroy"]
-	pub fn cbw_BrowserWindow_destroy(bw: *mut cbw_BrowserWindow);
-}
-extern "C" {
-	#[doc = " Marks the browser window handle as not being used anymore.\n This makes it so that if and when the window gets closed, everything is freed and cleaned from memory.\n This function can be called from any thread so it needs to be thread safe."]
-	#[link_name = "\u{1}bw_BrowserWindow_drop"]
-	pub fn cbw_BrowserWindow_drop(bw: *mut cbw_BrowserWindow);
 }
 extern "C" {
 	#[doc = " Executes the given JavaScript and calls the given callback (on the GUI thread) to provide the result."]
@@ -4921,6 +4979,10 @@ extern "C" {
 		bw: *mut cbw_BrowserWindow, js: cbw_CStrSlice, callback: cbw_BrowserWindowJsCallbackFn,
 		cb_data: *mut ::std::os::raw::c_void,
 	);
+}
+extern "C" {
+	#[link_name = "\u{1}bw_BrowserWindow_free"]
+	pub fn cbw_BrowserWindow_free(bw: *mut cbw_BrowserWindow);
 }
 extern "C" {
 	#[link_name = "\u{1}bw_BrowserWindow_getApp"]
@@ -4949,8 +5011,7 @@ extern "C" {
 	pub fn cbw_BrowserWindow_new(
 		app: *mut cbw_Application, parent: *const cbw_Window, title: cbw_CStrSlice,
 		width: ::std::os::raw::c_int, height: ::std::os::raw::c_int,
-		window_options: *const cbw_WindowOptions, handler: cbw_BrowserWindowHandlerFn,
-		user_data: *mut ::std::os::raw::c_void,
+		window_options: *const cbw_WindowOptions,
 	) -> *mut cbw_BrowserWindow;
 }
 extern "C" {
@@ -4961,6 +5022,322 @@ extern "C" {
 		source: cbw_BrowserWindowSource, browser_window_options: *const cbw_BrowserWindowOptions,
 		callback: cbw_BrowserWindowCreationCallbackFn, callback_data: *mut ::std::os::raw::c_void,
 	);
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct cbw_CookieImpl {
+	pub __: *mut ::std::os::raw::c_void,
+}
+#[test]
+fn bindgen_test_layout_cbw_CookieImpl() {
+	const UNINIT: ::std::mem::MaybeUninit<cbw_CookieImpl> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<cbw_CookieImpl>(),
+		8usize,
+		concat!("Size of: ", stringify!(cbw_CookieImpl))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cbw_CookieImpl>(),
+		8usize,
+		concat!("Alignment of ", stringify!(cbw_CookieImpl))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_CookieImpl),
+			"::",
+			stringify!(__)
+		)
+	);
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct cbw_CookieIteratorImpl {
+	pub __: *mut ::std::os::raw::c_void,
+}
+#[test]
+fn bindgen_test_layout_cbw_CookieIteratorImpl() {
+	const UNINIT: ::std::mem::MaybeUninit<cbw_CookieIteratorImpl> =
+		::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<cbw_CookieIteratorImpl>(),
+		8usize,
+		concat!("Size of: ", stringify!(cbw_CookieIteratorImpl))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cbw_CookieIteratorImpl>(),
+		8usize,
+		concat!("Alignment of ", stringify!(cbw_CookieIteratorImpl))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_CookieIteratorImpl),
+			"::",
+			stringify!(__)
+		)
+	);
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct cbw_CookieJarImpl {
+	pub __: *mut ::std::os::raw::c_void,
+}
+#[test]
+fn bindgen_test_layout_cbw_CookieJarImpl() {
+	const UNINIT: ::std::mem::MaybeUninit<cbw_CookieJarImpl> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<cbw_CookieJarImpl>(),
+		8usize,
+		concat!("Size of: ", stringify!(cbw_CookieJarImpl))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cbw_CookieJarImpl>(),
+		8usize,
+		concat!("Alignment of ", stringify!(cbw_CookieJarImpl))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).__) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_CookieJarImpl),
+			"::",
+			stringify!(__)
+		)
+	);
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct cbw_Cookie {
+	pub impl_: cbw_CookieImpl,
+}
+#[test]
+fn bindgen_test_layout_cbw_Cookie() {
+	const UNINIT: ::std::mem::MaybeUninit<cbw_Cookie> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<cbw_Cookie>(),
+		8usize,
+		concat!("Size of: ", stringify!(cbw_Cookie))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cbw_Cookie>(),
+		8usize,
+		concat!("Alignment of ", stringify!(cbw_Cookie))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).impl_) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_Cookie),
+			"::",
+			stringify!(impl_)
+		)
+	);
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct cbw_CookieJar {
+	pub impl_: cbw_CookieJarImpl,
+}
+#[test]
+fn bindgen_test_layout_cbw_CookieJar() {
+	const UNINIT: ::std::mem::MaybeUninit<cbw_CookieJar> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<cbw_CookieJar>(),
+		8usize,
+		concat!("Size of: ", stringify!(cbw_CookieJar))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cbw_CookieJar>(),
+		8usize,
+		concat!("Alignment of ", stringify!(cbw_CookieJar))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).impl_) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_CookieJar),
+			"::",
+			stringify!(impl_)
+		)
+	);
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct cbw_CookieIterator {
+	pub impl_: cbw_CookieIteratorImpl,
+}
+#[test]
+fn bindgen_test_layout_cbw_CookieIterator() {
+	const UNINIT: ::std::mem::MaybeUninit<cbw_CookieIterator> = ::std::mem::MaybeUninit::uninit();
+	let ptr = UNINIT.as_ptr();
+	assert_eq!(
+		::std::mem::size_of::<cbw_CookieIterator>(),
+		8usize,
+		concat!("Size of: ", stringify!(cbw_CookieIterator))
+	);
+	assert_eq!(
+		::std::mem::align_of::<cbw_CookieIterator>(),
+		8usize,
+		concat!("Alignment of ", stringify!(cbw_CookieIterator))
+	);
+	assert_eq!(
+		unsafe { ::std::ptr::addr_of!((*ptr).impl_) as usize - ptr as usize },
+		0usize,
+		concat!(
+			"Offset of field: ",
+			stringify!(cbw_CookieIterator),
+			"::",
+			stringify!(impl_)
+		)
+	);
+}
+pub type cbw_CookieJarStorageCallbackFn = ::std::option::Option<
+	unsafe extern "C" fn(cj: *mut cbw_CookieJar, data: *mut ::std::os::raw::c_void, error: cbw_Err),
+>;
+pub type cbw_CookieIteratorNextCallbackFn = ::std::option::Option<
+	unsafe extern "C" fn(
+		ci: *mut cbw_CookieIterator,
+		data: *mut ::std::os::raw::c_void,
+		cookie: *mut cbw_Cookie,
+	),
+>;
+pub type cbw_CookieJarDeleteCallbackFn = ::std::option::Option<
+	unsafe extern "C" fn(
+		cj: *mut cbw_CookieJar,
+		data: *mut ::std::os::raw::c_void,
+		deleted: ::std::os::raw::c_uint,
+	),
+>;
+extern "C" {
+	#[link_name = "\u{1}bw_Cookie_free"]
+	pub fn cbw_Cookie_free(cookie: *mut cbw_Cookie);
+}
+extern "C" {
+	#[link_name = "\u{1}bw_Cookie_new"]
+	pub fn cbw_Cookie_new(name: cbw_CStrSlice, value: cbw_CStrSlice) -> *mut cbw_Cookie;
+}
+extern "C" {
+	#[link_name = "\u{1}bw_Cookie_getCreationTime"]
+	pub fn cbw_Cookie_getCreationTime(cookie: *const cbw_Cookie) -> u64;
+}
+extern "C" {
+	#[link_name = "\u{1}bw_Cookie_setCreationTime"]
+	pub fn cbw_Cookie_setCreationTime(cookie: *mut cbw_Cookie, time: u64);
+}
+extern "C" {
+	#[link_name = "\u{1}bw_Cookie_getDomain"]
+	pub fn cbw_Cookie_getDomain(cookie: *const cbw_Cookie, domain: *mut cbw_StrSlice) -> cBOOL;
+}
+extern "C" {
+	#[link_name = "\u{1}bw_Cookie_setDomain"]
+	pub fn cbw_Cookie_setDomain(cookie: *mut cbw_Cookie, domain: cbw_CStrSlice);
+}
+extern "C" {
+	#[link_name = "\u{1}bw_Cookie_getExpires"]
+	pub fn cbw_Cookie_getExpires(cookie: *const cbw_Cookie) -> u64;
+}
+extern "C" {
+	#[link_name = "\u{1}bw_Cookie_setExpires"]
+	pub fn cbw_Cookie_setExpires(cookie: *mut cbw_Cookie, time: u64);
+}
+extern "C" {
+	#[link_name = "\u{1}bw_Cookie_getName"]
+	pub fn cbw_Cookie_getName(cookie: *const cbw_Cookie, name: *mut cbw_StrSlice) -> cBOOL;
+}
+extern "C" {
+	#[link_name = "\u{1}bw_Cookie_setName"]
+	pub fn cbw_Cookie_setName(cookie: *mut cbw_Cookie, name: cbw_CStrSlice);
+}
+extern "C" {
+	#[link_name = "\u{1}bw_Cookie_getPath"]
+	pub fn cbw_Cookie_getPath(cookie: *const cbw_Cookie, path: *mut cbw_StrSlice) -> cBOOL;
+}
+extern "C" {
+	#[link_name = "\u{1}bw_Cookie_setPath"]
+	pub fn cbw_Cookie_setPath(cookie: *mut cbw_Cookie, path: cbw_CStrSlice);
+}
+extern "C" {
+	#[link_name = "\u{1}bw_Cookie_getValue"]
+	pub fn cbw_Cookie_getValue(cookie: *const cbw_Cookie, value: *mut cbw_StrSlice) -> cBOOL;
+}
+extern "C" {
+	#[link_name = "\u{1}bw_Cookie_setValue"]
+	pub fn cbw_Cookie_setValue(cookie: *mut cbw_Cookie, value: cbw_CStrSlice);
+}
+extern "C" {
+	#[link_name = "\u{1}bw_Cookie_isHttpOnly"]
+	pub fn cbw_Cookie_isHttpOnly(cookie: *const cbw_Cookie) -> cBOOL;
+}
+extern "C" {
+	#[link_name = "\u{1}bw_Cookie_makeHttpOnly"]
+	pub fn cbw_Cookie_makeHttpOnly(cookie: *mut cbw_Cookie);
+}
+extern "C" {
+	#[link_name = "\u{1}bw_Cookie_isSecure"]
+	pub fn cbw_Cookie_isSecure(cookie: *const cbw_Cookie) -> cBOOL;
+}
+extern "C" {
+	#[link_name = "\u{1}bw_Cookie_makeSecure"]
+	pub fn cbw_Cookie_makeSecure(cookie: *mut cbw_Cookie);
+}
+extern "C" {
+	#[link_name = "\u{1}bw_CookieJar_delete"]
+	pub fn cbw_CookieJar_delete(
+		jar: *mut cbw_CookieJar, url: cbw_CStrSlice, name: cbw_CStrSlice,
+		cb: cbw_CookieJarDeleteCallbackFn, cb_data: *mut ::std::os::raw::c_void,
+	);
+}
+extern "C" {
+	#[link_name = "\u{1}bw_CookieJar_free"]
+	pub fn cbw_CookieJar_free(jar: *mut cbw_CookieJar);
+}
+extern "C" {
+	#[link_name = "\u{1}bw_CookieJar_iterator"]
+	pub fn cbw_CookieJar_iterator(
+		jar: *mut cbw_CookieJar, iterator: *mut *mut cbw_CookieIterator, include_http_only: cBOOL,
+		url: cbw_CStrSlice,
+	);
+}
+extern "C" {
+	#[link_name = "\u{1}bw_CookieJar_iteratorAll"]
+	pub fn cbw_CookieJar_iteratorAll(
+		jar: *mut cbw_CookieJar, iterator: *mut *mut cbw_CookieIterator,
+	);
+}
+extern "C" {
+	#[link_name = "\u{1}bw_CookieJar_newGlobal"]
+	pub fn cbw_CookieJar_newGlobal() -> *mut cbw_CookieJar;
+}
+extern "C" {
+	#[link_name = "\u{1}bw_CookieJar_store"]
+	pub fn cbw_CookieJar_store(
+		jar: *mut cbw_CookieJar, url: cbw_CStrSlice, cookie: *const cbw_Cookie,
+		cb: cbw_CookieJarStorageCallbackFn, cb_data: *mut ::std::os::raw::c_void,
+	) -> cbw_Err;
+}
+extern "C" {
+	#[link_name = "\u{1}bw_CookieIterator_free"]
+	pub fn cbw_CookieIterator_free(iterator: *mut cbw_CookieIterator);
+}
+extern "C" {
+	#[link_name = "\u{1}bw_CookieIterator_next"]
+	pub fn cbw_CookieIterator_next(
+		iterator: *mut cbw_CookieIterator, on_next: cbw_CookieIteratorNextCallbackFn,
+		cb_data: *mut ::std::os::raw::c_void,
+	) -> cBOOL;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
