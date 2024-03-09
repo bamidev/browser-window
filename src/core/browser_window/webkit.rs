@@ -28,11 +28,6 @@ pub struct BrowserWindowImpl {
 	inner: webkit2gtk::WebView,
 }
 
-struct CreationCallbackData {
-	func: CreationCallbackFn,
-	data: *mut (),
-}
-
 struct EvalJsCallbackData {
 	handle: BrowserWindowImpl,
 	code: String,
