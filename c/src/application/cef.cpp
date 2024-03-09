@@ -49,7 +49,7 @@ bw_Err bw_ApplicationEngineImpl_initialize( bw_ApplicationEngineImpl* impl, bw_A
 #endif
 
 	// For some reason the Windows implementation for CEF doesn't have the constructor for argc and argv.
-#ifdef BW_WIN32
+#ifdef BW_WINDOWS
 	CefMainArgs main_args( GetModuleHandle(NULL) );
 #else
 	CefMainArgs main_args( argc, argv );

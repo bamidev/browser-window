@@ -201,6 +201,12 @@ void bw_BrowserWindowImpl_new(
 	// Create the browser
 	CefRefPtr<CefClient>* cef_client = (CefRefPtr<CefClient>*)browser->window->app->engine_impl.cef_client;
 #ifndef BW_CEF_WINDOW
+	// The following line isn't work at the moment.
+	// We used to use CefBrowserHost::CreateBrowser, and listen for the OnBrowserCreated event.
+	// Problem is, it used to send a IPC message to the main process, but it wouldn't reliably come before or after the OnLoadEnd event.
+	// Moreover, the OnLoadEnd event would sometimes not be able to get the identifier of the CefBrowser instance.
+	// So there were times when it was simply impossible to link the bw_BrowserWindow* pointer to the CefBrowser identifier.
+	// Therefore, using CEF on top of another window API like that of win32, is currently unsupported.
 	auto cef_browser = CefBrowserHost::CreateBrowserSync( info, *cef_client, source_string, settings, dict, nullptr );
 #else
 	// CefBrowserHost::CreateBrowser doesn't work well with Cef's own window layer, so we use the CefBrowserView

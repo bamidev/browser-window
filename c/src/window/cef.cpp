@@ -84,7 +84,7 @@ void bw_Window_setOpacity( bw_Window* window, uint8_t opacity ) {
 	UNUSED( opacity );
 }
 
-bw_WindowImpl bw_WindowImpl_new(
+extern "C" bw_WindowImpl bw_WindowImpl_new(
 	bw_Window* _window,
 	bw_CStrSlice _title,
 	int width, int height,
@@ -105,17 +105,17 @@ bw_WindowImpl bw_WindowImpl_new(
 	return impl;
 }
 
-void bw_WindowImpl_destroy( bw_WindowImpl* window ) {
+extern "C" void bw_WindowImpl_close( bw_WindowImpl* window ) {
 	auto window_ptr = (CefRefPtr<CefWindow>*)window->handle_ptr;
 	(*window_ptr)->Close();
 	delete window_ptr;
 }
 
-void bw_WindowImpl_hide( bw_WindowImpl* window ) {
+extern "C" void bw_WindowImpl_hide( bw_WindowImpl* window ) {
 	(*(CefRefPtr<CefWindow>*)window->handle_ptr)->Hide();
 }
 
-void bw_WindowImpl_show( bw_WindowImpl* window ) {
+extern "C" void bw_WindowImpl_show( bw_WindowImpl* window ) {
 	(*(CefRefPtr<CefWindow>*)window->handle_ptr)->Show();
 }
 

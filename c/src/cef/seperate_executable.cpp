@@ -21,7 +21,7 @@ int main(int argc, char* argv[]) {
 
 	// Structure for passing command-line arguments.
 	// The definition of this structure is platform-specific.
-#ifndef BW_WIN32
+#ifndef BW_WINDOWS
 	CefMainArgs main_args(argc, argv);
 #else
 	CefMainArgs main_args(GetModuleHandle(NULL));
