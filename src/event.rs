@@ -9,10 +9,10 @@ pub type EventHandlerAsyncCallback<O, A> =
 #[cfg(not(feature = "threadsafe"))]
 pub type EventHandlerSyncCallback<H, A> = dyn FnMut(&H, &A) + 'static;
 #[cfg(feature = "threadsafe")]
-pub type EventHandlerAsyncCallback<H, A> =
+pub type EventHandlerAsyncCallback<O, A> =
 	dyn FnMut(O, &A) -> Pin<Box<dyn Future<Output = ()> + 'static>> + Send + 'static;
 #[cfg(feature = "threadsafe")]
-pub type EventHandlerSyncCallback<O, A> = dyn FnMut(&H, &A) + Send + 'static;
+pub type EventHandlerSyncCallback<H, A> = dyn FnMut(&H, &A) + Send + 'static;
 
 
 pub enum EventHandler<H, O, A> {
@@ -39,7 +39,7 @@ pub trait EventExt<H, O, A> {
 
 	/// Register a closure to be invoked for this event.
 	#[cfg(feature = "threadsafe")]
-	fn register<H>(&mut self, mut handler: H)
+	fn register<X>(&mut self, handler: X)
 	where
 		X: FnMut(&H, &A) + Send + 'static;
 
@@ -66,7 +66,7 @@ pub trait EventExt<H, O, A> {
 	/// });
 	/// ```
 	#[cfg(feature = "threadsafe")]
-	fn register_async<X, F>(&mut self, mut handler: HX)
+	fn register_async<X, F>(&mut self, handler: X)
 	where
 		X: FnMut(O, &A) -> F + Send + 'static,
 		F: Future<Output = ()> + 'static;
@@ -126,6 +126,7 @@ where
 macro_rules! decl_event {
 	($name:ident < $owner:ty >) => {
 		pub struct $name {
+			#[allow(dead_code)]
 			pub(crate) owner: crate::rc::Weak<$owner>,
 		}
 

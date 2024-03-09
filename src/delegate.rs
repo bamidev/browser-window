@@ -4,19 +4,17 @@ use std::{
 	mem, panic,
 	panic::{catch_unwind, AssertUnwindSafe},
 	pin::Pin,
-	rc::Rc,
-	sync::Arc,
 	task::{Context, Poll, Waker},
 };
 
-use super::application::{ApplicationHandle, HasAppHandle};
+use super::application::ApplicationHandle;
 use crate::core::application::*;
 
 /// The data that is sent to the GUI thread for `DelegateFuture`.
-struct DelegateData<'a, 'b, H, R> {
-	handle: H,
+struct DelegateData<'a, 'b, O, H, R> {
+	handle: O,
 	result: &'a mut Option<Result<R, DelegateError>>,
-	func: Box<dyn FnOnce(H) -> R + Send + 'b>,
+	func: Box<dyn FnOnce(&H) -> R + Send + 'b>,
 	waker: Waker,
 }
 //unsafe impl<'a,H,R> Send for DelegateData<'a,H,R> {}
@@ -42,23 +40,23 @@ pub enum DelegateError {
 }
 
 /// This future executes a closure on the GUI thread and returns the result.
-pub struct DelegateFuture<'a, H, R>
+pub struct DelegateFuture<'a, O, H, R>
 where
 	R: Send,
 {
-	handle: H,
-	func: Option<Box<dyn FnOnce(H) -> R + Send + 'a>>,
+	handle: O,
+	func: Option<Box<dyn FnOnce(&H) -> R + Send + 'a>>,
 	result: Option<Result<R, DelegateError>>,
 	started: bool,
 }
-impl<'a, H, R> Unpin for DelegateFuture<'a, H, R> where R: Send {}
+impl<'a, O, H, R> Unpin for DelegateFuture<'a, O, H, R> where R: Send {}
 /// # Safety
 /// `DelegateFuture` by itself is not send.
 /// This is because we keep a handle `H`, which is not necessarily `Send`.
 /// However, because the closure only executes on the GUI thread,
 ///  and because the handle is only provided to the closure that will be
 /// executed on the GUI thread,  this should be fine.
-unsafe impl<'a, H, R> Send for DelegateFuture<'a, H, R> where R: Send {}
+unsafe impl<'a, O, H, R> Send for DelegateFuture<'a, O, H, R> where R: Send {}
 
 /// This future runs a future on the GUI thread and returns its output.
 pub struct DelegateFutureFuture<'a, R>
@@ -101,13 +99,19 @@ where
 // sure that the future is safe to send to other threads.
 unsafe impl<'a, R> Send for DelegateFutureInner<'a, R> where R: Send {}
 
-impl<'a, H, R> DelegateFuture<'a, H, R>
+
+pub trait HasHandle<H> {
+	fn handle(&self) -> &H;
+}
+
+
+impl<'a, O, H, R> DelegateFuture<'a, O, H, R>
 where
 	R: Send,
 {
-	pub(super) fn new<F>(handle: H, func: F) -> Self
+	pub(super) fn new<F>(handle: O, func: F) -> Self
 	where
-		F: FnOnce(H) -> R + Send + 'a,
+		F: FnOnce(&H) -> R + Send + 'a,
 		R: Send,
 	{
 		Self {
@@ -120,9 +124,10 @@ where
 }
 
 #[cfg(feature = "threadsafe")]
-impl<'a, H, R> Future for DelegateFuture<'a, H, R>
+impl<'a, O, H, R> Future for DelegateFuture<'a, O, H, R>
 where
-	H: HasAppHandle + Clone + 'static,
+	O: HasHandle<H> + HasHandle<ApplicationHandle> + Clone,
+	H: 'static,
 	R: Send + 'static,
 {
 	type Output = Result<R, DelegateError>;
@@ -130,7 +135,7 @@ where
 	fn poll(mut self: Pin<&mut Self>, cx: &mut Context) -> Poll<Self::Output> {
 		if !self.started {
 			self.started = true;
-			let app_inner = self.handle.app_handle().inner;
+			let app_inner = HasHandle::<ApplicationHandle>::handle(&self.handle).inner;
 
 			// Move ownership from `DelegateFuture` to `DelegateData`
 			let mut func = None;
@@ -150,7 +155,7 @@ where
 			let succeeded = {
 				let data_ptr = Box::into_raw(Box::new(data));
 
-				app_inner.dispatch(delegate_handler::<H, R>, data_ptr as _)
+				app_inner.dispatch(delegate_handler::<O, H, R>, data_ptr as _)
 			};
 
 			// cbw_Application_dispatch fails when there is now runtime that is running
@@ -203,16 +208,14 @@ where
 			self.started = true;
 			let app_inner = self.app_handle.inner.clone();
 
-			let succeeded = unsafe {
-				let data_ptr = Box::into_raw(Box::new(DelegateFutureData {
-					inner: &mut self.inner,
-					waker: ctx.waker().clone(),
-				}));
+			let data_ptr = Box::into_raw(Box::new(DelegateFutureData {
+				inner: &mut self.inner,
+				waker: ctx.waker().clone(),
+			}));
 
-				app_inner.dispatch(delegate_async_handler::<R>, data_ptr as _)
-			};
+			let succeeded = app_inner.dispatch(delegate_async_handler::<R>, data_ptr as _);
 
-			// cbw_Application_dispatch fails when there is now runtime that is running
+			// cbw_Application_dispatch fails when there is no runtime that is actually running
 			if !succeeded {
 				return Poll::Ready(Err(DelegateError::RuntimeNotAvailable));
 			}
@@ -228,12 +231,18 @@ where
 	}
 }
 
-fn delegate_handler<H, R>(app: ApplicationImpl, _data: *mut ())
+impl<H> HasHandle<H> for H {
+	fn handle(&self) -> &H { self }
+}
+
+
+fn delegate_handler<O, H, R>(app: ApplicationImpl, _data: *mut ())
 where
-	H: Clone + 'static,
+	H: 'static,
+	O: HasHandle<H>,
 	R: 'static,
 {
-	let data_ptr = _data as *mut DelegateData<'static, 'static, H, R>;
+	let data_ptr = _data as *mut DelegateData<'static, 'static, O, H, R>;
 	let data = unsafe { Box::from_raw(data_ptr) }; // Take ownership of the data struct
 
 	match *data {
@@ -245,7 +254,8 @@ where
 		} => {
 			// Catch Rust panics during execution of delegated function
 			match catch_unwind(AssertUnwindSafe(|| {
-				*result = Some(Ok(func(handle)));
+				let h = handle.handle();
+				*result = Some(Ok(func(h)));
 				waker.clone().wake();
 			})) {
 				Ok(()) => {}

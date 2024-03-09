@@ -16,15 +16,15 @@ fn main() {
 		//bwb.dev_tools(false)
 		bwb.size(800, 600);
 		bwb.title("Log in to Github");
-		let bw = bwb.build(app.clone()).await;
+		let bw = bwb.build(&app).await;
 
-		bw.on_navigation_start().register(|h, arg| {
+		bw.on_navigation_start().register(|_h, _arg| {
 			println!("on_navigation_start");
 		});
-		bw.on_navigation_end().register(|h, result| {
+		bw.on_navigation_end().register(|_h, result| {
 			println!("on_navigation_end {:?}", result);
 		});
-		bw.on_page_title_changed().register(|h, result| {
+		bw.on_page_title_changed().register(|_h, result| {
 			println!("on_page_title_changed {:?}", result);
 		});
 

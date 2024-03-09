@@ -7,6 +7,8 @@
 //! Be sure to check them out [here](../window/struct.WindowHandle.html).
 
 use std::{borrow::Cow, ops::Deref};
+#[cfg(feature = "threadsafe")]
+use std::future::Future;
 
 use futures_channel::oneshot;
 #[cfg(feature = "threadsafe")]
@@ -36,7 +38,7 @@ pub use builder::{BrowserWindowBuilder, Source};
 
 /// The future that dispatches a closure on the GUI thread.
 #[cfg(feature = "threadsafe")]
-pub type BrowserDelegateFuture<'a, R> = DelegateFuture<'a, BrowserWindowHandle, R>;
+pub type BrowserDelegateFuture<'a, R> = DelegateFuture<'a, BrowserWindow, BrowserWindowHandle, R>;
 
 /// An owned browser window handle.
 /// When this handle goes out of scope, its resources will get scheduled for
@@ -46,8 +48,10 @@ pub type BrowserDelegateFuture<'a, R> = DelegateFuture<'a, BrowserWindowHandle, 
 /// exists, the window is actually just been closed. It can be reshown by
 /// calling `show` on this handle.
 pub struct BrowserWindowOwner(pub(super) BrowserWindowHandle);
+#[derive(Clone)]
 pub struct BrowserWindow(pub(super) Rc<BrowserWindowOwner>);
 #[cfg(feature = "threadsafe")]
+#[derive(Clone)]
 pub struct BrowserWindowThreaded(BrowserWindow);
 #[cfg(feature = "threadsafe")]
 unsafe impl Sync for BrowserWindowThreaded {}
@@ -315,11 +319,11 @@ impl BrowserWindowHandle {
 impl BrowserWindowThreaded {
 	/// The thread-safe application handle associated with this browser window.
 	pub fn app(&self) -> ApplicationHandleThreaded {
-		ApplicationHandleThreaded::from_core_handle(self.handle.inner.window().app())
+		ApplicationHandleThreaded::from_core_handle(self.0.inner.window().app())
 	}
 
 	/// Closes the browser.
-	pub fn close(self) -> bool { self.dispatch(|bw| bw.close()) }
+	pub fn close(self) -> bool { self.dispatch(|bw| unsafe { bw.clone().close() }) }
 
 	/// Executes the given closure within the GUI thread, and return the value
 	/// that the closure returned. Also see `ApplicationThreaded::delegate`.
@@ -335,7 +339,7 @@ impl BrowserWindowThreaded {
 		F: FnOnce(&BrowserWindowHandle) -> R + Send + 'a,
 		R: Send,
 	{
-		BrowserDelegateFuture::new(self.handle.clone(), func)
+		BrowserDelegateFuture::new(self.0.clone(), func)
 	}
 
 	/// Executes the given async closure `func` on the GUI thread, and gives
@@ -343,12 +347,12 @@ impl BrowserWindowThreaded {
 	/// Also see `ApplicationThreaded::delegate_async`.
 	pub fn delegate_async<'a, C, F, R>(&self, func: C) -> DelegateFutureFuture<'a, R>
 	where
-		C: FnOnce(&BrowserWindowHandle) -> F + Send + 'a,
+		C: FnOnce(BrowserWindow) -> F + Send + 'a,
 		F: Future<Output = R>,
 		R: Send + 'static,
 	{
-		let handle = self.handle.clone();
-		DelegateFutureFuture::new(self.app().handle.clone(), async move {
+		let handle = self.0.clone();
+		DelegateFutureFuture::new(unsafe { self.app().handle.clone() }, async move {
 			func(handle.into()).await
 		})
 	}
@@ -360,8 +364,8 @@ impl BrowserWindowThreaded {
 		F: Future<Output = R> + Send + 'a,
 		R: Send + 'static,
 	{
-		let handle = self.handle.clone();
-		DelegateFutureFuture::new(self.app().handle.clone(), fut)
+		let handle = self.0.clone();
+		DelegateFutureFuture::new(unsafe { self.app().handle.clone() }, fut)
 	}
 
 	/// Executes the given close on the GUI thread.
@@ -370,11 +374,10 @@ impl BrowserWindowThreaded {
 	where
 		F: FnOnce(&BrowserWindowHandle) + Send + 'a,
 	{
-		let handle = UnsafeSend::new(self.handle.clone());
-
+		let handle = UnsafeSend::new(self.0.clone());
 		// FIXME: It is more efficient to reimplement this for the browser window
 		self.app().dispatch(move |_| {
-			func(handle.i);
+			func(&handle.unwrap());
 		})
 	}
 
@@ -382,17 +385,14 @@ impl BrowserWindowThreaded {
 	/// See also `Application::dispatch`.
 	pub fn dispatch_async<'a, C, F>(&self, func: C) -> bool
 	where
-		C: FnOnce(&BrowserWindowHandle) -> F + Send + 'a,
+		C: FnOnce(BrowserWindow) -> F + Send + 'a,
 		F: Future<Output = ()> + 'static,
 	{
-		let handle = UnsafeSend::new(self.handle.clone());
-
+		let handle = UnsafeSend::new(self.0.clone());
 		self.app().dispatch(move |a| {
-			a.spawn(func(handle.i));
+			a.spawn(func(handle.unwrap()));
 		})
 	}
-
-	fn new(handle: BrowserWindowHandle) -> Self { Self { handle } }
 }
 
 impl BrowserWindowHandle {
@@ -401,6 +401,15 @@ impl BrowserWindowHandle {
 			app: ApplicationHandle::new(inner_handle.window().app()),
 			window: WindowHandle::new(inner_handle.window()),
 			inner: inner_handle,
+		}
+	}
+	
+	#[cfg(feature = "threadsafe")]
+	unsafe fn clone(&self) -> Self {
+		Self {
+			app: self.app.clone(),
+			window: self.window.clone(),
+			inner: self.inner.clone()
 		}
 	}
 }
@@ -433,9 +442,12 @@ impl Drop for BrowserWindowOwner {
 		#[cfg(not(feature = "threadsafe"))]
 		Self::cleanup(&self.0);
 		#[cfg(feature = "threadsafe")]
-		self.app().dispatch(|bw| {
-			Self::cleanup(bw);
-		});
+		{
+			let bw = unsafe { UnsafeSend::new(self.0.clone()) };
+			self.app().into_threaded().dispatch(|app| {
+				Self::cleanup(&bw.unwrap());
+			});
+		}
 	}
 }
 

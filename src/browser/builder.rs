@@ -67,7 +67,7 @@ impl BrowserWindowBuilder {
 	///
 	/// # Arguments
 	/// * `app` - An application handle that this browser window can spawn into
-	pub async fn build(self, app: ApplicationHandle) -> BrowserWindow {
+	pub async fn build(self, app: &ApplicationHandle) -> BrowserWindow {
 		let (tx, rx) = oneshot::channel::<BrowserWindowHandle>();
 
 		self._build(app, move |handle| {
@@ -76,7 +76,7 @@ impl BrowserWindowBuilder {
 			}
 		});
 
-		BrowserWindow(Self::prepare_handle(rx.await.unwrap()))
+		Self::prepare_handle(rx.await.unwrap())
 	}
 
 	/// Creates the browser window.
@@ -91,13 +91,13 @@ impl BrowserWindowBuilder {
 	/// * `app` - An (thread-safe) application handle.
 	#[cfg(feature = "threadsafe")]
 	pub async fn build_threaded(
-		self, app: ApplicationHandle,
+		self, app: &ApplicationHandleThreaded,
 	) -> Result<BrowserWindowThreaded, DelegateError> {
 		let (tx, rx) = oneshot::channel::<UnsafeSend<BrowserWindowHandle>>();
 
 		// We need to dispatch the spawning of the browser to the GUI thread
 		app.delegate(|app_handle| {
-			self._build(app_handle, |inner_handle| {
+			self._build(&*app_handle, |inner_handle| {
 				if let Err(_) = tx.send(UnsafeSend::new(inner_handle)) {
 					panic!("Unable to send browser handle back")
 				}
@@ -105,12 +105,12 @@ impl BrowserWindowBuilder {
 		})
 		.await?;
 
-		Ok(BrowserWindowThreaded::new(Self::prepare_handle(
-			rx.await.unwrap(),
+		Ok(BrowserWindowThreaded(Self::prepare_handle(
+			rx.await.unwrap().unwrap(),
 		)))
 	}
 
-	fn prepare_handle(handle: BrowserWindowHandle) -> Rc<BrowserWindowOwner> {
+	fn prepare_handle(handle: BrowserWindowHandle) -> BrowserWindow {
 		// Put a reference counted handle in the user data of the window, so that there
 		// exists 'ownership' for as long as the window actually lives.
 		let owner = BrowserWindowOwner(handle);
@@ -120,10 +120,10 @@ impl BrowserWindowBuilder {
 		}));
 		rc_handle.0.window().0.set_user_data(user_data as _);
 
-		rc_handle
+		BrowserWindow(rc_handle)
 	}
 
-	fn _build<H>(self, app: ApplicationHandle, on_created: H)
+	fn _build<H>(self, app: &ApplicationHandle, on_created: H)
 	where
 		H: FnOnce(BrowserWindowHandle),
 	{

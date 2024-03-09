@@ -11,11 +11,13 @@ use super::prelude::*;
 /// A handle that exposes all windowing functionality.
 pub struct WindowHandle(pub(super) WindowImpl);
 
-pub trait HasWindowHandle {
-	fn window_handle(&self) -> &WindowHandle;
-}
 
 impl WindowHandle {
+	#[cfg(feature = "threadsafe")]
+	pub(crate) unsafe fn clone(&self) -> Self {
+		Self (self.0.clone())
+	}
+
 	pub(super) fn new(inner: WindowImpl) -> Self { Self(inner) }
 
 	pub fn content_dimensions(&self) -> Dims2D { self.0.content_dimensions() }

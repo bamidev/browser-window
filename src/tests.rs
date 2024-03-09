@@ -154,11 +154,11 @@ async fn async_correct_parent_cleanup(app: ApplicationHandle) {
 	let mut bwb_parent =
 		BrowserWindowBuilder::new(Source::Url("https://www.duckduckgo.com/".into()));
 	bwb_parent.title("Parent Window");
-	let bw_parent = bwb_parent.build(app.clone()).await;
+	let bw_parent = bwb_parent.build(&app).await;
 
 	// Then a child
 	let mut bwb_child = BrowserWindowBuilder::new(Source::Url("https://www.google.com/".into()));
 	bwb_child.title("Child Window");
 	bwb_child.parent(&bw_parent);
-	let _bw_child = bwb_child.build(app.clone()).await;
+	let _bw_child = bwb_child.build(&app).await;
 }

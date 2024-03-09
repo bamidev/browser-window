@@ -98,7 +98,7 @@ fn main() {
 		bwb.size(800, 600);
 		bwb.title("Terminal Example");
 
-		let bw = bwb.build(app).await;
+		let bw = bwb.build(&app).await;
 
 		bw.on_message().register_async(|bw, e| {
 			// e.cmd is a &str that lives as long as the closure does, but not as long as
