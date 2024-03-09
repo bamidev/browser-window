@@ -92,4 +92,10 @@ pub trait BrowserWindowExt: BrowserWindowEventExt {
 
 	/// Gives a handle to the underlying window.
 	fn window(&self) -> WindowImpl;
+
+	fn new(
+		app: ApplicationImpl, parent: WindowImpl, source: Source, title: &str, width: Option<u32>,
+		height: Option<u32>, options: &WindowOptions,
+		browser_window_options: &BrowserWindowOptions, creation_callback: CreationCallbackFn, callback_data: *mut (),
+	);
 }
