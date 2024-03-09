@@ -22,11 +22,6 @@ pub enum Source {
 	Url(String),
 }
 
-/// The data that is passed to the C FFI handler function
-struct BrowserUserData {
-	_handle: Rc<BrowserWindowOwner>,
-}
-
 /// Used to create a [`BrowserWindow`] or [`BrowserWindowThreaded`] instance,
 /// depending on whether or not you have feature `threadsafe` enabled.
 ///
@@ -160,7 +155,7 @@ impl BrowserWindowBuilder {
 				};
 
 				BrowserWindowImpl::new(
-					app.inner,
+					app.inner.clone(),
 					parent_handle,
 					source,
 					title,

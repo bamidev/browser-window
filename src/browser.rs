@@ -52,11 +52,6 @@ pub struct BrowserWindowOwner(pub(super) BrowserWindowHandle);
 #[derive(Clone)]
 pub struct BrowserWindow(pub(super) Rc<BrowserWindowOwner>);
 #[cfg(feature = "threadsafe")]
-#[derive(Clone)]
-pub struct BrowserWindowThreaded(BrowserWindow);
-#[cfg(feature = "threadsafe")]
-unsafe impl Sync for BrowserWindowThreaded {}
-
 /// **Note:** Only available with feature `threadsafe` enabled.
 ///
 /// A thread-safe handle to a browser window.
@@ -89,6 +84,10 @@ unsafe impl Sync for BrowserWindowThreaded {}
 /// 	result.unwrap().to_string()
 /// }
 /// ```
+#[derive(Clone)]
+pub struct BrowserWindowThreaded(BrowserWindow);
+#[cfg(feature = "threadsafe")]
+unsafe impl Sync for BrowserWindowThreaded {}
 
 pub type BrowserWindowEventHandler<A> = EventHandler<BrowserWindowHandle, BrowserWindow, A>;
 
@@ -377,7 +376,6 @@ impl BrowserWindowThreaded {
 		F: Future<Output = R> + Send + 'a,
 		R: Send + 'static,
 	{
-		let handle = self.0.clone();
 		DelegateFutureFuture::new(unsafe { self.app().handle.clone() }, fut)
 	}
 
@@ -457,7 +455,7 @@ impl Drop for BrowserWindowOwner {
 		#[cfg(feature = "threadsafe")]
 		{
 			let bw = unsafe { UnsafeSend::new(self.0.clone()) };
-			self.app().into_threaded().dispatch(|app| {
+			self.app().into_threaded().dispatch(|_| {
 				Self::cleanup(&bw.unwrap());
 			});
 		}

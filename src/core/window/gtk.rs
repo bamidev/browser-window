@@ -1,5 +1,6 @@
 use std::sync::{atomic::AtomicI32, Arc};
 
+use glib::object::ObjectExt;
 use gtk::prelude::{GtkWindowExt, WidgetExt};
 
 use super::{WindowExt, WindowOptions};
@@ -11,7 +12,7 @@ pub struct WindowImpl(pub gtk::Window);
 impl WindowImpl {
 	pub fn new(
 		app: ApplicationImpl, parent: Self, title: &str, width: Option<u32>, height: Option<u32>,
-		options: &WindowOptions, mut user_data: *mut (),
+		options: &WindowOptions
 	) -> Self {
 		let mut builder = gtk::Window::builder()
 			.application(&app.inner)
@@ -31,6 +32,12 @@ impl WindowImpl {
 		}
 
 		let inner = builder.build();
+		// Delete user data when closing the window
+		inner.connect_destroy(|this| {
+			let user_data = unsafe { *this.data::<*mut ()>("bw-data").unwrap().as_ref() };
+			BrowserWindowImpl::free_user_data(user_data);
+		});
+
 		Self(inner)
 	}
 }
@@ -47,17 +54,17 @@ impl WindowExt for WindowImpl {
 		}
 	}
 
-	fn destroy(&self) { self.0.close(); }
+	fn close(&self) { self.0.close(); }
 
 	fn free(&self) {}
 
-	fn get_content_dimensions(&self) -> Dims2D {
+	fn content_dimensions(&self) -> Dims2D {
 		unimplemented!();
 	}
 
-	fn get_opacity(&self) -> u8 { 0 }
+	fn opacity(&self) -> u8 { 0 }
 
-	fn get_position(&self) -> Pos2D {
+	fn position(&self) -> Pos2D {
 		let (x, y) = self.0.position();
 		Pos2D {
 			x: x as _,
@@ -65,14 +72,14 @@ impl WindowExt for WindowImpl {
 		}
 	}
 
-	fn get_title(&self) -> String {
+	fn title(&self) -> String {
 		self.0
 			.title()
 			.map(|g| g.to_string())
 			.unwrap_or(String::new())
 	}
 
-	fn get_window_dimensions(&self) -> Dims2D {
+	fn window_dimensions(&self) -> Dims2D {
 		let (w, h) = self.0.size();
 		Dims2D {
 			width: w as _,
@@ -84,13 +91,17 @@ impl WindowExt for WindowImpl {
 
 	fn set_content_dimensions(&self, dimensions: Dims2D) {}
 
-	fn set_opacity(&self, opacity: u8) {}
+	fn set_opacity(&self, _opacity: u8) {}
 
 	fn set_position(&self, position: Pos2D) {
 		unimplemented!();
 	}
 
 	fn set_title(&self, title: &str) { self.0.set_title(title); }
+
+	fn set_user_data(&self, user_data: *mut ()) {
+		unsafe { self.0.set_data("bw-data", user_data); }
+	}
 
 	fn set_window_dimensions(&self, dimensions: Dims2D) {
 		self.0

@@ -21,13 +21,18 @@ use super::{
 	cookie::CookieJarImpl,
 	window::{WindowImpl, WindowOptions},
 };
-use crate::{browser::*, prelude::JsValue, rc::Weak};
+use crate::{browser::*, prelude::JsValue, rc::*};
 
 
 //pub type BrowserWindowEventHandler<'a, A> = EventHandler<'a,
 // BrowserWindowHandle, A>;
 
 pub type BrowserWindowOptions = cbw_BrowserWindowOptions;
+
+/// The data that is passed to the C FFI handler function
+pub(crate) struct BrowserUserData {
+	pub(crate) _handle: Rc<BrowserWindowOwner>,
+}
 
 pub type CreationCallbackFn = fn(bw: BrowserWindowImpl, data: *mut ());
 pub type EvalJsCallbackFn =
@@ -53,9 +58,7 @@ pub trait BrowserWindowEventExt {
 	) -> LoadingProgressChangedEvent {
 		unimplemented!();
 	}
-	fn on_message(&self, _handle: Weak<BrowserWindowOwner>) -> MessageEvent {
-		unimplemented!();
-	}
+	fn on_message(&self, _handle: Weak<BrowserWindowOwner>) -> MessageEvent;
 	fn on_navigation_end(&self, _handle: Weak<BrowserWindowOwner>) -> NavigationEndEvent {
 		unimplemented!();
 	}
@@ -73,7 +76,7 @@ pub trait BrowserWindowEventExt {
 	}
 }
 
-pub trait BrowserWindowExt: BrowserWindowEventExt {
+pub trait BrowserWindowExt: BrowserWindowEventExt + Clone {
 	fn cookie_jar(&self) -> Option<CookieJarImpl>;
 
 	/// Executes the given JavaScript string.
@@ -98,4 +101,14 @@ pub trait BrowserWindowExt: BrowserWindowEventExt {
 		height: Option<u32>, options: &WindowOptions,
 		browser_window_options: &BrowserWindowOptions, creation_callback: CreationCallbackFn, callback_data: *mut (),
 	);
+}
+
+
+impl BrowserWindowImpl {
+	pub(crate) fn free_user_data(user_data: *mut ()) {
+		let ptr = user_data as *mut BrowserUserData;
+		unsafe {
+			let _ = Box::from_raw(ptr);
+		}
+	}
 }

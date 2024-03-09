@@ -17,18 +17,6 @@ fn main() {
 		bwb.size(800, 600);
 		bwb.title("Log in to Github");
 		let bw = bwb.build(&app).await;
-
-		bw.on_navigation_start().register(|_h, _arg| {
-			println!("on_navigation_start");
-		});
-		bw.on_navigation_end().register(|_h, result| {
-			println!("on_navigation_end {:?}", result);
-		});
-		bw.on_page_title_changed().register(|_h, result| {
-			println!("on_page_title_changed {:?}", result);
-		});
-
-
 		bw.show();
 
 		let cookie_jar = app.cookie_jar().expect("cookies not supported");

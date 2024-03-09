@@ -215,15 +215,6 @@ impl BrowserWindowExt for BrowserWindowImpl {
 	}
 }
 
-impl BrowserWindowImpl {
-	fn free_user_data(user_data: *mut c_void) {
-		let ptr = user_data as *mut BrowserWindowUserData;
-		unsafe {
-			let _ = Box::from_raw(ptr);
-		}
-	}
-}
-
 impl BrowserWindowEventExt for BrowserWindowImpl {
 	fn on_address_changed(&self, handle: Weak<BrowserWindowOwner>) -> AddressChangedEvent {
 		AddressChangedEvent::new(handle)
@@ -433,7 +424,7 @@ extern "C" fn bw_Window_freeUserData(w: *mut c_void) {
 	let w_ptr = w as *mut cbw_Window;
 	unsafe {
 		if (*w_ptr).user_data != ptr::null_mut() {
-			BrowserWindowImpl::free_user_data((*w_ptr).user_data);
+			BrowserWindowImpl::free_user_data((*w_ptr).user_data as _);
 			(*w_ptr).user_data = ptr::null_mut();
 		}
 	}

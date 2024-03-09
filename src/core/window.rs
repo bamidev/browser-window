@@ -11,7 +11,7 @@ pub use gtk::WindowImpl;
 use crate::prelude::*;
 
 
-pub trait WindowExt {
+pub trait WindowExt: Clone {
 	fn app(&self) -> ApplicationImpl;
 
 	fn close(&self);

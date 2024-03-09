@@ -131,7 +131,7 @@ where
 	fn poll(mut self: Pin<&mut Self>, cx: &mut Context) -> Poll<Self::Output> {
 		if !self.started {
 			self.started = true;
-			let app_inner = HasHandle::<ApplicationHandle>::handle(&self.handle).inner;
+			let app_inner = HasHandle::<ApplicationHandle>::handle(&self.handle).inner.clone();
 
 			// Move ownership from `DelegateFuture` to `DelegateData`
 			let mut func = None;
