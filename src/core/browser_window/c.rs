@@ -10,7 +10,7 @@ use super::{
 };
 use crate::{
 	def_browser_event, def_event,
-	rc::{Rc, Weak},
+	rc::*,
 };
 
 
