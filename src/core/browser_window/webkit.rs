@@ -156,40 +156,39 @@ impl BrowserWindowEventExt for BrowserWindowImpl {
 }
 
 def_browser_event!(MessageEvent<MessageEventArgs<'static>>(&mut self, handler) {
-		if let Some(this) = self.owner.upgrade() {
-			// Register a message handler
-			let user_context_manager = this.inner.inner.user_content_manager().unwrap();
-			user_context_manager.register_script_message_handler("bw");
-			let this2 = this.clone();
-			let h = Rc::new(Cell::new(handler));
-			user_context_manager.connect_script_message_received(Some("bw"), move |_, r| {
-				let value = r
-					.js_value()
-					.map(|v| transform_js_value(v))
-					.unwrap_or(JsValue::Undefined);
-				let (command, args) = match &value {
-					JsValue::Array(a) => (a[0].to_string_unenclosed(), a[1..].to_vec()),
-					_ => panic!("unexpected value type received from invoke_extern"),
-				};
+	// Register a message handler
+	let user_context_manager = self.owner.upgrade().unwrap().inner.inner.user_content_manager().unwrap();
+	user_context_manager.register_script_message_handler("bw");
+	let owner = self.owner.clone();
+	let h = Rc::new(Cell::new(handler));
+	user_context_manager.connect_script_message_received(Some("bw"), move |_, r| {
+		if let Some(this) = owner.upgrade() {
+			let value = r
+				.js_value()
+				.map(|v| transform_js_value(v))
+				.unwrap_or(JsValue::Undefined);
+			let (command, args) = match &value {
+				JsValue::Array(a) => (a[0].to_string_unenclosed(), a[1..].to_vec()),
+				_ => panic!("unexpected value type received from invoke_extern"),
+			};
 
-				let e = MessageEventArgs {
-					cmd: unsafe { &*(command.as_ref() as *const str) },
-					args
-				};
-				match unsafe { &mut *h.as_ptr() } {
-					EventHandler::Sync(callback) => {
-						(callback)(&*this2, &e);
-					}
-					EventHandler::Async(callback) => {
-						let app = this2.0.app();
-						let future = (callback)(BrowserWindow(this2.clone()), &e);
-						app.spawn(future);
-					}
+			let e = MessageEventArgs {
+				cmd: unsafe { &*(command.as_ref() as *const str) },
+				args
+			};
+			match unsafe { &mut *h.as_ptr() } {
+				EventHandler::Sync(callback) => {
+					(callback)(&*this, &e);
 				}
-			});
+				EventHandler::Async(callback) => {
+					let app = this.0.app();
+					let future = (callback)(BrowserWindow(this.clone()), &e);
+					app.spawn(future);
+				}
+			}
 		}
-	}
-);
+	});
+});
 
 
 fn transform_js_value(v: javascriptcore::Value) -> JsValue {
