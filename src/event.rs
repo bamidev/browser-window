@@ -1,37 +1,49 @@
 //! This module contains all event related types.
-//! 
-//! To register a callback to an event, the documentation may be a bit hard to
-//! navigate. The [`BrowserWindow`](../browser/struct.BrowserWindow.html) handle
+//!
+//! To understand how events work in _BrowserWindow_, here is a short summary.
+//! The [`BrowserWindow`](../browser/struct.BrowserWindow.html) handle
 //! contains a bunch of functions that return different event objects, and then
 //! the event object can be used to register the callback at.
-//! 
-//! Each event object has the [`register`](trait.EventExt.html#tymethod.register)
-//! method to register a closure to be executed on the occurence of the event.
-//! 
+//!
+//! Each event object has the
+//! [`register`](trait.EventExt.html#tymethod.register) method to register a
+//! closure to be executed on the occurence of the event.
+//!
 //! ```
-//! use browser_window::browser::*;
-//! use browser_window::prelude::*;
-//! 
+//! use browser_window::{browser::*, prelude::*};
+//!
 //! fn example(bw: BrowserWindow) {
-//! 	bw.on_message().register(|h: &BrowserWindowHandle, e: MessageEventArgs| {
-//! 		// .. code here ...
-//! 	});
+//! 	bw.on_message()
+//! 		.register(|h: &BrowserWindowHandle, e: MessageEventArgs| {
+//! 			// .. code here ...
+//! 		});
 //! }
 //! ```
-//! 
-//! There is also a [`register_async`](trait.EventExt.html#tymethod.register_async)
+//!
+//! There is also a
+//! [`register_async`](trait.EventExt.html#tymethod.register_async)
 //! method, which can be useful in async code:
-//! 
+//!
 //! ```
-//! use browser_window::browser::*;
-//! use browser_window::prelude::*;
-//! 
+//! use browser_window::{browser::*, prelude::*};
+//!
 //! fn async_example(bw: BrowserWindow) {
-//! 	bw.on_message().register_async(|h: BrowserWindow, e: MessageEventArgs| async move {
-//! 		// .. code here ...
-//! 	});
+//! 	bw.on_message()
+//! 		.register_async(|h: BrowserWindow, e: MessageEventArgs| async move {
+//! 			// .. code here ...
+//! 		});
 //! }
 //! ```
+//!
+//! Also, keep in mind that if the `register` or `register_async` methods are
+//! not available, that means that event object does not implement `EventExt`,
+//! which in turn means that the corresponding event is not supported for the
+//! browser framework that has been selected.
+//!
+//! CEF supports all events, unless it is stated that it is not implemented yet.
+//! The other browser frameworks only support a subset of what is supported for
+//! CEF. The reason for this is that CEF is simply the most cross-platform
+//! framework out there, so it gets the most care.
 
 use std::{boxed::Box, future::Future, pin::Pin};
 

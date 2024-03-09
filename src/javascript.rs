@@ -15,8 +15,8 @@ pub enum JsValue {
 	Undefined,
 	/// When a javascript value is returned that does not fit any of the other
 	/// value types in this enum, `JsValue::Other` is returned with a string
-	/// representation of the value. When using feature `cef`, it currently
-	/// always returns the javascript value as `JsValue::Other`.
+	/// representation of the value. For example, functions get returned as an
+	/// instance of `JsValue::Other`.
 	Other(String),
 }
 

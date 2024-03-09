@@ -8,10 +8,7 @@ use super::{
 	super::{error::Error, window::WindowImpl},
 	*,
 };
-use crate::{
-	def_browser_event, def_event,
-	rc::*,
-};
+use crate::{def_browser_event, def_event, rc::*};
 
 
 #[derive(Clone)]
@@ -388,13 +385,12 @@ unsafe fn bool_converter(input: &c_int) -> bool { *input > 0 }
 unsafe fn f64_converter(input: &c_double) -> f64 { *input }
 
 unsafe fn str_converter(input: &cbw_CStrSlice) -> String {
-	let string = str::from_utf8_unchecked(slice::from_raw_parts(input.data as *const u8, input.len) as _);
+	let string =
+		str::from_utf8_unchecked(slice::from_raw_parts(input.data as *const u8, input.len) as _);
 	string.to_string()
 }
 
-unsafe fn message_args_converter(
-	input: &cbw_BrowserWindowMessageArgs,
-) -> MessageEventArgs {
+unsafe fn message_args_converter(input: &cbw_BrowserWindowMessageArgs) -> MessageEventArgs {
 	// Convert the command and args to a String and `Vec<&str>`
 	let cmd_string = str::from_utf8_unchecked(slice::from_raw_parts(
 		input.cmd.data as *const u8,
