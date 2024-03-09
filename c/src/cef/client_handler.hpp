@@ -162,9 +162,9 @@ public:
 		std::optional<bw::BrowserInfo*> bw_info_opt = bw::bw_handle_map.fetch(browser);
 		if (bw_info_opt.has_value()) {
 			auto bw_info = bw_info_opt.value();
-			bw_StrSlice slice = bw_cef_copyToStrSlice(tooltip);
+			bw_CStrSlice slice = bw_cef_copyToCStrSlice(tooltip);
 			BOOL result = bw_Event_fire(&bw_info->handle->events.on_tooltip, (void*)&slice);
-			bw_string_free(slice);
+			bw_string_freeC(slice);
 			return result;
 		}
 		return false;

@@ -98,8 +98,8 @@ pub struct BrowserWindowHandle {
 	window: WindowHandle,
 }
 
-pub struct MessageEventArgs<'a> {
-	pub cmd: &'a str,
+pub struct MessageEventArgs {
+	pub cmd: String,
 	pub args: Vec<JsValue>,
 }
 

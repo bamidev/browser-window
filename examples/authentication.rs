@@ -3,7 +3,7 @@
 
 use std::time::Duration;
 
-use browser_window::{application::*, browser::*, event::EventExt};
+use browser_window::{application::*, browser::*, prelude::*};
 
 fn main() {
 	let application =

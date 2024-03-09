@@ -178,7 +178,7 @@ impl BrowserWindowEventExt for BrowserWindowImpl {
 }
 
 
-def_browser_event!(MessageEvent<MessageEventArgs<'static>>(&mut self, handler) {
+def_browser_event!(MessageEvent<MessageEventArgs>(&mut self, handler) {
 
 	// Register the message handler
 	let owner = self.owner.clone();
@@ -202,7 +202,7 @@ def_browser_event!(MessageEvent<MessageEventArgs<'static>>(&mut self, handler) {
 			};
 
 			let e = MessageEventArgs {
-				cmd: unsafe { &*(command.as_ref() as *const str) },
+				cmd: command,
 				args: args2
 			};
 			match unsafe { &mut *h.as_ptr() } {
@@ -243,7 +243,6 @@ fn dispatch_eval_js(_app: ApplicationImpl, dispatch_data: *mut ()) {
 #[no_mangle]
 extern "C" fn bw_Window_freeUserData(w: *mut c_void) {
 	let w_ptr = w as *mut cbw_Window;
-	println!("bw_Window_freeUserData");
 	unsafe {
 		if (*w_ptr).user_data != ptr::null_mut() {
 			BrowserWindowImpl::free_user_data((*w_ptr).user_data as _);

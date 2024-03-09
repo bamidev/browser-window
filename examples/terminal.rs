@@ -100,23 +100,16 @@ fn main() {
 
 		let bw = bwb.build(&app).await;
 
-		bw.on_message().register_async(|bw, e| {
-			// e.cmd is a &str that lives as long as the closure does, but not as long as
-			// the future does.
-			let cmd = e.cmd.to_string();
-			let args = e.args.clone();
+		bw.on_message().register_async(|bw, e| async move {
+			match e.cmd.as_str() {
+				"exec" => {
+					// The whole command line is passed one string value.
+					let cmd_line = &e.args[0];
 
-			async move {
-				match cmd.as_str() {
-					"exec" => {
-						// The whole command line is passed one string value.
-						let cmd_line = &args[0];
-
-						execute_command(bw, &cmd_line.to_string_unenclosed()).await;
-					}
-					other => {
-						eprintln!("Received unsupported command: {}", other);
-					}
+					execute_command(bw, &cmd_line.to_string_unenclosed()).await;
+				}
+				other => {
+					eprintln!("Received unsupported command: {}", other);
 				}
 			}
 		});

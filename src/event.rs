@@ -1,18 +1,51 @@
 //! This module contains all event related types.
+//! 
+//! To register a callback to an event, the documentation may be a bit hard to
+//! navigate. The [`BrowserWindow`](../browser/struct.BrowserWindow.html) handle
+//! contains a bunch of functions that return different event objects, and then
+//! the event object can be used to register the callback at.
+//! 
+//! Each event object has the [`register`](trait.EventExt.html#tymethod.register)
+//! method to register a closure to be executed on the occurence of the event.
+//! 
+//! ```
+//! use browser_window::browser::*;
+//! use browser_window::prelude::*;
+//! 
+//! fn example(bw: BrowserWindow) {
+//! 	bw.on_message().register(|h: &BrowserWindowHandle, e: MessageEventArgs| {
+//! 		// .. code here ...
+//! 	});
+//! }
+//! ```
+//! 
+//! There is also a [`register_async`](trait.EventExt.html#tymethod.register_async)
+//! method, which can be useful in async code:
+//! 
+//! ```
+//! use browser_window::browser::*;
+//! use browser_window::prelude::*;
+//! 
+//! fn async_example(bw: BrowserWindow) {
+//! 	bw.on_message().register_async(|h: BrowserWindow, e: MessageEventArgs| async move {
+//! 		// .. code here ...
+//! 	});
+//! }
+//! ```
 
 use std::{boxed::Box, future::Future, pin::Pin};
 
 
 #[cfg(not(feature = "threadsafe"))]
 pub type EventHandlerAsyncCallback<O, A> =
-	dyn FnMut(O, &A) -> Pin<Box<dyn Future<Output = ()> + 'static>> + 'static;
+	dyn FnMut(O, A) -> Pin<Box<dyn Future<Output = ()> + 'static>> + 'static;
 #[cfg(not(feature = "threadsafe"))]
-pub type EventHandlerSyncCallback<H, A> = dyn FnMut(&H, &A) + 'static;
+pub type EventHandlerSyncCallback<H, A> = dyn FnMut(&H, A) + 'static;
 #[cfg(feature = "threadsafe")]
 pub type EventHandlerAsyncCallback<O, A> =
-	dyn FnMut(O, &A) -> Pin<Box<dyn Future<Output = ()> + 'static>> + Send + 'static;
+	dyn FnMut(O, A) -> Pin<Box<dyn Future<Output = ()> + 'static>> + Send + 'static;
 #[cfg(feature = "threadsafe")]
-pub type EventHandlerSyncCallback<H, A> = dyn FnMut(&H, &A) + Send + 'static;
+pub type EventHandlerSyncCallback<H, A> = dyn FnMut(&H, A) + Send + 'static;
 
 
 pub enum EventHandler<H, O, A> {
@@ -35,13 +68,13 @@ pub trait EventExt<H, O, A> {
 	#[cfg(not(feature = "threadsafe"))]
 	fn register<X>(&mut self, handler: X)
 	where
-		X: FnMut(&H, &A) + 'static;
+		X: FnMut(&H, A) + 'static;
 
 	/// Register a closure to be invoked for this event.
 	#[cfg(feature = "threadsafe")]
 	fn register<X>(&mut self, handler: X)
 	where
-		X: FnMut(&H, &A) + Send + 'static;
+		X: FnMut(&H, A) + Send + 'static;
 
 	/// Register an 'async closure' to be invoked for this event.
 	///
@@ -54,7 +87,7 @@ pub trait EventExt<H, O, A> {
 	#[cfg(not(feature = "threadsafe"))]
 	fn register_async<X, F>(&mut self, handler: X)
 	where
-		X: FnMut(O, &A) -> F + 'static,
+		X: FnMut(O, A) -> F + 'static,
 		F: Future<Output = ()> + 'static;
 
 	/// Register an 'async closure' to be invoked for this event.
@@ -68,7 +101,7 @@ pub trait EventExt<H, O, A> {
 	#[cfg(feature = "threadsafe")]
 	fn register_async<X, F>(&mut self, handler: X)
 	where
-		X: FnMut(O, &A) -> F + Send + 'static,
+		X: FnMut(O, A) -> F + Send + 'static,
 		F: Future<Output = ()> + 'static;
 }
 
@@ -80,7 +113,7 @@ where
 	#[cfg(not(feature = "threadsafe"))]
 	fn register<X>(&mut self, mut handler: X)
 	where
-		X: FnMut(&H, &A) + 'static,
+		X: FnMut(&H, A) + 'static,
 	{
 		self.register_handler(EventHandler::Sync(Box::new(move |h, args| {
 			handler(h, args);
@@ -90,7 +123,7 @@ where
 	#[cfg(feature = "threadsafe")]
 	fn register<X>(&mut self, mut handler: X)
 	where
-		X: FnMut(&H, &A) + Send + 'static,
+		X: FnMut(&H, A) + Send + 'static,
 	{
 		self.register_handler(EventHandler::Sync(Box::new(move |h, args| {
 			handler(h, args);
@@ -100,7 +133,7 @@ where
 	#[cfg(not(feature = "threadsafe"))]
 	fn register_async<X, F>(&mut self, mut handler: X)
 	where
-		X: FnMut(O, &A) -> F + 'static,
+		X: FnMut(O, A) -> F + 'static,
 		F: Future<Output = ()> + 'static,
 	{
 		self.register_handler(EventHandler::Async(Box::new(move |h, args| {
@@ -111,7 +144,7 @@ where
 	#[cfg(feature = "threadsafe")]
 	fn register_async<X, F>(&mut self, mut handler: X)
 	where
-		X: FnMut(O, &A) -> F + Send + 'static,
+		X: FnMut(O, A) -> F + Send + 'static,
 		F: Future<Output = ()> + 'static,
 	{
 		self.register_handler(EventHandler::Async(Box::new(move |h, args| {

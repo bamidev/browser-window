@@ -261,17 +261,17 @@ impl BrowserWindowEventExt for BrowserWindowImpl {
 	}
 }
 
-def_browser_event_c!(AddressChangedEvent<cbw_CStrSlice, &str> => str_converter => on_address_changed);
-def_browser_event_c!(ConsoleMessageEvent<cbw_CStrSlice, &str> => str_converter => on_console_message);
-def_browser_event_c!(FaviconChangedEvent<cbw_CStrSlice, &str> => str_converter => on_favicon_changed);
+def_browser_event_c!(AddressChangedEvent<cbw_CStrSlice, String> => str_converter => on_address_changed);
+def_browser_event_c!(ConsoleMessageEvent<cbw_CStrSlice, String> => str_converter => on_console_message);
+def_browser_event_c!(FaviconChangedEvent<cbw_CStrSlice, String> => str_converter => on_favicon_changed);
 def_browser_event_c!(FullscreenModeChangedEvent<c_int, bool> => bool_converter => on_fullscreen_mode_changed);
 def_browser_event_c!(LoadingProgressChangedEvent<c_double, f64> => f64_converter => on_loading_progress_changed);
-def_browser_event_c!(MessageEvent<cbw_BrowserWindowMessageArgs, MessageEventArgs<'static>> => message_args_converter => on_message);
+def_browser_event_c!(MessageEvent<cbw_BrowserWindowMessageArgs, MessageEventArgs> => message_args_converter => on_message);
 def_browser_event_c!(NavigationStartEvent<(), ()> => no_converter => on_navigation_start);
 def_browser_event_c!(NavigationEndEvent<cbw_Err, Result<(), Error>> => error_converter => on_navigation_end);
-def_browser_event_c!(PageTitleChangedEvent<cbw_CStrSlice, &str> => str_converter => on_page_title_changed);
-def_browser_event_c!(StatusMessageEvent<cbw_CStrSlice, &str> => str_converter => on_status_message);
-def_browser_event_c!(TooltipEvent<cbw_StrSlice, &mut str> => str_mut_converter => on_tooltip);
+def_browser_event_c!(PageTitleChangedEvent<cbw_CStrSlice, String> => str_converter => on_page_title_changed);
+def_browser_event_c!(StatusMessageEvent<cbw_CStrSlice, String> => str_converter => on_status_message);
+def_browser_event_c!(TooltipEvent<cbw_CStrSlice, String> => str_converter => on_tooltip);
 
 impl JsEvaluationError {
 	pub(super) unsafe fn new(err: *const cbw_Err) -> Self {
@@ -361,11 +361,11 @@ unsafe extern "C" fn ffi_browser_window_event_callback<C, A>(
 		.expect("browser window handle is gone");
 	match &mut event_data.handler {
 		EventHandler::Sync(callback) => {
-			(callback)(&*rc_handle, &rarg);
+			(callback)(&*rc_handle, rarg);
 		}
 		EventHandler::Async(callback) => {
 			let app = rc_handle.0.app();
-			let future = (callback)(BrowserWindow(rc_handle.clone()), &rarg);
+			let future = (callback)(BrowserWindow(rc_handle.clone()), rarg);
 			app.spawn(future);
 		}
 	}
@@ -387,17 +387,14 @@ unsafe fn bool_converter(input: &c_int) -> bool { *input > 0 }
 
 unsafe fn f64_converter(input: &c_double) -> f64 { *input }
 
-unsafe fn str_converter(input: &cbw_CStrSlice) -> &'static str {
-	str::from_utf8_unchecked(slice::from_raw_parts(input.data as *const u8, input.len) as _)
-}
-
-unsafe fn str_mut_converter(input: &cbw_StrSlice) -> &'static mut str {
-	str::from_utf8_unchecked_mut(slice::from_raw_parts_mut(input.data as *mut u8, input.len) as _)
+unsafe fn str_converter(input: &cbw_CStrSlice) -> String {
+	let string = str::from_utf8_unchecked(slice::from_raw_parts(input.data as *const u8, input.len) as _);
+	string.to_string()
 }
 
 unsafe fn message_args_converter(
 	input: &cbw_BrowserWindowMessageArgs,
-) -> MessageEventArgs<'static> {
+) -> MessageEventArgs {
 	// Convert the command and args to a String and `Vec<&str>`
 	let cmd_string = str::from_utf8_unchecked(slice::from_raw_parts(
 		input.cmd.data as *const u8,
@@ -409,7 +406,7 @@ unsafe fn message_args_converter(
 	}
 
 	MessageEventArgs {
-		cmd: cmd_string,
+		cmd: cmd_string.to_string(),
 		args: args_vec,
 	}
 }

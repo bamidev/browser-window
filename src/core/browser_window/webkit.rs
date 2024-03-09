@@ -152,7 +152,7 @@ impl BrowserWindowEventExt for BrowserWindowImpl {
 	}
 }
 
-def_browser_event!(MessageEvent<MessageEventArgs<'static>>(&mut self, handler) {
+def_browser_event!(MessageEvent<MessageEventArgs>(&mut self, handler) {
 	// Register a message handler
 	let user_context_manager = self.owner.upgrade().unwrap().inner.inner.user_content_manager().unwrap();
 	user_context_manager.register_script_message_handler("bw");
@@ -170,16 +170,16 @@ def_browser_event!(MessageEvent<MessageEventArgs<'static>>(&mut self, handler) {
 			};
 
 			let e = MessageEventArgs {
-				cmd: unsafe { &*(command.as_ref() as *const str) },
+				cmd: command.to_string(),
 				args
 			};
 			match unsafe { &mut *h.as_ptr() } {
 				EventHandler::Sync(callback) => {
-					(callback)(&*this, &e);
+					(callback)(&*this, e);
 				}
 				EventHandler::Async(callback) => {
 					let app = this.0.app();
-					let future = (callback)(BrowserWindow(this.clone()), &e);
+					let future = (callback)(BrowserWindow(this.clone()), e);
 					app.spawn(future);
 				}
 			}
