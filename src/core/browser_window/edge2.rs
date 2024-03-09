@@ -1,18 +1,12 @@
-use std::{
-	borrow::Cow,
-	cell::Cell,
-	ffi::c_void,
-	ptr
-};
+use std::{borrow::Cow, cell::Cell, ffi::c_void, ptr};
 
 use webview2::Environment;
 use winapi::{shared::windef, um::winuser};
 
 use super::{super::window::WindowImpl, *};
 use crate::{
-	def_browser_event,
-	def_event,
-	prelude::{ApplicationExt, WindowExt}
+	def_browser_event, def_event,
+	prelude::{ApplicationExt, WindowExt},
 };
 
 
@@ -82,7 +76,8 @@ impl BrowserWindowExt for BrowserWindowImpl {
 	fn new(
 		app: ApplicationImpl, parent: WindowImpl, source: Source, title: &str, width: Option<u32>,
 		height: Option<u32>, window_options: &WindowOptions,
-		browser_window_options: &BrowserWindowOptions, creation_callback: CreationCallbackFn, callback_data: *mut (),
+		browser_window_options: &BrowserWindowOptions, creation_callback: CreationCallbackFn,
+		callback_data: *mut (),
 	) {
 		// Create window
 		let bw_inner = unsafe {
@@ -177,12 +172,14 @@ impl BrowserWindowExt for BrowserWindowImpl {
 }
 
 impl BrowserWindowEventExt for BrowserWindowImpl {
-	fn on_message(&self, handle: Weak<BrowserWindowOwner>) -> MessageEvent { MessageEvent::new(handle) }
+	fn on_message(&self, handle: Weak<BrowserWindowOwner>) -> MessageEvent {
+		MessageEvent::new(handle)
+	}
 }
 
 
 def_browser_event!(MessageEvent<MessageEventArgs<'static>>(&mut self, handler) {
-	
+
 	// Register the message handler
 	let owner = self.owner.clone();
 	let h = Rc::new(Cell::new(handler));
@@ -245,7 +242,8 @@ fn dispatch_eval_js(_app: ApplicationImpl, dispatch_data: *mut ()) {
 #[allow(non_snake_case)]
 #[no_mangle]
 extern "C" fn bw_Window_freeUserData(w: *mut c_void) {
-	let w_ptr = w as *mut cbw_Window; println!("bw_Window_freeUserData");
+	let w_ptr = w as *mut cbw_Window;
+	println!("bw_Window_freeUserData");
 	unsafe {
 		if (*w_ptr).user_data != ptr::null_mut() {
 			BrowserWindowImpl::free_user_data((*w_ptr).user_data as _);

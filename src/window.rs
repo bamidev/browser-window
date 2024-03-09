@@ -14,9 +14,7 @@ pub struct WindowHandle(pub(super) WindowImpl);
 
 impl WindowHandle {
 	#[cfg(feature = "threadsafe")]
-	pub(crate) unsafe fn clone(&self) -> Self {
-		Self (self.0.clone())
-	}
+	pub(crate) unsafe fn clone(&self) -> Self { Self(self.0.clone()) }
 
 	pub(super) fn new(inner: WindowImpl) -> Self { Self(inner) }
 

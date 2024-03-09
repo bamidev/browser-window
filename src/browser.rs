@@ -6,9 +6,9 @@
 //! `BrowserWindow`, but the methods of `WindowHandle` are not displayed.
 //! Be sure to check them out [here](../window/struct.WindowHandle.html).
 
-use std::{borrow::Cow, ops::Deref};
 #[cfg(feature = "threadsafe")]
 use std::future::Future;
+use std::{borrow::Cow, ops::Deref};
 
 use futures_channel::oneshot;
 #[cfg(feature = "threadsafe")]
@@ -25,11 +25,11 @@ use crate::{
 		window::WindowExt,
 	},
 	decl_browser_event, decl_event,
-	HasHandle,
 	event::EventHandler,
 	prelude::*,
 	rc::Rc,
 	window::*,
+	HasHandle,
 };
 
 mod builder;
@@ -420,7 +420,7 @@ impl BrowserWindowHandle {
 		Self {
 			app: self.app.clone(),
 			window: self.window.clone(),
-			inner: self.inner.clone()
+			inner: self.inner.clone(),
 		}
 	}
 }

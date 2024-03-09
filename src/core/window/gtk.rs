@@ -12,7 +12,7 @@ pub struct WindowImpl(pub gtk::Window);
 impl WindowImpl {
 	pub fn new(
 		app: ApplicationImpl, parent: Self, title: &str, width: Option<u32>, height: Option<u32>,
-		options: &WindowOptions
+		options: &WindowOptions,
 	) -> Self {
 		let mut builder = gtk::Window::builder()
 			.application(&app.inner)
@@ -100,7 +100,9 @@ impl WindowExt for WindowImpl {
 	fn set_title(&self, title: &str) { self.0.set_title(title); }
 
 	fn set_user_data(&self, user_data: *mut ()) {
-		unsafe { self.0.set_data("bw-data", user_data); }
+		unsafe {
+			self.0.set_data("bw-data", user_data);
+		}
 	}
 
 	fn set_window_dimensions(&self, dimensions: Dims2D) {

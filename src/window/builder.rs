@@ -1,6 +1,6 @@
 use unsafe_send_sync::UnsafeSend;
 
-use crate::{application::*, core::prelude::*, HasHandle, window::*};
+use crate::{application::*, core::prelude::*, window::*, HasHandle};
 
 
 /// Exposes functionality related to constructing a window.

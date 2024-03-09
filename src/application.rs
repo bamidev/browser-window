@@ -170,7 +170,8 @@ struct WakerData<'a> {
 
 /// The future that dispatches a closure onto the GUI thread
 #[cfg(feature = "threadsafe")]
-pub type ApplicationDelegateFuture<'a, R> = DelegateFuture<'a, ApplicationHandle, ApplicationHandle, R>;
+pub type ApplicationDelegateFuture<'a, R> =
+	DelegateFuture<'a, ApplicationHandle, ApplicationHandle, R>;
 
 lazy_static! {
 	static ref WAKER_VTABLE: RawWakerVTable =
@@ -532,10 +533,9 @@ impl ApplicationHandleThreaded {
 		R: Send + 'static,
 	{
 		let handle = unsafe { self.handle.clone() };
-		DelegateFutureFuture::new(
-			unsafe { self.handle.clone() },
-			async move { func(handle.into()).await },
-		)
+		DelegateFutureFuture::new(unsafe { self.handle.clone() }, async move {
+			func(handle.into()).await
+		})
 	}
 
 	/// Queues the given closure `func` to be executed on the GUI thread

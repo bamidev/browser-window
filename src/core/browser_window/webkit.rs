@@ -2,16 +2,10 @@ use std::{
 	borrow::Cow,
 	cell::Cell,
 	collections::HashMap,
-	sync::{
-		atomic::{AtomicBool, Ordering},
-	},
+	sync::atomic::{AtomicBool, Ordering},
 };
 
-use gtk::{
-	gio::Cancellable,
-	glib::CastNone,
-	prelude::*,
-};
+use gtk::{gio::Cancellable, glib::CastNone, prelude::*};
 use javascriptcore::ValueExt;
 use webkit2gtk::{LoadEvent, Settings, SettingsExt, UserContentManagerExt, WebViewExt};
 
@@ -19,7 +13,7 @@ use super::{super::window::WindowImpl, *};
 use crate::{
 	def_browser_event, def_event,
 	prelude::{ApplicationExt, WindowExt},
-	rc::Rc
+	rc::Rc,
 };
 
 
@@ -77,7 +71,8 @@ impl BrowserWindowExt for BrowserWindowImpl {
 	fn new(
 		app: ApplicationImpl, parent: WindowImpl, source: Source, title: &str, width: Option<u32>,
 		height: Option<u32>, options: &WindowOptions,
-		browser_window_options: &BrowserWindowOptions, creation_callback: CreationCallbackFn, callback_data: *mut (),
+		browser_window_options: &BrowserWindowOptions, creation_callback: CreationCallbackFn,
+		callback_data: *mut (),
 	) {
 		let window = WindowImpl::new(app, parent, title, width, height, options);
 		let settings = Settings::builder().build();
@@ -152,7 +147,9 @@ impl BrowserWindowExt for BrowserWindowImpl {
 }
 
 impl BrowserWindowEventExt for BrowserWindowImpl {
-	fn on_message(&self, handle: Weak<BrowserWindowOwner>) -> MessageEvent { MessageEvent::new(handle) }
+	fn on_message(&self, handle: Weak<BrowserWindowOwner>) -> MessageEvent {
+		MessageEvent::new(handle)
+	}
 }
 
 def_browser_event!(MessageEvent<MessageEventArgs<'static>>(&mut self, handler) {
