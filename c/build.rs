@@ -241,6 +241,7 @@ fn main() {
 						&cef_path
 					);
 					println!("cargo:rustc-link-lib=static=libcef_dll_wrapper");
+					println!("cargo:rustc-link-lib=static=libcef");
 					println!("cargo:rustc-link-lib=dylib=libcef");
 
 					build_se_lib_args.push(format!("/LIBPATH:{}", &cef_path).into());
@@ -251,6 +252,7 @@ fn main() {
 					build_se_lib_args.push(format!("/LIBPATH:{}/Release", &cef_path).into());
 				} else {
 					println!("cargo:rustc-link-lib=static=cef_dll_wrapper");
+					println!("cargo:rustc-link-lib=static=cef");
 					println!("cargo:rustc-link-lib=dylib=cef");
 
 					build_se_lib_args.push(format!("-L{}/libcef_dll_wrapper", &cef_path).into());
