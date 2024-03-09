@@ -64,8 +64,3 @@ impl super::ApplicationExt for ApplicationImpl {
 		self.exit_code.load(Ordering::Relaxed)
 	}
 }
-
-struct DispatchData {
-	func: unsafe fn(ApplicationImpl, *mut ()),
-	data: *mut (),
-}

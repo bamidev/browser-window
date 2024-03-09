@@ -166,8 +166,8 @@ def_browser_event!(MessageEvent<MessageEventArgs<'static>>(&mut self, handler) {
 			let user_context_manager = this.inner.inner.user_content_manager().unwrap();
 			user_context_manager.register_script_message_handler("bw");
 			let this2 = this.clone();
-			let mut h = Rc::new(Cell::new(handler));
-			user_context_manager.connect_script_message_received(Some("bw"), move |ucm, r| {
+			let h = Rc::new(Cell::new(handler));
+			user_context_manager.connect_script_message_received(Some("bw"), move |_, r| {
 				let value = r
 					.js_value()
 					.map(|v| transform_js_value(v))
