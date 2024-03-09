@@ -93,9 +93,11 @@ Once downloaded, you will need to extract it somewhere.
 The library itself is already compiled for the binary distribution. However, there is a static 'wrapper' library that still needs to be built.
 To do this, first run _cmake_ by running this on the command line from within the extracted folder:
 ```
-cmake -DCMAKE_BUILD_TYPE=Debug .
+cmake .
 ```
-Keep in mind that currently, it seems that the CEF wrapper library misses some symbols in release mode. This can cause some linker errors when trying to compile against the Release binaries.
+Keep in mind that currently, right out of the box, CEF seems to miss a symbol when compiled.
+This can be solved by defining `DCHECK_ALWAYS_ON` before compiling, which should be straightforward when using Visual Studio.
+In the other cases, another solution might be to build the cmake project in debug mode: `cmake -DCMAKE_BUILD_TYPE=Debug .`
 
 #### Unix-like Systems
 
@@ -107,12 +109,9 @@ A newly generated Visual Studio solution has been generated in the folder.
 You should build this solution's Release target with [Visual Studio](https://visualstudio.microsoft.com/vs/).
 However, before you do, you need to change one setting in the project's settings.
 
-Goto Project -> Properties -> Configuration Properties -> C/C++ -> Code Generation
+Make sure to compile the project as a static lib (.lib).
 
-If `Runtime Library` is set to `Multi-threaded (/MT)`, set it to `Multi-threaded DLL (/MD)`.
-Rust links against the C runtime dynamically, and thus requires CEF to link to it dynamically as well.
-
-Now you can build the solution.
+Now you can just build the solution.
 
 ### Environment Variables & Resource Files
 

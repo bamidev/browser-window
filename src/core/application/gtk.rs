@@ -44,7 +44,7 @@ impl super::ApplicationExt for ApplicationImpl {
 	fn free(&self) {}
 
 	fn initialize(
-		argc: c_int, argv: *mut *mut c_char, _settings: &ApplicationSettings,
+		_argc: c_int, _argv: *mut *mut c_char, _settings: &ApplicationSettings,
 	) -> Result<Self> {
 		let inner = gtk::Application::builder().build();
 		Ok(Self {
@@ -63,9 +63,4 @@ impl super::ApplicationExt for ApplicationImpl {
 		self.inner.run();
 		self.exit_code.load(Ordering::Relaxed)
 	}
-}
-
-struct DispatchData {
-	func: unsafe fn(ApplicationImpl, *mut ()),
-	data: *mut (),
 }

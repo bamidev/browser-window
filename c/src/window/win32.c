@@ -138,8 +138,12 @@ void bw_Window_setWindowDimensions( bw_Window* window, bw_Dims2D dimensions ) {
 
 
 
-void bw_WindowImpl_destroy( bw_WindowImpl* window ) {
-	DestroyWindow( window->handle );
+void bw_WindowImpl_close(bw_WindowImpl* window) {
+	// Hides the window so that it is perceived as 'closed'.
+	if (window->closed = FALSE) {
+		ShowWindow(window->handle, SW_HIDE);
+		window->closed = TRUE;
+	}
 }
 
 void bw_WindowImpl_hide( bw_WindowImpl* window ) {
@@ -217,14 +221,26 @@ LRESULT CALLBACK bw_Window_proc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 				unsigned int width = rect.right - rect.left;
 				unsigned int height = rect.bottom - rect.top;
 
-				if ( window->callbacks.on_resize != 0 )
-					window->callbacks.on_resize( window, width, height );
+				bw_BrowserWindowImpl_onResize( window, width, height );
 
 			break;
 		}
-		// When closing the window, only destroy it when it is ready for it to be destroyed
+		// Triggered when a user closes the window
 		case WM_CLOSE: {
-			bw_Window_triggerClose( window );
+			if (window->user_data != NULL) {
+				bw_Window_freeUserData(window);
+				window->user_data = NULL;
+			}
+			ShowWindow(hwnd, SW_HIDE);
+			break;
+		}
+		// Triggered when DestroyWindow is called, which is the only way for us to programmatically close the window.
+		// So bw_Window_freeUserData may have been called multiple times, but it should have been implemented to account for that.
+		case WM_DESTROY: {
+			if (window->user_data != NULL) {
+				bw_Window_freeUserData(window);
+				window->user_data = NULL;
+			}
 			break;
 		}
 		default: {
@@ -262,18 +278,6 @@ BOOL CALLBACK _bw_Window_closeChild( HWND handle, LPARAM _window ) {
 		// Read the class name for the win32 handle
 		wchar_t class_name[11];
 		int class_name_len = GetClassNameW( handle, class_name, 11 );
-
-		// Check if this handle is of class bw-window,
-		//  if it is, we know that the enum_window handle is valid.
-		wchar_t* bw_class = L"bw-window";
-		if ( class_name_len == 9 && memcmp( class_name, bw_class, 9*sizeof(wchar_t) ) == 0 ) {
-
-			// If this is a child window, close it
-			if ( enum_window->parent == window ) {
-				bw_Window_triggerClose( enum_window );
-			}
-		}
-
 	}
 
 	return true;

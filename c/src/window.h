@@ -16,18 +16,6 @@ extern "C" {
 
 typedef struct bw_Window bw_Window;
 
-typedef struct bw_WindowCallbacks {
-	/// Fired just before the window gets destroyed and freed from memory.
-	/// Should be implemented to free the user data provided to the window.
-	void (*do_cleanup)( bw_Window* );
-	/// Fired when the window has been closed, either by the user or programmatically.
-	void (*on_close)( const bw_Window* );
-	/// Fired when a window has finished loading
-	void (*on_loaded)( const bw_Window* );
-	/// Fired when a window is resizing
-	void (*on_resize)( const bw_Window*, unsigned int width, unsigned int height );
-} bw_WindowCallbacks;
-
 typedef struct bw_WindowOptions {
 	bool borders;
 	bool minimizable;
@@ -54,20 +42,19 @@ struct bw_Window {
 	const bw_Window* parent;	// An optional window that acts as the parent to this window. If the parent gets destroyed, children will get destroyed too.
 	bool closed;	// Whether or not the window has been closed already
 	bool dropped;	// Whether or not the window may be destroyed when it is actually closed
-	bw_WindowCallbacks callbacks;
 	void* user_data;
 	bw_WindowImpl impl;	// Data for the implementation of the window
 };
 
 
-
-/// Destroy the window, releasing all resources it holds.
-/// After this call, the handle is considered invalid.
-void bw_Window_destroy( bw_Window* window );
+/// Hides the window and frees the user data
+void bw_Window_close(bw_Window* window);
 
 /// Invalidates the window handle.
-/// The window will get destroyed when it is deemed possible.
-void bw_Window_drop( bw_Window* window );
+void bw_Window_free(bw_Window* window);
+
+/// Frees the user data that was attached to this window.
+void bw_Window_freeUserData(bw_Window* window);
 
 /// Gets the width and height of the usable area inside the window.
 bw_Dims2D bw_Window_getContentDimensions( bw_Window* window );
@@ -101,15 +88,17 @@ bw_Window* bw_Window_new(
 	const bw_Window* parent,
 	bw_CStrSlice _title,
 	int width, int height,
-	const bw_WindowOptions* options,
-	void* user_data
+	const bw_WindowOptions* options
 );
+
 
 void bw_Window_setContentDimensions( bw_Window* window, bw_Dims2D dimensions );
 
 void bw_Window_setOpacity( bw_Window* window, uint8_t opacity );
 
 void bw_Window_setPosition( bw_Window* window, bw_Pos2D position );
+
+void bw_Window_setUserData(bw_Window* bw, void* user_data);
 
 /// Applies the given title;
 void bw_Window_setTitle( bw_Window* window, bw_CStrSlice title );

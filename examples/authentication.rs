@@ -16,8 +16,7 @@ fn main() {
 		//bwb.dev_tools(false)
 		bwb.size(800, 600);
 		bwb.title("Log in to Github");
-		let bw = bwb.build(app.clone()).await;
-
+		let bw = bwb.build(&app).await;
 		bw.show();
 
 		let cookie_jar = app.cookie_jar().expect("cookies not supported");

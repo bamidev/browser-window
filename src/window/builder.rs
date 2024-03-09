@@ -1,99 +1,29 @@
-use std::future::Future;
-
 use unsafe_send_sync::UnsafeSend;
 
-use crate::{application::*, core::prelude::*, window::*};
+use crate::{application::*, core::prelude::*, window::*, HasHandle};
 
-macro_rules! _def_event {
-	( $(#[$metas:meta])*, $args_type:ty, $name:ident, $name_async:ident ) => {
-		$(#[$metas])*
-		#[cfg(not(feature = "threadsafe"))]
-		pub fn $name<H>( &mut self, handler: H ) -> &mut Self where
-			H: FnMut( &$args_type ) + 'static
-		{
-			self.events.$name.register( handler );
-			self
-		}
-
-		$(#[$metas])*
-		#[cfg(feature = "threadsafe")]
-		pub fn $name<H>( &mut self, handler: H ) -> &mut Self where
-			H: FnMut( &$args_type ) + Send + 'static
-		{
-			self.events.$name.register( handler );
-			self
-		}
-
-		$(#[$metas])*
-		#[cfg(not(feature = "threadsafe"))]
-		pub fn $name_async<H,F>( &mut self, handler: H ) -> &mut Self where
-			H: FnMut( &$args_type ) -> F + 'static,
-			F: Future<Output=()> + 'static
-		{
-			self.events.$name.register_async( handler );
-			self
-		}
-
-		$(#[$metas])*
-		#[cfg(feature = "threadsafe")]
-		pub fn $name_async<H,F>( &mut self, handler: H ) -> &mut Self where
-			H: FnMut( &$args_type ) -> F + Send + 'static,
-			F: Future<Output=()> + 'static
-		{
-			self.events.$name.register_async( handler );
-			self
-		}
-	};
-}
-
-macro_rules! def_event {
-	( $(#[$metas:meta])* $args_type:ty, $name:ident, $name_async:ident ) => {
-		_def_event!( $(#[$metas])*, $args_type, $name, $name_async );
-	};
-
-	( $(#[$metas:meta])* $name:ident, $name_async:ident ) => {
-		_def_event!( $(#[$metas])*, WindowHandle, $name, $name_async );
-	};
-}
 
 /// Exposes functionality related to constructing a window.
 pub struct WindowBuilder {
 	pub(crate) borders: bool,
-	pub(crate) events: Box<WindowEvents>,
 	pub(crate) height: Option<u32>,
 	pub(crate) minimizable: bool,
-	pub(crate) parent: Option<UnsafeSend<WindowHandle>>,
+	pub(crate) parent: Option<UnsafeSend<WindowImpl>>,
 	pub(crate) resizable: bool,
 	pub(crate) title: Option<String>,
 	pub(crate) width: Option<u32>,
-}
-
-struct WindowUserData {
-	events: Box<WindowEvents>,
 }
 
 #[allow(dead_code)]
 pub type WindowOptions = cbw_WindowOptions;
 
 impl WindowBuilder {
-	def_event! { /// Invoked whenever the window closes, whether it was closed by the user or programmatically.
-		#[doc(hidden)]
-		on_close, on_close_async
-	}
-
-	def_event! { /// Invoked whenever the window resizes
-		#[doc(hidden)]
-		WindowResizeEventArgs, on_resize, on_resize_async
-	}
-
 	/// Sets whether or not the window has borders.
 	/// Default is true.
-	pub fn borders(&mut self, value: bool) -> &mut Self {
-		self.borders = value;
-		self
-	}
+	pub fn borders(&mut self, value: bool) { self.borders = value; }
 
 	// TODO: Create a Window struct that can be created with this method.
+	#[allow(dead_code)]
 	fn build(self, app: ApplicationHandle) {
 		// Title
 		let title: &str = match self.title.as_ref() {
@@ -108,17 +38,10 @@ impl WindowBuilder {
 			resizable: self.resizable,
 		};
 
-		// Put event data into a user data pointer
-		let user_data = Box::new(WindowUserData {
-			events: unsafe { Box::from_raw(Box::into_raw(self.events)) }, /* Move ownership of
-			                                                               * events into
-			                                                               * WindowUserData */
-		});
-
 		// Unwrap the parent ffi handle
 		let parent_impl_handle = match self.parent {
 			None => WindowImpl::default(),
-			Some(parent) => parent.inner.clone(),
+			Some(parent) => (*parent).clone(),
 		};
 
 		let _impl_handle = WindowImpl::new(
@@ -128,32 +51,24 @@ impl WindowBuilder {
 			self.width as _,
 			self.height as _,
 			&window_options,
-			Box::into_raw(user_data) as _,
 		);
 	}
 
 	/// Sets the height that the browser window will be created with initially
-	pub fn height(&mut self, height: u32) -> &mut Self {
-		self.height = Some(height);
-		self
-	}
+	pub fn height(&mut self, height: u32) { self.height = Some(height); }
 
 	/// Sets whether or not the window has a minimize button on the title bar
 	/// Default is true
-	pub fn minimizable(&mut self, value: bool) -> &mut Self {
-		self.minimizable = value;
-		self
-	}
+	pub fn minimizable(&mut self, value: bool) { self.minimizable = value; }
 
 	/// Configure a parent window.
 	/// When a parent window closes, this browser window will close as well.
 	/// This could be a reference to a `Browser` or `BrowserThreaded` handle.
-	pub fn parent<W>(&mut self, bw: &W) -> &mut Self
+	pub fn parent<W>(&mut self, bw: &W)
 	where
-		W: OwnedWindow,
+		W: HasHandle<WindowHandle>,
 	{
-		self.parent = Some(UnsafeSend::new(bw.window_handle()));
-		self
+		self.parent = Some(UnsafeSend::new(bw.handle().0.clone()));
 	}
 
 	pub fn new() -> Self {
@@ -165,33 +80,22 @@ impl WindowBuilder {
 			resizable: true,
 			title: None,
 			width: None,
-			events: Box::new(WindowEvents::default()),
 		}
 	}
 
 	/// Sets the width and height of the browser window
-	pub fn size(&mut self, width: u32, height: u32) -> &mut Self {
+	pub fn size(&mut self, width: u32, height: u32) {
 		self.width = Some(width);
 		self.height = Some(height);
-		self
 	}
 
 	/// Sets the title of the window.
-	pub fn title<S: Into<String>>(&mut self, title: S) -> &mut Self {
-		self.title = Some(title.into());
-		self
-	}
+	pub fn title<S: Into<String>>(&mut self, title: S) { self.title = Some(title.into()); }
 
 	/// Sets the width that the browser window will be created with initially.
-	pub fn width(&mut self, width: u32) -> &mut Self {
-		self.width = Some(width);
-		self
-	}
+	pub fn width(&mut self, width: u32) { self.width = Some(width); }
 
 	/// Sets whether or not the window will be resizable.
 	/// Default is true.
-	pub fn resizable(&mut self, resizable: bool) -> &mut Self {
-		self.resizable = resizable;
-		self
-	}
+	pub fn resizable(&mut self, resizable: bool) { self.resizable = resizable; }
 }

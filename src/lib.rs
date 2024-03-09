@@ -17,11 +17,20 @@
 //!
 //! # Thread safety
 //! To use the threadsafe version of _BrowserWindow_, enable feature
-//! `threadsafe`.
+//! `threadsafe`. This will use [`Arc`](https://doc.rust-lang.org/std/sync/struct.Arc.html)
+//! instead of [`Rc`](https://doc.rust-lang.org/std/rc/struct.Rc.html)
+//! internally, and will enable the [`BrowserWindowThreaded`](browser/struct.BrowserWindow.html) and
+//! [`ApplicationHandleThreaded`](browser/struct.BrowserWindowThreaded.html)
+//! handles. It will also require closures to be `Send`. Docs.rs will show the
+//! threadsafe versions of everything. If you need to know how everything is
+//! compiled in the non-threadsafe version, you need to invoke `cargo doc --open`
+//! in the git repo yourself.
+//! 
+//! # Events
+//! To learn how to use events, take a quick look at the [`event`](event/index.html)
+//! module.
 
 mod core;
-#[macro_use]
-mod prop;
 #[cfg(test)]
 mod tests;
 
@@ -32,10 +41,13 @@ pub mod error;
 pub mod event;
 pub mod javascript;
 pub mod prelude;
+pub(crate) mod rc;
 pub mod window;
 
 #[cfg(feature = "threadsafe")]
 mod delegate;
 #[cfg(feature = "threadsafe")]
 pub use delegate::{DelegateError, DelegateFuture, DelegateFutureFuture};
-pub use prop::Property;
+
+mod common;
+pub use common::*;

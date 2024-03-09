@@ -1,48 +1,80 @@
 //! This module contains all event related types.
+//! 
+//! To register a callback to an event, the documentation may be a bit hard to
+//! navigate. The [`BrowserWindow`](../browser/struct.BrowserWindow.html) handle
+//! contains a bunch of functions that return different event objects, and then
+//! the event object can be used to register the callback at.
+//! 
+//! Each event object has the [`register`](trait.EventExt.html#tymethod.register)
+//! method to register a closure to be executed on the occurence of the event.
+//! 
+//! ```
+//! use browser_window::browser::*;
+//! use browser_window::prelude::*;
+//! 
+//! fn example(bw: BrowserWindow) {
+//! 	bw.on_message().register(|h: &BrowserWindowHandle, e: MessageEventArgs| {
+//! 		// .. code here ...
+//! 	});
+//! }
+//! ```
+//! 
+//! There is also a [`register_async`](trait.EventExt.html#tymethod.register_async)
+//! method, which can be useful in async code:
+//! 
+//! ```
+//! use browser_window::browser::*;
+//! use browser_window::prelude::*;
+//! 
+//! fn async_example(bw: BrowserWindow) {
+//! 	bw.on_message().register_async(|h: BrowserWindow, e: MessageEventArgs| async move {
+//! 		// .. code here ...
+//! 	});
+//! }
+//! ```
 
 use std::{boxed::Box, future::Future, pin::Pin};
 
+
 #[cfg(not(feature = "threadsafe"))]
-type EventHandler<'a, A> = Box<dyn FnMut(&A) -> Pin<Box<dyn Future<Output = ()> + 'a>> + 'a>;
+pub type EventHandlerAsyncCallback<O, A> =
+	dyn FnMut(O, A) -> Pin<Box<dyn Future<Output = ()> + 'static>> + 'static;
+#[cfg(not(feature = "threadsafe"))]
+pub type EventHandlerSyncCallback<H, A> = dyn FnMut(&H, A) + 'static;
 #[cfg(feature = "threadsafe")]
-type EventHandler<'a, A> = Box<dyn FnMut(&A) -> Pin<Box<dyn Future<Output = ()> + 'a>> + Send + 'a>;
+pub type EventHandlerAsyncCallback<O, A> =
+	dyn FnMut(O, A) -> Pin<Box<dyn Future<Output = ()> + 'static>> + Send + 'static;
+#[cfg(feature = "threadsafe")]
+pub type EventHandlerSyncCallback<H, A> = dyn FnMut(&H, A) + Send + 'static;
 
-pub struct Event<'a, A> {
-	handlers: Vec<EventHandler<'a, A>>,
+
+pub enum EventHandler<H, O, A> {
+	Sync(Box<EventHandlerSyncCallback<H, A>>),
+	Async(Box<EventHandlerAsyncCallback<O, A>>),
 }
 
-impl<'a, A> Event<'a, A> {
-	/// Invokes the event, which calls all handlers that have been registered to
-	/// this event.
-	pub(crate) fn invoke(&mut self, args: &A) {
-		for h in self.handlers.iter_mut() {
-			h(args);
-		}
-	}
 
+/// An `Event` can be registered to with a regular closure or an 'async
+/// enclosure'. All events are implemented for CEF.
+/// If an event is not implemented for another browser framework, it will simply
+/// never be invoked. If an event _is_ supported by another browser framework,
+/// it should say so in its documentation.
+pub(crate) trait Event<H, O, A> {
+	fn register_handler(&mut self, handler: EventHandler<H, O, A>);
+}
+
+pub trait EventExt<H, O, A> {
 	/// Register a closure to be invoked for this event.
 	#[cfg(not(feature = "threadsafe"))]
-	pub fn register<H>(&mut self, mut handler: H)
+	fn register<X>(&mut self, handler: X)
 	where
-		H: FnMut(&A) + 'a,
-	{
-		self.handlers.push(Box::new(move |args| {
-			handler(args);
-			Box::pin(async {})
-		}));
-	}
+		X: FnMut(&H, A) + 'static;
 
 	/// Register a closure to be invoked for this event.
 	#[cfg(feature = "threadsafe")]
-	pub fn register<H>(&mut self, mut handler: H)
+	fn register<X>(&mut self, handler: X)
 	where
-		H: FnMut(&A) + Send + 'a,
-	{
-		self.handlers.push(Box::new(move |args| {
-			handler(args);
-			Box::pin(async {})
-		}));
-	}
+		X: FnMut(&H, A) + Send + 'static;
 
 	/// Register an 'async closure' to be invoked for this event.
 	///
@@ -53,14 +85,10 @@ impl<'a, A> Event<'a, A> {
 	/// });
 	/// ```
 	#[cfg(not(feature = "threadsafe"))]
-	pub fn register_async<H, F>(&mut self, mut handler: H)
+	fn register_async<X, F>(&mut self, handler: X)
 	where
-		H: FnMut(&A) -> F + 'a,
-		F: Future<Output = ()> + 'a,
-	{
-		self.handlers
-			.push(Box::new(move |args| Box::pin(handler(args))));
-	}
+		X: FnMut(O, A) -> F + 'static,
+		F: Future<Output = ()> + 'static;
 
 	/// Register an 'async closure' to be invoked for this event.
 	///
@@ -71,20 +99,99 @@ impl<'a, A> Event<'a, A> {
 	/// });
 	/// ```
 	#[cfg(feature = "threadsafe")]
-	pub fn register_async<H, F>(&mut self, mut handler: H)
+	fn register_async<X, F>(&mut self, handler: X)
 	where
-		H: FnMut(&A) -> F + Send + 'a,
-		F: Future<Output = ()> + 'a,
+		X: FnMut(O, A) -> F + Send + 'static,
+		F: Future<Output = ()> + 'static;
+}
+
+
+impl<H, O, A, T> EventExt<H, O, A> for T
+where
+	T: Event<H, O, A>,
+{
+	#[cfg(not(feature = "threadsafe"))]
+	fn register<X>(&mut self, mut handler: X)
+	where
+		X: FnMut(&H, A) + 'static,
 	{
-		self.handlers
-			.push(Box::new(move |args| Box::pin(handler(args))));
+		self.register_handler(EventHandler::Sync(Box::new(move |h, args| {
+			handler(h, args);
+		})));
+	}
+
+	#[cfg(feature = "threadsafe")]
+	fn register<X>(&mut self, mut handler: X)
+	where
+		X: FnMut(&H, A) + Send + 'static,
+	{
+		self.register_handler(EventHandler::Sync(Box::new(move |h, args| {
+			handler(h, args);
+		})));
+	}
+
+	#[cfg(not(feature = "threadsafe"))]
+	fn register_async<X, F>(&mut self, mut handler: X)
+	where
+		X: FnMut(O, A) -> F + 'static,
+		F: Future<Output = ()> + 'static,
+	{
+		self.register_handler(EventHandler::Async(Box::new(move |h, args| {
+			Box::pin(handler(h, args))
+		})));
+	}
+
+	#[cfg(feature = "threadsafe")]
+	fn register_async<X, F>(&mut self, mut handler: X)
+	where
+		X: FnMut(O, A) -> F + Send + 'static,
+		F: Future<Output = ()> + 'static,
+	{
+		self.register_handler(EventHandler::Async(Box::new(move |h, args| {
+			Box::pin(handler(h, args))
+		})));
 	}
 }
 
-impl<'a, A> Default for Event<'a, A> {
-	fn default() -> Self {
-		Self {
-			handlers: Vec::new(),
+
+#[doc(hidden)]
+#[macro_export]
+macro_rules! decl_event {
+	($name:ident < $owner:ty >) => {
+		pub struct $name {
+			#[allow(dead_code)]
+			pub(crate) owner: crate::rc::Weak<$owner>,
 		}
+
+		impl $name {
+			#[allow(dead_code)]
+			pub(crate) fn new(owner: crate::rc::Weak<$owner>) -> Self { Self { owner } }
+		}
+	};
+}
+
+#[doc(hidden)]
+#[macro_export]
+macro_rules! decl_browser_event {
+	($name:ident) => {
+		decl_event!($name<BrowserWindowOwner>);
+	};
+}
+
+#[doc(hidden)]
+#[macro_export]
+macro_rules! def_event {
+	( $name:ident<$handle_type:ty, $owner_type:ty, $arg_type:ty> (&mut $this:ident, $arg_name:ident) $body:block ) => {
+		impl crate::event::Event<$handle_type, $owner_type, $arg_type> for $name {
+			fn register_handler(&mut $this, $arg_name: crate::event::EventHandler<$handle_type, $owner_type, $arg_type>) $body
+		}
+	}
+}
+
+#[doc(hidden)]
+#[macro_export]
+macro_rules! def_browser_event {
+	( $name:ident<$arg_type:ty> (&mut $this:ident, $arg_name:ident) $body:block ) => {
+		def_event!($name<BrowserWindowHandle, BrowserWindow, $arg_type> (&mut $this, $arg_name) $body);
 	}
 }

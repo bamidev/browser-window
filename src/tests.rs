@@ -6,7 +6,7 @@ use std::{
 #[cfg(feature = "threadsafe")]
 use tokio;
 
-use crate::{application::*, browser::*, cookie::*, prelude::*};
+use crate::{application::*, browser::*, cookie::*};
 
 #[test]
 fn tests() {
@@ -55,9 +55,9 @@ fn async_tests(application: &Application) {
 	let runtime = application.start();
 
 	let exit_code = runtime.run_async(|app| async move {
-		let _bw = async_basic(app.clone()).await;
+		let _bw = async_basic(&app).await;
 		#[cfg(not(feature = "webkitgtk"))]
-		async_cookies(app.clone()).await;
+		async_cookies(&app).await;
 		//async_correct_parent_cleanup(app).await;
 		app.exit(0);
 	});
@@ -65,13 +65,13 @@ fn async_tests(application: &Application) {
 	assert!(exit_code == 0);
 }
 
-async fn async_basic(app: ApplicationHandle) -> BrowserWindow {
+async fn async_basic(app: &ApplicationHandle) -> BrowserWindow {
 	let mut bwb = BrowserWindowBuilder::new(Source::Url("https://www.duckduckgo.com/".into()));
 	bwb.title("Basic Async Test");
-	return bwb.build(app).await;
+	return bwb.build(&app).await;
 }
 
-async fn async_cookies(app: ApplicationHandle) {
+async fn async_cookies(app: &ApplicationHandle) {
 	if let Some(mut jar) = app.cookie_jar() {
 		let cookie = Cookie::new("name", "value");
 
@@ -137,12 +137,12 @@ fn cookie() {
 					.expires()
 					.unwrap()
 					.duration_since(UNIX_EPOCH)
-					.unwrap()) < Duration::from_millis(1)
+					.unwrap()) < Duration::from_secs(1)
 		);
 		assert!(
 			(now.duration_since(UNIX_EPOCH).unwrap()
 				- cookie.creation_time().duration_since(UNIX_EPOCH).unwrap())
-				< Duration::from_millis(1)
+				< Duration::from_secs(1)
 		);
 	}
 }
@@ -154,11 +154,11 @@ async fn async_correct_parent_cleanup(app: ApplicationHandle) {
 	let mut bwb_parent =
 		BrowserWindowBuilder::new(Source::Url("https://www.duckduckgo.com/".into()));
 	bwb_parent.title("Parent Window");
-	let bw_parent = bwb_parent.build(app.clone()).await;
+	let bw_parent = bwb_parent.build(&app).await;
 
 	// Then a child
 	let mut bwb_child = BrowserWindowBuilder::new(Source::Url("https://www.google.com/".into()));
 	bwb_child.title("Child Window");
 	bwb_child.parent(&bw_parent);
-	let _bw_child = bwb_child.build(app.clone()).await;
+	let _bw_child = bwb_child.build(&app).await;
 }

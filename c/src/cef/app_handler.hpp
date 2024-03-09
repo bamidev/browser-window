@@ -24,19 +24,22 @@ public:
 	AppHandler( bw_Application* app ) : app(app) {}
 
 	virtual void OnBrowserCreated( CefRefPtr<CefBrowser> browser, CefRefPtr<CefDictionaryValue> extra_info ) override {
-		if (browser->IsPopup()) { return; }
-		
-		// Lets send the handle and callback data back to the browser process, where we can actually use them
-		auto msg = CefProcessMessage::Create( "on-browser-created" );
-		auto args = msg->GetArgumentList();
+		/*if (browser->IsPopup()) { return; }
+		printf("OnBrowserCreated %p\n", browser->GetMainFrame());
+		auto main_frame = browser->GetMainFrame();
+		if (main_frame != NULL) {
+			// Lets send the handle and callback data back to the browser process, where we can actually use them
+			auto msg = CefProcessMessage::Create( "on-browser-created" );
+			auto args = msg->GetArgumentList();
 
-		// Load in our other data
-		args->SetBinary( 0, extra_info->GetBinary( "handle" ) );
-		args->SetBinary( 1, extra_info->GetBinary( "callback" ) );
-		args->SetBinary( 2, extra_info->GetBinary( "callback-data" ) );
-		args->SetBool( 3, extra_info->GetBool( "dev-tools" ) );
-
-		browser->GetMainFrame()->SendProcessMessage( PID_BROWSER, msg );
+			// Load in our other data
+			args->SetBinary( 0, extra_info->GetBinary( "handle" ) );
+			args->SetBinary( 1, extra_info->GetBinary( "callback" ) );
+			args->SetBinary( 2, extra_info->GetBinary( "callback-data" ) );
+			args->SetBool( 3, extra_info->GetBool( "dev-tools" ) );
+			printf("OnBrowserCreated SendProcessMessage\n");
+			main_frame->SendProcessMessage( PID_BROWSER, msg );
+		}*/
 	}
 
 	virtual void OnContextCreated( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefV8Context> context ) override {

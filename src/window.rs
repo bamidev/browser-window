@@ -4,88 +4,53 @@ mod builder;
 
 pub use builder::WindowBuilder;
 
-use super::{event::Event, prelude::*};
+pub use super::core::window::WindowExt;
+use super::prelude::*;
 
-pub type StandardWindowEvent = Event<'static, WindowHandle>;
 
 /// A handle that exposes all windowing functionality.
-#[derive(Clone)]
-pub struct WindowHandle {
-	pub(super) inner: WindowImpl,
-}
+pub struct WindowHandle(pub(super) WindowImpl);
 
-#[derive(Default)]
-pub(crate) struct WindowEvents {
-	pub on_close: StandardWindowEvent,
-	pub on_destroy: StandardWindowEvent,
-	pub on_resize: Event<'static, WindowResizeEventArgs>,
-}
-
-pub struct WindowResizeEventArgs {
-	handle: WindowHandle,
-	new_size: Dims2D,
-}
-
-pub trait OwnedWindow {
-	fn window_handle(&self) -> WindowHandle;
-}
 
 impl WindowHandle {
-	impl_prop! { pub content_dimensions: ContentDimensions }
+	#[cfg(feature = "threadsafe")]
+	pub(crate) unsafe fn clone(&self) -> Self { Self(self.0.clone()) }
 
-	impl_prop! { pub opacity: Opacity }
+	pub(super) fn new(inner: WindowImpl) -> Self { Self(inner) }
 
-	impl_prop! { pub position: Position }
+	pub fn content_dimensions(&self) -> Dims2D { self.0.content_dimensions() }
 
-	impl_prop! { pub title: Title }
+	pub fn opacity(&self) -> u8 { self.0.opacity() }
 
-	impl_prop! { pub window_dimensions: WindowDimensions }
+	pub fn position(&self) -> Pos2D { self.0.position() }
 
-	/// Make the window invisible to the user.
-	pub fn hide(&self) { self.inner.hide() }
+	pub fn title(&self) -> String { self.0.title() }
 
-	pub(super) fn new(inner: WindowImpl) -> Self { Self { inner } }
+	pub fn window_dimensions(&self) -> Dims2D { self.0.window_dimensions() }
 
-	/// Make the window visible to the user.
-	pub fn show(&self) { self.inner.show() }
-}
+	/// Hides the window.
+	/// Keep in mind that hiding the window is not the same as closing it.
+	/// Hiding the window will keep it's resources alive.
+	/// If the window is hidden, and all window handles are gone, the memory is
+	/// effectively leaked.
+	pub fn hide(&self) { self.0.hide(); }
 
-prop! { /// Gets or sets the width and height of the content of the window.
-	ContentDimensions<Dims2D>( this: WindowHandle ) {
-		get => this.inner.get_content_dimensions().into(),
-		set(val) => this.inner.set_content_dimensions( val.into() )
+	pub fn set_content_dimensions(&self, dimensions: Dims2D) {
+		self.0.set_content_dimensions(dimensions);
 	}
-}
 
-prop! { /// Gets or sets the opacity of the window.
-		/// An opacity of 255 means the window is invisible.
-		/// An opacity of 0 means the window is completely visible.
-		/// Anything in between makes the window transparent.
-		///
-		/// This feature only works on Windows.
-	Opacity<u8>( this: WindowHandle ) {
-		get => this.inner.get_opacity(),
-		set(val) => this.inner.set_opacity( val )
-	}
-}
+	pub fn set_opacity(&self, opacity: u8) { self.0.set_opacity(opacity); }
 
-prop! { /// Gets or sets the current position of the window.
-	Position<Pos2D>( this: WindowHandle ) {
-		get => this.inner.get_position(),
-		set(val) => this.inner.set_position( val )
-	}
-}
+	pub fn set_position(&self, position: Pos2D) { self.0.set_position(position); }
 
-prop! { /// Gets or sets the title of the window.
-	pub Title<String, &str>( this: WindowHandle ) {
-		get => this.inner.get_title(),
-		set(val) => this.inner.set_title( val ).into()
-	}
-}
+	pub fn set_title(&self, title: &str) { self.0.set_title(title); }
 
-prop! { /// Gets or sets the current window size including its border and titlebar.
-	WindowDimensions<Dims2D>( this: WindowHandle ) {
-		get => this.inner.get_window_dimensions().into(),
-		set(val) => this.inner.set_window_dimensions( val.into() )
+	pub fn set_window_dimensions(&self, dimensions: Dims2D) {
+		self.0.set_window_dimensions(dimensions);
 	}
+
+	/// Shows a window if it was hidden.
+	/// Windows that were just created are hidden to start.
+	/// This method is necessary to show it to the user.
+	pub fn show(&self) { self.0.show(); }
 }

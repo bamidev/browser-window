@@ -11,7 +11,7 @@ _BrowserWindow_ is designed to be easy to use, and work cross-platform. It utili
 syntax & it even has optional thread-safe handles. There are currently three different underlying
 browser frameworks that can be selected: CEF, WebkitGTK or Edge WebView2.
 Each framework has their pros and cons, but CEF will be the most feature complete because it has the
-best cross-platform support and the underlying engine is regularly worked on.
+best cross-platform support and the browser engine is regularely updated.
 However, if you only need some very basic functionality, the other frameworks are easier to set up.
 
 You can look at some [examples](https://github.com/bamilab/browser-window/tree/master/examples) to

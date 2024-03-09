@@ -38,7 +38,7 @@ impl JsValue {
 		// If the symbol starts with a digit, interpret it as a (positive) number
 		if "0123456789".contains(|c| c == string.chars().nth(0).unwrap()) {
 			return match BigFloat::from_str(string) {
-				Err(e) => Self::Other(format!("unable to parse number: {}", string)),
+				Err(_) => Self::Other(format!("unable to parse number: {}", string)),
 				Ok(f) => Self::Number(f),
 			};
 		}
@@ -89,7 +89,7 @@ impl JsValue {
 				let (sign, mantissa, exponent) = n.as_parts();
 
 				let big: BigFloat = mantissa.into();
-				for i in 0..exponent {
+				for _i in 0..exponent {
 					big.mul(&10.into());
 				}
 				if !sign {

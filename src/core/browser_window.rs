@@ -16,20 +16,67 @@ pub use edge2::{BrowserWindowImpl, JsEvaluationError};
 pub use webkit::{BrowserWindowImpl, JsEvaluationError};
 
 use super::{
+	super::event::*,
 	application::ApplicationImpl,
 	cookie::CookieJarImpl,
 	window::{WindowImpl, WindowOptions},
 };
-use crate::{browser::Source, prelude::JsValue};
+use crate::{browser::*, prelude::JsValue, rc::*};
+
+
+//pub type BrowserWindowEventHandler<'a, A> = EventHandler<'a,
+// BrowserWindowHandle, A>;
 
 pub type BrowserWindowOptions = cbw_BrowserWindowOptions;
+
+/// The data that is passed to the C FFI handler function
+pub(crate) struct BrowserUserData {
+	pub(crate) _handle: Rc<BrowserWindowOwner>,
+}
 
 pub type CreationCallbackFn = fn(bw: BrowserWindowImpl, data: *mut ());
 pub type EvalJsCallbackFn =
 	fn(bw: BrowserWindowImpl, data: *mut (), result: Result<JsValue, JsEvaluationError>);
-pub type ExternalInvocationHandlerFn = fn(bw: BrowserWindowImpl, cmd: &str, args: Vec<JsValue>);
 
-pub trait BrowserWindowExt: Clone {
+pub trait BrowserWindowEventExt {
+	fn on_address_changed(&self, _handle: Weak<BrowserWindowOwner>) -> AddressChangedEvent {
+		unimplemented!();
+	}
+	fn on_console_message(&self, _handle: Weak<BrowserWindowOwner>) -> ConsoleMessageEvent {
+		unimplemented!();
+	}
+	fn on_favicon_changed(&self, _handle: Weak<BrowserWindowOwner>) -> FaviconChangedEvent {
+		unimplemented!();
+	}
+	fn on_fullscreen_mode_changed(
+		&self, _handle: Weak<BrowserWindowOwner>,
+	) -> FullscreenModeChangedEvent {
+		unimplemented!();
+	}
+	fn on_loading_progress_changed(
+		&self, _handle: Weak<BrowserWindowOwner>,
+	) -> LoadingProgressChangedEvent {
+		unimplemented!();
+	}
+	fn on_message(&self, _handle: Weak<BrowserWindowOwner>) -> MessageEvent;
+	fn on_navigation_end(&self, _handle: Weak<BrowserWindowOwner>) -> NavigationEndEvent {
+		unimplemented!();
+	}
+	fn on_navigation_start(&self, _handle: Weak<BrowserWindowOwner>) -> NavigationStartEvent {
+		unimplemented!();
+	}
+	fn on_page_title_changed(&self, _handle: Weak<BrowserWindowOwner>) -> PageTitleChangedEvent {
+		unimplemented!();
+	}
+	fn on_status_message(&self, _handle: Weak<BrowserWindowOwner>) -> StatusMessageEvent {
+		unimplemented!();
+	}
+	fn on_tooltip(&self, _handle: Weak<BrowserWindowOwner>) -> TooltipEvent {
+		unimplemented!();
+	}
+}
+
+pub trait BrowserWindowExt: BrowserWindowEventExt + Clone {
 	fn cookie_jar(&self) -> Option<CookieJarImpl>;
 
 	/// Executes the given JavaScript string.
@@ -44,36 +91,25 @@ pub trait BrowserWindowExt: Clone {
 	/// Causes the browser to navigate to the given URI.
 	fn navigate(&self, uri: &str);
 
-	/// Creates a new browser window asynchronously.
-	/// The `BrowserWindowImpl` handle to the new browser window will be passed
-	/// via a callback.
-	///
-	/// # Arguments
-	/// `app` - The application handle
-	/// `parent` - An handle for another window that this window will be a child
-	/// of. Use WindowImpl::default() for no parent. `source` - The content that
-	/// will be displayed by the browser. `title` - The title that the window
-	/// will have. `width` - The width of the window.
-	/// `height` - The height of the window.
-	/// `window_options` - Options for the window.
-	/// `browser_window_options` - Some extra browser related options.
-	/// `handler` - A handler function that can be invoked from within
-	/// JavaScript code. `user_data` - Could be set to point to some extra data
-	/// that this browser window will store. `creation_callback` - Will be
-	/// invoked when the browser window is created. It provided the
-	/// `BrowserWindowImpl` handle. `callback_data` - The data that will be
-	/// provided to the `creation_callback`.
-	fn new(
-		app: ApplicationImpl, parent: WindowImpl, source: Source, title: &str, width: Option<u32>,
-		height: Option<u32>, window_options: &WindowOptions,
-		browser_window_options: &BrowserWindowOptions, handler: ExternalInvocationHandlerFn,
-		user_data: *mut (), creation_callback: CreationCallbackFn, callback_data: *mut (),
-	);
-
-	fn user_data(&self) -> *mut ();
-
 	fn url<'a>(&'a self) -> Cow<'a, str>;
 
 	/// Gives a handle to the underlying window.
 	fn window(&self) -> WindowImpl;
+
+	fn new(
+		app: ApplicationImpl, parent: WindowImpl, source: Source, title: &str, width: Option<u32>,
+		height: Option<u32>, options: &WindowOptions,
+		browser_window_options: &BrowserWindowOptions, creation_callback: CreationCallbackFn,
+		callback_data: *mut (),
+	);
+}
+
+
+impl BrowserWindowImpl {
+	pub(crate) fn free_user_data(user_data: *mut ()) {
+		let ptr = user_data as *mut BrowserUserData;
+		unsafe {
+			let _ = Box::from_raw(ptr);
+		}
+	}
 }

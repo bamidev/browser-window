@@ -16,7 +16,7 @@ repository = "https://github.com/bamidev/browser-window/"
 cef = ["browser-window-c/cef"]
 edge2 = ["dep:webview2", "dep:winapi", "browser-window-c/edge2"]
 gtk = []
-webkitgtk = ["dep:gtk", "dep:javascriptcore-rs", "dep:webkit2gtk", "gtk"]
+webkitgtk = ["dep:glib", "dep:gtk", "dep:javascriptcore-rs", "dep:webkit2gtk", "gtk"]
 threadsafe = []
 
 [lib]
@@ -34,6 +34,7 @@ path = "examples/authentication.rs"
 [dependencies]
 browser-window-c = { path = "c", version = "0.2.2" }
 futures-channel = { version = "^0.3" }
+glib = { version = "0.18", optional = true }
 gtk = { version = "0.18", optional = true }
 javascriptcore-rs = { version = "1", optional = true }
 json = "0.12"

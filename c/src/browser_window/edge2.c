@@ -2,7 +2,9 @@
 #include "impl.h"
 
 
-void bw_BrowserWindowImpl_doCleanup( bw_Window* window ) {}
+void bw_BrowserWindowImpl_clean(bw_BrowserWindowImpl* bw) {
+	UNUSED(bw);
+}
 
 void bw_BrowserWindowImpl_new(
 	bw_BrowserWindow* browser,
@@ -13,4 +15,8 @@ void bw_BrowserWindowImpl_new(
 	void* callback_data
 ) {}
 
-void bw_BrowserWindowImpl_onResize( const bw_Window* window, unsigned int width, unsigned int height ) {}
+void bw_BrowserWindowImpl_onResize( const bw_Window* window, unsigned int width, unsigned int height ) {
+	UNUSED(window);
+	UNUSED(width);
+	UNUSED(height);
+}

@@ -15,7 +15,7 @@ pub struct WindowImpl {
 impl WindowImpl {
 	pub fn new(
 		app: ApplicationImpl, parent: Self, title: &str, width: Option<u32>, height: Option<u32>,
-		options: &WindowOptions, user_data: *mut (),
+		options: &WindowOptions,
 	) -> Self {
 		let str_slice: cbw_CStrSlice = title.into();
 
@@ -28,17 +28,7 @@ impl WindowImpl {
 			Some(x) => x as i32,
 		};
 
-		let handle = unsafe {
-			cbw_Window_new(
-				app.inner,
-				parent.inner,
-				str_slice,
-				w,
-				h,
-				options,
-				user_data as _,
-			)
-		};
+		let handle = unsafe { cbw_Window_new(app.inner, parent.inner, str_slice, w, h, options) };
 
 		// Return
 		Self { inner: handle }
@@ -60,19 +50,19 @@ impl WindowExt for WindowImpl {
 		}
 	}
 
-	fn destroy(&self) { unsafe { cbw_Window_destroy(self.inner) } }
+	fn close(&self) { unsafe { cbw_Window_close(self.inner) } }
 
-	fn drop(&self) { unsafe { cbw_Window_drop(self.inner) } }
+	fn free(&self) { unsafe { cbw_Window_free(self.inner) } }
 
-	fn get_content_dimensions(&self) -> Dims2D {
+	fn content_dimensions(&self) -> Dims2D {
 		unsafe { cbw_Window_getContentDimensions(self.inner) }
 	}
 
-	fn get_opacity(&self) -> u8 { unsafe { cbw_Window_getOpacity(self.inner) } }
+	fn opacity(&self) -> u8 { unsafe { cbw_Window_getOpacity(self.inner) } }
 
-	fn get_position(&self) -> Pos2D { unsafe { cbw_Window_getPosition(self.inner) } }
+	fn position(&self) -> Pos2D { unsafe { cbw_Window_getPosition(self.inner) } }
 
-	fn get_title(&self) -> String {
+	fn title(&self) -> String {
 		// First obtain string size
 		let mut buf: *mut c_char = ptr::null_mut();
 		let buf_len = unsafe { cbw_Window_getTitle(self.inner, &mut buf) };
@@ -88,9 +78,7 @@ impl WindowExt for WindowImpl {
 		slice.into()
 	}
 
-	fn get_window_dimensions(&self) -> Dims2D {
-		unsafe { cbw_Window_getWindowDimensions(self.inner) }
-	}
+	fn window_dimensions(&self) -> Dims2D { unsafe { cbw_Window_getWindowDimensions(self.inner) } }
 
 	fn hide(&self) { unsafe { cbw_Window_hide(self.inner) } }
 
@@ -107,6 +95,12 @@ impl WindowExt for WindowImpl {
 	fn set_title(&self, title: &str) {
 		let slice: cbw_CStrSlice = title.into();
 		unsafe { cbw_Window_setTitle(self.inner, slice) };
+	}
+
+	fn set_user_data(&self, user_data: *mut ()) {
+		unsafe {
+			(*self.inner).user_data = user_data as _;
+		}
 	}
 
 	fn set_window_dimensions(&self, dimensions: Dims2D) {

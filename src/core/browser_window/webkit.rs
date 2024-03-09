@@ -1,33 +1,25 @@
 use std::{
 	borrow::Cow,
+	cell::Cell,
 	collections::HashMap,
-	ptr,
-	sync::{
-		atomic::{AtomicBool, AtomicPtr, Ordering},
-		Arc,
-	},
+	sync::atomic::{AtomicBool, Ordering},
 };
 
-use gtk::{
-	gio::Cancellable,
-	glib::{error::ErrorDomain, CastNone, IsA},
-	prelude::{ContainerExt, WidgetExt, WindowExtManual},
-};
-use javascriptcore::{Value, ValueExt};
+use gtk::{gio::Cancellable, glib::CastNone, prelude::*};
+use javascriptcore::ValueExt;
 use webkit2gtk::{LoadEvent, Settings, SettingsExt, UserContentManagerExt, WebViewExt};
 
 use super::{super::window::WindowImpl, *};
-use crate::prelude::{ApplicationExt, WindowExt};
+use crate::{
+	def_browser_event, def_event,
+	prelude::{ApplicationExt, WindowExt},
+	rc::Rc,
+};
+
 
 #[derive(Clone)]
 pub struct BrowserWindowImpl {
 	inner: webkit2gtk::WebView,
-	user_data: Arc<AtomicPtr<()>>,
-}
-
-struct CreationCallbackData {
-	func: CreationCallbackFn,
-	data: *mut (),
 }
 
 struct EvalJsCallbackData {
@@ -39,11 +31,6 @@ struct EvalJsCallbackData {
 
 /// An error that may occur when evaluating or executing JavaScript code.
 pub type JsEvaluationError = webkit2gtk::Error;
-
-struct UserData {
-	func: ExternalInvocationHandlerFn,
-	data: *mut (),
-}
 
 impl BrowserWindowExt for BrowserWindowImpl {
 	fn cookie_jar(&self) -> Option<CookieJarImpl> { None }
@@ -84,37 +71,18 @@ impl BrowserWindowExt for BrowserWindowImpl {
 	fn new(
 		app: ApplicationImpl, parent: WindowImpl, source: Source, title: &str, width: Option<u32>,
 		height: Option<u32>, options: &WindowOptions,
-		browser_window_options: &BrowserWindowOptions, handler: ExternalInvocationHandlerFn,
-		user_data: *mut (), creation_callback: CreationCallbackFn, callback_data: *mut (),
+		browser_window_options: &BrowserWindowOptions, creation_callback: CreationCallbackFn,
+		callback_data: *mut (),
 	) {
-		let window = WindowImpl::new(app, parent, title, width, height, options, user_data);
+		let window = WindowImpl::new(app, parent, title, width, height, options);
 		let settings = Settings::builder().build();
 		if browser_window_options.dev_tools > 0 {
 			settings.set_enable_developer_extras(true);
 		}
 		let inner = webkit2gtk::WebView::builder().settings(&settings).build();
-		let user_data_ptr = Arc::new(AtomicPtr::new(user_data));
 		let this = Self {
 			inner: inner.clone(),
-			user_data: user_data_ptr.clone(),
 		};
-
-		// Register a message handler
-		let user_context_manager = inner.user_content_manager().unwrap();
-		user_context_manager.register_script_message_handler("bw");
-		let this2 = this.clone();
-		user_context_manager.connect_script_message_received(Some("bw"), move |ucm, r| {
-			let value = r
-				.js_value()
-				.map(|v| transform_js_value(v))
-				.unwrap_or(JsValue::Undefined);
-			let (command, args) = match &value {
-				JsValue::Array(a) => (a[0].to_string_unenclosed(), a[1..].to_vec()),
-				_ => panic!("unexpected value type received from invoke_extern"),
-			};
-
-			handler(this2.clone(), &command, args);
-		});
 
 		// Add the webview to the window
 		window.0.add(&inner);
@@ -142,7 +110,7 @@ impl BrowserWindowExt for BrowserWindowImpl {
 		// FIXME: We need to call creation_callback, but pass an error to it, if the web
 		// view can not be loaded correctly.        Now we risk never notifying the
 		// future that is waiting on us.
-		let mut created = AtomicBool::new(false);
+		let created = AtomicBool::new(false);
 		inner.connect_load_changed(move |i, e| {
 			if e == LoadEvent::Finished {
 				// Create the global JS function `invoke_extern`
@@ -167,8 +135,6 @@ impl BrowserWindowExt for BrowserWindowImpl {
 		});
 	}
 
-	fn user_data(&self) -> *mut () { self.user_data.load(Ordering::Relaxed) }
-
 	fn url(&self) -> Cow<'_, str> {
 		self.inner
 			.uri()
@@ -179,6 +145,48 @@ impl BrowserWindowExt for BrowserWindowImpl {
 
 	fn window(&self) -> WindowImpl { WindowImpl(self.inner.toplevel().and_dynamic_cast().unwrap()) }
 }
+
+impl BrowserWindowEventExt for BrowserWindowImpl {
+	fn on_message(&self, handle: Weak<BrowserWindowOwner>) -> MessageEvent {
+		MessageEvent::new(handle)
+	}
+}
+
+def_browser_event!(MessageEvent<MessageEventArgs>(&mut self, handler) {
+	// Register a message handler
+	let user_context_manager = self.owner.upgrade().unwrap().inner.inner.user_content_manager().unwrap();
+	user_context_manager.register_script_message_handler("bw");
+	let owner = self.owner.clone();
+	let h = Rc::new(Cell::new(handler));
+	user_context_manager.connect_script_message_received(Some("bw"), move |_, r| {
+		if let Some(this) = owner.upgrade() {
+			let value = r
+				.js_value()
+				.map(|v| transform_js_value(v))
+				.unwrap_or(JsValue::Undefined);
+			let (command, args) = match &value {
+				JsValue::Array(a) => (a[0].to_string_unenclosed(), a[1..].to_vec()),
+				_ => panic!("unexpected value type received from invoke_extern"),
+			};
+
+			let e = MessageEventArgs {
+				cmd: command.to_string(),
+				args
+			};
+			match unsafe { &mut *h.as_ptr() } {
+				EventHandler::Sync(callback) => {
+					(callback)(&*this, e);
+				}
+				EventHandler::Async(callback) => {
+					let app = this.0.app();
+					let future = (callback)(BrowserWindow(this.clone()), e);
+					app.spawn(future);
+				}
+			}
+		}
+	});
+});
+
 
 fn transform_js_value(v: javascriptcore::Value) -> JsValue {
 	if v.is_array() {

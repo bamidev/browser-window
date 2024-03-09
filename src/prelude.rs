@@ -2,5 +2,4 @@
 
 #[cfg(feature = "threadsafe")]
 pub use super::delegate::{DelegateError, DelegateFuture, DelegateFutureFuture};
-pub use super::prop::*;
-pub use crate::{core::prelude::*, javascript::JsValue};
+pub use crate::{core::prelude::*, event::EventExt, javascript::JsValue};

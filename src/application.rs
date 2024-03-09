@@ -124,13 +124,13 @@ pub struct ApplicationHandle {
 
 struct ApplicationDispatchData<'a> {
 	handle: ApplicationHandle,
-	func: Box<dyn FnOnce(ApplicationHandle) + 'a>,
+	func: Box<dyn FnOnce(&ApplicationHandle) + 'a>,
 }
 
 #[cfg(feature = "threadsafe")]
 struct ApplicationDispatchSendData<'a> {
 	handle: ApplicationHandle,
-	func: Box<dyn FnOnce(ApplicationHandle) + Send + 'a>,
+	func: Box<dyn FnOnce(&ApplicationHandle) + Send + 'a>,
 }
 
 #[derive(Default)]
@@ -151,7 +151,7 @@ pub struct ApplicationSettings {
 // return an ApplicationHandle. Like: Application, ApplicationAsync,
 // BrowserWindow, BrowserWindowAsync
 pub trait HasAppHandle {
-	fn app_handle(&self) -> ApplicationHandle;
+	fn app_handle(&self) -> &ApplicationHandle;
 }
 
 /// The runtime to run the application with.
@@ -170,7 +170,8 @@ struct WakerData<'a> {
 
 /// The future that dispatches a closure onto the GUI thread
 #[cfg(feature = "threadsafe")]
-pub type ApplicationDelegateFuture<'a, R> = DelegateFuture<'a, ApplicationHandle, R>;
+pub type ApplicationDelegateFuture<'a, R> =
+	DelegateFuture<'a, ApplicationHandle, ApplicationHandle, R>;
 
 lazy_static! {
 	static ref WAKER_VTABLE: RawWakerVTable =
@@ -230,7 +231,7 @@ impl Application {
 	/// Creates a `Runtime` from which you can run the application.
 	pub fn start(&self) -> Runtime {
 		Runtime {
-			handle: self.handle.clone(),
+			handle: unsafe { self.handle.clone() },
 		}
 	}
 }
@@ -298,7 +299,7 @@ impl Runtime {
 		H: FnOnce(ApplicationHandle),
 	{
 		return self._run(|handle| {
-			let result = on_ready(handle.clone());
+			let result = on_ready(unsafe { handle.clone() });
 			handle.inner.mark_as_done();
 
 			result
@@ -321,7 +322,7 @@ impl Runtime {
 	{
 		self._run(|handle| {
 			self.spawn(async move {
-				func(handle.clone()).await;
+				func(unsafe { handle.clone() }).await;
 				handle.inner.mark_as_done();
 			});
 		})
@@ -334,7 +335,7 @@ impl Runtime {
 	{
 		// Data for the waker.
 		let waker_data = Box::into_raw(Box::new(WakerData {
-			handle: self.handle.clone(),
+			handle: unsafe { self.handle.clone() },
 			future: Box::pin(future),
 		}));
 
@@ -370,6 +371,12 @@ impl ApplicationHandle {
 	/// framework supports it. Currently, only CEF supports cookies.
 	pub fn cookie_jar(&self) -> Option<CookieJar> { CookieJar::global() }
 
+	pub(crate) unsafe fn clone(&self) -> Self {
+		Self {
+			inner: self.inner.clone(),
+		}
+	}
+
 	/// Causes the `Runtime` to terminate.
 	/// The `Runtime`'s [`Runtime::run`] or spawn command will return the exit
 	/// code provided. This will mean that not all tasks might complete.
@@ -392,7 +399,7 @@ impl ApplicationHandle {
 	{
 		// Data for the waker.
 		let waker_data = Box::into_raw(Box::new(WakerData {
-			handle: self.clone(),
+			handle: unsafe { self.clone() },
 			future: Box::pin(future),
 		}));
 
@@ -406,10 +413,10 @@ impl ApplicationHandle {
 	/// Returns whether or not the closure will be able to execute.
 	pub fn dispatch_delayed<'a, F>(&self, func: F, delay: Duration) -> bool
 	where
-		F: FnOnce(ApplicationHandle) + 'a,
+		F: FnOnce(&ApplicationHandle) + 'a,
 	{
 		let data_ptr = Box::into_raw(Box::new(ApplicationDispatchData {
-			handle: self.app_handle(),
+			handle: unsafe { self.app_handle().clone() },
 			func: Box::new(func),
 		}));
 
@@ -461,10 +468,10 @@ impl ApplicationHandleThreaded {
 	/// ```
 	pub fn delegate<'a, F, R>(&self, func: F) -> ApplicationDelegateFuture<'a, R>
 	where
-		F: FnOnce(ApplicationHandle) -> R + Send + 'a,
+		F: FnOnce(&ApplicationHandle) -> R + Send + 'a,
 		R: Send,
 	{
-		ApplicationDelegateFuture::<'a, R>::new(self.handle.clone(), |handle| func(handle.into()))
+		ApplicationDelegateFuture::<'a, R>::new(unsafe { self.handle.clone() }, |h| func(h))
 	}
 
 	/// Executes the given `future` on the GUI thread, and gives back its output
@@ -490,7 +497,7 @@ impl ApplicationHandleThreaded {
 		F: Future<Output = R> + 'static,
 		R: Send + 'static,
 	{
-		DelegateFutureFuture::new(self.handle.clone(), future)
+		DelegateFutureFuture::new(unsafe { self.handle.clone() }, future)
 	}
 
 	/// Executes the given async closure `func` on the GUI thread, and gives
@@ -525,11 +532,10 @@ impl ApplicationHandleThreaded {
 		F: Future<Output = R>,
 		R: Send + 'static,
 	{
-		let handle = self.handle.clone();
-		DelegateFutureFuture::new(
-			self.handle.clone(),
-			async move { func(handle.into()).await },
-		)
+		let handle = unsafe { self.handle.clone() };
+		DelegateFutureFuture::new(unsafe { self.handle.clone() }, async move {
+			func(handle.into()).await
+		})
 	}
 
 	/// Queues the given closure `func` to be executed on the GUI thread
@@ -538,10 +544,10 @@ impl ApplicationHandleThreaded {
 	/// able to execute.
 	pub fn dispatch<'a, F>(&self, func: F) -> bool
 	where
-		F: FnOnce(ApplicationHandle) + Send + 'a,
+		F: FnOnce(&ApplicationHandle) + Send + 'a,
 	{
 		let data_ptr = Box::into_raw(Box::new(ApplicationDispatchSendData {
-			handle: self.handle.clone(),
+			handle: unsafe { self.handle.clone() },
 			func: Box::new(func),
 		}));
 
@@ -556,10 +562,10 @@ impl ApplicationHandleThreaded {
 	/// Returns whether or not the closure will be able to execute.
 	pub fn dispatch_delayed<'a, F>(&self, func: F, delay: Duration) -> bool
 	where
-		F: FnOnce(ApplicationHandle) + Send + 'a,
+		F: FnOnce(&ApplicationHandle) + Send + 'a,
 	{
 		let data_ptr = Box::into_raw(Box::new(ApplicationDispatchData {
-			handle: self.handle.clone(),
+			handle: unsafe { self.handle.clone() },
 			func: Box::new(func),
 		}));
 
@@ -580,7 +586,7 @@ impl ApplicationHandleThreaded {
 		F: Future<Output = ()> + 'static,
 	{
 		self.dispatch(|handle| {
-			let future = func(handle.clone());
+			let future = func(unsafe { handle.clone() });
 			handle.spawn(future);
 		})
 	}
@@ -614,7 +620,7 @@ impl ApplicationHandleThreaded {
 impl From<ApplicationHandle> for ApplicationHandleThreaded {
 	fn from(other: ApplicationHandle) -> Self {
 		Self {
-			handle: other.clone(),
+			handle: unsafe { other.clone() },
 		}
 	}
 }
@@ -627,14 +633,14 @@ impl Deref for ApplicationHandleThreaded {
 }
 
 impl HasAppHandle for ApplicationHandle {
-	fn app_handle(&self) -> ApplicationHandle { self.clone() }
+	fn app_handle(&self) -> &ApplicationHandle { &self }
 }
 
 fn dispatch_handler(_app: ApplicationImpl, _data: *mut ()) {
 	let data_ptr = _data as *mut ApplicationDispatchData<'static>;
 	let data = unsafe { Box::from_raw(data_ptr) };
 
-	(data.func)(data.handle.into());
+	(data.func)(&data.handle);
 }
 
 #[cfg(feature = "threadsafe")]
@@ -642,7 +648,7 @@ fn dispatch_handler_send(_app: ApplicationImpl, _data: *mut ()) {
 	let data_ptr = _data as *mut ApplicationDispatchSendData<'static>;
 	let data = unsafe { Box::from_raw(data_ptr) };
 
-	(data.func)(data.handle.into());
+	(data.func)(&data.handle);
 }
 
 /// The handler that is invoked when the runtime is deemed 'ready'.

@@ -136,6 +136,14 @@ fn main() {
 		}
 	};
 
+	if target.contains("windows") {
+		build.define("BW_WINDOWS", None);
+		build_se.define("BW_WINDOWS", None);
+	}
+	if target.contains("msvc") {
+		build.flag("/MT");
+	}
+
 	/**************************************
 	 *	C header files for bindgen
 	 ************************* */
@@ -147,35 +155,9 @@ fn main() {
 		.header("src/cookie.h")
 		.header("src/common.h")
 		.header("src/err.h")
+		.header("src/event.h")
 		.header("src/string.h")
 		.header("src/window.h");
-
-	/**************************************
-	 *	The Platform source files
-	 ************************* */
-	if target.contains("windows") {
-		//bgbuilder = bgbuilder.clang_arg("-DBW_WIN32");
-		if target.contains("msvc") {
-			build.flag("/MT");
-		}
-
-		// Win32 API
-		build
-			.file("src/win32.c")
-			.file("src/application/win32.c")
-			.file("src/window/win32.c")
-			.define("BW_WIN32", None)
-			.define("_CRT_SECURE_NO_WARNINGS", None); // Disable sprintf_s warnings. sprintf_s tends to cause segfaults anyway...
-
-		build_se
-			.define("BW_WIN32", None)
-			.define("_CRT_SECURE_NO_WARNINGS", None);
-	} else if target.contains("macos") {
-		bgbuilder = bgbuilder.clang_arg("-DBW_MACOS");
-
-		build.define("BW_MACOS", None);
-		build_se.define("BW_MACOS", None);
-	}
 
 	// When opting for using GTK:
 	if cfg!(feature = "gtk") {
@@ -202,21 +184,12 @@ fn main() {
 			}
 		}
 	}
-	// Non-windows systems that opt for using CEF, use CEF's own internal windowing features
-	else if cfg!(feature = "cef") && !target.contains("windows") {
-		bgbuilder = bgbuilder.clang_arg("-DBW_CEF_WINDOW");
-		build
-			.file("src/application/cef_window.cpp")
-			.file("src/window/cef.cpp")
-			.define("BW_CEF_WINDOW", None);
-		build_se.define("BW_CEF_WINDOW", None);
-	}
 
 	/*******************************************
 	 *	The Browser Engine (CEF3) source files *
 	 ************************************* */
-	if cfg!(feature = "cef") {
-		bgbuilder = bgbuilder.clang_arg("-DBW_CEF");
+	else if cfg!(feature = "cef") {
+		bgbuilder = bgbuilder.clang_arg("-DBW_CEF").clang_arg("-DBW_CEF_WINDOW");
 
 		build.flag_if_supported("-Wno-unused-parameter"); // CEF's header files produce a lot of unused parameters warnings.
 		build_se.flag_if_supported("-Wno-unused-parameter");
@@ -251,6 +224,7 @@ fn main() {
 						&cef_path
 					);
 					println!("cargo:rustc-link-lib=static=libcef_dll_wrapper");
+					println!("cargo:rustc-link-lib=static=libcef");
 					println!("cargo:rustc-link-lib=dylib=libcef");
 
 					build_se_lib_args.push(format!("/LIBPATH:{}", &cef_path).into());
@@ -261,6 +235,7 @@ fn main() {
 					build_se_lib_args.push(format!("/LIBPATH:{}/Release", &cef_path).into());
 				} else {
 					println!("cargo:rustc-link-lib=static=cef_dll_wrapper");
+					println!("cargo:rustc-link-lib=static=cef");
 					println!("cargo:rustc-link-lib=dylib=cef");
 
 					build_se_lib_args.push(format!("-L{}/libcef_dll_wrapper", &cef_path).into());
@@ -288,17 +263,21 @@ fn main() {
 		// Source files
 		build
 			.file("src/application/cef.cpp")
+			.file("src/application/cef_window.cpp")
 			.file("src/browser_window/cef.cpp")
 			.file("src/cookie/cef.cpp")
 			.file("src/cef/bw_handle_map.cpp")
 			.file("src/cef/client_handler.cpp")
 			.file("src/cef/exception.cpp")
 			.file("src/cef/util.cpp")
+			.file("src/window/cef.cpp")
 			.define("BW_CEF", None)
+			.define("BW_CEF_WINDOW", None)
+			.flag(std_flag)
 			.cpp(true);
 
 		// Build the seperate executable and copy it to target/debug (or target/release)
-		build_se.define("BW_CEF", None).cpp(true).flag(std_flag);
+		build_se.define("BW_CEF", None).define("BW_CEF_WINDOW", None).cpp(true).flag(std_flag);
 		let se_comp = build_se.get_compiler();
 
 		for var in se_comp.env() {
@@ -338,6 +317,16 @@ fn main() {
 	 * Microsoft Edge WebView2 source files
 	 ************************************** */
 	else if cfg!(feature = "edge2") {
+		bgbuilder = bgbuilder.clang_arg("-DBW_WIN32").clang_arg("-DBW_EDGE2");
+
+		// Win32 API
+		build
+			.file("src/win32.c")
+			.file("src/application/win32.c")
+			.file("src/window/win32.c")
+			.define("BW_WIN32", None)
+			.define("BW_EDGE2", None)
+			.define("_CRT_SECURE_NO_WARNINGS", None); // Disable sprintf_s warnings. sprintf_s tends to cause segfaults anyway...
 
 		// Add the MinGW header files and libraries when available
 		if Path::new("/usr/share/mingw-w64/include/").exists() {
@@ -357,13 +346,15 @@ fn main() {
 		]);
 
 		build
+			.define("BW_WIN32", None)
 			.define("BW_EDGE2", None)
 			//.include(include_dir)
 			.file("src/application/edge2.c")
 			.file("src/application/win32.c")
 			.file("src/browser_window/edge2.c")
 			.file("src/window/win32.c")
-			.file("src/cookie/unsupported.c");
+			.file("src/cookie/unsupported.c")
+			.file("src/win32.c");
 	}
 	else {
 		build.file("src/application/other.c");
@@ -376,6 +367,7 @@ fn main() {
 		.file("src/application/common.c")
 		.file("src/browser_window/common.c")
 		.file("src/err.c")
+		.file("src/event.c")
 		.file("src/string.c")
 		.file("src/window/common.c")
 		//.flag(std_flag)
