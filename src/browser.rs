@@ -25,6 +25,7 @@ use crate::{
 		window::WindowExt,
 	},
 	decl_browser_event, decl_event,
+	HasHandle,
 	event::EventHandler,
 	prelude::*,
 	rc::Rc,
@@ -101,10 +102,6 @@ pub struct BrowserWindowHandle {
 pub struct MessageEventArgs<'a> {
 	pub cmd: &'a str,
 	pub args: Vec<JsValue>,
-}
-
-pub trait HasBrowserWindowHandle: HasWindowHandle {
-	fn browser_handle(&self) -> &BrowserWindowHandle;
 }
 
 
@@ -252,6 +249,14 @@ impl Deref for BrowserWindow {
 	fn deref(&self) -> &Self::Target { &self.0.0 }
 }
 
+impl HasHandle<ApplicationHandle> for BrowserWindow {
+	fn handle(&self) -> &ApplicationHandle { &self.app }
+}
+
+impl HasHandle<WindowHandle> for BrowserWindow {
+	fn handle(&self) -> &WindowHandle { &self.window }
+}
+
 // Core browser window functions
 impl BrowserWindowHandle {
 	/// Returns the application handle associated with this browser window.
@@ -312,6 +317,14 @@ impl BrowserWindowHandle {
 	pub fn url<'a>(&'a self) -> Cow<'a, str> { self.inner.url() }
 
 	pub fn window(&self) -> &WindowHandle { &self.window }
+}
+
+impl HasHandle<ApplicationHandle> for BrowserWindowHandle {
+	fn handle(&self) -> &ApplicationHandle { &self.app }
+}
+
+impl HasHandle<WindowHandle> for BrowserWindowHandle {
+	fn handle(&self) -> &WindowHandle { &self.window }
 }
 
 // Functions to reach the UI thread
@@ -403,7 +416,7 @@ impl BrowserWindowHandle {
 			inner: inner_handle,
 		}
 	}
-	
+
 	#[cfg(feature = "threadsafe")]
 	unsafe fn clone(&self) -> Self {
 		Self {

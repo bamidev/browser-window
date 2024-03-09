@@ -7,8 +7,8 @@ use std::{
 	task::{Context, Poll, Waker},
 };
 
-use super::application::ApplicationHandle;
-use crate::core::application::*;
+use crate::{application::ApplicationHandle, core::application::*, HasHandle};
+
 
 /// The data that is sent to the GUI thread for `DelegateFuture`.
 struct DelegateData<'a, 'b, O, H, R> {
@@ -100,11 +100,7 @@ where
 unsafe impl<'a, R> Send for DelegateFutureInner<'a, R> where R: Send {}
 
 
-pub trait HasHandle<H> {
-	fn handle(&self) -> &H;
-}
-
-
+#[cfg(feature = "threadsafe")]
 impl<'a, O, H, R> DelegateFuture<'a, O, H, R>
 where
 	R: Send,
@@ -229,10 +225,6 @@ where
 			Poll::Ready(temp.unwrap())
 		}
 	}
-}
-
-impl<H> HasHandle<H> for H {
-	fn handle(&self) -> &H { self }
 }
 
 

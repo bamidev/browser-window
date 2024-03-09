@@ -1,6 +1,6 @@
 use unsafe_send_sync::UnsafeSend;
 
-use crate::{application::*, core::prelude::*, window::*};
+use crate::{application::*, core::prelude::*, HasHandle, window::*};
 
 
 /// Exposes functionality related to constructing a window.
@@ -68,7 +68,7 @@ impl WindowBuilder {
 	where
 		W: HasHandle<WindowHandle>,
 	{
-		self.parent = Some(UnsafeSend::new(bw.window_handle().0.clone()));
+		self.parent = Some(UnsafeSend::new(bw.handle().0.clone()));
 	}
 
 	pub fn new() -> Self {
