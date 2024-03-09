@@ -36,10 +36,6 @@ pub struct JsEvaluationError {
 	                  * the JS error */
 }
 
-struct BrowserWindowUserData {
-	_owner: Rc<BrowserWindowOwner>,
-}
-
 struct EventData<C, A> {
 	owner: Weak<BrowserWindowOwner>,
 	handler: BrowserWindowEventHandler<A>,
