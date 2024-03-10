@@ -42,7 +42,7 @@ export CEF_PATH="$PWD/cef/$CEF_ARCHIVE"
 
 	# Build
 	cmake .
-	make
+	cmake --build .
 )
 
 echo "CEF is ready, please put the following line somewhere to set the environment variable, e.g. in .profile:"

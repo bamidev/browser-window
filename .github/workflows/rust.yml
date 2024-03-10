@@ -22,10 +22,7 @@ jobs:
       run: sudo apt-get install -y libwebkit2gtk-4.1-dev mingw-w64 xvfb
     - uses: actions/checkout@v3
     - name: Set up CEF
-      run: |
-        ${GITHUB_WORKSPACE}/get-cef-linux.sh
-        export CEF_PATH="${GITHUB_WORKSPACE}/cef/$(ls cef)"
-        echo $CEF_PATH
+      run: ${GITHUB_WORKSPACE}/get-cef.sh
     - name: Build with CEF
       run: CEF_PATH="${GITHUB_WORKSPACE}/cef/$(ls cef)" cargo build --release --verbose --features cef
     - name: Build with CEF (threadsafe)
