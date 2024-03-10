@@ -11,6 +11,10 @@
 #pragma comment(lib, "User32.lib")
 #pragma comment(lib, "OleAut32.lib")
 
+#ifndef WC_ERR_INVALID_CHARS
+#define WC_ERR_INVALID_CHARS 0x80
+#endif
+
 
 
 char* bw_win32_unhandledHresultMessage( bw_ErrCode code, const void* data );
