@@ -20,9 +20,9 @@ jobs:
     - name: Add x86_64-pc-windows-gnu target for Rust
       run: rustup target add x86_64-pc-windows-gnu
     - name: Set up CEF
-    - run: |
-      ./get-cef.sh
-      export CEF_PATH="$PWD/cef/$(ls cef)"
+      run: |
+        ./get-cef-linux.sh
+        export CEF_PATH="$PWD/cef/$(ls cef)"
     - uses: actions/checkout@v3
     - name: Build with CEF
       run: cargo build --release --verbose --features cef

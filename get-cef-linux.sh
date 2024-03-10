@@ -20,9 +20,9 @@ else
 fi
 
 # Download CEF archive
-CEF_ARCHIVE="cef_binary_122.1.12+g6e69d20+chromium-122.0.6261.112_linux${CEF_ARCH}_minimal.tar.bz2"
+CEF_ARCHIVE="cef_binary_122.1.12+g6e69d20+chromium-122.0.6261.112_linux${CEF_ARCH}_minimal"
 if [ ! -f /tmp/cef.tar.bz2 ]; then
-	curl -o /tmp/cef.tar.bz2.part "https://cef-builds.spotifycdn.com/$CEF_ARCHIVE"
+	curl -o /tmp/cef.tar.bz2.part "https://cef-builds.spotifycdn.com/$CEF_ARCHIVE.tar.bz2"
 	mv /tmp/cef.tar.bz2.part /tmp/cef.tar.bz2
 fi
 mkdir -p cef
@@ -33,6 +33,7 @@ export CEF_PATH="$PWD/cef/$CEF_ARCHIVE"
 # Build CEF
 (
 	cd "$CEF_PATH"
+	echo $CEF_PATH
 
 	# Add compilation definitions to the top of the CMakeLists.txt file
 	mv CMakeLists.txt CMakeLists.txt.old
