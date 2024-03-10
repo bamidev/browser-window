@@ -15,7 +15,7 @@ If you want the exact same behavior of your app on all these platforms, CEF is r
 * Supports the most event types.
 
 *Cons:*
-* Can be a pain to set up correctly; requires a lot of files to be present for the executable & compilation (especially on Windows) needs some extra care to get it done correctly.
+* Can be a pain to set up correctly; requires a lot of files to be present for the executable & compilation (especially on Windows) needs some extra care to get it done correctly. Although, there are scripts in this repository to do it for you.
 * No option to link statically & generally not available through package managers.
 
 ### WebkitGTK
@@ -96,8 +96,21 @@ export CEF_PATH= ...                           # Set environment variable
 cargo run --example terminal --features cef    # Run example code to test if it works
 ```
 
+#### Windows
+
+```
+git clone https://github.com/bamidev/browser-window
+cd browser-window    # Download & compile CEF
+.\get-cef.ps1        # Set environment variable
+```
+Then, add the printed environment variable to your system environment variables for next time.
+```
+.\setup-cef-files.bat                          # Put necessary files in target/debug
+cargo run --example terminal --features cef    # Run example code to test if it works
+```
+
 As long as `CEF_PATH` is set correctly on the system you're compiling on, compilation of `browser-window`
-should work if it is a dependency of your crate.
+should work even if it is a dependency of your crate.
 But you still need to copy files (just like `setup-cef-files.sh` does) to your crate's target/debug directory.
 
 ### Download & Extract
