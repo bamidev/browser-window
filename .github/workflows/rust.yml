@@ -21,11 +21,11 @@ jobs:
       run: rustup target add x86_64-pc-windows-gnu
     - uses: actions/checkout@v3
     - name: Build with WebkitGTK
-      run: cargo build --verbose --features webkitgtk
+      run: cargo build --release --verbose --features webkitgtk
     - name: Build with WebkitGTK (threadsafe)
-      run: cargo build --verbose --features webkitgtk,threadsafe
+      run: cargo build --release --verbose --features webkitgtk,threadsafe
     - name: Build with Edge WebView2 (MinGW)
-      run: cargo build --verbose --features edge2 --target=x86_64-pc-windows-gnu
+      run: cargo build --release --verbose --features edge2 --target=x86_64-pc-windows-gnu
     - name: Run tests
       run: RUST_BACKTRACE=full RUST_LOG=debug xvfb-run cargo test --verbose --features webkitgtk
 
@@ -40,3 +40,7 @@ jobs:
         with:
           command: build
           args: --release --features edge2
+      - uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --features edge2
