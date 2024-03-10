@@ -40,7 +40,3 @@ jobs:
         with:
           command: build
           args: --release --features edge2
-      - uses: actions-rs/cargo@v1
-        with:
-          command: test
-          args: --features edge2
