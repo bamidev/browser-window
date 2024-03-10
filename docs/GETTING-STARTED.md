@@ -12,10 +12,11 @@ Here are the pros and cons of each browser framework. Choose wisely:
 * Is available on all major platforms: Windows, MacOS, Linux (although MacOS support in _BrowserWindow_ needs some work).
 If you want the exact same behavior of your app on all platforms, CEF is recommended.
 * The cookie API of _BrowserWindow_ is supported.
+* Supports the most event types.
 
 *Cons:*
-* Can be a pain to set up correctly; requires a lot of files to be present for the executable.
-* No option to link statically & generally not available in package managers.
+* Can be a pain to set up correctly; requires a lot of files to be present for the executable & compilation (especially on Windows) needs some extra care to get it done correctly.
+* No option to link statically & generally not available through package managers.
 
 ### WebkitGTK
 
