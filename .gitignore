@@ -16,3 +16,6 @@ chrome-sandbox
 *.dat
 *.pak
 *.so
+
+# The CEF dir when using the get-cef-* scripts
+cef

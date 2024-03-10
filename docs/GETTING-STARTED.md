@@ -10,8 +10,8 @@ Here are the pros and cons of each browser framework. Choose wisely:
 
 *Pros:*
 * Is available on all major platforms: Windows, MacOS, Linux (although MacOS support in _BrowserWindow_ needs some work).
-If you want the exact same behavior of your app on all platforms, CEF is recommended.
-* The cookie API of _BrowserWindow_ is supported.
+If you want the exact same behavior of your app on all these platforms, CEF is recommended.
+* Supports the cookie API.
 * Supports the most event types.
 
 *Cons:*
@@ -83,6 +83,21 @@ not covered by this guide.
 If you want to set up CEF by building it from source, take a look at [this](https://bitbucket.org/chromiumembedded/cef/wiki/MasterBuildQuickStart.md).
 However, it will take a lot of effort, time, memory & disk space for the compilation process.
 
+Otherwise, here it the TL;DR version of setting up CEF:
+
+#### Linux
+
+```
+git clone https://github.com/bamidev/browser-window
+cd browser-window
+./get-cef.sh                                   # Download & compile CEF
+export CEF_PATH= ...                           # Set environment variable
+./setup-cef-files.sh                           # Put necessary file in target/debug
+cargo run --example terminal --features cef    # Run example code to test if it works
+```
+
+As long as `CEF_PATH` is set, having `browser-window` as a dependency to your crate should compile.
+
 ### Download & Extract
 
 You can get the latest prebuilt binaries [here](https://cef-builds.spotifycdn.com/index.html).
@@ -97,8 +112,11 @@ To do this, first run _cmake_ by running this on the command line from within th
 cmake .
 ```
 Keep in mind that currently, right out of the box, CEF seems to miss a symbol when compiled.
-This can be solved by defining `DCHECK_ALWAYS_ON` before compiling, which should be straightforward when using Visual Studio.
-In the other cases, another solution might be to build the cmake project in debug mode: `cmake -DCMAKE_BUILD_TYPE=Debug .`
+This can be solved by defining `DCHECK_ALWAYS_ON` before compiling, which can be straightforward in
+Visual Studio.
+Otherwise, you can also just add `add_compile_definitions(DCHECK_ALWAYS_ON=1)` to the beginning of
+the `CMakeLists.txt` file.
+Another solution might be to build the cmake project in debug mode: `cmake -DCMAKE_BUILD_TYPE=Debug .`
 
 #### Unix-like Systems
 
