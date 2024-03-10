@@ -83,7 +83,7 @@ not covered by this guide.
 If you want to set up CEF by building it from source, take a look at [this](https://bitbucket.org/chromiumembedded/cef/wiki/MasterBuildQuickStart.md).
 However, it will take a lot of effort, time, memory & disk space for the compilation process.
 
-Otherwise, here it the TL;DR version of setting up CEF:
+Otherwise, if you're on linux, here it the TL;DR version on setting up CEF:
 
 #### Linux
 
@@ -92,14 +92,17 @@ git clone https://github.com/bamidev/browser-window
 cd browser-window
 ./get-cef.sh                                   # Download & compile CEF
 export CEF_PATH= ...                           # Set environment variable
-./setup-cef-files.sh                           # Put necessary file in target/debug
+./setup-cef-files.sh                           # Put necessary files in target/debug
 cargo run --example terminal --features cef    # Run example code to test if it works
 ```
 
-As long as `CEF_PATH` is set, having `browser-window` as a dependency to your crate should compile.
+As long as `CEF_PATH` is set correctly on the system you're compiling on, compilation of `browser-window`
+should work if it is a dependency of your crate.
+But you still need to copy files (just like `setup-cef-files.sh` does) to your crate's target/debug directory.
 
 ### Download & Extract
 
+If you're going to set it up manually, you need to get the binaries first.
 You can get the latest prebuilt binaries [here](https://cef-builds.spotifycdn.com/index.html).
 The 'minimal' package will be fine.
 Once downloaded, you will need to extract it somewhere.
