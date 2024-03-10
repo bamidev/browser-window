@@ -24,7 +24,7 @@ jobs:
       run: cargo build --verbose --features webkitgtk
     - name: Build with WebkitGTK (threadsafe)
       run: cargo build --verbose --features webkitgtk,threadsafe
-    #- name: Build with Edge WebView2
-    #  run: cargo build --verbose --features edge2 --target=x86_64-pc-windows-gnu
+    - name: Build with Edge WebView2 (MinGW)
+      run: cargo build --verbose --features edge2 --target=x86_64-pc-windows-gnu
     - name: Run tests
       run: RUST_BACKTRACE=full RUST_LOG=debug xvfb-run cargo test --verbose --features webkitgtk
