@@ -17,9 +17,15 @@ jobs:
     steps:
     - name: Install WebkitGTK development files
       run: sudo apt-get install -y libwebkit2gtk-4.1-dev mingw-w64 xvfb
-    - name: Add x86_64-pc-windows-gnu target
+    - name: Add x86_64-pc-windows-gnu target for Rust
       run: rustup target add x86_64-pc-windows-gnu
+    - name: Set up CEF
+    - run: |
+      ./get-cef.sh
+      export CEF_PATH="$PWD/cef/$(ls cef)"
     - uses: actions/checkout@v3
+    - name: Build with CEF
+      run: cargo build --release --verbose --features cef
     - name: Build with WebkitGTK
       run: cargo build --release --verbose --features webkitgtk
     - name: Build with WebkitGTK (threadsafe)
