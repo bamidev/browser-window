@@ -1,7 +1,7 @@
 [package]
 name = "browser-window"
 version = "0.12.0"
-description = "A simple, async/await aware browser window."
+description = "A simple, optionally async, optionally threadsafe, electron-like browser toolkit for Rust."
 edition = "2018"
 authors = ["Bamidev"]
 license = "MIT"
