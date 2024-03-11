@@ -143,7 +143,7 @@ impl fmt::Display for JsValue {
 				write!(f, "}}")
 			}
 			Self::Null => write!(f, "null"),
-			Self::String(s) => write!(f, "'{}'", escape_string(s)),
+			Self::String(s) => write!(f, "\"{}\"", escape_string(s)),
 			Self::Undefined => write!(f, "undefined"),
 			Self::Other(code) => write!(f, "{}", code),
 		}
@@ -151,7 +151,7 @@ impl fmt::Display for JsValue {
 }
 
 const UNESCAPED_CHARACTERS: &str =
-	" \t_0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@\\*_+-./";
+	" \t_0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@*_+-./";
 
 fn escape_string(string: &str) -> Cow<'_, str> {
 	if string.len() == 0 {
@@ -160,10 +160,19 @@ fn escape_string(string: &str) -> Cow<'_, str> {
 
 	let mut result = String::with_capacity(string.len() * 2);
 	for char in string.chars() {
-		if !UNESCAPED_CHARACTERS.contains(char) {
+		if char == '\n' {
 			result.push('\\');
+			result.push('n');
+		} else if char == '\r' {
+			result.push('\\');
+			result.push('r');
 		}
-		result.push(char);
+		else {
+			if !UNESCAPED_CHARACTERS.contains(char) {
+				result.push('\\');
+			}
+			result.push(char);
+		}
 	}
 	Cow::Owned(result)
 }
