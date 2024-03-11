@@ -151,7 +151,7 @@ impl fmt::Display for JsValue {
 }
 
 const UNESCAPED_CHARACTERS: &str =
-	" \t_0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@*_+-./";
+	" -_0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!#$%&()*+,./:;<=>?@[]^`~";
 
 fn escape_string(string: &str) -> Cow<'_, str> {
 	if string.len() == 0 {
@@ -159,20 +159,67 @@ fn escape_string(string: &str) -> Cow<'_, str> {
 	}
 
 	let mut result = String::with_capacity(string.len() * 2);
+	let mut escaped = 0;
 	for char in string.chars() {
-		if char == '\n' {
-			result.push('\\');
-			result.push('n');
-		} else if char == '\r' {
-			result.push('\\');
-			result.push('r');
-		}
-		else {
-			if !UNESCAPED_CHARACTERS.contains(char) {
+		// TODO: Clean up this code
+		if !UNESCAPED_CHARACTERS.contains(char) {
+			escaped += 1;
+			if char == '\n' {
 				result.push('\\');
+				result.push('n');
+			} else if char == '\r' {
+				result.push('\\');
+				result.push('r');
+			} else if char == '\t' {
+				result.push('\\');
+				result.push('t');
+			} else if char == '\r' {
+				result.push('\\');
+				result.push('r');
+			} else if char == '\x08' {
+				result.push('\\');
+				result.push('b');
+			} else if char == '\x0c' {
+				result.push('\\');
+				result.push('f');
+			} else if char == '\x0b' {
+				result.push('\\');
+				result.push('v');
+			} else if char == '\0' {
+				result.push('\\');
+				result.push('0');
+			} else if (char as u32) < 256 {
+				let codepoint = char as u32;
+				result.push('\\');
+				result.push('x');
+				result.push(char::from_digit(codepoint >> 4, 16).unwrap());
+				result.push(char::from_digit(codepoint & 0x0F, 16).unwrap());
+			} else {
+				result.extend(char.escape_unicode().into_iter());
 			}
+		} else {
 			result.push(char);
 		}
 	}
-	Cow::Owned(result)
+
+	// Even though we've already created a new string, we still save memory by
+	// dropping it:
+	if escaped == 0 {
+		Cow::Borrowed(string)
+	} else {
+		Cow::Owned(result)
+	}
+}
+
+
+#[cfg(test)]
+mod tests {
+	use super::*;
+
+	#[test]
+	fn test_string_escaping() {
+		let input = " test\r\n\t\x08\x0b\x0c\0\x7f\u{1234}❤©";
+		let output = " test\\r\\n\\t\\b\\v\\f\\0\\x7f\\u{1234}\\u{2764}\\xa9";
+		assert_eq!(output, escape_string(input))
+	}
 }
