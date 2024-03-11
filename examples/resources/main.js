@@ -39,28 +39,35 @@ function onExecutionEnded() {
 	is_executing = false
 }
 
+function escapeText(text) {
+	return text
+		.replaceAll(' ', '&nbsp;')
+		.replaceAll("\r\n", '<br />')
+		.replaceAll("\n", '<br />')
+}
+
 function onOutputReceived( output ) {
 	let span = document.createElement("span")
-	span.innerText = output
+	span.innerHTML = escapeText(output)
 
-	document.body.appendChild( span )
+	document.body.firstElementChild.appendChild( span )
 }
 
 function onErrorOutputReceived( output ) {
 
 	let span = document.createElement("span")
 	span.setAttribute("class", "stderr")
-	span.innerText = output
+	span.innerHTML = escapeText(output)
 
-	document.body.appendChild( span )
+	document.body.firstElementChild.appendChild( span )
 }
 
 function print( text ) {
-	$('body').append( text )
+	$('body div').append( text )
 }
 
 function printPrefix() {
-	print( working_dir + '$ ' )
+	print(working_dir + '$ ')
 }
 
 

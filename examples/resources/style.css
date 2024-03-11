@@ -1,15 +1,11 @@
 body {
     background-color: #000;
     color: #0F0;
-    font: 1em coolFont;
+    font: 1.2em monospace;
+    margin-top: 0;
     word-break: break-all;
     word-wrap: break-word;
     white-space: pre-line;
-}
-
-@font-face {
-    font-family: coolFont;
-    src: url('ShareTechMono-Regular.ttf');
 }
 
 .stderr {
