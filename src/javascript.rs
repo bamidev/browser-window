@@ -151,7 +151,7 @@ impl fmt::Display for JsValue {
 }
 
 const UNESCAPED_CHARACTERS: &str =
-	" -_0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!#$%&()*+,./:;<=>?@[]^`~";
+	" -_0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!#$%&()*+,./:;<=>?@[]^`{|}~";
 
 fn escape_string(string: &str) -> Cow<'_, str> {
 	if string.len() == 0 {
@@ -167,6 +167,12 @@ fn escape_string(string: &str) -> Cow<'_, str> {
 			if char == '\n' {
 				result.push('\\');
 				result.push('n');
+			} else if char == '\'' {
+				result.push('\\');
+				result.push('\'');
+			} else if char == '"' {
+				result.push('\\');
+				result.push('"');
 			} else if char == '\r' {
 				result.push('\\');
 				result.push('r');
