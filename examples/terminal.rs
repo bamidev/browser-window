@@ -69,7 +69,8 @@ where
 
 			// Convert to string
 			let text = JsValue::String(String::from_utf8_lossy(&buffer[0..read]).to_string());
-			// Converting `JsValue` to a string automatically formats the value as a JavaScript string literal
+			// Converting `JsValue` to a string automatically formats the value as a
+			// JavaScript string literal
 			let js_string = text.to_string();
 
 			bw.exec_js(&(js_func.to_owned() + "(" + js_string.as_str() + ")"));
