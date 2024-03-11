@@ -10,6 +10,43 @@
 //! # Getting Started
 //! To start building apps with Browser Window, take a quick look at the
 //! [`application`](application/index.html) module.
+//! Otherwise, here is a quick example:
+//! ```
+//! use browser_window::{application::*, browser::*, prelude::*};
+//!
+//! fn main() {
+//! 	let app = Application::initialize(&ApplicationSettings::default()).unwrap();
+//! 	let runtime = app.start();
+//!
+//! 	runtime.run(|app| {
+//! 		let mut bwb = BrowserWindowBuilder::new(Source::File("file:///my-file.html".into()));
+//! 		bwb.dev_tools(true);
+//! 		bwb.size(800, 600);
+//! 		bwb.title("Example");
+//! 		bwb.build_sync(&app, |bw| {
+//! 			bw.on_message().register(|h, e| {
+//! 				match e.cmd.as_str() {
+//! 					"command_one" => {
+//! 						h.eval_js(&format!(
+//! 							"js_function({}, {}, {})",
+//! 							1,
+//! 							"'two'",
+//! 							JsValue::String("𝟛\n".into()) // Gets properly formatted to a JS string literal
+//! 						));
+//! 					}
+//! 					"command_two" => {
+//! 						// ... do something else here ...
+//! 					}
+//! 					_ => {}
+//! 				}
+//! 			});
+//!
+//! 			bw.show();
+//! 		});
+//! 	});
+//! 	app.finish();
+//! }
+//! ```
 //!
 //! For more detailed example code, see [this example code](https://github.com/bamidev/browser-window/tree/master/examples).
 //!
