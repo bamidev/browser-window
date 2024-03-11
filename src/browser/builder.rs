@@ -58,11 +58,16 @@ impl BrowserWindowBuilder {
 		}
 	}
 
+	#[deprecated(since = "0.13.0", note = "please use `build_async` instead")]
+	pub async fn build(self, app: &ApplicationHandle) -> BrowserWindow {
+		self.build_async(app).await
+	}
+
 	/// Creates the browser window.
 	///
 	/// # Arguments
 	/// * `app` - An application handle that this browser window can spawn into
-	pub async fn build(self, app: &ApplicationHandle) -> BrowserWindow {
+	pub async fn build_async(self, app: &ApplicationHandle) -> BrowserWindow {
 		let (tx, rx) = oneshot::channel::<BrowserWindowHandle>();
 
 		self._build(app, move |handle| {
@@ -92,7 +97,7 @@ impl BrowserWindowBuilder {
 
 		// We need to dispatch the spawning of the browser to the GUI thread
 		app.delegate(|app_handle| {
-			self._build(&*app_handle, |inner_handle| {
+			self.build_sync(&*app_handle, |inner_handle| {
 				if let Err(_) = tx.send(UnsafeSend::new(inner_handle)) {
 					panic!("Unable to send browser handle back")
 				}
@@ -118,10 +123,14 @@ impl BrowserWindowBuilder {
 		BrowserWindow(rc_handle)
 	}
 
-	fn _build<H>(self, app: &ApplicationHandle, on_created: H)
-	where
-		H: FnOnce(BrowserWindowHandle),
-	{
+	pub fn build_sync(self, app: &ApplicationHandle, on_created: impl FnOnce(BrowserWindow)) {
+		self._build(app, move |inner| {
+			let handle = Self::prepare_handle(inner);
+			on_created(handle);
+		})
+	}
+
+	fn _build(self, app: &ApplicationHandle, on_created: impl FnOnce(BrowserWindowHandle)) {
 		match self {
 			Self {
 				source,
