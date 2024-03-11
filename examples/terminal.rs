@@ -68,9 +68,9 @@ where
 			}
 
 			// Convert to string
-			let string = String::from_utf8_lossy(&buffer[0..read]);
-			// Sanitize string input for JavaScript
-			let js_string = serde_json::to_string(&*string).unwrap();
+			let text = JsValue::String(String::from_utf8_lossy(&buffer[0..read]).to_string());
+			// Converting `JsValue` to a string automatically formats the value as a JavaScript string literal
+			let js_string = text.to_string();
 
 			bw.exec_js(&(js_func.to_owned() + "(" + js_string.as_str() + ")"));
 		}
@@ -104,9 +104,9 @@ fn main() {
 			match e.cmd.as_str() {
 				"exec" => {
 					// The whole command line is passed one string value.
-					let cmd_line = &e.args[0];
+					let cmd_line = e.args[0].to_string_unenclosed();
 
-					execute_command(bw, &cmd_line.to_string_unenclosed()).await;
+					execute_command(bw, &cmd_line.to_string()).await;
 				}
 				other => {
 					eprintln!("Received unsupported command: {}", other);
