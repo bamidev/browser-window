@@ -157,6 +157,7 @@ impl BrowserWindow {
 
 	/// The event that will fire whenever `invoke_extern` is called with JS on
 	/// the client side.
+	/// This event is implemented for _all_ browser frameworks.
 	pub fn on_message(&self) -> MessageEvent { self.0.0.inner.on_message(Rc::downgrade(&self.0)) }
 
 	/// Whenever navigation has finished and the page has loaded.
