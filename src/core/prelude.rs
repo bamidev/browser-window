@@ -1,6 +1,6 @@
 pub use core::prelude::*;
 
-pub use browser_window_c::*;
+pub(crate) use browser_window_c::*;
 
 pub use super::cookie::*;
 
