@@ -11,7 +11,7 @@
 //! To start building apps with Browser Window, take a quick look at the
 //! [`application`](application/index.html) module.
 //! Otherwise, here is a quick example:
-//! ```
+//! ```no_run
 //! use browser_window::{application::*, browser::*, prelude::*};
 //! 
 //! fn main() {
