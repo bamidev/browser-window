@@ -97,7 +97,7 @@ impl BrowserWindowBuilder {
 
 		// We need to dispatch the spawning of the browser to the GUI thread
 		app.delegate(|app_handle| {
-			self.build_sync(&*app_handle, |inner_handle| {
+			self._build(&*app_handle, |inner_handle| {
 				if let Err(_) = tx.send(UnsafeSend::new(inner_handle)) {
 					panic!("Unable to send browser handle back")
 				}
