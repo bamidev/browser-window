@@ -13,36 +13,35 @@
 //! Otherwise, here is a quick example:
 //! ```
 //! use browser_window::{application::*, browser::*, prelude::*};
-//!
+//! 
 //! fn main() {
 //! 	let app = Application::initialize(&ApplicationSettings::default()).unwrap();
 //! 	let runtime = app.start();
-//!
-//! 	runtime.run(|app| {
+//! 	runtime.run_async(|app| async move {
 //! 		let mut bwb = BrowserWindowBuilder::new(Source::File("file:///my-file.html".into()));
 //! 		bwb.dev_tools(true);
 //! 		bwb.size(800, 600);
 //! 		bwb.title("Example");
-//! 		bwb.build_sync(&app, |bw| {
-//! 			bw.on_message().register(|h, e| {
-//! 				match e.cmd.as_str() {
-//! 					"command_one" => {
-//! 						h.eval_js(&format!(
-//! 							"js_function({}, {}, {})",
-//! 							1,
-//! 							"'two'",
-//! 							JsValue::String("𝟛\n".into()) // Gets properly formatted to a JS string literal
-//! 						));
-//! 					}
-//! 					"command_two" => {
-//! 						// ... do something else here ...
-//! 					}
-//! 					_ => {}
-//! 				}
-//! 			});
-//!
-//! 			bw.show();
-//! 		});
+//! 		let bw = bwb.build_async(&app).await;
+//!         bw.on_message().register_async(|h, e| async move {
+//!             match e.cmd.as_str() {
+//!                 "command_one" => {
+//!                     h.eval_js(&format!(
+//!                         "js_function({}, {}, {})",
+//!                         1,
+//!                         "'two'",
+//!                         JsValue::String("𝟛\n".into()) // Gets properly formatted to a JS string
+//!                                                       // literal
+//!                     ));
+//!                 }
+//!                 "command_two" => {
+//!                     // ... do something else here ...
+//!                 }
+//!                 _ => {}
+//!             }
+//!         });
+//! 
+//!         bw.show();
 //! 	});
 //! 	app.finish();
 //! }
