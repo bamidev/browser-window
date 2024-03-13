@@ -58,7 +58,7 @@ impl BrowserWindowBuilder {
 		}
 	}
 
-	#[deprecated(since = "0.13.0", note = "please use `build_async` instead")]
+	#[deprecated(since = "0.12.1", note = "please use `build_async` instead")]
 	pub async fn build(self, app: &ApplicationHandle) -> BrowserWindow {
 		self.build_async(app).await
 	}

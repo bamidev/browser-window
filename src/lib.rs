@@ -8,9 +8,8 @@
 //! up, check [this guide](https://github.com/bamidev/browser-window/tree/master/docs/GETTING-STARTED.md).
 
 //! # Getting Started
-//! To start building apps with Browser Window, take a quick look at the
-//! [`application`](application/index.html) module.
-//! Otherwise, here is a quick example:
+//! To start building apps with Browser Window, take a look at the
+//! [`application`](application/index.html) module, or this quick example:
 //! ```no_run
 //! use browser_window::{application::*, browser::*, prelude::*};
 //! 
@@ -48,8 +47,6 @@
 //! ```
 //!
 //! For more detailed example code, see [this example code](https://github.com/bamidev/browser-window/tree/master/examples).
-//!
-//! Or, for a very simple example of a browser frame, [look at this](https://github.com/bamidev/stonenet/blob/dev/desktop/src/main.rs).
 //!
 //! # Thread safety
 //! To use the threadsafe version of _BrowserWindow_, enable feature
