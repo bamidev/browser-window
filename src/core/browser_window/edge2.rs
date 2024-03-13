@@ -148,12 +148,6 @@ impl BrowserWindowExt for BrowserWindowImpl {
 						Ok(())
 					});
 
-					webview.add_navigation_completed(move |_, _| {
-						let handle = BrowserWindowImpl { inner: bw_inner };
-						creation_callback(handle, callback_data);
-						Ok(())
-					});
-
 					Ok(())
 				});
 				Ok(())
