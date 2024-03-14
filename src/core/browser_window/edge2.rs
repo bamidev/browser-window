@@ -1,4 +1,4 @@
-use std::{borrow::Cow, cell::Cell, ffi::c_void, ptr};
+use std::{borrow::Cow, cell::Cell, ffi::c_void, ptr, sync::atomic::{AtomicBool, Ordering}};
 
 use webview2::Environment;
 use winapi::{shared::windef, um::winuser};
@@ -142,9 +142,12 @@ impl BrowserWindowExt for BrowserWindowImpl {
 						move |_| Ok(()),
 					);
 
+					let mut created = AtomicBool::new(false);;
 					webview.add_navigation_completed(move |wv, e| {
-						let handle = BrowserWindowImpl { inner: bw_inner };
-						creation_callback(handle, callback_data);
+						if !created.swap(true, Ordering::Relaxed) {
+							let handle = BrowserWindowImpl { inner: bw_inner };
+							creation_callback(handle, callback_data);
+						}
 						Ok(())
 					});
 
