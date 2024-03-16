@@ -99,7 +99,7 @@ fn main() {
 		bwb.size(800, 600);
 		bwb.title("Terminal Example");
 
-		let bw = bwb.build(&app).await;
+		let bw = bwb.build_async(&app).await;
 
 		bw.on_message().register_async(|bw, e| async move {
 			match e.cmd.as_str() {
