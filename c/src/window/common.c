@@ -58,6 +58,8 @@ bw_Window* bw_Window_new(
 	window->parent = parent;
 	window->closed = true;  // Windows start out hidden to the user
 	window->dropped = false;
+	window->user_data = NULL;
+	window->browser = NULL;
 
 	window->impl = bw_WindowImpl_new( window, title, width, height, options );
 

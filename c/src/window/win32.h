@@ -28,6 +28,9 @@ typedef struct {
 } bw_WindowImpl;
 
 
+void bw_WindowWin32_onResize(bw_Window*, int left, int right, int top, int bottom);
+
+
 #ifdef __cplusplus
 }
 #endif

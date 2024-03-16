@@ -28,6 +28,7 @@ bw_BrowserWindow* bw_BrowserWindow_new(
 
 	bw_BrowserWindow* browser = (bw_BrowserWindow*)malloc( sizeof( bw_BrowserWindow ) );
 	browser->window = bw_Window_new( app, parent, title, width, height, window_options );
+	browser->window->browser = browser;
 	memset(&browser->events, 0, sizeof(bw_BrowserWindowEvents));
 	return browser;
 }

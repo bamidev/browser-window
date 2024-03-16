@@ -217,12 +217,7 @@ LRESULT CALLBACK bw_Window_proc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 
 			RECT rect;
 			GetClientRect( window->impl.handle, &rect );
-
-				unsigned int width = rect.right - rect.left;
-				unsigned int height = rect.bottom - rect.top;
-
-				bw_BrowserWindowImpl_onResize( window, width, height );
-
+			bw_WindowWin32_onResize(window, rect.left, rect.right, rect.top, rect.bottom);
 			break;
 		}
 		// Triggered when a user closes the window

@@ -13,10 +13,7 @@ void bw_BrowserWindowImpl_new(
 	const bw_BrowserWindowOptions* browser_window_options,
 	bw_BrowserWindowCreationCallbackFn callback,
 	void* callback_data
-) {}
-
-void bw_BrowserWindowImpl_onResize( const bw_Window* window, unsigned int width, unsigned int height ) {
-	UNUSED(window);
-	UNUSED(width);
-	UNUSED(height);
+) {
+	browser->impl.controller = NULL;
+	browser->impl.webview = NULL;
 }

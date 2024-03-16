@@ -1,4 +1,4 @@
-use std::{borrow::Cow, cell::Cell, ffi::c_void, ptr, sync::atomic::{AtomicBool, Ordering}};
+use std::{borrow::Cow, cell::Cell, ffi::{c_int, c_void}, ptr, sync::atomic::{AtomicBool, Ordering}};
 
 use webview2::Environment;
 use winapi::{shared::windef, um::winuser};
@@ -103,10 +103,6 @@ impl BrowserWindowExt for BrowserWindowImpl {
 					controller.put_is_visible(true);
 					let webview =
 						Box::new(controller.get_webview().expect("unable to get webview"));
-					unsafe {
-						(*bw_inner).impl_.controller = Box::into_raw(controller.clone()) as _;
-						(*bw_inner).impl_.webview = Box::into_raw(webview.clone()) as _;
-					}
 
 					let settings = webview.get_settings().expect("unable to get settings");
 					settings.put_is_script_enabled(true);
@@ -122,6 +118,10 @@ impl BrowserWindowExt for BrowserWindowImpl {
 					};
 					unsafe { winuser::GetClientRect(hwnd, &mut rect) };
 					controller.put_bounds(rect);
+					unsafe {
+						(*bw_inner).impl_.controller = Box::into_raw(controller.clone()) as _;
+						(*bw_inner).impl_.webview = Box::into_raw(webview.clone()) as _;
+					}
 
 					let result = match source {
 						Source::Url(url) => webview.navigate(&url),
@@ -251,5 +251,23 @@ extern "C" fn bw_Window_freeUserData(w: *mut c_void) {
 			BrowserWindowImpl::free_user_data((*w_ptr).user_data as _);
 			(*w_ptr).user_data = ptr::null_mut();
 		}
+	}
+}
+
+
+#[allow(non_snake_case)]
+#[no_mangle]
+extern "C" fn bw_WindowWin32_onResize(window: *mut cbw_Window, left: c_int, right: c_int, top: c_int, bottom: c_int) { println!("bw_WindowWin32_onResize {:p}", window);
+	let bw = unsafe { (*window).browser as *mut cbw_BrowserWindow };
+	let controller_ptr = unsafe { (*bw).impl_.controller as *mut webview2::Controller };
+	if controller_ptr != ptr::null_mut() {
+		let controller = unsafe { &*controller_ptr };
+		let rect = windef::RECT {
+			left,
+			right,
+			top,
+			bottom,
+		};
+		controller.put_bounds(rect);
 	}
 }

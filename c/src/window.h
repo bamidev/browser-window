@@ -37,12 +37,15 @@ typedef struct {} bw_WindowImpl;
 #endif
 
 
+typedef struct bw_BrowserWindow bw_BrowserWindow;
+
 struct bw_Window {
 	bw_Application* app;	// The application handle that this window belongs to.
 	const bw_Window* parent;	// An optional window that acts as the parent to this window. If the parent gets destroyed, children will get destroyed too.
 	bool closed;	// Whether or not the window has been closed already
 	bool dropped;	// Whether or not the window may be destroyed when it is actually closed
-	void* user_data;
+	void* user_data;	// TODO: Put the user_data ptr on bw_BrowserWindow
+	bw_BrowserWindow* browser;
 	bw_WindowImpl impl;	// Data for the implementation of the window
 };
 
