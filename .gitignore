@@ -1,4 +1,3 @@
-Cargo.lock
 target
 
 # CEF generated files
@@ -19,3 +18,6 @@ chrome-sandbox
 
 # The CEF dir when using the get-cef-* scripts
 cef
+
+# CCLS generated files
+.ccls-cache
