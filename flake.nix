@@ -13,7 +13,7 @@
         pkgs = nixpkgs.legacyPackages.${system};
         stdenv = pkgs.stdenv;
         browser-window = stdenv.mkDerivation {
-          pname = "stonenet";
+          pname = "browser-window";
           version = "0.0.0";
           src = ./.;
           buildPhase = ''
@@ -26,9 +26,33 @@
         };
       in {
         apps.default = {
-          name = "browser-window";
+          name = "terminal-example";
           type = "app";
-          program = "${browser-window}/bin/stonenetd";
+          program = "${browser-window}/bin/terminal-example";
+        };
+
+        devShells = {
+          default = pkgs.mkShell {
+            packages = with pkgs; [
+              llvmPackages_21.libcxxClang
+            ];
+          };
+
+          cef = pkgs.mkShell {
+            packages = with pkgs; [
+              cmake
+              llvmPackages_21.libcxxClang
+            ];
+
+            shellHook = ''
+              if [ ! -d cef ]; then
+                echo Preparing CEF... 
+                ./get-cef.sh
+              fi
+
+              export CEF_PATH="cef/$(ls cef)"
+            '';
+          };
         };
       });
 }
