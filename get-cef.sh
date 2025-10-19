@@ -1,4 +1,5 @@
-#!/bin/sh
+#!/usr/bin/env bash
+set -e
 
 # Check processor architecture to download the correction version
 LINUX_ARCH=`uname -m`
@@ -33,7 +34,6 @@ export CEF_PATH="$PWD/cef/$CEF_ARCHIVE"
 # Build CEF
 (
 	cd "$CEF_PATH"
-	echo $CEF_PATH
 
 	# Add compilation definitions to the top of the CMakeLists.txt file
 	mv CMakeLists.txt CMakeLists.txt.old
