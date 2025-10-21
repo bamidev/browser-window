@@ -119,6 +119,10 @@ extern "C" void bw_WindowImpl_show( bw_WindowImpl* window ) {
 	(*(CefRefPtr<CefWindow>*)window->handle_ptr)->Show();
 }
 
+extern "C" void* bw_WindowImpl_innerHandle(bw_WindowImpl* window) {
+	return window->handle_ptr;
+}
+
 
 
 bw_Dims2D bw_Window_getContentDimensions( bw_Window* window ) {

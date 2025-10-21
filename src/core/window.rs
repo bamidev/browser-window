@@ -19,6 +19,13 @@ pub trait WindowExt: Clone {
 	fn free(&self);
 
 	fn content_dimensions(&self) -> Dims2D;
+	/// Returns a C void pointer that is an internal handle for the underlying
+	/// window system being used.
+	/// For CEF, this is a pointer to a `CefRefPtr<CefWindow>` in C. So a
+	/// pointer to smart pointer. For Edge, the pointer is of type `HWND` as
+	/// known from the winapi. (See crate `winapi`.) For webkitgtk, the pointer
+	/// is a null pointer. You can use `WindowImpl::gtk_handle()`.
+	unsafe fn inner_handle(&self) -> *mut c_void { ptr::null_mut() }
 	fn opacity(&self) -> u8;
 	fn position(&self) -> Pos2D;
 	fn title(&self) -> String;

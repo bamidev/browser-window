@@ -152,6 +152,10 @@ void bw_WindowImpl_hide( bw_WindowImpl* window ) {
 	ShowWindow( window->handle, SW_HIDE );
 }
 
+void* bw_WindowImpl_innerHandle(bw_WindowImpl* window) {
+	return window->handle;
+}
+
 bw_WindowImpl bw_WindowImpl_new(
 	const bw_Window* window,
 	bw_CStrSlice _title,

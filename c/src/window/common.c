@@ -39,6 +39,10 @@ void bw_Window_hide( bw_Window* window ) {
 	bw_WindowImpl_hide( &window->impl );
 }
 
+void* bw_Window_innerHandle(bw_Window* window) {
+  return bw_WindowImpl_innerHandle(&window->impl);
+}
+
 bool bw_Window_isVisible( const bw_Window* window ) {
 	return !window->closed;
 }

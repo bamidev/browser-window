@@ -78,6 +78,8 @@ bw_Dims2D bw_Window_getWindowDimensions( bw_Window* window );
 // Makes the window invisible and inaccessible from the user.
 void bw_Window_hide( bw_Window* window );
 
+void* bw_Window_innerHandle(bw_Window* window);
+
 /// Returns whether or not the window is not hidden.
 /// `bw_Window_show` and `bw_Window_hide` change the visibility.
 bool bw_Window_isVisible( const bw_Window* window );

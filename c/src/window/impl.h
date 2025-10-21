@@ -15,6 +15,7 @@ bw_WindowImpl bw_WindowImpl_new(
 
 void bw_WindowImpl_close( bw_WindowImpl* window );
 void bw_WindowImpl_hide( bw_WindowImpl* window );
+void* bw_WindowImpl_innerHandle(bw_WindowImpl* window);
 void bw_WindowImpl_show( bw_WindowImpl* window );
 
 

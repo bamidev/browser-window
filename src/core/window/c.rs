@@ -61,6 +61,8 @@ impl WindowExt for WindowImpl {
 		unsafe { cbw_Window_getContentDimensions(self.inner) }
 	}
 
+	unsafe fn inner_handle(&self) -> *mut c_void { cbw_Window_innerHandle(self.inner) }
+
 	fn opacity(&self) -> u8 { unsafe { cbw_Window_getOpacity(self.inner) } }
 
 	fn position(&self) -> Pos2D { unsafe { cbw_Window_getPosition(self.inner) } }

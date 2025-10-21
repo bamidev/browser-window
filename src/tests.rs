@@ -10,6 +10,10 @@ use crate::{application::*, browser::*, cookie::*};
 
 #[test]
 fn tests() {
+	// This test doesn't work with GTK
+	if cfg!(feature = "webkitgtk") {
+		return;
+	}
 	let exec_path = env::current_dir()
 		.unwrap()
 		.join("target/debug/browser-window-se");

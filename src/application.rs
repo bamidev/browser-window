@@ -9,7 +9,7 @@
 //!
 //! # Example #1
 //! Here is an example to show how you can construct your application:
-//! ```
+//! ```rust,no_run
 //! use std::process;
 //!
 //! use browser_window::application::*;

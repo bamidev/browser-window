@@ -20,6 +20,9 @@ impl WindowHandle {
 
 	pub fn content_dimensions(&self) -> Dims2D { self.0.content_dimensions() }
 
+	#[cfg(feature = "gtk")]
+	pub fn gtk_handle(&self) -> &gtk::Window { &self.impl_handle().0 }
+
 	pub fn opacity(&self) -> u8 { self.0.opacity() }
 
 	pub fn position(&self) -> Pos2D { self.0.position() }
@@ -34,6 +37,10 @@ impl WindowHandle {
 	/// If the window is hidden, and all window handles are gone, the memory is
 	/// effectively leaked.
 	pub fn hide(&self) { self.0.hide(); }
+
+	pub fn impl_handle(&self) -> &WindowImpl { &self.0 }
+
+	pub unsafe fn inner_handle(&self) -> *mut c_void { self.impl_handle().inner_handle() }
 
 	pub fn set_content_dimensions(&self, dimensions: Dims2D) {
 		self.0.set_content_dimensions(dimensions);

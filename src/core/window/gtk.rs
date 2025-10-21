@@ -40,6 +40,8 @@ impl WindowImpl {
 
 		Self(inner)
 	}
+
+	pub fn gtk_handle(&self) -> &gtk::Window { &self.0 }
 }
 
 impl Default for WindowImpl {
@@ -89,11 +91,11 @@ impl WindowExt for WindowImpl {
 
 	fn hide(&self) { self.0.hide(); }
 
-	fn set_content_dimensions(&self, dimensions: Dims2D) {}
+	fn set_content_dimensions(&self, _dimensions: Dims2D) {}
 
 	fn set_opacity(&self, _opacity: u8) {}
 
-	fn set_position(&self, position: Pos2D) {
+	fn set_position(&self, _position: Pos2D) {
 		unimplemented!();
 	}
 
