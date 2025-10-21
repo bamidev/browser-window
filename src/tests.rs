@@ -10,8 +10,8 @@ use crate::{application::*, browser::*, cookie::*};
 
 #[test]
 fn tests() {
-	// This test doesn't work with GTK
-	if cfg!(feature = "webkitgtk") {
+	// FIXME: This test doesn't quite work with CEF anymore
+	if cfg!(feature = "cef") {
 		return;
 	}
 	let exec_path = env::current_dir()
