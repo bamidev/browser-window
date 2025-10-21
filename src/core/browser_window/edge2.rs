@@ -1,4 +1,10 @@
-use std::{borrow::Cow, cell::Cell, ffi::{c_int, c_void}, ptr, sync::atomic::{AtomicBool, Ordering}};
+use std::{
+	borrow::Cow,
+	cell::Cell,
+	ffi::{c_int, c_void},
+	ptr,
+	sync::atomic::{AtomicBool, Ordering},
+};
 
 use webview2::Environment;
 use winapi::{shared::windef, um::winuser};
@@ -8,7 +14,6 @@ use crate::{
 	def_browser_event, def_event,
 	prelude::{ApplicationExt, WindowExt},
 };
-
 
 #[derive(Clone)]
 pub struct BrowserWindowImpl {
@@ -24,7 +29,6 @@ struct EvalJsCallbackData {
 
 /// An error that may occur when evaluating or executing JavaScript code.
 pub type JsEvaluationError = ();
-
 
 impl BrowserWindowImpl {
 	fn controller(&self) -> &webview2::Controller {
@@ -142,7 +146,7 @@ impl BrowserWindowExt for BrowserWindowImpl {
 						move |_| Ok(()),
 					);
 
-					let mut created = AtomicBool::new(false);;
+					let mut created = AtomicBool::new(false);
 					webview.add_navigation_completed(move |wv, e| {
 						if !created.swap(true, Ordering::Relaxed) {
 							let handle = BrowserWindowImpl { inner: bw_inner };
@@ -179,7 +183,6 @@ impl BrowserWindowEventExt for BrowserWindowImpl {
 		MessageEvent::new(handle)
 	}
 }
-
 
 def_browser_event!(MessageEvent<MessageEventArgs>(&mut self, handler) {
 
@@ -224,7 +227,6 @@ def_browser_event!(MessageEvent<MessageEventArgs>(&mut self, handler) {
 	.expect("unable to register message handler");
 });
 
-
 fn dispatch_eval_js(_app: ApplicationImpl, dispatch_data: *mut ()) {
 	let data_ptr = dispatch_data as *mut EvalJsCallbackData;
 	let data = unsafe { Box::from_raw(data_ptr) };
@@ -241,7 +243,6 @@ fn dispatch_eval_js(_app: ApplicationImpl, dispatch_data: *mut ()) {
 		});
 }
 
-
 #[allow(non_snake_case)]
 #[no_mangle]
 extern "C" fn bw_Window_freeUserData(w: *mut c_void) {
@@ -254,10 +255,12 @@ extern "C" fn bw_Window_freeUserData(w: *mut c_void) {
 	}
 }
 
-
 #[allow(non_snake_case)]
 #[no_mangle]
-extern "C" fn bw_WindowWin32_onResize(window: *mut cbw_Window, left: c_int, right: c_int, top: c_int, bottom: c_int) { println!("bw_WindowWin32_onResize {:p}", window);
+extern "C" fn bw_WindowWin32_onResize(
+	window: *mut cbw_Window, left: c_int, right: c_int, top: c_int, bottom: c_int,
+) {
+	println!("bw_WindowWin32_onResize {:p}", window);
 	let bw = unsafe { (*window).browser as *mut cbw_BrowserWindow };
 	let controller_ptr = unsafe { (*bw).impl_.controller as *mut webview2::Controller };
 	if controller_ptr != ptr::null_mut() {

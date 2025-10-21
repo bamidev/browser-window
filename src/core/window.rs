@@ -3,13 +3,14 @@ mod c;
 #[cfg(feature = "gtk")]
 mod gtk;
 
+use std::{ffi::c_void, ptr};
+
 #[cfg(not(feature = "gtk"))]
 pub use c::WindowImpl;
 #[cfg(feature = "gtk")]
 pub use gtk::WindowImpl;
 
 use crate::prelude::*;
-
 
 pub trait WindowExt: Clone {
 	fn app(&self) -> ApplicationImpl;

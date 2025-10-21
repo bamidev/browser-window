@@ -2,15 +2,15 @@
 
 mod builder;
 
+pub use std::ffi::c_void;
+
 pub use builder::WindowBuilder;
 
 pub use super::core::window::WindowExt;
 use super::prelude::*;
 
-
 /// A handle that exposes all windowing functionality.
 pub struct WindowHandle(pub(super) WindowImpl);
-
 
 impl WindowHandle {
 	#[cfg(feature = "threadsafe")]

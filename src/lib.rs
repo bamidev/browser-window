@@ -12,7 +12,7 @@
 //! [`application`](application/index.html) module, or this quick example:
 //! ```no_run
 //! use browser_window::{application::*, browser::*, prelude::*};
-//! 
+//!
 //! fn main() {
 //! 	let app = Application::initialize(&ApplicationSettings::default()).unwrap();
 //! 	let runtime = app.start();
@@ -22,25 +22,25 @@
 //! 		bwb.size(800, 600);
 //! 		bwb.title("Example");
 //! 		let bw = bwb.build_async(&app).await;
-//!         bw.on_message().register_async(|h, e| async move {
-//!             match e.cmd.as_str() {
-//!                 "command_one" => {
-//!                     h.eval_js(&format!(
-//!                         "js_function({}, {}, {})",
-//!                         1,
-//!                         "'two'",
-//!                         JsValue::String("𝟛\n".into()) // Gets properly formatted to a JS string
-//!                                                       // literal
-//!                     ));
-//!                 }
-//!                 "command_two" => {
-//!                     // ... do something else here ...
-//!                 }
-//!                 _ => {}
-//!             }
-//!         });
-//! 
-//!         bw.show();
+//! 		bw.on_message().register_async(|h, e| async move {
+//! 			match e.cmd.as_str() {
+//! 				"command_one" => {
+//! 					h.eval_js(&format!(
+//! 						"js_function({}, {}, {})",
+//! 						1,
+//! 						"'two'",
+//! 						JsValue::String("𝟛\n".into()) // Gets properly formatted to a JS string
+//! 						                              // literal
+//! 					));
+//! 				}
+//! 				"command_two" => {
+//! 					// ... do something else here ...
+//! 				}
+//! 				_ => {}
+//! 			}
+//! 		});
+//!
+//! 		bw.show();
 //! 	});
 //! 	app.finish();
 //! }

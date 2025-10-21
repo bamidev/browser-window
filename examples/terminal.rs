@@ -1,7 +1,7 @@
 use std::{
 	env,
 	io::prelude::*,
-	process::{exit, Command, Stdio},
+	process::{Command, Stdio, exit},
 };
 
 use browser_window::{application::*, browser::*, prelude::*};

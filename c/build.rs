@@ -184,7 +184,6 @@ fn main() {
 			}
 		}
 	}
-
 	/*******************************************
 	 *	The Browser Engine (CEF3) source files *
 	 ************************************* */
@@ -202,7 +201,9 @@ fn main() {
 						// Disable checking CEF_PATH for the docs.rs compiler, it is not on their
 						// system anyway.
 						if let Err(_) = env::var("DOCS_RS") {
-							panic!("Environment variable CEF_PATH is not set! This is needed by Browser Window to find CEF's development files. See https://github.com/bamilab/browser-window/tree/master/docs/getting-started for more information.")
+							panic!(
+								"Environment variable CEF_PATH is not set! This is needed by Browser Window to find CEF's development files. See https://github.com/bamilab/browser-window/tree/master/docs/getting-started for more information."
+							)
 						}
 					}
 					other => panic!("Unable to use CEF_PATH: {}", other),
@@ -277,7 +278,11 @@ fn main() {
 			.cpp(true);
 
 		// Build the seperate executable and copy it to target/debug (or target/release)
-		build_se.define("BW_CEF", None).define("BW_CEF_WINDOW", None).cpp(true).flag(std_flag);
+		build_se
+			.define("BW_CEF", None)
+			.define("BW_CEF_WINDOW", None)
+			.cpp(true)
+			.flag(std_flag);
 		let se_comp = build_se.get_compiler();
 
 		for var in se_comp.env() {
@@ -334,16 +339,13 @@ fn main() {
 			build.include(PathBuf::from(
 				env::var("CARGO_MANIFEST_DIR").unwrap() + "/win32/include",
 			));
-			
+
 			bgbuilder = bgbuilder
 				//.clang_arg("--target=x86_64-pc-windows-gnu")
 				.clang_arg("-I/usr/lib/gcc/x86_64-w64-mingw32/12-win32/include");
 		}
 
-		bgbuilder = bgbuilder.clang_args(&[
-			"-DBW_WIN32",
-			"-DBW_EDGE2"
-		]);
+		bgbuilder = bgbuilder.clang_args(&["-DBW_WIN32", "-DBW_EDGE2"]);
 
 		build
 			.define("BW_WIN32", None)

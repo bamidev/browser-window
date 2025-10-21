@@ -2,13 +2,12 @@ use std::{
 	boxed::Box,
 	future::Future,
 	mem, panic,
-	panic::{catch_unwind, AssertUnwindSafe},
+	panic::{AssertUnwindSafe, catch_unwind},
 	pin::Pin,
 	task::{Context, Poll, Waker},
 };
 
-use crate::{application::ApplicationHandle, core::application::*, HasHandle};
-
+use crate::{HasHandle, application::ApplicationHandle, core::application::*};
 
 /// The data that is sent to the GUI thread for `DelegateFuture`.
 struct DelegateData<'a, 'b, O, H, R> {
@@ -98,7 +97,6 @@ where
 // whenever `DelegateFutureFuture` is constructed,  care should be taken to make
 // sure that the future is safe to send to other threads.
 unsafe impl<'a, R> Send for DelegateFutureInner<'a, R> where R: Send {}
-
 
 #[cfg(feature = "threadsafe")]
 impl<'a, O, H, R> DelegateFuture<'a, O, H, R>
@@ -229,7 +227,6 @@ where
 		}
 	}
 }
-
 
 fn delegate_handler<O, H, R>(app: ApplicationImpl, _data: *mut ())
 where

@@ -217,7 +217,6 @@ fn escape_string(string: &str) -> Cow<'_, str> {
 	}
 }
 
-
 #[cfg(test)]
 mod tests {
 	use super::*;

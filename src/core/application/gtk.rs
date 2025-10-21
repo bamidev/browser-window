@@ -1,8 +1,8 @@
 use std::{
 	ffi::{c_char, c_int},
 	sync::{
-		atomic::{AtomicI32, Ordering},
 		Arc,
+		atomic::{AtomicI32, Ordering},
 	},
 	time::Duration,
 };

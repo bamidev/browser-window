@@ -1,4 +1,4 @@
-use std::sync::{atomic::AtomicI32, Arc};
+use std::sync::{Arc, atomic::AtomicI32};
 
 use glib::object::ObjectExt;
 use gtk::prelude::{GtkWindowExt, WidgetExt};

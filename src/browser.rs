@@ -17,6 +17,7 @@ use unsafe_send_sync::UnsafeSend;
 #[cfg(feature = "threadsafe")]
 use crate::delegate::*;
 use crate::{
+	HasHandle,
 	application::*,
 	core::{
 		browser_window::{
@@ -29,13 +30,11 @@ use crate::{
 	prelude::*,
 	rc::Rc,
 	window::*,
-	HasHandle,
 };
 
 mod builder;
 
 pub use builder::{BrowserWindowBuilder, Source};
-
 
 /// The future that dispatches a closure on the GUI thread.
 #[cfg(feature = "threadsafe")]
@@ -103,7 +102,6 @@ pub struct MessageEventArgs {
 	pub args: Vec<JsValue>,
 }
 
-
 decl_browser_event!(AddressChangedEvent);
 decl_browser_event!(AuthCredentialsEvent);
 decl_browser_event!(CertificateErrorEvent);
@@ -126,7 +124,6 @@ decl_browser_event!(StartDraggingEvent);
 decl_browser_event!(StatusMessageEvent);
 decl_browser_event!(TooltipEvent);
 decl_browser_event!(TextSelectionChangedEvent);
-
 
 impl BrowserWindow {
 	/// Whenver the address URI changes
@@ -462,7 +459,6 @@ impl Drop for BrowserWindowOwner {
 		}
 	}
 }
-
 
 fn eval_js_callback<H>(
 	_handle: BrowserWindowImpl, cb_data: *mut (), result: Result<JsValue, JsEvaluationError>,

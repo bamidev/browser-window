@@ -10,7 +10,6 @@ use super::{
 };
 use crate::{def_browser_event, def_event, rc::*};
 
-
 #[derive(Clone)]
 pub struct BrowserWindowImpl {
 	inner: *mut cbw_BrowserWindow,
@@ -39,7 +38,6 @@ struct EventData<C, A> {
 	converter: unsafe fn(&C) -> A,
 }
 
-
 #[doc(hidden)]
 #[macro_export]
 macro_rules! def_browser_event_c {
@@ -67,7 +65,6 @@ macro_rules! def_browser_event_c {
 		});
 	}
 }
-
 
 impl BrowserWindowExt for BrowserWindowImpl {
 	fn cookie_jar(&self) -> Option<CookieJarImpl> {

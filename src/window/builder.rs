@@ -1,7 +1,6 @@
 use unsafe_send_sync::UnsafeSend;
 
-use crate::{application::*, core::prelude::*, window::*, HasHandle};
-
+use crate::{HasHandle, application::*, core::prelude::*, window::*};
 
 /// Exposes functionality related to constructing a window.
 pub struct WindowBuilder {

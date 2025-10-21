@@ -16,7 +16,6 @@ use crate::{
 	rc::Rc,
 };
 
-
 #[derive(Clone)]
 pub struct BrowserWindowImpl {
 	inner: webkit2gtk::WebView,
@@ -186,7 +185,6 @@ def_browser_event!(MessageEvent<MessageEventArgs>(&mut self, handler) {
 		}
 	});
 });
-
 
 fn transform_js_value(v: javascriptcore::Value) -> JsValue {
 	if v.is_array() {

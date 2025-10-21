@@ -2,7 +2,10 @@
 //! definitions found in the C code base of `browser-window-c`. All functions
 //! are basically wrapping the FFI provided by crate `browser-window-c`.
 
-use std::{os::raw::c_char, ptr};
+use std::{
+	ffi::{c_char, c_void},
+	ptr,
+};
 
 use super::{WindowExt, WindowOptions};
 use crate::{core::application::ApplicationImpl, prelude::*};

@@ -23,7 +23,6 @@ use super::{
 };
 use crate::{browser::*, prelude::JsValue, rc::*};
 
-
 //pub type BrowserWindowEventHandler<'a, A> = EventHandler<'a,
 // BrowserWindowHandle, A>;
 
@@ -103,7 +102,6 @@ pub trait BrowserWindowExt: BrowserWindowEventExt + Clone {
 		callback_data: *mut (),
 	);
 }
-
 
 impl BrowserWindowImpl {
 	pub(crate) fn free_user_data(user_data: *mut ()) {

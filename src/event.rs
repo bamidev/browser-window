@@ -47,7 +47,6 @@
 
 use std::{boxed::Box, future::Future, pin::Pin};
 
-
 #[cfg(not(feature = "threadsafe"))]
 pub type EventHandlerAsyncCallback<O, A> =
 	dyn FnMut(O, A) -> Pin<Box<dyn Future<Output = ()> + 'static>> + 'static;
@@ -59,12 +58,10 @@ pub type EventHandlerAsyncCallback<O, A> =
 #[cfg(feature = "threadsafe")]
 pub type EventHandlerSyncCallback<H, A> = dyn FnMut(&H, A) + Send + 'static;
 
-
 pub enum EventHandler<H, O, A> {
 	Sync(Box<EventHandlerSyncCallback<H, A>>),
 	Async(Box<EventHandlerAsyncCallback<O, A>>),
 }
-
 
 /// An `Event` can be registered to with a regular closure or an 'async
 /// enclosure'. All events are implemented for CEF.
@@ -117,7 +114,6 @@ pub trait EventExt<H, O, A> {
 		F: Future<Output = ()> + 'static;
 }
 
-
 impl<H, O, A, T> EventExt<H, O, A> for T
 where
 	T: Event<H, O, A>,
@@ -164,7 +160,6 @@ where
 		})));
 	}
 }
-
 
 #[doc(hidden)]
 #[macro_export]
