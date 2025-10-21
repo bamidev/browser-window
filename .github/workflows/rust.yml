@@ -20,7 +20,7 @@ jobs:
       run: sudo apt-get install -y nix-bin
     - uses: actions/checkout@v3
     - name: Build nix flake wth WebkitGtk
-      run: nix build .#webkitgtk
+      run: sudo nix --extra-experimental-features 'nix-command flakes' build .#webkitgtk
 
   build:
     runs-on: ubuntu-latest
@@ -29,7 +29,9 @@ jobs:
         shell: bash
     steps:
     - name: Install development files
-      run: sudo apt-get install -y libwebkit2gtk-4.1-dev mingw-w64 xvfb
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libwebkit2gtk-4.1-dev mingw-w64 xvfb
     - uses: actions/checkout@v3
     - name: Set up CEF
       run: ${GITHUB_WORKSPACE}/get-cef.sh
@@ -40,8 +42,8 @@ jobs:
     - name: Run tests with CEF
       run: |
         CEF_PATH="${GITHUB_WORKSPACE}/cef/$(ls cef)" ${GITHUB_WORKSPACE}/setup-cef-files.sh
-        chmod 4755 ${GITHUB_WORKSPACE}/target/debug/chrome-sandbox
-        chown root:root ${GITHUB_WORKSPACE}/target/debug/chrome-sandbox
+        sudo chmod 4755 ${GITHUB_WORKSPACE}/target/debug/chrome-sandbox
+        sudo chown root:root ${GITHUB_WORKSPACE}/target/debug/chrome-sandbox
         CEF_PATH="${GITHUB_WORKSPACE}/cef/$(ls cef)" RUST_BACKTRACE=full RUST_LOG=debug xvfb-run cargo test --verbose --features cef,threadsafe  --lib --bins --tests
     - name: Build with WebkitGTK
       run: cargo build --release --verbose --features webkitgtk
@@ -72,3 +74,11 @@ jobs:
         with:
           command: build
           args: --release --features edge2,threadsafe
+      - uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --features edge2
+      - uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --features edge2,threadsafe
