@@ -44,7 +44,7 @@ If you want to run another kind of runtime, like [tokio](https://tokio.rs/) for 
 However, you will need to enable feature `threadsafe`, as it will enable all threadsafe handles.
 Here is an example:
 
-```rust
+```rust,no_run
 use std::process;
 use browser_window::application::*;
 use tokio;
