@@ -18,6 +18,7 @@ edge2 = ["dep:webview2", "dep:winapi", "browser-window-c/edge2"]
 gtk = []
 webkitgtk = ["dep:glib", "dep:gtk", "dep:javascriptcore-rs", "dep:webkit2gtk", "gtk"]
 threadsafe = []
+no-gui-tests = []
 
 [lib]
 name = "browser_window"

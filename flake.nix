@@ -31,7 +31,7 @@
         };
 
         browserWindowWebkitGtk = buildRustPackage (browserWindowDefaults // {
-          buildFeatures = ["webkitgtk"];
+          buildFeatures = ["webkitgtk" "no-gui-tests"];
 
           buildInputs = with pkgs; [ zlib ];
           # Populate PKG_CONFIG_PATH because most Rust crates utilize pkg-config to find all system build flags.
@@ -87,7 +87,7 @@
 
         # TODO: The CEF derivation needs some work.
         browserWindowCef = buildRustPackage (browserWindowDefaults // {
-          buildFeatures = ["cef"];
+          buildFeatures = ["cef" "no-gui-tests"];
 
           buildInputs = with pkgs; [ dbus cups ];
           nativeBuildInputs = [

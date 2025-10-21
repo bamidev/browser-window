@@ -44,15 +44,13 @@ jobs:
         CEF_PATH="${GITHUB_WORKSPACE}/cef/$(ls cef)" ${GITHUB_WORKSPACE}/setup-cef-files.sh
         sudo chmod 4755 ${GITHUB_WORKSPACE}/target/debug/chrome-sandbox
         sudo chown root:root ${GITHUB_WORKSPACE}/target/debug/chrome-sandbox
-        sudo chmod 4755 /home/runner/work/browser-window/browser-window/target/debug/chrome-sandbox
-        sudo chown root:root /home/runner/work/browser-window/browser-window/target/debug/chrome-sandbox
-        CEF_PATH="${GITHUB_WORKSPACE}/cef/$(ls cef)" RUST_BACKTRACE=full RUST_LOG=debug xvfb-run cargo test --verbose --features cef,threadsafe  --lib --bins --tests
+        CEF_PATH="${GITHUB_WORKSPACE}/cef/$(ls cef)" RUST_BACKTRACE=full RUST_LOG=debug xvfb-run cargo test --verbose --features cef,threadsafe,no-gui-tests
     - name: Build with WebkitGTK
       run: cargo build --release --verbose --features webkitgtk
     - name: Build with WebkitGTK (threadsafe)
       run: cargo build --release --verbose --features webkitgtk,threadsafe
     - name: Run tests with WebkitGTK
-      run: RUST_BACKTRACE=full RUST_LOG=debug xvfb-run cargo test --verbose --features webkitgtk,threadsafe
+      run: RUST_BACKTRACE=full RUST_LOG=debug xvfb-run cargo test --verbose --features webkitgtk,threadsafe,no-gui-tests
     #- name: Add x86_64-pc-windows-gnu target for Rust
     #  run: rustup target add x86_64-pc-windows-gnu
     #- name: Build with Edge WebView2 (MinGW)

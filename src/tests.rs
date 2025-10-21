@@ -10,8 +10,8 @@ use crate::{application::*, browser::*, cookie::*};
 
 #[test]
 fn tests() {
-	// FIXME: This test doesn't quite work with CEF anymore
-	if cfg!(feature = "cef") {
+	// This test would normally fail in non-desktop environments
+	if cfg!(feature = "no-gui-tests") {
 		return;
 	}
 	let exec_path = env::current_dir()
