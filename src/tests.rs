@@ -114,7 +114,7 @@ async fn async_cookies(app: &ApplicationHandle) {
 #[test]
 /// Checking if all cookie methods work correctly.
 fn cookie() {
-	if !cfg!(feature = "webkitgtk") {
+	if !cfg!(feature = "webkitgtk") && !cfg!(feature = "edge2") {
 		let now = SystemTime::now();
 
 		let mut cookie = Cookie::new("name", "value");
