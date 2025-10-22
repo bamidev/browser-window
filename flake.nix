@@ -33,20 +33,18 @@
         browserWindowWebkitGtk = buildRustPackage (browserWindowDefaults // {
           buildFeatures = ["webkitgtk" "no-gui-tests"];
 
-          buildInputs = with pkgs; [ zlib ];
-          # Populate PKG_CONFIG_PATH because most Rust crates utilize pkg-config to find all system build flags.
-          preBuild = with pkgs; ''
-            export PKG_CONFIG_PATH=""\
-            "${at-spi2-atk.dev}/lib/pkgconfig:"\
-            "${cairo.dev}/lib/pkgconfig:"\
-            "${gdk-pixbuf.dev}/lib/pkgconfig:"\
-            "${glib.dev}/lib/pkgconfig:"\
-            "${gtk3.dev}/lib/pkgconfig:"\
-            "${harfbuzz.dev}/lib/pkgconfig:"\
-            "${libsoup_3.dev}/lib/pkgconfig:"\
-            "${pango.dev}/lib/pkgconfig:"\
-            "${webkitgtk_4_1.dev}/lib/pkgconfig"
-          '';
+          buildInputs = with pkgs; [
+            at-spi2-atk
+            cairo
+            gdk-pixbuf
+            glib
+            gtk3
+            harfbuzz
+            libsoup_3
+            pango
+            webkitgtk_4_1
+            zlib
+          ];
 
         });
 
@@ -54,10 +52,6 @@
           pname = "cef";
           version = "122.1.12";
           outputs = ["out"];
-
-          nativeBuildInputs = with pkgs; [
-            xorg.libX11
-          ];
 
           src = fetchTarball {
             url = "https://cef-builds.spotifycdn.com/cef_binary_122.1.12+g6e69d20+chromium-122.0.6261.112_linux64_minimal.tar.bz2";
@@ -76,7 +70,10 @@
             ${coreutils}/bin/mkdir -p $out/Release
             ${coreutils}/bin/mkdir -p $out/Resources
             ${coreutils}/bin/cp -r Release $out
-            ${coreutils}/bin/cp -r Resources $out
+            #${coreutils}/bin/cp -r Resources $out
+            # The resources need to live in the same directory as libcef.so,
+            # so lets put everything in the Release folder then.
+            ${coreutils}/bin/cp -r Resources/* $out/Release
 
             ${coreutils}/bin/cp -r include $out
 
@@ -86,10 +83,36 @@
         };
 
         # TODO: The CEF derivation needs some work.
-        browserWindowCef = buildRustPackage (browserWindowDefaults // {
+        browserWindowCef = buildRustPackage (browserWindowDefaults // rec {
           buildFeatures = ["cef" "no-gui-tests"];
 
-          buildInputs = with pkgs; [ dbus cups ];
+          buildInputs = with pkgs; [
+            alsa-lib
+            at-spi2-atk
+            cairo
+            cups
+            dbus
+            expat
+            libdrm
+            harfbuzz
+            glib
+            gtk3
+            libgbm
+            libGL
+            libxkbcommon
+            nspr
+            nss_3_115
+            pango
+            xorg.libXcomposite
+            xorg.libXdamage
+            xorg.libXext
+            xorg.libXfixes
+            xorg.libXrandr
+            xorg.libxcb
+            xorg.libX11
+            xorg.xorgproto
+          ];
+
           nativeBuildInputs = [
             cef
           ] ++ (with pkgs; [
@@ -97,15 +120,14 @@
             rustPlatform.bindgenHook
           ]);
 
-          preBuild = with pkgs; ''
-            export CEF_PATH="${cef}"
-            export PKG_CONFIG_PATH=""\
-            "${at-spi2-atk.dev}/lib/pkgconfig:"\
-            "${cairo.dev}/lib/pkgconfig:"\
-            "${cups.dev}/lib/pkgconfig:"\
-            "${dbus.dev}/lib/pkgconfig:"\
-            "${glib.dev}/lib/pkgconfig:"\
-            "${pango.dev}/lib/pkgconfig"
+          env = {
+            CEF_PATH = "${cef}";
+            LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath buildInputs;
+          };
+
+          fixupPhase = with pkgs; ''
+            patchelf --set-rpath "${env.LD_LIBRARY_PATH}:${cef}/Release" $out/bin/authentication
+            patchelf --set-rpath "${env.LD_LIBRARY_PATH}:${cef}/Release:${libgcc.lib}/lib" $out/bin/terminal
           '';
         });
       in {
@@ -140,13 +162,16 @@
           cef = pkgs.mkShell {
             packages = browserWindowCef.nativeBuildInputs ++ browserWindowCef.buildInputs;
             inputsFrom = browserWindowCef.buildInputs;
-            shellHook = browserWindowCef.preBuild;
+
+            shellHook = ''
+              export CEF_PATH="${browserWindowCef.CEF_PATH}"
+              export LD_LIBRARY_PATH="${browserWindowCef.LD_LIBRARY_PATH}"
+            '';
           };
           default = webkitgtk;
           webkitgtk = pkgs.mkShell {
             packages = browserWindowWebkitGtk.nativeBuildInputs ++ browserWindowWebkitGtk.buildInputs;
             inputsFrom = browserWindowWebkitGtk.buildInputs;
-            shellHook = browserWindowWebkitGtk.preBuild;
           };
         };
 
