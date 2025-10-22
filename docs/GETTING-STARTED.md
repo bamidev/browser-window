@@ -49,6 +49,16 @@ This is explained [here](https://rust-lang.github.io/rust-bindgen/requirements.h
 If you're going to use WebkitGTK, a lot of systems have a convenient package for this. If not, just
 make sure that `pkg-config` is set up to find all the headers & binaries.
 
+### Nix
+
+Also, a Nix flake is contained in this repository so that if you use the Nix package manager, you
+can open a shell with all the required development files already available and in place:
+```
+git clone https://github.com/bamidev/browser-window ../bw
+nix develop ../bw#webkitgtk
+cargo run
+```
+
 ### Debian APT
 
 `apt install libwebkit2gtk-4.1-dev`

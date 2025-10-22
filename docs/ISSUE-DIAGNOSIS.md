@@ -95,3 +95,12 @@ This may be because the library and resource files were not copied to your execu
 If this is not done, your program will not get past `Application::initialize`.
 Execute `setup-cef-files.sh` or `setup-cef-files.bat` if you're trying to run an example.
 Otherwise, check the content of these scripts to get an idea of what files need to be copied.
+
+## Resource error
+
+If you're using CEF and are getting this error on application initialization:
+```
+[1022/131322.883003:ERROR:icu_util.cc(240)] Invalid file descriptor to ICU data received.
+```
+
+Then that simply means that the `Resources` files need to live in the same directory as the `libcef.so` file.
