@@ -11,7 +11,10 @@ uint64_t bw_Cookie_getCreationTime(const bw_Cookie* cookie) { return 0; }
 
 void bw_Cookie_setCreationTime(bw_Cookie* cookie, uint64_t time) {}
 
-BOOL bw_Cookie_getDomain(const bw_Cookie* cookie, bw_StrSlice* domain) { return FALSE; }
+BOOL bw_Cookie_getDomain(const bw_Cookie* cookie, bw_StrSlice* domain) {
+	domain->len = 0;
+	return FALSE;
+}
 
 void bw_Cookie_setDomain(bw_Cookie* cookie, bw_CStrSlice domain) {}
 
@@ -21,7 +24,10 @@ void bw_Cookie_setExpires(bw_Cookie* cookie, uint64_t time) {}
 
 void bw_Cookie_setName(bw_Cookie* cookie, bw_CStrSlice name) {}
 
-BOOL bw_Cookie_getPath(const bw_Cookie* cookie, bw_StrSlice* path) { return FALSE; }
+BOOL bw_Cookie_getPath(const bw_Cookie* cookie, bw_StrSlice* path) {
+	path->len = 0;
+	return FALSE;
+}
 
 void bw_Cookie_setPath(bw_Cookie* cookie, bw_CStrSlice path) {}
 
@@ -35,9 +41,15 @@ BOOL bw_Cookie_isSecure(const bw_Cookie* cookie) { return FALSE; }
 
 void bw_Cookie_makeSecure(bw_Cookie* cookie) {}
 
-BOOL bw_Cookie_getName(const bw_Cookie* cookie, bw_StrSlice* name) { return FALSE; }
+BOOL bw_Cookie_getName(const bw_Cookie* cookie, bw_StrSlice* name) {
+	name->len = 0;
+	return FALSE;
+}
 
-BOOL bw_Cookie_getValue(const bw_Cookie* cookie, bw_StrSlice* value) { return FALSE; }
+BOOL bw_Cookie_getValue(const bw_Cookie* cookie, bw_StrSlice* value) {
+	value->len = 0;
+	return FALSE;
+}
 
 void bw_CookieJar_delete(bw_CookieJar* jar, bw_CStrSlice _url, bw_CStrSlice _name, bw_CookieJarDeleteCallbackFn cb, void* cb_data) {}
 
