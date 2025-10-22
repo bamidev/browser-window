@@ -146,7 +146,7 @@ fn main() {
 
 	/**************************************
 	 *	C header files for bindgen
-	 ************************* */
+	 ************************ */
 	let mut bgbuilder = bindgen::Builder::default()
 		.parse_callbacks(Box::new(BwBindgenCallbacks {}))
 		.clang_arg("-DBW_BINDGEN")
@@ -160,7 +160,7 @@ fn main() {
 		.header("src/window.h");
 
 	// When opting for using GTK:
-	if cfg!(feature = "gtk") {
+	/*if cfg!(feature = "gtk") {
 		bgbuilder = bgbuilder.clang_arg("-DBW_GTK");
 
 		// GTK source files
@@ -183,11 +183,12 @@ fn main() {
 				}
 			}
 		}
-	}
+	}*/
+
 	/*******************************************
 	 *	The Browser Engine (CEF3) source files *
-	 ************************************* */
-	else if cfg!(feature = "cef") {
+	 ****************************************** */
+	if cfg!(feature = "cef") {
 		bgbuilder = bgbuilder.clang_arg("-DBW_CEF").clang_arg("-DBW_CEF_WINDOW");
 
 		build.flag_if_supported("-Wno-unused-parameter"); // CEF's header files produce a lot of unused parameters warnings.
@@ -243,21 +244,35 @@ fn main() {
 					build_se_lib_args.push(format!("-L{}/Release", &cef_path).into());
 				}
 
-				// Add X flags to compiler
-				match pkg_config::Config::new()
-					.arg("--cflags")
-					.arg("--libs")
-					.probe("x11")
-				{
-					Err(_) => {} // CEF doesn't always use X...
-					Ok(result) => {
-						// Includes
-						for inc in &result.include_paths {
-							build.include(inc);
-							build_se.include(inc);
-						}
-					}
-				}
+        let pkg_deps = [
+            "alsa",
+            "cups",
+            "dbus-1",
+            "expat",
+            "gtk+-3.0",
+            "libdrm",
+            "nss",
+            "gbm",
+            "x11",
+            "x11-xcb",
+            "xcomposite",
+            "xdamage",
+            "xext",
+            "xfixes",
+            "xkbcommon",
+            "xrandr",
+        ];
+        for pkg_name in pkg_deps {
+            let result = pkg_config::Config::new().probe(pkg_name).expect(&format!("Unable to find {}", pkg_name));
+
+            if pkg_name == "x11" {
+                // When X11 is used, browser-window-c uses a bit of x11 code as well
+                for inc in &result.include_paths {
+                  build.include(inc);
+                  build_se.include(inc);
+                }
+            }
+        }
 			}
 		}
 
@@ -364,7 +379,7 @@ fn main() {
 
 	/**************************************
 	 *	All other source files
-	 ************************* */
+	 ************************ */
 	build
 		.file("src/application/common.c")
 		.file("src/browser_window/common.c")
