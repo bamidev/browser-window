@@ -19,8 +19,26 @@ jobs:
     - name: Install Nix
       run: sudo apt-get install -y nix-bin
     - uses: actions/checkout@v3
-    - name: Build nix flake wth WebkitGtk
+    - name: Build nix flake with WebkitGtk
       run: sudo nix --extra-experimental-features 'nix-command flakes' build .#webkitgtk
+    - name: Test nix develop shell with WebkitGtk
+      run: sudo xvfb-run nix --extra-experimental-features 'nix-command flakes' develop .#webkitgtk --command cargo test --verbose --features webkitgtk
+    - name: Test nix develop shell with WebkitGtk (threadsafe)
+      run: sudo xvfb-run nix --extra-experimental-features 'nix-command flakes' develop .#webkitgtk --command cargo test --verbose --features webkitgtk,threadsafe
+    - name: Test nix develop shell with WebkitGtk (release)
+      run: sudo xvfb-run nix --extra-experimental-features 'nix-command flakes' develop .#webkitgtk --command cargo test --release --verbose --features webkitgtk
+    - name: Test nix develop shell with WebkitGtk (release, threadsafe)
+      run: sudo xvfb-run nix --extra-experimental-features 'nix-command flakes' develop .#webkitgtk --command cargo test --release --verbose --features webkitgtk,threadsafe
+    - name: Build nix flake with CEF
+      run: sudo nix --extra-experimental-features 'nix-command flakes' build .#cef
+    - name: Test nix develop shell with CEF
+      run: sudo nix --extra-experimental-features 'nix-command flakes' develop .#cef --command cargo test --verbose --features cef,no-gui-tests
+    - name: Test nix develop shell with CEF (threadsafe)
+      run: sudo nix --extra-experimental-features 'nix-command flakes' develop .#cef --command cargo test --verbose --features cef,no-gui-tests,threadsafe
+    - name: Test nix develop shell with CEF (release)
+      run: sudo nix --extra-experimental-features 'nix-command flakes' develop .#cef --command cargo test --release --verbose --features cef,no-gui-tests
+    - name: Test nix develop shell with CEF (release, threadsafe)
+      run: sudo nix --extra-experimental-features 'nix-command flakes' develop .#cef --command cargo test --release --verbose --features cef,no-gui-tests,threadsafe
 
   build:
     runs-on: ubuntu-latest
@@ -31,30 +49,37 @@ jobs:
     - name: Install development files
       run: |
         sudo apt-get update
-        sudo apt-get install -y libwebkit2gtk-4.1-dev mingw-w64 xvfb
+        sudo apt-get install -y libwebkit2gtk-4.1-dev xvfb mingw-w64
     - uses: actions/checkout@v3
     - name: Set up CEF
       run: ${GITHUB_WORKSPACE}/get-cef.sh
-    - name: Build with CEF
-      run: CEF_PATH="${GITHUB_WORKSPACE}/cef/$(ls cef)" cargo build --release --verbose --features cef
-    - name: Build with CEF (threadsafe)
-      run: CEF_PATH="${GITHUB_WORKSPACE}/cef/$(ls cef)" cargo build --release --verbose --features cef,threadsafe
-    - name: Run tests with CEF
+    - name: Prepare files for CEF
       run: |
         CEF_PATH="${GITHUB_WORKSPACE}/cef/$(ls cef)" ${GITHUB_WORKSPACE}/setup-cef-files.sh
         sudo chmod 4755 ${GITHUB_WORKSPACE}/target/debug/chrome-sandbox
         sudo chown root:root ${GITHUB_WORKSPACE}/target/debug/chrome-sandbox
-        CEF_PATH="${GITHUB_WORKSPACE}/cef/$(ls cef)" RUST_BACKTRACE=full RUST_LOG=debug xvfb-run cargo test --verbose --features cef,threadsafe,no-gui-tests
-    - name: Build with WebkitGTK
-      run: cargo build --release --verbose --features webkitgtk
-    - name: Build with WebkitGTK (threadsafe)
-      run: cargo build --release --verbose --features webkitgtk,threadsafe
+    - name: Run tests with CEF
+      run: CEF_PATH="${GITHUB_WORKSPACE}/cef/$(ls cef)" RUST_BACKTRACE=full RUST_LOG=debug cargo test --verbose --features cef,threadsafe,no-gui-tests
+    - name: Run tests with CEF (threadsafe)
+      run: CEF_PATH="${GITHUB_WORKSPACE}/cef/$(ls cef)" RUST_BACKTRACE=full RUST_LOG=debug cargo test --verbose --features cef,threadsafe,no-gui-tests
+    - name: Run tests with CEF (release)
+      run: CEF_PATH="${GITHUB_WORKSPACE}/cef/$(ls cef)" RUST_BACKTRACE=full RUST_LOG=debug cargo test --release --verbose --features cef,threadsafe,no-gui-tests
+    - name: Run tests with CEF (release, threadsafe)
+      run: CEF_PATH="${GITHUB_WORKSPACE}/cef/$(ls cef)" RUST_BACKTRACE=full RUST_LOG=debug cargo test --release --verbose --features cef,threadsafe,no-gui-tests
     - name: Run tests with WebkitGTK
-      run: RUST_BACKTRACE=full RUST_LOG=debug xvfb-run cargo test --verbose --features webkitgtk,threadsafe,no-gui-tests
-    #- name: Add x86_64-pc-windows-gnu target for Rust
-    #  run: rustup target add x86_64-pc-windows-gnu
-    #- name: Build with Edge WebView2 (MinGW)
-    #  run: cargo build --release --verbose --features edge2 --target=x86_64-pc-windows-gnu
+      run: RUST_BACKTRACE=full RUST_LOG=debug xvfb-run cargo test --verbose --features webkitgtk,threadsafe
+    - name: Run tests with WebkitGTK (threadsafe)
+      run: RUST_BACKTRACE=full RUST_LOG=debug xvfb-run cargo test --verbose --features webkitgtk,threadsafe
+    - name: Run tests with WebkitGTK (release)
+      run: RUST_BACKTRACE=full RUST_LOG=debug xvfb-run cargo test --release --verbose --features webkitgtk
+    - name: Run tests with WebkitGTK (release, threadsafe)
+      run: RUST_BACKTRACE=full RUST_LOG=debug xvfb-run cargo test --release --verbose --features webkitgtk,threadsafe
+    - name: Add x86_64-pc-windows-gnu target for Rust
+      run: rustup target add x86_64-pc-windows-gnu
+    - name: Test with Edge WebView2 (MinGW, release)
+      run: cargo test --release --verbose --features edge2 --target=x86_64-pc-windows-gnu
+    - name: Test with Edge WebView2 (MinGW)
+      run: cargo test --verbose --features edge2 --target=x86_64-pc-windows-gnu
 
   build-windows:
     runs-on: windows-latest
@@ -68,17 +93,17 @@ jobs:
       #  run: .\get-cef.ps1
       - uses: actions-rs/cargo@v1
         with:
-          command: build
-          args: --release --features edge2
-      - uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --release --features edge2,threadsafe
-      - uses: actions-rs/cargo@v1
-        with:
           command: test
           args: --features edge2
       - uses: actions-rs/cargo@v1
         with:
           command: test
           args: --features edge2,threadsafe
+      - uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --release --features edge2
+      - uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --release --features edge2,threadsafe
