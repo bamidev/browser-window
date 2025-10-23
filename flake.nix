@@ -1,5 +1,5 @@
 {
-  description = "Browser Window flake";
+  description = "Browser Window flake for testing and development.";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
@@ -23,10 +23,12 @@
             rustPlatform.bindgenHook
           ];
 
-          # Install all examples' binaries in the bin folder
+          # Install all examples' binaries in the bin folder, and the seperate executable as well
           installPhase = with pkgs; ''
             ${coreutils}/bin/mkdir -p $out/bin
-            ${coreutils}/bin/cp -r target/${stdenv.targetPlatform.rust.rustcTargetSpec}/release/examples/* $out/bin
+            ${coreutils}/bin/cp target/${stdenv.targetPlatform.rust.rustcTargetSpec}/release/examples/authentication $out/bin
+            ${coreutils}/bin/cp target/${stdenv.targetPlatform.rust.rustcTargetSpec}/release/examples/terminal $out/bin
+            ${coreutils}/bin/cp target/${stdenv.targetPlatform.rust.rustcTargetSpec}/release/browser-window-se $out/bin
           '';
         };
 
@@ -45,10 +47,9 @@
             webkitgtk_4_1
             zlib
           ];
-
         });
 
-        cef = pkgs.stdenv.mkDerivation {
+        cef = pkgs.stdenv.mkDerivation rec {
           pname = "cef";
           version = "122.1.12";
           outputs = ["out"];
@@ -57,34 +58,6 @@
             url = "https://cef-builds.spotifycdn.com/cef_binary_122.1.12+g6e69d20+chromium-122.0.6261.112_linux64_minimal.tar.bz2";
             sha256 = "sha256:0kqd2yx6xiblnp1davjfy3xfv8q69rd1b6nyir2abprlwn04rhh9";
           };
-
-          buildPhase = with pkgs; ''
-            ${coreutils}/bin/mv CMakeLists.txt CMakeLists.txt.old
-            ${coreutils}/bin/echo "add_compile_definitions(DCHECK_ALWAYS_ON=1)" > CMakeLists.txt
-            ${coreutils}/bin/cat CMakeLists.txt.old >> CMakeLists.txt
-
-            ${cmake}/bin/cmake .
-            ${cmake}/bin/cmake --build .
-          '';
-          installPhase = with pkgs; ''
-            ${coreutils}/bin/mkdir -p $out/Release
-            ${coreutils}/bin/mkdir -p $out/Resources
-            ${coreutils}/bin/cp -r Release $out
-            #${coreutils}/bin/cp -r Resources $out
-            # The resources need to live in the same directory as libcef.so,
-            # so lets put everything in the Release folder then.
-            ${coreutils}/bin/cp -r Resources/* $out/Release
-
-            ${coreutils}/bin/cp -r include $out
-
-            ${coreutils}/bin/mkdir $out/libcef_dll_wrapper
-            ${coreutils}/bin/cp libcef_dll_wrapper/libcef_dll_wrapper.a $out/libcef_dll_wrapper
-          '';
-        };
-
-        # TODO: The CEF derivation needs some work.
-        browserWindowCef = buildRustPackage (browserWindowDefaults // rec {
-          buildFeatures = ["cef" "no-gui-tests"];
 
           buildInputs = with pkgs; [
             alsa-lib
@@ -113,6 +86,39 @@
             xorg.xorgproto
           ];
 
+          buildPhase = with pkgs; ''
+            ${coreutils}/bin/mv CMakeLists.txt CMakeLists.txt.old
+            ${coreutils}/bin/echo "add_compile_definitions(DCHECK_ALWAYS_ON=1)" > CMakeLists.txt
+            ${coreutils}/bin/cat CMakeLists.txt.old >> CMakeLists.txt
+
+            ${cmake}/bin/cmake .
+            ${cmake}/bin/cmake --build .
+          '';
+          installPhase = with pkgs; ''
+            ${coreutils}/bin/mkdir -p $out/Release
+            ${coreutils}/bin/mkdir -p $out/Resources
+            ${coreutils}/bin/cp -r Release $out
+            #${coreutils}/bin/cp -r Resources $out
+            # The resources need to live in the same directory as libcef.so,
+            # so lets put everything in the Release folder then.
+            ${coreutils}/bin/cp -r Resources/* $out/Release
+
+            ${coreutils}/bin/cp -r include $out
+
+            ${coreutils}/bin/mkdir $out/libcef_dll_wrapper
+            ${coreutils}/bin/cp libcef_dll_wrapper/libcef_dll_wrapper.a $out/libcef_dll_wrapper
+          '';
+
+          fixupPhase = ''
+            # Patch libcef.so because it has been precompiled
+            patchelf --set-rpath "${pkgs.lib.makeLibraryPath buildInputs}" $out/Release/libcef.so
+          '';
+        };
+
+        browserWindowCef = buildRustPackage (browserWindowDefaults // {
+          buildFeatures = ["cef" "no-gui-tests"];
+
+          buildInputs = cef.buildInputs;
           nativeBuildInputs = [
             cef
           ] ++ (with pkgs; [
@@ -122,13 +128,7 @@
 
           env = {
             CEF_PATH = "${cef}";
-            LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath buildInputs;
           };
-
-          fixupPhase = with pkgs; ''
-            patchelf --set-rpath "${env.LD_LIBRARY_PATH}:${cef}/Release" $out/bin/authentication
-            patchelf --set-rpath "${env.LD_LIBRARY_PATH}:${cef}/Release:${libgcc.lib}/lib" $out/bin/terminal
-          '';
         });
       in {
         # The examples are made available through `nix run`
@@ -165,7 +165,6 @@
 
             shellHook = ''
               export CEF_PATH="${browserWindowCef.CEF_PATH}"
-              export LD_LIBRARY_PATH="${browserWindowCef.LD_LIBRARY_PATH}"
             '';
           };
           default = webkitgtk;
