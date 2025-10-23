@@ -54,7 +54,7 @@ jobs:
     - name: Build with Edge WebView2 (MinGW, release)
       run: |
         rustup target add x86_64-pc-windows-gnu
-        cargo build --release --verbose --features edge2 --target=x86_64-pc-windows-gnu
+        rustup run x86_64-pc-windows-gnu cargo test --release --verbose --features edge2 --target=x86_64-pc-windows-gnu
     - name: Run tests with WebkitGTK
       run: RUST_BACKTRACE=full RUST_LOG=debug cargo test --verbose --features webkitgtk,threadsafe,no-gui-tests
     - name: Run tests with WebkitGTK (threadsafe)
