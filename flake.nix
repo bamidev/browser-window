@@ -28,7 +28,6 @@
             ${coreutils}/bin/mkdir -p $out/bin
             ${coreutils}/bin/cp target/${stdenv.targetPlatform.rust.rustcTargetSpec}/release/examples/authentication $out/bin
             ${coreutils}/bin/cp target/${stdenv.targetPlatform.rust.rustcTargetSpec}/release/examples/terminal $out/bin
-            ${coreutils}/bin/cp target/${stdenv.targetPlatform.rust.rustcTargetSpec}/release/browser-window-se $out/bin
           '';
         };
 
@@ -129,6 +128,10 @@
           env = {
             CEF_PATH = "${cef}";
           };
+
+          installPhase = browserWindowDefaults.installPhase + (with pkgs; ''
+            ${coreutils}/bin/cp target/${stdenv.targetPlatform.rust.rustcTargetSpec}/release/browser-window-se $out/bin
+          '');
         });
       in {
         # The examples are made available through `nix run`
