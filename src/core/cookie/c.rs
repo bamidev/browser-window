@@ -14,8 +14,6 @@ use super::*;
 
 pub struct CookieImpl(pub(crate) *mut cbw_Cookie);
 
-pub struct CookieMutImpl(CookieImpl);
-
 pub struct CookieJarImpl(pub(crate) *mut cbw_CookieJar);
 
 pub struct CookieIteratorImpl(pub(crate) *mut cbw_CookieIterator);

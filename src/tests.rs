@@ -59,10 +59,9 @@ fn async_tests(application: &Application) {
 	let runtime = application.start();
 
 	let exit_code = runtime.run_async(|app| async move {
-		let _bw = async_basic(&app).await;
-		#[cfg(not(feature = "webkitgtk"))]
+		async_basic(&app).await;
 		async_cookies(&app).await;
-		//async_correct_parent_cleanup(app).await;
+		async_correct_parent_cleanup(&app).await;
 		app.exit(0);
 	});
 
@@ -72,7 +71,7 @@ fn async_tests(application: &Application) {
 async fn async_basic(app: &ApplicationHandle) -> BrowserWindow {
 	let mut bwb = BrowserWindowBuilder::new(Source::Url("https://www.duckduckgo.com/".into()));
 	bwb.title("Basic Async Test");
-	return bwb.build(&app).await;
+	return bwb.build_async(&app).await;
 }
 
 async fn async_cookies(app: &ApplicationHandle) {
@@ -153,16 +152,16 @@ fn cookie() {
 
 /// Closes a parent window before closing its child window, to see if the child
 /// window handle still is valid and doesn't cause any memory issues.
-async fn async_correct_parent_cleanup(app: ApplicationHandle) {
+async fn async_correct_parent_cleanup(app: &ApplicationHandle) {
 	// First create the parent
 	let mut bwb_parent =
 		BrowserWindowBuilder::new(Source::Url("https://www.duckduckgo.com/".into()));
 	bwb_parent.title("Parent Window");
-	let bw_parent = bwb_parent.build(&app).await;
+	let bw_parent = bwb_parent.build_async(&app).await;
 
 	// Then a child
 	let mut bwb_child = BrowserWindowBuilder::new(Source::Url("https://www.google.com/".into()));
 	bwb_child.title("Child Window");
 	bwb_child.parent(&bw_parent);
-	let _bw_child = bwb_child.build(&app).await;
+	bwb_child.build_async(&app).await;
 }

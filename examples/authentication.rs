@@ -3,7 +3,7 @@
 
 use std::time::Duration;
 
-use browser_window::{application::*, browser::*, prelude::*};
+use browser_window::{application::*, browser::*};
 
 fn main() {
 	let application =
@@ -16,7 +16,7 @@ fn main() {
 		//bwb.dev_tools(false)
 		bwb.size(800, 600);
 		bwb.title("Log in to Github");
-		let bw = bwb.build(&app).await;
+		let bw = bwb.build_async(&app).await;
 		bw.show();
 
 		let cookie_jar = app.cookie_jar().expect("cookies not supported");
