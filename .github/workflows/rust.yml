@@ -51,13 +51,13 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y libasound2-dev libavahi-client-dev libcups2-dev libdbus-1-dev libdrm-dev libexpat1-dev libgbm-dev libgnutls28-dev libgtk-3-dev libnss3-dev libwebkit2gtk-4.1-dev libx11-dev libx11-xcb-dev libxcomposite-dev libxdamage-dev libxext-dev libxfixes-dev libxkbcommon-dev libxrandr-dev xvfb mingw-w64
     - uses: actions/checkout@v3
-    - name: Build with Edge WebView2 (MinGW, release)
+    - name: Build with Edge WebView2 using MinGW (release)
       run: |
         rustup target add x86_64-pc-windows-gnu
-        rustup run x86_64-pc-windows-gnu cargo test --release --verbose --features edge2 --target=x86_64-pc-windows-gnu
-    - name: Run tests with WebkitGTK
+        cargo test --release --verbose --features edge2 --target=x86_64-pc-windows-gnu
+    - name: Run tests with WebkitGTK (debug)
       run: RUST_BACKTRACE=full RUST_LOG=debug cargo test --verbose --features webkitgtk,threadsafe,no-gui-tests
-    - name: Run tests with WebkitGTK (threadsafe)
+    - name: Run tests with WebkitGTK (debug, threadsafe)
       run: RUST_BACKTRACE=full RUST_LOG=debug cargo test --verbose --features webkitgtk,threadsafe,no-gui-tests
     - name: Run tests with WebkitGTK (release)
       run: RUST_BACKTRACE=full RUST_LOG=debug cargo test --release --verbose --features webkitgtk,no-gui-tests
@@ -71,9 +71,9 @@ jobs:
         sudo chmod 4755 ${GITHUB_WORKSPACE}/target/release/chrome-sandbox
         sudo chown root:root ${GITHUB_WORKSPACE}/target/debug/chrome-sandbox
         sudo chown root:root ${GITHUB_WORKSPACE}/target/release/chrome-sandbox
-    - name: Run tests with CEF
+    - name: Run tests with CEF (debug)
       run: CEF_PATH="${GITHUB_WORKSPACE}/cef/$(ls cef)" RUST_BACKTRACE=full RUST_LOG=debug cargo test --verbose --features cef,threadsafe,no-gui-tests
-    - name: Run tests with CEF (threadsafe)
+    - name: Run tests with CEF (debug, threadsafe)
       run: CEF_PATH="${GITHUB_WORKSPACE}/cef/$(ls cef)" RUST_BACKTRACE=full RUST_LOG=debug cargo test --verbose --features cef,threadsafe,no-gui-tests
     - name: Run tests with CEF (release)
       run: CEF_PATH="${GITHUB_WORKSPACE}/cef/$(ls cef)" RUST_BACKTRACE=full RUST_LOG=debug cargo test --release --verbose --features cef,threadsafe,no-gui-tests
