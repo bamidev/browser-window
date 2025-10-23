@@ -84,16 +84,23 @@ It will be installed in the current working directory, and then the .dll file ca
 ## Set up CEF
 
 Keep in mind when you're going to use CEF, that _BrowserWindow_ is written to work for a specific version of CEF, and CEF does release new major versions fairly often. Therefore, it is recommended to
-obtain the version that _BrowserWindow_ supports, which currently is v122. Use other versions at
-your own risk.
+obtain the version that _BrowserWindow_ supports, which currently is v122. Use other versions at your own risk.
 
-CEF isn't generally available in package managers, so it needs to be set up manually. Luckily, there are binaries avaiable. You can also build it from source, but that is a whole other beast and it is
+CEF isn't generally available in package managers, so it needs to be set up manually. Luckily, there are binaries available. You can also build it from source, but that is a whole other beast and it is
 not covered by this guide.
 
 If you want to set up CEF by building it from source, take a look at [this](https://bitbucket.org/chromiumembedded/cef/wiki/MasterBuildQuickStart.md).
 However, it will take a lot of effort, time, memory & disk space for the compilation process.
 
 Otherwise, if you're on linux, here it the TL;DR version on setting up CEF:
+
+#### Nix
+
+```
+git clone https://github.com/bamidev/browser-window ../bw
+nix develop ../bw#cef
+cargo run
+```
 
 #### Linux
 
