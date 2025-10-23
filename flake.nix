@@ -50,12 +50,12 @@
 
         cef = pkgs.stdenv.mkDerivation rec {
           pname = "cef";
-          version = "122.1.12";
+          version = "141.0.10";
           outputs = ["out"];
 
           src = fetchTarball {
-            url = "https://cef-builds.spotifycdn.com/cef_binary_122.1.12+g6e69d20+chromium-122.0.6261.112_linux64_minimal.tar.bz2";
-            sha256 = "sha256:0kqd2yx6xiblnp1davjfy3xfv8q69rd1b6nyir2abprlwn04rhh9";
+            url = "https://cef-builds.spotifycdn.com/cef_binary_141.0.10%2Bg1d65b0d%2Bchromium-141.0.7390.123_linux64_minimal.tar.bz2";
+            sha256 = "sha256:0fpkxl9k73r6q2c3xfjpzd5njjb5d0dlg9vmly3dbxa9gi5sfgz9";
           };
 
           buildInputs = with pkgs; [
@@ -64,6 +64,7 @@
             cairo
             cups
             dbus
+            eudev
             expat
             libdrm
             harfbuzz
