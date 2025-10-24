@@ -71,7 +71,6 @@
             glib
             gtk3
             libgbm
-            libGL
             libxkbcommon
             nspr
             nss_3_115
@@ -102,6 +101,7 @@
             # The resources need to live in the same directory as libcef.so,
             # so lets put everything in the Release folder then.
             ${coreutils}/bin/cp -r Resources/* $out/Release
+            ${coreutils}/bin/ln -s $out/Release/libEGL.so $out/Release/libEGL.so.1
 
             ${coreutils}/bin/cp -r include $out
 
@@ -111,7 +111,7 @@
 
           fixupPhase = ''
             # Patch libcef.so because it has been precompiled
-            patchelf --set-rpath "${pkgs.lib.makeLibraryPath buildInputs}" $out/Release/libcef.so
+            patchelf --add-rpath "$out/Release:${lib.makeLibraryPath buildInputs}" $out/Release/libcef.so
           '';
         };
 
@@ -149,18 +149,26 @@
             program = "${browserWindowWebkitGtk}/bin/terminal";
           };
         # TODO: Make the CEF apps available for other supported platforms as well
-        } // lib.optionals (system == "x86_64-linux") {
+        } // lib.optionals (system == "x86_64-linux") (let
+          # We need to set the dynamic library search path because dlopen is used to dynamically
+          # load pre-compiled libraries in the CEF output directory, they are not loaded from
+          # rpath.
+          runExample = example: pkgs.writers.writeBashBin "run-example" ''
+            set -e
+            LD_LIBRARY_PATH="${pkgs.libGL.out}/lib" ${browserWindowCef}/bin/${example}
+          '';
+        in {
           authentication-cef = {
             name = "authentication";
             type = "app";
-            program = "${browserWindowCef}/bin/authentication";
+            program = "${runExample "authentication"}/bin/run-example";
           };
           terminal-cef = {
             name = "terminal";
             type = "app";
-            program = "${browserWindowCef}/bin/terminal";
+            program = "${runExample "terminal"}/bin/run-example";
           };
-        };
+        });
 
         devShells = rec {
           cef = pkgs.mkShell {
