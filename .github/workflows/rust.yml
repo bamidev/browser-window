@@ -89,7 +89,7 @@ jobs:
   build-windows:
     runs-on: windows-latest
     env:
-      CEF_PATH: ${GITHUB_WORKSPACE}/cef/cef_binary_141.0.11+g7e73ac4+chromium-141.0.7390.123_windows64_minimal
+      CEF_PATH: D:\a\browser-window\browser-window\cef\cef_binary_141.0.11+g7e73ac4+chromium-141.0.7390.123_windows64_minimal
     steps:
       - uses: actions-rs/toolchain@v1
         with:
