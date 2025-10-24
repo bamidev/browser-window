@@ -177,6 +177,7 @@
 
             shellHook = ''
               export CEF_PATH="${browserWindowCef.CEF_PATH}"
+              export LD_LIBRARY_PATH="${pkgs.libGL.out}/lib"
             '';
           };
           default = webkitgtk;
