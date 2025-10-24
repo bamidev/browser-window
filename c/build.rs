@@ -242,37 +242,38 @@ fn main() {
 
 					build_se_lib_args.push(format!("-L{}/libcef_dll_wrapper", &cef_path).into());
 					build_se_lib_args.push(format!("-L{}/Release", &cef_path).into());
+
+                    let pkg_deps = [
+                        "alsa",
+                        "cups",
+                        "dbus-1",
+                        "expat",
+                        "gtk+-3.0",
+                        "libdrm",
+                        "nss",
+                        "gbm",
+                        "x11",
+                        "x11-xcb",
+                        "xcomposite",
+                        "xdamage",
+                        "xext",
+                        "xfixes",
+                        "xkbcommon",
+                        "xrandr",
+                    ];
+                    for pkg_name in pkg_deps {
+                        let result = pkg_config::Config::new().probe(pkg_name).expect(&format!("Unable to find {}", pkg_name));
+
+                        if pkg_name == "x11" {
+                            // When X11 is used, browser-window-c uses a bit of x11 code as well
+                            for inc in &result.include_paths {
+                              build.include(inc);
+                              build_se.include(inc);
+                            }
+                        }
+                    }
 				}
 
-        let pkg_deps = [
-            "alsa",
-            "cups",
-            "dbus-1",
-            "expat",
-            "gtk+-3.0",
-            "libdrm",
-            "nss",
-            "gbm",
-            "x11",
-            "x11-xcb",
-            "xcomposite",
-            "xdamage",
-            "xext",
-            "xfixes",
-            "xkbcommon",
-            "xrandr",
-        ];
-        for pkg_name in pkg_deps {
-            let result = pkg_config::Config::new().probe(pkg_name).expect(&format!("Unable to find {}", pkg_name));
-
-            if pkg_name == "x11" {
-                // When X11 is used, browser-window-c uses a bit of x11 code as well
-                for inc in &result.include_paths {
-                  build.include(inc);
-                  build_se.include(inc);
-                }
-            }
-        }
 			}
 		}
 
