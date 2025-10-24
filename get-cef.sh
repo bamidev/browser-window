@@ -21,7 +21,7 @@ else
 fi
 
 # Download CEF archive
-CEF_ARCHIVE="https://cef-builds.spotifycdn.com/cef_binary_141.0.10%2Bg1d65b0d%2Bchromium-141.0.7390.123_${CEF_ARCH}_minimal"
+CEF_ARCHIVE="cef_binary_141.0.11+g7e73ac4+chromium-141.0.7390.123_linux${CEF_ARCH}_minimal"
 if [ ! -f /tmp/cef.tar.bz2 ]; then
 	curl -o /tmp/cef.tar.bz2.part "https://cef-builds.spotifycdn.com/$CEF_ARCHIVE.tar.bz2"
 	mv /tmp/cef.tar.bz2.part /tmp/cef.tar.bz2

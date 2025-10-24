@@ -1,5 +1,5 @@
 # Download CEF archive
-$CEF_ARCHIVE = "cef_binary_141.0.10%2Bg1d65b0d%2Bchromium-141.0.7390.123__windows64_minimal"
+$CEF_ARCHIVE = "cef_binary_141.0.11%2Bg7e73ac4%2Bchromium-141.0.7390.123_windows64_minimal"
 
 
 $ErrorActionPreference = "Stop"
