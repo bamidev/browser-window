@@ -15,7 +15,7 @@ If you want the exact same behavior of your app on all these platforms, CEF is r
 * Supports the most event types.
 
 *Cons:*
-* Can be a pain to set up correctly; requires a lot of files to be present for the executable & compilation (especially on Windows) needs some extra care to get it done correctly. Although, there are scripts in this repository to do it for you.
+* Can be a pain to set up correctly; requires a lot of files to be present for the executable & compilation (especially on Windows) needs some extra care to get it done correctly. Although, there are scripts in this repository to do it for you, and it is virtually painless when using the Nix package manager.
 * No option to link statically & generally not available through package managers.
 
 ### WebkitGTK
@@ -59,6 +59,15 @@ nix develop ../bw#webkitgtk
 cargo run
 ```
 
+You can also run the examples to check that it works:
+```
+git clone https://github.com/bamidev/browser-window
+nix run .#terminal-webkitgtk
+# or:
+nix develop .#webkitgtk
+cargo run --example terminal --features webkitgtk
+```
+
 ### Debian APT
 
 `apt install libwebkit2gtk-4.1-dev`
@@ -100,6 +109,17 @@ Otherwise, if you're on linux, here it the TL;DR version on setting up CEF:
 git clone https://github.com/bamidev/browser-window ../bw
 nix develop ../bw#cef
 cargo run
+```
+
+Running examples:
+```
+git clone https://github.com/bamidev/browser-window
+nix run .#terminal-cef
+nix run .#authentication-cef
+# or:
+nix develop .#webkitgtk
+cargo run --example terminal --features cef
+cargo run --example authentication --features cef
 ```
 
 #### Linux
