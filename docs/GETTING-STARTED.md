@@ -62,6 +62,7 @@ cargo run
 You can also run the examples to check that it works:
 ```
 git clone https://github.com/bamidev/browser-window
+cd browser-window
 nix run .#terminal-webkitgtk
 # or:
 nix develop .#webkitgtk
@@ -114,6 +115,7 @@ cargo run
 Running examples:
 ```
 git clone https://github.com/bamidev/browser-window
+cd browser-window
 nix run .#terminal-cef
 nix run .#authentication-cef
 # or:
