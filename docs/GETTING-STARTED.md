@@ -119,7 +119,7 @@ cd browser-window
 nix run .#terminal-cef
 nix run .#authentication-cef
 # or:
-nix develop .#webkitgtk
+nix develop .#cef
 cargo run --example terminal --features cef
 cargo run --example authentication --features cef
 ```
