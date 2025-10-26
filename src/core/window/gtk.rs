@@ -18,6 +18,7 @@ impl WindowImpl {
 			.application(&app.inner)
 			.parent(&parent.0)
 			.destroy_with_parent(true)
+			.decorated(true)
 			.title(title);
 
 		builder = builder
@@ -32,6 +33,8 @@ impl WindowImpl {
 		}
 
 		let inner = builder.build();
+		inner.set_keep_above(options.keep_above);
+
 		// Delete user data when closing the window
 		inner.connect_destroy(|this| {
 			let user_data = unsafe { *this.data::<*mut ()>("bw-data").unwrap().as_ref() };

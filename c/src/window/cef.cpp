@@ -95,10 +95,10 @@ extern "C" bw_WindowImpl bw_WindowImpl_new(
 	CefRefPtr<CefWindowDelegate> cef_window_options( new MyWindowDelegate( _window, *options ) );
 	CefRefPtr<CefWindow> window = CefWindow::CreateTopLevelWindow( cef_window_options );
 
-	window->SetTitle( bw_cef_copyFromStrSlice( _title ) );
-
-	CefSize size( width, height );
-	window->SetSize( size );
+	window->SetAlwaysOnTop(options->keep_above);
+	CefSize size(width, height);
+	window->SetSize(size);
+	window->SetTitle(bw_cef_copyFromStrSlice(_title));
 
 	bw_WindowImpl impl;
 	impl.handle_ptr = new CefRefPtr<CefWindow>( window );
