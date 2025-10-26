@@ -48,13 +48,20 @@
           ];
         });
 
+        cefSystems = {
+          aarch64-darwin = "macosarm64";
+          aarch64-linux = "linuxarm64";
+          armv7l-linux = "linuxarm";
+          x86_64-darwin = "macosx64";
+          x86_64-linux = "linux64";
+        };
         cef = pkgs.stdenv.mkDerivation rec {
           pname = "cef";
-          version = "141.0.10";
+          version = "141.0.11";
           outputs = ["out"];
 
           src = fetchTarball {
-            url = "https://cef-builds.spotifycdn.com/cef_binary_141.0.10%2Bg1d65b0d%2Bchromium-141.0.7390.123_linux64_minimal.tar.bz2";
+            url = "https://cef-builds.spotifycdn.com/cef_binary_141.0.11%2Bg7e73ac4%2Bchromium-141.0.7390.123_${cefSystems.${system}}_minimal.tar.bz2";
             sha256 = "sha256:0fpkxl9k73r6q2c3xfjpzd5njjb5d0dlg9vmly3dbxa9gi5sfgz9";
           };
 
@@ -149,7 +156,7 @@
             program = "${browserWindowWebkitGtk}/bin/terminal";
           };
         # TODO: Make the CEF apps available for other supported platforms as well
-        } // lib.optionals (system == "x86_64-linux") (let
+        } // lib.optionals (builtins.hasAttr system cefSystems) (let
           # We need to set the dynamic library search path because dlopen is used to dynamically
           # load pre-compiled libraries in the CEF output directory, they are not loaded from
           # rpath.
