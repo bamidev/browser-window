@@ -62,7 +62,10 @@
 
           src = fetchTarball {
             url = "https://cef-builds.spotifycdn.com/cef_binary_141.0.11%2Bg7e73ac4%2Bchromium-141.0.7390.123_${cefSystems.${system}}_minimal.tar.bz2";
-            sha256 = "sha256:0fpkxl9k73r6q2c3xfjpzd5njjb5d0dlg9vmly3dbxa9gi5sfgz9";
+            sha256 = if system == "x86_64-linux" then
+              "sha256:06bnbfqg164wg84mb0zmr5gm3w00zvq7ciwm88a0ffbljv451n3l"
+            else
+              "nohash";
           };
 
           buildInputs = with pkgs; [
