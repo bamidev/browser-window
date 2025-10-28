@@ -164,7 +164,7 @@ bw_WindowImpl bw_WindowImpl_new(
 ) {
 	bw_WindowImpl impl;
 
-	impl.style = WS_OVERLAPPEDWINDOW;
+	impl.style = options->decorated ? WS_OVERLAPPEDWINDOW : 0;
 
 	if ( !options->borders )
 		impl.style ^= WS_BORDER;
