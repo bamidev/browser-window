@@ -99,15 +99,23 @@ jobs:
         shell: pwsh
         run: |
           .\get-cef.ps1
-          .\setup-cef-files.bat
-      - uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --features cef
+          .\setup-cef-files-github.bat
       - uses: actions-rs/cargo@v1
         with:
           command: test
           args: --features cef,no-gui-tests
+      - uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --features cef,thread-safe,no-gui-tests
+      - uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --release --features cef,no-gui-tests
+      - uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --release --features cef,thread-safe,no-gui-tests
       - uses: actions-rs/cargo@v1
         with:
           command: test
