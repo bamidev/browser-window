@@ -54,13 +54,13 @@ public:
 		}
 	}
 
-#if CEF_VERSION_MAJOR < 144
+#if CEF_VERSION_MAJOR < 141
 	void
 #else
 	bool
 #endif
 	OnBeforeDownload(CefRefPtr<CefBrowser> browser, CefRefPtr<CefDownloadItem> download_item, const CefString& suggested_name, CefRefPtr<CefBeforeDownloadCallback> callback ) {
-#if CEF_VERSION_MAJOR >= 144
+#if CEF_VERSION_MAJOR >= 141
 		return false;
 #endif
 	}
