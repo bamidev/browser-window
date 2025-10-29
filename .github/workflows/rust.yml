@@ -102,6 +102,10 @@ jobs:
           .\setup-cef-files-github.bat
       - uses: actions-rs/cargo@v1
         with:
+          command: build
+          args: --features cef
+      - uses: actions-rs/cargo@v1
+        with:
           command: test
           args: --features cef,no-gui-tests
       - uses: actions-rs/cargo@v1
