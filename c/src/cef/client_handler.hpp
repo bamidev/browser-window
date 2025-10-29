@@ -6,6 +6,7 @@
 #include <include/cef_life_span_handler.h>
 #include <include/cef_load_handler.h>
 #include <include/cef_request_handler.h>
+#include <include/cef_version.h>
 #include <include/cef_v8.h>
 #include <string>
 #include <vector>
@@ -53,8 +54,15 @@ public:
 		}
 	}
 
-	bool OnBeforeDownload(CefRefPtr<CefBrowser> browser, CefRefPtr<CefDownloadItem> download_item, const CefString& suggested_name, CefRefPtr<CefBeforeDownloadCallback> callback ) {
+#if CEF_VERSION_MAJOR < 141
+	void
+#else
+	bool
+#endif
+	OnBeforeDownload(CefRefPtr<CefBrowser> browser, CefRefPtr<CefDownloadItem> download_item, const CefString& suggested_name, CefRefPtr<CefBeforeDownloadCallback> callback ) {
+#if CEF_VERSION_MAJOR >= 141
 		return false;
+#endif
 	}
 
 	bool OnConsoleMessage( CefRefPtr< CefBrowser > browser, cef_log_severity_t level, const CefString& message, const CefString& source, int line ) override {

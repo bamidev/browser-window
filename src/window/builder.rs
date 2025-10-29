@@ -5,7 +5,9 @@ use crate::{HasHandle, application::*, core::prelude::*, window::*};
 /// Exposes functionality related to constructing a window.
 pub struct WindowBuilder {
 	pub(crate) borders: bool,
+	pub(crate) decorated: bool,
 	pub(crate) height: Option<u32>,
+	pub(crate) keep_above: bool,
 	pub(crate) minimizable: bool,
 	pub(crate) parent: Option<UnsafeSend<WindowImpl>>,
 	pub(crate) resizable: bool,
@@ -13,13 +15,12 @@ pub struct WindowBuilder {
 	pub(crate) width: Option<u32>,
 }
 
-#[allow(dead_code)]
-pub type WindowOptions = cbw_WindowOptions;
-
 impl WindowBuilder {
 	/// Sets whether or not the window has borders.
 	/// Default is true.
 	pub fn borders(&mut self, value: bool) { self.borders = value; }
+
+	pub fn decorated(&mut self, value: bool) { self.decorated = value; }
 
 	// TODO: Create a Window struct that can be created with this method.
 	#[allow(dead_code)]
@@ -31,8 +32,10 @@ impl WindowBuilder {
 		};
 
 		// Convert options to the FFI struct
-		let window_options = WindowOptions {
+		let window_options = cbw_WindowOptions {
 			borders: self.borders,
+			decorated: self.decorated,
+			keep_above: self.keep_above,
 			minimizable: self.minimizable,
 			resizable: self.resizable,
 		};
@@ -56,6 +59,9 @@ impl WindowBuilder {
 	/// Sets the height that the browser window will be created with initially
 	pub fn height(&mut self, height: u32) { self.height = Some(height); }
 
+	/// If set to true, keeps the window above all other windows
+	pub fn keep_above(&mut self, value: bool) { self.keep_above = value; }
+
 	/// Sets whether or not the window has a minimize button on the title bar
 	/// Default is true
 	pub fn minimizable(&mut self, value: bool) { self.minimizable = value; }
@@ -73,7 +79,9 @@ impl WindowBuilder {
 	pub fn new() -> Self {
 		Self {
 			borders: true,
+			decorated: true,
 			height: None,
+			keep_above: false,
 			minimizable: true,
 			parent: None,
 			resizable: true,

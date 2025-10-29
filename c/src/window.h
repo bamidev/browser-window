@@ -18,6 +18,8 @@ typedef struct bw_Window bw_Window;
 
 typedef struct bw_WindowOptions {
 	bool borders;
+	bool decorated;
+	bool keep_above;
 	bool minimizable;
 	bool resizable;
 } bw_WindowOptions;

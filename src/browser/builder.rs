@@ -155,6 +155,8 @@ impl BrowserWindowBuilder {
 				// Convert options to FFI structs
 				let window_options = WindowOptions {
 					borders: window.borders,
+					decorated: window.decorated,
+					keep_above: window.keep_above,
 					minimizable: window.minimizable,
 					resizable: window.resizable,
 				};
