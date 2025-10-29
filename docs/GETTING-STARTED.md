@@ -94,7 +94,7 @@ It will be installed in the current working directory, and then the .dll file ca
 ## Set up CEF
 
 Keep in mind when you're going to use CEF, that _BrowserWindow_ is written to work for a specific version of CEF, and CEF does release new major versions fairly often. Therefore, it is recommended to
-obtain the version that _BrowserWindow_ supports, which currently is v141 (or v122 on Windows). Other versions may not work necessarily.
+obtain the version that _BrowserWindow_ supports, which currently can be v141 or v122 (v141 doesn't work with Windows). Other versions aren't tested and may not work necessarily.
 You can also use the `get-cef.sh` and `get-cef.ps1` scripts in this repository to get these versions on your system, as they may not be easy to find anymore.
 
 CEF isn't generally available in package managers, so it needs to be set up manually (unless you're using Nix). Luckily, there are binaries available. Building it from source is not covered by this guide.
