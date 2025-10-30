@@ -38,11 +38,11 @@ jobs:
         sudo chown root:root ${GITHUB_WORKSPACE}/target/debug/chrome-sandbox
         sudo chown root:root ${GITHUB_WORKSPACE}/target/release/chrome-sandbox
     - name: Run tests with CEF (debug)
-      run: CEF_PATH="${GITHUB_WORKSPACE}/cef/$(ls cef)" RUST_BACKTRACE=full RUST_LOG=debug cargo test --verbose --features cef,threadsafe,no-gui-tests
+      run: CEF_PATH="${GITHUB_WORKSPACE}/cef/$(ls cef)" RUST_BACKTRACE=full RUST_LOG=debug cargo test --verbose --features cef,no-gui-tests
     - name: Run tests with CEF (debug, threadsafe)
       run: CEF_PATH="${GITHUB_WORKSPACE}/cef/$(ls cef)" RUST_BACKTRACE=full RUST_LOG=debug cargo test --verbose --features cef,threadsafe,no-gui-tests
     - name: Run tests with CEF (release)
-      run: CEF_PATH="${GITHUB_WORKSPACE}/cef/$(ls cef)" RUST_BACKTRACE=full RUST_LOG=debug cargo test --release --verbose --features cef,threadsafe,no-gui-tests
+      run: CEF_PATH="${GITHUB_WORKSPACE}/cef/$(ls cef)" RUST_BACKTRACE=full RUST_LOG=debug cargo test --release --verbose --features cef,no-gui-tests
     - name: Run tests with CEF (release, threadsafe)
       run: CEF_PATH="${GITHUB_WORKSPACE}/cef/$(ls cef)" RUST_BACKTRACE=full RUST_LOG=debug cargo test --release --verbose --features cef,threadsafe,no-gui-tests
     - name: Build with Edge WebView2 using MinGW (debug)
