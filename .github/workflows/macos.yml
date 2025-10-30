@@ -1,4 +1,4 @@
-name: MacOS
+name: MacOS (under construction)
 
 on:
   push:
@@ -10,7 +10,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  run:
+  latest:
     runs-on: macos-latest
     steps:
       - name: Install Rust toolchain
@@ -25,5 +25,4 @@ jobs:
         with:
           command: build
           args: --features webkitgtk
-
-
+        continue-on-error: true

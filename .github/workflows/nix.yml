@@ -10,7 +10,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  ubuntu:
+  ubuntu-latest:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -40,7 +40,7 @@ jobs:
     - name: Test nix develop shell with CEF (release, threadsafe)
       run: sudo nix --extra-experimental-features 'nix-command flakes' develop .#cef --command cargo test --release --verbose --features cef,no-gui-tests,threadsafe
 
-  macos:
+  macos-latest-under-construction:
     runs-on: macos-latest
     steps:
     - name: Install Nix
