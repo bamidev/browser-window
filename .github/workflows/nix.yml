@@ -49,8 +49,8 @@ jobs:
         nix_path: nixpkgs=channel:nixos-25.05
     - name: Checkout browser-window
       uses: actions/checkout@v3
-    - name: Build nix flake with WebkitGtk
+    - name: Build nix flake with WebkitGtk (broken)
       run: sudo nix --extra-experimental-features 'nix-command flakes' build .#webkitgtk
-      # Does not work because webkitgtk is broken for the darwin targets
+      # Does not work because the Nix package webkitgtk is broken for the darwin targets
       continue-on-error: true
 

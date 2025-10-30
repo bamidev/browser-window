@@ -21,16 +21,16 @@ jobs:
       - name: Setup CEF
         run: |
           ./get-cef.sh
-      - name: Run tests with CEF (debug)
+      - name: Run tests with CEF (broken)
         run: CEF_PATH="${GITHUB_WORKSPACE}/cef/$(ls cef)" RUST_BACKTRACE=full RUST_LOG=debug cargo test --verbose --features cef,no-gui-tests
         # Still needs to be tested
         continue-on-error: true
       - name: Install dependencies
         run: brew install gtk+3 libsoup
-      - name: Build with Webkitgtk (debug)
+      - name: Run tests with Webkitgtk (broken)
         uses: actions-rs/cargo@v1
         with:
-          command: build
+          command: test
           args: --features webkitgtk
         # Doesn't work because javascriptcoregtk is not available with homebrew
         continue-on-error: true
