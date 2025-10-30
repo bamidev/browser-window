@@ -1,0 +1,73 @@
+name: Windows
+
+on:
+  push:
+    branches: [ "master", "dev" ]
+  pull_request:
+    branches: [ "master", "dev" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    env:
+      CEF_PATH: D:\a\browser-window\browser-window\cef\cef_binary_122.1.12+g6e69d20+chromium-122.0.6261.112_windows64_minimal
+    steps:
+      - name: Install stable toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - name: Checkout browser-window
+        uses: actions/checkout@v3
+      - name: Set up CEF
+        shell: pwsh
+        run: |
+          .\get-cef.ps1
+          .\setup-cef-files-github.bat
+      - name: Build with CEF
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --features cef
+      - name: Run tests with CEF (debug)
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --features cef,no-gui-tests
+      - name: Run tests with CEF (debug, threadsafe)
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --features cef,threadsafe,no-gui-tests
+      - name: Run tests with CEF (release)
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --release --features cef,no-gui-tests
+      - name: Run tests with CEF (release, threadsafe)
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --release --features cef,threadsafe,no-gui-tests
+      - name: Run tests with Edge WebView2 (debug)
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --features edge2
+      - name: Run tests with Edge WebView2 (debug, threadsafe)
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --features edge2,threadsafe
+      - name: Run tests with Edge WebView2 (release)
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --release --features edge2
+      - name: Run tests with Edge WebView2 (release, threadsafe)
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --release --features edge2,threadsafe

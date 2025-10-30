@@ -1,0 +1,41 @@
+name: Nix
+
+on:
+  push:
+    branches: [ "master", "dev" ]
+  pull_request:
+    branches: [ "master", "dev" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-nix:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+    - name: Install Nix
+      run: sudo apt-get install -y nix-bin
+    - uses: actions/checkout@v3
+    - name: Build nix flake with WebkitGtk
+      run: sudo nix --extra-experimental-features 'nix-command flakes' build .#webkitgtk
+    - name: Test nix develop shell with WebkitGtk
+      run: sudo nix --extra-experimental-features 'nix-command flakes' develop .#webkitgtk --command cargo test --verbose --features webkitgtk,no-gui-tests
+    - name: Test nix develop shell with WebkitGtk (threadsafe)
+      run: sudo nix --extra-experimental-features 'nix-command flakes' develop .#webkitgtk --command cargo test --verbose --features webkitgtk,threadsafe,no-gui-tests
+    - name: Test nix develop shell with WebkitGtk (release)
+      run: sudo nix --extra-experimental-features 'nix-command flakes' develop .#webkitgtk --command cargo test --release --verbose --features webkitgtk,no-gui-tests
+    - name: Test nix develop shell with WebkitGtk (release, threadsafe)
+      run: sudo nix --extra-experimental-features 'nix-command flakes' develop .#webkitgtk --command cargo test --release --verbose --features webkitgtk,threadsafe,no-gui-tests
+    - name: Build nix flake with CEF
+      run: sudo nix --extra-experimental-features 'nix-command flakes' build .#cef
+    - name: Test nix develop shell with CEF
+      run: sudo nix --extra-experimental-features 'nix-command flakes' develop .#cef --command cargo test --verbose --features cef,no-gui-tests
+    - name: Test nix develop shell with CEF (threadsafe)
+      run: sudo nix --extra-experimental-features 'nix-command flakes' develop .#cef --command cargo test --verbose --features cef,no-gui-tests,threadsafe
+    - name: Test nix develop shell with CEF (release)
+      run: sudo nix --extra-experimental-features 'nix-command flakes' develop .#cef --command cargo test --release --verbose --features cef,no-gui-tests
+    - name: Test nix develop shell with CEF (release, threadsafe)
+      run: sudo nix --extra-experimental-features 'nix-command flakes' develop .#cef --command cargo test --release --verbose --features cef,no-gui-tests,threadsafe
