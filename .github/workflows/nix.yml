@@ -10,7 +10,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build-nix:
+  ubuntu:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -39,3 +39,17 @@ jobs:
       run: sudo nix --extra-experimental-features 'nix-command flakes' develop .#cef --command cargo test --release --verbose --features cef,no-gui-tests
     - name: Test nix develop shell with CEF (release, threadsafe)
       run: sudo nix --extra-experimental-features 'nix-command flakes' develop .#cef --command cargo test --release --verbose --features cef,no-gui-tests,threadsafe
+
+  macos:
+    runs-on: macos-latest
+    steps:
+    - name: Install Nix
+      uses: cachix/install-nix-action@v31
+      with:
+        nix_path: nixpkgs=channel:nixos-25.05
+    - name: Checkout browser-window
+      uses: actions/checkout@v3
+    - name: Build nix flake with WebkitGtk
+      run: sudo nix --extra-experimental-features 'nix-command flakes' build .#webkitgtk
+      continue-on-error: true
+
