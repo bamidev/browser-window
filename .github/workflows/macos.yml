@@ -20,9 +20,15 @@ jobs:
       - name: Install dependencies
         run: brew install gtk+3 libsoup
       - uses: actions/checkout@v3
-      - name: Build with webkitgtk
+      - name: Build with CEF (debug)
+        run: |
+          ./get-cef.sh
+        # Still needs to be tested
+        continue-on-error: true
+      - name: Build with Webkitgtk (debug)
         uses: actions-rs/cargo@v1
         with:
           command: build
           args: --features webkitgtk
+        # Doesn't work because javascriptcoregtk is not available with homebrew
         continue-on-error: true

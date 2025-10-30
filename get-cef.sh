@@ -2,26 +2,31 @@
 set -e
 
 # Check processor architecture to download the correction version
-LINUX_ARCH=`uname -m`
-if [ "$LINUX_ARCH" = "x86_64" ]; then
+SYSTEM_ARCH=$(uname -m)
+if [ "$SYSTEM_ARCH" = "x86_64" ]; then
 	CEF_ARCH="64"
-elif [ "$LINUX_ARCH" = "arm" ]; then
+elif [ "$SYSTEM_ARCH" = "arm" ]; then
 	CEF_ARCH="arm"
-elif [ "$LINUX_ARCH" = "aarch64" ]; then
+elif [ "$SYSTEM_ARCH" = "aarch64" ]; then
 	CEF_ARCH="arm64"
-elif [ "$LINUX_ARCH" = "aarch64_be" ]; then
+elif [ "$SYSTEM_ARCH" = "aarch64_be" ]; then
 	CEF_ARCH="arm64"
-elif [ "$LINUX_ARCH" = "armv8b" ]; then
+elif [ "$SYSTEM_ARCH" = "armv8b" ]; then
 	CEF_ARCH="arm64"
-elif [ "$LINUX_ARCH" = "armv8l" ]; then
+elif [ "$SYSTEM_ARCH" = "armv8l" ]; then
 	CEF_ARCH="arm64"
 else
-	echo "Your system has a processor architecture that is unsupported by CEF: \"$LINUX_ARCH\""
+	echo "Your system has a processor architecture that is unsupported by CEF: \"$SYSTEM_ARCH\""
 	exit 1
 fi
 
+CEF_PLATFORM="linux${CEF_ARCH}"
+if [[ "$OSTYPE" == "darwin"* ]]; then
+	CEF_PLATFORM="macos${CEF_ARCH}"
+fi
+
 # Download CEF archive
-CEF_ARCHIVE="cef_binary_141.0.11+g7e73ac4+chromium-141.0.7390.123_linux${CEF_ARCH}_minimal"
+CEF_ARCHIVE="cef_binary_141.0.11+g7e73ac4+chromium-141.0.7390.123_${CEF_PLATFORM}_minimal"
 if [ ! -f /tmp/cef.tar.bz2 ]; then
 	curl -o /tmp/cef.tar.bz2.part "https://cef-builds.spotifycdn.com/$CEF_ARCHIVE.tar.bz2"
 	mv /tmp/cef.tar.bz2.part /tmp/cef.tar.bz2
