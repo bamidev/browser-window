@@ -148,9 +148,9 @@ fn main() {
 		build.flag("/MT");
 	}
 
-	/**************************************
-	 *	C header files for bindgen
-	 ************************ */
+	/******************************
+	 * C header files for bindgen *
+	 ****************************** */
 	let mut bgbuilder = bindgen::Builder::default()
 		.parse_callbacks(Box::new(BwBindgenCallbacks {}))
 		.clang_arg("-DBW_BINDGEN")
@@ -189,8 +189,8 @@ fn main() {
 		}
 	}*/
 
-	/*******************************************
-	 *	The Browser Engine (CEF3) source files *
+	/******************************************
+	 * The Browser Engine (CEF3) source files *
 	 ****************************************** */
 	if cfg!(feature = "cef") {
 		bgbuilder = bgbuilder.clang_arg("-DBW_CEF").clang_arg("-DBW_CEF_WINDOW");
@@ -219,73 +219,77 @@ fn main() {
 				build_se.include(&cef_path);
 
 				// Link with CEF
-                println!("cargo:rustc-link-search={}/libcef_dll_wrapper", &cef_path);
-                if target.contains("apple-darwin") {
-                    println!("cargo:rustc-link-search=framework={}/Release", &cef_path);
-                    println!("cargo:rustc-link-lib=framework=Chromium Embedded Framework");
-                    build_se_lib_args.push(format!("-F{}/Release", &cef_path).into());
-                    //build_se_lib_args.push("-framework".into());
-                    //build_se_lib_args.push("Chromium Embedded Framework".into());
-                    build_se_lib_args.push(format!("-L{}/libcef_dll_wrapper", &cef_path).into());
-                } else {
-                    println!("cargo:rustc-link-search={}/Release", &cef_path);
-                    if target.contains("msvc") {
-                        build_se.flag("/MT");
+				println!("cargo:rustc-link-search={}/libcef_dll_wrapper", &cef_path);
+				if target.contains("apple-darwin") {
+					println!("cargo:rustc-link-search=framework={}/Release", &cef_path);
+					println!("cargo:rustc-link-lib=framework=Chromium Embedded Framework");
+					build_se_lib_args.push(format!("-F{}/Release", &cef_path).into());
+					build_se_lib_args.push("-framework".into());
+					build_se_lib_args.push("Chromium Embedded Framework".into());
+					build_se_lib_args.push(format!("-L{}/libcef_dll_wrapper", &cef_path).into());
+				} else {
+					println!("cargo:rustc-link-search={}/Release", &cef_path);
+					if target.contains("msvc") {
+						build_se.flag("/MT");
 
-                        println!("cargo:rustc-link-search={}", &cef_path);
-                        println!(
-                            "cargo:rustc-link-search={}/libcef_dll_wrapper/Release",
-                            &cef_path
-                        );
-                        println!("cargo:rustc-link-lib=static=libcef_dll_wrapper");
-                        println!("cargo:rustc-link-lib=static=libcef");
-                        println!("cargo:rustc-link-lib=dylib=libcef");
+						println!("cargo:rustc-link-search={}", &cef_path);
+						println!(
+							"cargo:rustc-link-search={}/libcef_dll_wrapper/Release",
+							&cef_path
+						);
+						println!("cargo:rustc-link-lib=static=libcef_dll_wrapper");
+						println!("cargo:rustc-link-lib=static=libcef");
+						println!("cargo:rustc-link-lib=dylib=libcef");
 
-                        build_se_lib_args.push(format!("/LIBPATH:{}", &cef_path).into());
-                        build_se_lib_args
-                            .push(format!("/LIBPATH:{}/libcef_dll_wrapper", &cef_path).into());
-                        build_se_lib_args
-                            .push(format!("/LIBPATH:{}/libcef_dll_wrapper/Release", &cef_path).into());
-                        build_se_lib_args.push(format!("/LIBPATH:{}/Release", &cef_path).into());
-                    } else {
-                        println!("cargo:rustc-link-lib=static=cef_dll_wrapper");
-                        println!("cargo:rustc-link-lib=static=cef");
-                        println!("cargo:rustc-link-lib=dylib=cef");
+						build_se_lib_args.push(format!("/LIBPATH:{}", &cef_path).into());
+						build_se_lib_args
+							.push(format!("/LIBPATH:{}/libcef_dll_wrapper", &cef_path).into());
+						build_se_lib_args.push(
+							format!("/LIBPATH:{}/libcef_dll_wrapper/Release", &cef_path).into(),
+						);
+						build_se_lib_args.push(format!("/LIBPATH:{}/Release", &cef_path).into());
+					} else {
+						println!("cargo:rustc-link-lib=static=cef_dll_wrapper");
+						println!("cargo:rustc-link-lib=static=cef");
+						println!("cargo:rustc-link-lib=dylib=cef");
 
-                        build_se_lib_args.push(format!("-L{}/libcef_dll_wrapper", &cef_path).into());
-                        build_se_lib_args.push(format!("-L{}/Release", &cef_path).into());
+						build_se_lib_args
+							.push(format!("-L{}/libcef_dll_wrapper", &cef_path).into());
+						build_se_lib_args.push(format!("-L{}/Release", &cef_path).into());
 
-                        let pkg_deps = &[
-                            "alsa",
-                            "cups",
-                            "dbus-1",
-                            "expat",
-                            "gtk+-3.0",
-                            "libdrm",
-                            "nss",
-                            "gbm",
-                            "x11",
-                            "x11-xcb",
-                            "xcomposite",
-                            "xdamage",
-                            "xext",
-                            "xfixes",
-                            "xkbcommon",
-                            "xrandr",
-                        ];
-                        for pkg_name in pkg_deps {
-                            let result = pkg_config::Config::new().probe(pkg_name).expect(&format!("Unable to find {}", pkg_name));
+						let pkg_deps = &[
+							"alsa",
+							"cups",
+							"dbus-1",
+							"expat",
+							"gtk+-3.0",
+							"libdrm",
+							"nss",
+							"gbm",
+							"x11",
+							"x11-xcb",
+							"xcomposite",
+							"xdamage",
+							"xext",
+							"xfixes",
+							"xkbcommon",
+							"xrandr",
+						];
+						for pkg_name in pkg_deps {
+							let result = pkg_config::Config::new()
+								.probe(pkg_name)
+								.expect(&format!("Unable to find {}", pkg_name));
 
-                            if *pkg_name == "x11" {
-                                // When X11 is used, browser-window-c uses a bit of x11 code as well
-                                for inc in &result.include_paths {
-                                  build.include(inc);
-                                  build_se.include(inc);
-                                }
-                            }
-                        }
-                    }
-                }
+							if *pkg_name == "x11" {
+								// When X11 is used, browser-window-c uses a bit of x11 code as well
+								for inc in &result.include_paths {
+									build.include(inc);
+									build_se.include(inc);
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 
@@ -329,26 +333,27 @@ fn main() {
 			&se_file,
 		);
 
-		let status = se_cmd
-			.status()
-			.expect("unable to get status of seperate executable compiler");
-		assert!(
-			status.code().unwrap() == 0,
-			"Seperate executable compiler failed with error code {}.",
-			status.code().unwrap()
-		);
-
-		if !target.contains("windows") {
-			fs::copy(se_file, target_dir.join("browser-window-se"))
-				.expect("unable to copy seperate executable");
-		} else {
-			fs::copy(se_file, target_dir.join("browser-window-se.exe"))
-				.expect("unable to copy seperate executable");
+		if !target.contains("apple-darwin") {
+			let status = se_cmd
+				.status()
+				.expect("unable to get status of seperate executable compiler");
+			assert!(
+				status.code().unwrap() == 0,
+				"Seperate executable compiler failed with error code {}.",
+				status.code().unwrap()
+			);
+			if !target.contains("windows") {
+				fs::copy(se_file, target_dir.join("browser-window-se"))
+					.expect("unable to copy seperate executable");
+			} else {
+				fs::copy(se_file, target_dir.join("browser-window-se.exe"))
+					.expect("unable to copy seperate executable");
+			}
 		}
 	}
 	/****************************************
-	 * Microsoft Edge WebView2 source files
-	 ************************************** */
+	 * Microsoft Edge WebView2 source files *
+	 **************************************** */
 	else if cfg!(feature = "edge2") {
 		bgbuilder = bgbuilder.clang_arg("-DBW_WIN32").clang_arg("-DBW_EDGE2");
 
@@ -385,14 +390,13 @@ fn main() {
 			.file("src/window/win32.c")
 			.file("src/cookie/unsupported.c")
 			.file("src/win32.c");
-	}
-	else {
+	} else {
 		build.file("src/application/other.c");
 	}
 
-	/**************************************
-	 *	All other source files
-	 ************************ */
+	/**************************
+	 * All other source files *
+	 ************************** */
 	build
 		.file("src/application/common.c")
 		.file("src/browser_window/common.c")
