@@ -10,6 +10,8 @@ use std::{
 	process::Command,
 };
 
+use bindgen::callbacks::{ItemInfo, ParseCallbacks};
+
 #[derive(Debug)]
 struct BwBindgenCallbacks {}
 
@@ -420,6 +422,8 @@ fn main() {
 	}
 }
 
-impl bindgen::callbacks::ParseCallbacks for BwBindgenCallbacks {
-	fn item_name(&self, item_name: &str) -> Option<String> { Some("c".to_owned() + item_name) }
+impl ParseCallbacks for BwBindgenCallbacks {
+	fn item_name(&self, item_name: ItemInfo<'_>) -> Option<String> {
+		Some("c".to_owned() + item_name.name)
+	}
 }
