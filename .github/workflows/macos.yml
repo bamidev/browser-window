@@ -21,8 +21,6 @@ jobs:
       - name: Setup CEF
         run: |
           ./get-cef.sh
-          find . -name "cef*"
-          find . -name "libcef*"
       - name: Run tests with CEF (broken)
         run: CEF_PATH="${GITHUB_WORKSPACE}/cef/$(ls cef)" RUST_BACKTRACE=full RUST_LOG=debug cargo test --verbose --features cef,no-gui-tests
         # Still needs to be tested
