@@ -18,10 +18,17 @@ jobs:
         with:
           toolchain: stable
       - uses: actions/checkout@v3
-      - name: Setup CEF
+      - name: Set up webkit2gtk
+        run: brew install webkitgtk
+      - name: Run tests with WebkitGTK
+        run: RUST_BACKTRACE=full RUST_LOG=debug cargo test --verbose --features webkitgtk,no-gui-tests
+        continue-on-error: true
+      - name: Set up CEF
         run: |
           ./get-cef.sh
       - name: Run tests with CEF (broken)
-        run: CEF_PATH="${GITHUB_WORKSPACE}/cef/$(ls cef)" RUST_BACKTRACE=full RUST_LOG=debug cargo test --verbose --features cef,no-gui-tests
+        run: |
+          ls $CEF_PATH
+          CEF_PATH="${GITHUB_WORKSPACE}/cef/$(ls cef)" RUST_BACKTRACE=full RUST_LOG=debug cargo test --verbose --features cef,no-gui-tests
         # Still needs to be tested
         continue-on-error: true
