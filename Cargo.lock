@@ -1097,9 +1097,9 @@ checksum = "f63a545481291138910575129486daeaf8ac54aee4387fe7906919f7830c7d9d"
 
 [[package]]
 name = "unsafe-send-sync"
-version = "0.1.0"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e1018b747e426bb8078b687813128515800452e6c42a53c80dd0550f5d8c4483"
+checksum = "b02598b6e30bc55408b6a4ac412aa26336bcfa03ddfec7fc541ce06a62f2e286"
 
 [[package]]
 name = "version-compare"

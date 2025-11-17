@@ -11,16 +11,16 @@ pub struct WindowImpl(pub gtk::Window);
 
 impl WindowImpl {
 	pub fn new(
-		app: ApplicationImpl, parent: Self, title: &str, width: Option<u32>, height: Option<u32>,
-		options: &WindowOptions,
+		app: ApplicationImpl, parent: Option<Self>, title: &str, width: Option<u32>,
+		height: Option<u32>, options: &WindowOptions,
 	) -> Self {
 		let mut builder = gtk::Window::builder()
 			.application(&app.inner)
-			.parent(&parent.0)
-			.destroy_with_parent(true)
-			.decorated(true)
+			.decorated(options.decorated)
 			.title(title);
-
+		if let Some(p) = parent {
+			builder = builder.parent(&p.0).destroy_with_parent(true);
+		}
 		builder = builder
 			.border_width(options.borders as _)
 			.resizable(options.resizable);

@@ -138,10 +138,7 @@ impl BrowserWindowBuilder {
 				window,
 			} => {
 				// Parent
-				let parent_handle = match window.parent {
-					None => WindowImpl::default(),
-					Some(p) => p.i,
-				};
+				let parent_handle = window.parent.map(|u| u.0);
 
 				// Title
 				let title = match window.title.as_ref() {

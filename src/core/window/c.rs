@@ -31,7 +31,8 @@ impl WindowImpl {
 			Some(x) => x as i32,
 		};
 
-		let handle = unsafe { cbw_Window_new(app.inner, parent.inner, str_slice, w, h, options) };
+		let parent_inner = parent.map(|o| o.inner).unwrap_or(ptr::null_mut());
+		let handle = unsafe { cbw_Window_new(app.inner, parent_inner, str_slice, w, h, options) };
 
 		// Return
 		Self { inner: handle }

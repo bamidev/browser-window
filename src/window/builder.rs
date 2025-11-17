@@ -40,12 +40,7 @@ impl WindowBuilder {
 			resizable: self.resizable,
 		};
 
-		// Unwrap the parent ffi handle
-		let parent_impl_handle = match self.parent {
-			None => WindowImpl::default(),
-			Some(parent) => (*parent).clone(),
-		};
-
+		let parent_impl_handle = self.parent.clone().map(|u| u.0);
 		let _impl_handle = WindowImpl::new(
 			app.inner,
 			parent_impl_handle,
