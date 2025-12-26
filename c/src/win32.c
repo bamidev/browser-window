@@ -9,7 +9,6 @@
 #include <windows.h>
 
 #pragma comment(lib, "User32.lib")
-#pragma comment(lib, "OleAut32.lib")
 
 #ifndef WC_ERR_INVALID_CHARS
 #define WC_ERR_INVALID_CHARS 0x80
