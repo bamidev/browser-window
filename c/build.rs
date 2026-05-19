@@ -149,7 +149,6 @@ fn main() {
 	 ************************ */
 	let mut bgbuilder = bindgen::Builder::default()
 		.parse_callbacks(Box::new(BwBindgenCallbacks {}))
-		.clang_arg("-DBW_BINDGEN")
 		.header("src/application.h")
 		.header("src/browser_window.h")
 		.header("src/cookie.h")
@@ -405,5 +404,7 @@ fn main() {
 }
 
 impl bindgen::callbacks::ParseCallbacks for BwBindgenCallbacks {
-	fn item_name(&self, item_name: &str) -> Option<String> { Some("c".to_owned() + item_name) }
+	fn item_name(&self, item_info: bindgen::callbacks::ItemInfo<'_>) -> Option<String> {
+		Some("c".to_owned() + item_info.name)
+	}
 }
